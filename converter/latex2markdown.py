@@ -120,7 +120,7 @@ class LaTeX2Markdown(object):
                                     flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
-        self._trinket_re = re.compile(r"""\\begin{trinket}{(?P<block_name>.*?)}
+        self._trinket_re = re.compile(r"""\\begin{trinket}[\[\]0-9]*{(?P<block_name>.*?)}
                                     (?P<block_contents>.*?) # Non-greedy list contents
                                     \\end{trinket}""", # closing list
                                    flags=re.DOTALL + re.VERBOSE)
@@ -192,7 +192,6 @@ class LaTeX2Markdown(object):
             header=header,
             block_contents=formatted_contents)
         return output_str
-
 
     def _format_block_contents(self, block_name, block_contents):
         """Format the contents of a block with configuration parameters
@@ -306,6 +305,7 @@ class LaTeX2Markdown(object):
         output = self._stdout_re.sub(r"```code\1```", output)
 
         output = re.sub(r"\\java{(.*?)}", r"`\1`", output)
+        output = re.sub(r"\\verb\"(.*?)\"", r"`\1`", output)
 
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 
