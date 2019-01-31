@@ -34,16 +34,12 @@ def apply_codio_transformation(lines):
 
 def cleanup_latex(lines):
     updated = []
+    starts = (
+        '%', '\\index{', '\\label{', '\\markboth{', '\\addcontentsline{',
+        '\\begin{center}', '\\vspace', '\\end{center}', '\\newpage', '\\noindent'
+    )
     for line in lines:
-        if line.startswith('%'):
-            continue
-        elif line.startswith('\\index{'):
-            continue
-        elif line.startswith('\\label{'):
-            continue
-        elif line.startswith('\\markboth{'):
-            continue
-        elif line.startswith('\\addcontentsline{'):
+        if line.startswith(starts):
             continue
         updated.append(line)
     return updated
@@ -95,7 +91,7 @@ def convert(config, base_path):
             chapter = item.section_name
         else:
             slug_name = slugify(item.section_name, chapter=chapter)
-        print("slug_name", slug_name)
+
         book_item = {
             "id": slug_name,
             "title": item.section_name,

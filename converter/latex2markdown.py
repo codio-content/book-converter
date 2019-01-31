@@ -1,7 +1,6 @@
 import re
 from collections import defaultdict
 
-
 # Basic configuration - modify this to change output formatting
 _block_configuration = {
     "chapter": {
@@ -81,6 +80,12 @@ _block_configuration = {
         "markdown_heading": "",
         "pretty_name": "",
         "show_count": False
+    },
+    "quotation": {
+        "line_indent_char": "> ",
+        "markdown_heading": "",
+        "pretty_name": "",
+        "show_count": False
     }
 }
 
@@ -90,7 +95,8 @@ class LaTeX2Markdown(object):
     reading this string from an existing .tex file.
     To modify the outputted markdown, modify the _block_configuration variable
     before initializing the LaTeX2Markdown instance."""
-    def __init__(self,  latex_string,
+
+    def __init__(self, latex_string,
                  block_configuration=_block_configuration,
                  block_counter=defaultdict(lambda: 1)):
 
@@ -107,36 +113,41 @@ class LaTeX2Markdown(object):
                                    flags=re.DOTALL + re.VERBOSE)
 
         # Select all our block materials.
-        self._block_re = re.compile(r"""\\begin{(?P<block_name>exer|proof|thm|lem|prop|quote)} # block name
+        self._block_re = re.compile(r"""\\begin{(?P<block_name>exer|proof|thm|lem|prop|quote|quotation)} # block name
                                     (\[(?P<block_title>.*?)\])? # Optional block title
                                     (?P<block_contents>.*?) # Non-greedy block contents
-                                    \\end{(?P=block_name)}""", # closing block
+                                    \\end{(?P=block_name)}""",  # closing block
                                     flags=re.DOTALL + re.VERBOSE)
 
         # Select all our list blocks
         self._lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize|description)} # list name
                                     (\[.*?\])? # Optional enumerate settings i.e. (a)
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{(?P=block_name)}""", # closing list
+                                    \\end{(?P=block_name)}""",  # closing list
                                     flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
         self._code_re = re.compile(r"""\\begin{code}
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{code}""", # closing list
-                                    flags=re.DOTALL + re.VERBOSE)
+                                    \\end{code}""",  # closing list
+                                   flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
         self._trinket_re = re.compile(r"""\\begin{trinket}[\[\]0-9]*{(?P<block_name>.*?)}
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{trinket}""", # closing list
-                                   flags=re.DOTALL + re.VERBOSE)
+                                    \\end{trinket}""",  # closing list
+                                      flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
         self._stdout_re = re.compile(r"""\\begin{stdout}
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{stdout}""", # closing list
-                                   flags=re.DOTALL + re.VERBOSE)
+                                    \\end{stdout}""",  # closing list
+                                     flags=re.DOTALL + re.VERBOSE)
+
+        self._exercise_re = re.compile(r"""\\begin{exercise}(.*?)\n
+                                    (.*?)
+                                    \\end{exercise}""",
+                                       flags=re.DOTALL + re.VERBOSE)
 
         # Select all our headers
         self._header_re = re.compile(r"""\\(?P<header_name>chapter|section|subsection) # Header
@@ -148,8 +159,13 @@ class LaTeX2Markdown(object):
         # in Markdown
         self._aux_block_re = re.compile(r"""\\begin{(?P<block_name>lstlisting)} # block name
                                     (?P<block_contents>.*?) # Non-greedy block contents
-                                    \\end{(?P=block_name)}""", # closing block
+                                    \\end{(?P=block_name)}""",  # closing block
                                         flags=re.DOTALL + re.VERBOSE)
+
+        self._table_re = re.compile(r"""\\begin{(?P<block_name>table|tabular)} # block name
+                                    (?P<block_contents>.*?) # Non-greedy block contents
+                                    \\end{(?P=block_name)}""",  # closing block
+                                    flags=re.DOTALL + re.VERBOSE)
 
     def _replace_header(self, matchobj):
         """Creates a header string for a section/subsection/chapter match.
@@ -265,6 +281,50 @@ class LaTeX2Markdown(object):
 
         return output_str.lstrip().rstrip()
 
+    def _format_table(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_name = matchobj.group('block_name')
+
+        out_str = ""
+        caption = ""
+        table = []
+
+        for line in block_contents.lstrip().rstrip().split("\n"):
+            line = line.rstrip("\\")
+            if line == "\\hline":
+                out_str += "\n"
+                continue
+            elif line.startswith("\\end") or line.startswith("\\begin") or line.startswith("[!ht]") or '&' not in line:
+                continue
+            elif line.startswith("\\caption"):
+                caption = line[9:-1]
+                continue
+            out_str += line
+            table.append(line.split(' & '))
+
+        heading = True
+        out = ""
+
+        if caption:
+            out += "**Table: " + caption + "**\n"
+
+        for row in table:
+            pos = 0
+            for col in row:
+                out += "|" + col.replace('|', '&#124;')
+                print('col', col, col.replace('|', '&#124;'))
+            if heading:
+                out += '|\n'
+                for _ in row:
+                    out += "|-"
+                    pos += 1
+            heading = False
+            out += '|\n'
+
+        print("out", out)
+
+        return out
+
     def _latex_to_markdown(self):
         """Main function, returns the formatted Markdown as a string.
         Uses a lot of custom regexes to fix a lot of content - you may have
@@ -281,6 +341,7 @@ class LaTeX2Markdown(object):
         output = self._block_re.sub(self._replace_block, output)
         output = self._header_re.sub(self._replace_header, output)
         output = self._aux_block_re.sub(self._replace_block, output)
+        output = self._table_re.sub(self._format_table, output)
 
         # Fix \\ formatting for line breaks in align blocks
         output = re.sub(r" \\\\", r" \\\\\\\\", output)
@@ -312,9 +373,6 @@ class LaTeX2Markdown(object):
         # Fix ``
         output = re.sub("''", "”", output)
 
-        # italic. move up???
-        output = re.sub(r"\$(.*?)\$", r"*\1*", output)
-
         # exercises refs?
         output = re.sub(r"~\\ref{(.*?)}", r" **\1**", output)
 
@@ -322,8 +380,12 @@ class LaTeX2Markdown(object):
         output = self._trinket_re.sub(r"```code\2```", output)
         output = self._stdout_re.sub(r"```code\1```", output)
 
+        # todo: refs?
+        output = self._exercise_re.sub(r"Exercise X.X:\n\2", output)
+
         output = re.sub(r"\\java{(.*?)}", r"`\1`", output)
         output = re.sub(r"\\verb\"(.*?)\"", r"`\1`", output)
+        output = re.sub(r"\\verb'(.*?)'", r"`\1`", output)
 
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 
@@ -331,7 +393,9 @@ class LaTeX2Markdown(object):
 
         output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 
-        output = re.sub("\\\\", "\n", output)
+        output = re.sub(r"[\\]+$", "", output)
+
+        output = re.sub("^%(.*?)$", "", output)
 
         return output.lstrip().rstrip()
 
