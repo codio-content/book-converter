@@ -16,8 +16,8 @@ def get_guide_content_path(file_path):
     return file_path[pos:]
 
 
-def convert(config):
-    base_dir = Path(config['workspace']['directory'])
+def convert(config, base_path):
+    base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
     if generate_dir.exists():
         name = input("destination directory exists, continue? Y/n: ")
@@ -29,7 +29,7 @@ def convert(config):
     guides_dir.mkdir()
     content_dir = guides_dir.joinpath("content")
     content_dir.mkdir()
-    toc = get_toc(base_dir, Path(config['workspace']['tex']))
+    toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
 
     chapter = None
 

@@ -12,6 +12,6 @@ if __name__ == '__main__':
     if args.generate:
         generate_toc(args.paths[0], args.generate)
     else:
-        # todo: multi
-        config = load_config_file(args.paths[0])
-        convert(config)
+        for path in args.paths:
+            config, base_path = load_config_file(path)
+            convert(config, base_path)
