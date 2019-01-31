@@ -279,7 +279,6 @@ class LaTeX2Markdown(object):
         output = re.sub(r"{\\it (.*?)}", r"*\1*", output)
         output = re.sub(r"{\\bf (.*?)}", r"**\1**", output)
         output = re.sub(r"{\\sf (.*?)}", r"**\1**", output)
-        output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 
         # Fix \% formatting
         output = re.sub(r"\\%", r"%", output)
@@ -307,6 +306,12 @@ class LaTeX2Markdown(object):
         output = self._stdout_re.sub(r"```code\1```", output)
 
         output = re.sub(r"\\java{(.*?)}", r"`\1`", output)
+
+        output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
+
+        output = re.sub(r"\\href{(.*?)}{(\\[a-z]).\s?(.*?)}", r"[\1](\3)", output)
+
+        output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 
         return output.lstrip().rstrip()
 
