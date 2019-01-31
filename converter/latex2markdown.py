@@ -140,7 +140,7 @@ class LaTeX2Markdown(object):
 
         # Select all our headers
         self._header_re = re.compile(r"""\\(?P<header_name>chapter|section|subsection) # Header
-                                    \\*.{(?P<header_contents>.*?)}""",  # Header title
+                                    \**{(?P<header_contents>.*?)}""",  # Header title
                                      flags=re.DOTALL + re.VERBOSE)
 
         # Select all our 'auxillary blocks' - these need special treatment
@@ -228,8 +228,13 @@ class LaTeX2Markdown(object):
 
             markdown_list_line = line.replace(r"\item", list_heading)
             if block_name == "description":
-                markdown_list_line = markdown_list_line.replace("[", "**")
-                markdown_list_line = markdown_list_line.replace("]", "**")
+                if "\\term" in markdown_list_line:
+                    markdown_list_line = markdown_list_line.replace("\\term", list_heading)
+                    markdown_list_line = markdown_list_line.replace("{", "**")
+                    markdown_list_line = markdown_list_line.replace("}", "**")
+                else:
+                    markdown_list_line = markdown_list_line.replace("[", "**")
+                    markdown_list_line = markdown_list_line.replace("]", "**")
             output_str += markdown_list_line + "\n"
             if block_name == "description":
                 output_str += "\n"
