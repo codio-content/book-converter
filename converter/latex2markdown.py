@@ -133,7 +133,7 @@ class LaTeX2Markdown(object):
 
         # Select all our headers
         self._header_re = re.compile(r"""\\(?P<header_name>chapter|section|subsection) # Header
-                                    {(?P<header_contents>.*?)}""",  # Header title
+                                    \\*.{(?P<header_contents>.*?)}""",  # Header title
                                      flags=re.DOTALL + re.VERBOSE)
 
         # Select all our 'auxillary blocks' - these need special treatment

@@ -16,6 +16,39 @@ def get_guide_content_path(file_path):
     return file_path[pos:]
 
 
+def prepare_codio_rules(config):
+    chapter = None
+    rules = {}
+    for section in config["sections"]:
+        if section["type"] == CHAPTER:
+            slug_name = slugify(section["name"])
+        else:
+            slug_name = slugify(section["name"], chapter=chapter)
+        rules[slug_name] = section
+    return rules
+
+
+def apply_codio_transformation(lines):
+    return lines
+
+
+def cleanup_latex(lines):
+    updated = []
+    for line in lines:
+        if line.startswith('%'):
+            continue
+        elif line.startswith('\\index{'):
+            continue
+        elif line.startswith('\\label{'):
+            continue
+        elif line.startswith('\\markboth{'):
+            continue
+        elif line.startswith('\\addcontentsline{'):
+            continue
+        updated.append(line)
+    return updated
+
+
 def convert(config, base_path):
     base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
@@ -78,7 +111,11 @@ def convert(config, base_path):
                 current_chapter["children"].append(book_item)
             else:
                 book["children"].append(book_item)
-        md_converter = LaTeX2Markdown('\n'.join(item.lines))
+
+        lines = apply_codio_transformation(item.lines)
+        lines = cleanup_latex(lines)
+
+        md_converter = LaTeX2Markdown('\n'.join(lines))
         converted_md = md_converter.to_markdown()
         md_path = content_dir.joinpath(slug_name + ".md")
         section = {
