@@ -29,6 +29,13 @@ _block_configuration = {
         "pretty_name": "",
         "show_count": False
     },
+    "description": {
+        "line_indent_char": "",
+        "list_heading": "",
+        "markdown_heading": "",
+        "pretty_name": "",
+        "show_count": False
+    },
     "lem": {
         "line_indent_char": "> ",
         "markdown_heading": "####",
@@ -107,7 +114,7 @@ class LaTeX2Markdown(object):
                                     flags=re.DOTALL + re.VERBOSE)
 
         # Select all our list blocks
-        self._lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize)} # list name
+        self._lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize|description)} # list name
                                     (\[.*?\])? # Optional enumerate settings i.e. (a)
                                     (?P<block_contents>.*?) # Non-greedy list contents
                                     \\end{(?P=block_name)}""", # closing list
@@ -179,7 +186,7 @@ class LaTeX2Markdown(object):
         block_title = matchobj.groupdict().get('block_title')
 
         # We have to format differently for lists
-        if block_name in {"itemize", "enumerate"}:
+        if block_name in {"itemize", "enumerate", "description"}:
             formatted_contents = self._format_list_contents(block_name,
                                                             block_contents)
         else:
@@ -218,8 +225,14 @@ class LaTeX2Markdown(object):
         output_str = ""
         for line in block_contents.lstrip().rstrip().split("\n"):
             line = line.lstrip().rstrip()
+
             markdown_list_line = line.replace(r"\item", list_heading)
+            if block_name == "description":
+                markdown_list_line = markdown_list_line.replace("[", "**")
+                markdown_list_line = markdown_list_line.replace("]", "**")
             output_str += markdown_list_line + "\n"
+            if block_name == "description":
+                output_str += "\n"
         return output_str
 
     def _format_block_name(self, block_name, block_title=None):
@@ -312,6 +325,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"\\href{(.*?)}{(\\[a-z]).\s?(.*?)}", r"[\1](\3)", output)
 
         output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
+
+        output = re.sub("\\\\", "\n", output)
 
         return output.lstrip().rstrip()
 
