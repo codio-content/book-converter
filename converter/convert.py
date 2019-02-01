@@ -1,6 +1,8 @@
+import logging
 import shutil
 import json
 import uuid
+
 from pathlib import Path
 
 from converter.toc import get_toc
@@ -48,8 +50,9 @@ def cleanup_latex(lines):
 
 
 def make_relative(i, item):
-    i["position"] = int(i.get("position")) - item.line_pos
-    return i
+    copied = i.copy()
+    copied["position"] = int(copied.get("position")) - item.line_pos
+    return copied
 
 
 def modify_rules_position(rules, start_position, delta):
@@ -66,13 +69,13 @@ def apply_codio_rules_to_item(item, rules):
 
     tokens = {}
 
+    pos = 0
     for rule in sorted_rules:
         position = rule.get('position')
+        pos += 1
         if position < 0 or position > len(item.lines) + 1:
-            print("wrong rule position, it will be ignored", rule)
+            logging.info("wrong rule position, it will be ignored %s", rules[pos - 1])
             continue
-        print("-" * 20)
-        print("item", item.lines)
         if 'add' in rule:
             text = rule.get('add')
             token = str(uuid.uuid4())
@@ -129,8 +132,6 @@ def convert(config, base_path):
     toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
 
     toc, tokens = codio_transformations(toc, config)
-
-    print('tokens', tokens)
 
     chapter = None
 
