@@ -9,6 +9,7 @@ from converter.toc import get_toc
 from converter.guides.tools import slugify, write_file
 from converter.guides.item import CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
+from converter.assets import copy_assets
 
 
 def get_guide_content_path(file_path):
@@ -210,3 +211,5 @@ def convert(config, base_path):
     book_path = guides_dir.joinpath("book.json")
     write_file(metadata_path, json.dumps(metadata, sort_keys=True, indent=2, separators=(',', ': ')))
     write_file(book_path, json.dumps(book, sort_keys=True, indent=2, separators=(',', ': ')))
+
+    copy_assets(config, generate_dir)
