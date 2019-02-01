@@ -156,6 +156,9 @@ def convert(config, base_path):
         "protectLayout": False
     }
 
+    predefined_metadata = config.get('metadata', {})
+    metadata = {**metadata, **predefined_metadata}
+
     current_chapter = None
 
     for item in toc:

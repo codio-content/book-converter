@@ -1,4 +1,6 @@
 import yaml
+import logging
+
 from pathlib import Path
 
 
@@ -15,5 +17,5 @@ def load_config_file(base_path):
         try:
             return yaml.load(stream), file_path.parent
         except yaml.YAMLError as exc:
-            print("load config file exception", exc)
+            logging.error("load config file exception", exc)
             raise BaseException("load config file exception")
