@@ -312,7 +312,6 @@ class LaTeX2Markdown(object):
             pos = 0
             for col in row:
                 out += "|" + col.replace('|', '&#124;')
-                print('col', col, col.replace('|', '&#124;'))
             if heading:
                 out += '|\n'
                 for _ in row:
@@ -320,8 +319,6 @@ class LaTeX2Markdown(object):
                     pos += 1
             heading = False
             out += '|\n'
-
-        print("out", out)
 
         return out
 

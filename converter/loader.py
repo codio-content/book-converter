@@ -16,3 +16,4 @@ def load_config_file(base_path):
             return yaml.load(stream), file_path.parent
         except yaml.YAMLError as exc:
             print("load config file exception", exc)
+            raise BaseException("load config file exception")

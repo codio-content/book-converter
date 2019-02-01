@@ -1,5 +1,6 @@
 import shutil
 import json
+import uuid
 from pathlib import Path
 
 from converter.toc import get_toc
@@ -22,6 +23,7 @@ def prepare_codio_rules(config):
     for section in config["sections"]:
         if section["type"] == CHAPTER:
             slug_name = slugify(section["name"])
+            chapter = section["name"]
         else:
             slug_name = slugify(section["name"], chapter=chapter)
         rules[slug_name] = section
@@ -45,6 +47,72 @@ def cleanup_latex(lines):
     return updated
 
 
+def make_relative(i, item):
+    i["position"] = int(i.get("position")) - item.line_pos
+    return i
+
+
+def modify_rules_position(rules, start_position, delta):
+    for rule in rules:
+        position = rule.get('position')
+        if position < start_position:
+            continue
+        rule['position'] = rule['position'] + delta
+
+
+def apply_codio_rules_to_item(item, rules):
+    relative = map(lambda i: make_relative(i, item), rules)
+    sorted_rules = sorted(relative, key=lambda i: i.get("position"))
+
+    tokens = {}
+
+    for rule in sorted_rules:
+        position = rule.get('position')
+        if position < 0 or position > len(item.lines) + 1:
+            print("wrong rule position, it will be ignored", rule)
+            continue
+        print("-" * 20)
+        print("item", item.lines)
+        if 'add' in rule:
+            text = rule.get('add')
+            token = str(uuid.uuid4())
+            tokens[token] = text
+            item.lines.insert(position, token)
+            modify_rules_position(sorted_rules, position, 1)
+        if 'remove' in rule:
+            count = rule.get('remove', 1)
+            for _ in range(count):
+                item.lines.pop(position)
+            modify_rules_position(sorted_rules, position, 0 - count)
+
+    return tokens
+
+
+def codio_transformations(toc, config):
+    transformation_rules = prepare_codio_rules(config)
+    updated_toc = []
+    chapter = None
+    tokens = {}
+
+    for item in toc:
+        if item.section_type == CHAPTER:
+            slug_name = slugify(item.section_name)
+            chapter = item.section_name
+        else:
+            slug_name = slugify(item.section_name, chapter=chapter)
+
+        if slug_name in transformation_rules:
+            rules = transformation_rules[slug_name].get("transformations")
+            if isinstance(rules, str) and rules == "skip":
+                continue
+            elif isinstance(rules, list) and rules:
+                tokens[slug_name] = apply_codio_rules_to_item(item, rules)
+
+        updated_toc.append(item)
+
+    return updated_toc, tokens
+
+
 def convert(config, base_path):
     base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
@@ -59,6 +127,10 @@ def convert(config, base_path):
     content_dir = guides_dir.joinpath("content")
     content_dir.mkdir()
     toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
+
+    toc, tokens = codio_transformations(toc, config)
+
+    print('tokens', tokens)
 
     chapter = None
 
@@ -86,8 +158,7 @@ def convert(config, base_path):
 
     for item in toc:
         if item.section_type == CHAPTER:
-            chapter = None
-            slug_name = slugify(item.section_name, chapter=chapter)
+            slug_name = slugify(item.section_name)
             chapter = item.section_name
         else:
             slug_name = slugify(item.section_name, chapter=chapter)
@@ -113,6 +184,11 @@ def convert(config, base_path):
 
         md_converter = LaTeX2Markdown('\n'.join(lines))
         converted_md = md_converter.to_markdown()
+
+        if slug_name in tokens:
+            for key, value in tokens.get(slug_name).items():
+                converted_md = converted_md.replace(key, value)
+
         md_path = content_dir.joinpath(slug_name + ".md")
         section = {
             "id": slug_name,
