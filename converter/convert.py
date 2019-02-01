@@ -161,6 +161,8 @@ def convert(config, base_path):
 
     current_chapter = None
 
+    transformation_rules = prepare_codio_rules(config)
+
     for item in toc:
         if item.section_type == CHAPTER:
             slug_name = slugify(item.section_name)
@@ -202,11 +204,15 @@ def convert(config, base_path):
             "path": [],
             "type": "markdown",
             "content-file": get_guide_content_path(md_path),
-            "chapter": False,
+            "chapter": True if item.section_type == CHAPTER else False,
             "reset": [],
             "teacherOnly": False,
             "learningObjectives": ""
         }
+        if slug_name in transformation_rules:
+            configuration = transformation_rules[slug_name].get('configuration', {})
+            if configuration:
+                section = {**section, **configuration}
         metadata["sections"].append(section)
         write_file(md_path, converted_md)
 
