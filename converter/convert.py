@@ -161,16 +161,17 @@ def make_refs(toc):
     return refs
 
 
-def convert(config, base_path):
+def convert(config, base_path, yes=False):
     base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
     if generate_dir.exists():
-        name = input("destination directory exists, continue? Y/n: ")
-        if name.lower().strip() == 'n':
-            return
+        if not yes:
+            name = input("destination directory exists, continue? Y/n: ")
+            if name.lower().strip() == 'n':
+                return
         shutil.rmtree(generate_dir, ignore_errors=True)
 
-    logging.debug("start converting")
+    logging.debug("start converting %s" % generate_dir)
 
     generate_dir.mkdir()
     guides_dir = generate_dir.joinpath(".guides")

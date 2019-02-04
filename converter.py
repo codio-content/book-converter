@@ -10,6 +10,7 @@ if __name__ == '__main__':
     parser.add_argument('paths', metavar='PATH', type=str, nargs='+', help='path to a book config')
     parser.add_argument('--generate', type=str, help='path to a latex book')
     parser.add_argument('-l', '--log', action='store', default=None)
+    parser.add_argument('-y', '--yes', action='store_true')
 
     args = parser.parse_args()
 
@@ -22,4 +23,4 @@ if __name__ == '__main__':
     else:
         for path in args.paths:
             config, base_path = load_config_file(path)
-            convert(config, base_path)
+            convert(config, base_path, args.yes)
