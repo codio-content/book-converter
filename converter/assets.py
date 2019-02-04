@@ -18,7 +18,7 @@ def copy_globing(asset, base_src_dir, generate_dir):
     src = base_src_dir.joinpath(key)
     dst = generate_dir.joinpath(key)
 
-    dst.mkdir()
+    dst.mkdir(exist_ok=True, parents=True)
 
     for file in glob.glob(str(src.joinpath(value))):
         shutil.copy(file, dst.joinpath(Path(file).name))
