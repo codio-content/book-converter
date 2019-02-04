@@ -338,7 +338,7 @@ class LaTeX2Markdown(object):
         block_contents = matchobj.group('block_contents')
 
         self._exercise_counter += 1
-        prefix = "Exercise {}.{}:\n".format(self._chapter_num, self._exercise_counter)
+        prefix = "**Exercise {}.{}:**\n".format(self._chapter_num, self._exercise_counter)
 
         return prefix + block_contents
 
