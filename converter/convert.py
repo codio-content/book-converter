@@ -8,7 +8,7 @@ from converter.toc import get_toc
 from converter.guides.tools import slugify, write_file, write_json
 from converter.guides.item import CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
-from converter.assets import copy_assets
+from converter.assets import copy_assets, convert_assets
 
 
 def get_guide_content_path(file_path):
@@ -211,6 +211,8 @@ def convert(config, base_path):
 
     chapter_num = 0
 
+    pdfs_for_convert = []
+
     for item in toc:
         if item.section_type == CHAPTER:
             chapter_num += 1
@@ -264,9 +266,13 @@ def convert(config, base_path):
         metadata["sections"].append(section)
         write_file(md_path, converted_md)
 
+        if md_converter.get_pdfs_for_convert():
+            pdfs_for_convert += md_converter.get_pdfs_for_convert()
+
     metadata_path = guides_dir.joinpath("metadata.json")
     book_path = guides_dir.joinpath("book.json")
     write_json(metadata_path, metadata)
     write_json(book_path, book)
 
     copy_assets(config, generate_dir)
+    convert_assets(config, generate_dir, pdfs_for_convert)

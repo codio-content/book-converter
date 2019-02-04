@@ -110,6 +110,7 @@ class LaTeX2Markdown(object):
         self._block_configuration = block_configuration
         self._latex_string = latex_string
         self._block_counter = block_counter
+        self._pdfs = []
 
         # Precompile the regexes
 
@@ -321,6 +322,9 @@ class LaTeX2Markdown(object):
         markdown_images = []
 
         for image in images:
+            if image.lower().endswith('.pdf'):
+                self._pdfs.append(image)
+                image = image.replace('.pdf', '.jpg')
             markdown_images.append(
                 "![{}]({})".format(caption, image)
             )
@@ -460,3 +464,6 @@ class LaTeX2Markdown(object):
 
     def to_latex(self):
         return self._latex_string
+
+    def get_pdfs_for_convert(self):
+        return self._pdfs
