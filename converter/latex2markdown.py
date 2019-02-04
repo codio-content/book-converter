@@ -143,7 +143,7 @@ class LaTeX2Markdown(object):
 
         self._small_re = re.compile(r"""\\begin{small}
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{code}""",  # closing list
+                                    \\end{small}""",  # closing list
                                    flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
@@ -441,7 +441,7 @@ class LaTeX2Markdown(object):
         output = self._code_re.sub(r"```code\1```", output)
         output = self._trinket_re.sub(r"```code\2```", output)
         output = self._stdout_re.sub(r"```code\1```", output)
-        output = self._small_re.sub(r"```code\1```", output)
+        output = self._small_re.sub(r"\1", output)
 
         output = self._exercise_re.sub(self._exercise_block, output)
         output = self._figure_re.sub(self._figure_block, output)
