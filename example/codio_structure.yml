@@ -1,0 +1,424 @@
+workspace:
+  directory: ThinkJava2
+  tex: thinkjava.tex
+metadata:
+  hideMenu: false
+  protectLayout: false
+assets:
+  - code
+  - figs: "*.png"
+  - figs: "*.jpg"
+  - trinket
+sections:
+  - name: Preface
+    type: chapter
+    configuration:
+      layout: 2-panels
+      files:
+        - path: "code/ch03/GuessSoln.java"
+          panel: 0
+          action: open
+  - name: The philosophy behind the book
+    type: section
+  - name: Object-oriented programming
+    type: section
+  - name: Changes to the 2nd edition
+    type: section
+  - name: About the appendixes
+    type: section
+  - name: Using the code examples
+    type: section
+  - name: Contributors over the years
+    type: section
+  - name: Computer programming
+    type: chapter
+  - name: What is a computer?
+    type: section
+  - name: What is programming?
+    type: section
+  - name: The hello world program
+    type: section
+  - name: Compiling Java programs
+    type: section
+  - name: Displaying two messages
+    type: section
+  - name: Formatting source code
+    type: section
+  - name: Escape sequences
+    type: section
+  - name: What is computer science?
+    type: section
+  - name: Debugging programs
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Variables and operators
+    type: chapter
+  - name: Declaring variables
+    type: section
+  - name: Assigning variables
+    type: section
+  - name: Memory diagrams
+    type: section
+  - name: Printing variables
+    type: section
+  - name: Arithmetic operators
+    type: section
+  - name: Floating-point numbers
+    type: section
+  - name: Rounding errors
+    type: section
+  - name: Operators for strings
+    type: section
+  - name: Compiler error messages
+    type: section
+  - name: Other types of errors
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Input and output
+    type: chapter
+  - name: The System class
+    type: section
+  - name: The Scanner class
+    type: section
+  - name: Language elements
+    type: section
+  - name: Literals and constants
+    type: section
+  - name: Formatting output
+    type: section
+  - name: Type cast operators
+    type: section
+  - name: Remainder operator
+    type: section
+  - name: Putting it all together
+    type: section
+  - name: The Scanner bug
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Methods and testing
+    type: chapter
+  - name: Math methods
+    type: section
+  - name: Composition
+    type: section
+  - name: Defining new methods
+    type: section
+  - name: Flow of execution
+    type: section
+  - name: Parameters and arguments
+    type: section
+  - name: Multiple parameters
+    type: section
+  - name: Stack diagrams
+    type: section
+  - name: Return values
+    type: section
+  - name: Incremental development
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Conditionals and logic
+    type: chapter
+  - name: Relational operators
+    type: section
+  - name: The if-else statement
+    type: section
+  - name: Chaining and nesting
+    type: section
+  - name: Logical operators
+    type: section
+  - name: De Morgan's laws
+    type: section
+  - name: Boolean variables
+    type: section
+  - name: Boolean methods
+    type: section
+  - name: Validating input
+    type: section
+  - name: Example program
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Loops and strings
+    type: chapter
+  - name: The while statement
+    type: section
+  - name: Increment and decrement
+    type: section
+  - name: The for statement
+    type: section
+  - name: Nested loops
+    type: section
+  - name: Characters
+    type: section
+  - name: String iteration
+    type: section
+  - name: The indexOf method
+    type: section
+  - name: String comparison
+    type: section
+  - name: Substrings
+    type: section
+  - name: String formatting
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Arrays and references
+    type: chapter
+  - name: Creating arrays
+    type: section
+  - name: Accessing elements
+    type: section
+  - name: Displaying arrays
+    type: section
+  - name: Copying arrays
+    type: section
+  - name: Array traversal
+    type: section
+  - name: Random numbers
+    type: section
+  - name: Building a histogram
+    type: section
+  - name: The enhanced for loop
+    type: section
+  - name: Counting characters
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Recursive methods
+    type: chapter
+  - name: Recursive void methods
+    type: section
+  - name: Recursive stack diagrams
+    type: section
+  - name: Value returning methods
+    type: section
+  - name: The leap of faith
+    type: section
+  - name: Binary number system
+    type: section
+  - name: Recursive binary method
+    type: section
+  - name: CodingBat problems
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Immutable objects
+    type: chapter
+  - name: Primitives vs objects
+    type: section
+  - name: Strings are immutable
+    type: section
+  - name: Wrapper classes
+    type: section
+  - name: Command-line arguments
+    type: section
+  - name: BigInteger arithmetic
+    type: section
+  - name: Program development
+    type: section
+  - name: More generalization
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Mutable objects
+    type: chapter
+  - name: Point objects
+    type: section
+  - name: Objects as parameters
+    type: section
+  - name: Objects as return types
+    type: section
+  - name: Rectangles are mutable
+    type: section
+  - name: Aliasing revisited
+    type: section
+  - name: Java library source
+    type: section
+  - name: Class diagrams
+    type: section
+  - name: Garbage collection
+    type: section
+  - name: Mutable vs immutable
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Designing classes
+    type: chapter
+  - name: The Time class
+    type: section
+  - name: Constructors
+    type: section
+  - name: More constructors
+    type: section
+  - name: Getters and setters
+    type: section
+  - name: Displaying objects
+    type: section
+  - name: The toString method
+    type: section
+  - name: The equals method
+    type: section
+  - name: Adding times
+    type: section
+  - name: Pure methods
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Arrays of objects
+    type: chapter
+  - name: Card objects
+    type: section
+  - name: Card toString
+    type: section
+  - name: Class variables
+    type: section
+  - name: The compareTo method
+    type: section
+  - name: Cards are immutable
+    type: section
+  - name: Arrays of cards
+    type: section
+  - name: Sequential search
+    type: section
+  - name: Binary search
+    type: section
+  - name: Tracing the code
+    type: section
+  - name: Recursive version
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Objects of arrays
+    type: chapter
+  - name: Decks of cards
+    type: section
+  - name: Shuffling decks
+    type: section
+  - name: Selection sort
+    type: section
+  - name: Merge sort
+    type: section
+  - name: Subdecks
+    type: section
+  - name: Merging decks
+    type: section
+  - name: Adding recursion
+    type: section
+  - name: Static context
+    type: section
+  - name: Piles of cards
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Extending classes
+    type: chapter
+  - name: CardCollection
+    type: section
+  - name: Inheritance
+    type: section
+  - name: Dealing cards
+    type: section
+  - name: The Player class
+    type: section
+  - name: The Eights class
+    type: section
+  - name: Class relationships
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Tools
+    type: chapter
+  - name: Installing DrJava
+    type: section
+  - name: DrJava interactions
+    type: section
+  - name: Command-line interface
+    type: section
+  - name: Command-line testing
+    type: section
+  - name: Running Checkstyle
+    type: section
+  - name: Tracing with a debugger
+    type: section
+  - name: Testing with JUnit
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Javadoc
+    type: chapter
+  - name: Reading documentation
+    type: section
+  - name: Writing documentation
+    type: section
+  - name: Javadoc tags
+    type: section
+  - name: Example source file
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Graphics
+    type: chapter
+  - name: Creating graphics
+    type: section
+  - name: Graphics methods
+    type: section
+  - name: Example drawing
+    type: section
+  - name: Vocabulary
+    type: section
+  - name: Exercises
+    type: section
+  - name: Debugging
+    type: chapter
+  - name: Compile-time errors
+    type: section
+  - name: Run-time errors
+    type: section
+  - name: Logic errors
+    type: section
+  - name: Extras
+    type: chapter
+  - name: Unreachable code
+    type: section
+  - name: Method composition
+    type: section
+  - name: Overloading methods
+    type: section
+  - name: Generating tables
+    type: section
+  - name: The do-while loop
+    type: section
+  - name: Break and continue
+    type: section
