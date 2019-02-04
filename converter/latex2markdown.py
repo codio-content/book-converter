@@ -269,7 +269,7 @@ class LaTeX2Markdown(object):
                     markdown_list_line = markdown_list_line.replace("\\term", list_heading)
                     markdown_list_line = markdown_list_line.replace("{", "**")
                     markdown_list_line = markdown_list_line.replace("}", "**")
-                else:
+                elif "\\item" in markdown_list_line:
                     markdown_list_line = markdown_list_line.replace("[", "**")
                     markdown_list_line = markdown_list_line.replace("]", "**")
             output_str += markdown_list_line + "\n"
