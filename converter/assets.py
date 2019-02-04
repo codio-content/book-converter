@@ -27,6 +27,7 @@ def copy_globing(asset, base_src_dir, generate_dir):
 def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path):
     base_src_dir = Path(config['workspace']['directory'])
     for pdf in pdfs_for_convert:
+        logging.debug("convert %s to jpg" % pdf)
         pdf_file = base_src_dir.joinpath(pdf)
         pages = convert_from_path(pdf_file, 500)
 

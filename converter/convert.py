@@ -169,6 +169,9 @@ def convert(config, base_path):
         if name.lower().strip() == 'n':
             return
         shutil.rmtree(generate_dir, ignore_errors=True)
+
+    logging.debug("start converting")
+
     generate_dir.mkdir()
     guides_dir = generate_dir.joinpath(".guides")
     guides_dir.mkdir()
@@ -210,16 +213,22 @@ def convert(config, base_path):
     transformation_rules = prepare_codio_rules(config)
 
     chapter_num = 0
+    figure_num = 0
 
     pdfs_for_convert = []
+
+    logging.debug("convert selected pages")
 
     for item in toc:
         if item.section_type == CHAPTER:
             chapter_num += 1
+            figure_num = 0
             slug_name = slugify(item.section_name)
             chapter = item.section_name
         else:
             slug_name = slugify(item.section_name, chapter=chapter)
+
+        logging.debug("convert page %s" % slug_name)
 
         book_item = {
             "id": slug_name,
@@ -239,8 +248,11 @@ def convert(config, base_path):
 
         lines = cleanup_latex(item.lines)
 
-        md_converter = LaTeX2Markdown('\n'.join(lines), refs, chapter_num)
+        md_converter = LaTeX2Markdown('\n'.join(lines), refs, chapter_num, figure_num)
         converted_md = md_converter.to_markdown()
+        figure_num += md_converter.get_figure_counter()
+        if md_converter.get_pdfs_for_convert():
+            pdfs_for_convert += md_converter.get_pdfs_for_convert()
 
         if slug_name in tokens:
             for key, value in tokens.get(slug_name).items():
@@ -266,13 +278,16 @@ def convert(config, base_path):
         metadata["sections"].append(section)
         write_file(md_path, converted_md)
 
-        if md_converter.get_pdfs_for_convert():
-            pdfs_for_convert += md_converter.get_pdfs_for_convert()
+    logging.debug("write metadata")
 
     metadata_path = guides_dir.joinpath("metadata.json")
     book_path = guides_dir.joinpath("book.json")
     write_json(metadata_path, metadata)
     write_json(book_path, book)
 
+    logging.debug("copy assets")
     copy_assets(config, generate_dir)
-    convert_assets(config, generate_dir, pdfs_for_convert)
+
+    if pdfs_for_convert:
+        logging.debug("convert included pdfs")
+        convert_assets(config, generate_dir, pdfs_for_convert)

@@ -99,7 +99,7 @@ class LaTeX2Markdown(object):
     before initializing the LaTeX2Markdown instance."""
 
     def __init__(self, latex_string,
-                 refs={}, chapter_num=1,
+                 refs={}, chapter_num=1, figure_num=0,
                  block_configuration=_block_configuration,
                  block_counter=defaultdict(lambda: 1)):
 
@@ -107,6 +107,7 @@ class LaTeX2Markdown(object):
         self._chapter_num = chapter_num
         self._exercise_counter = 0
         self._figure_counter = 0
+        self._figure_counter_offset = figure_num
         self._block_configuration = block_configuration
         self._latex_string = latex_string
         self._block_counter = block_counter
@@ -311,7 +312,9 @@ class LaTeX2Markdown(object):
         self._figure_counter += 1
 
         images = []
-        caption = 'Figure {}.{} '.format(self._chapter_num, self._exercise_counter)
+        caption = 'Figure {}.{} '.format(
+            self._chapter_num, self._figure_counter + self._figure_counter_offset
+        )
 
         for line in block_contents.strip().split("\n"):
             if line.startswith("\\includegraphics"):
@@ -467,3 +470,6 @@ class LaTeX2Markdown(object):
 
     def get_pdfs_for_convert(self):
         return self._pdfs
+
+    def get_figure_counter(self):
+        return self._figure_counter
