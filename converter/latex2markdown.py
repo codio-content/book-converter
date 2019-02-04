@@ -97,9 +97,13 @@ class LaTeX2Markdown(object):
     before initializing the LaTeX2Markdown instance."""
 
     def __init__(self, latex_string,
+                 refs={}, chapter_num=1,
                  block_configuration=_block_configuration,
                  block_counter=defaultdict(lambda: 1)):
 
+        self._refs = refs
+        self._chapter_num = chapter_num
+        self._exercise_counter = 0
         self._block_configuration = block_configuration
         self._latex_string = latex_string
         self._block_counter = block_counter
@@ -145,9 +149,12 @@ class LaTeX2Markdown(object):
                                      flags=re.DOTALL + re.VERBOSE)
 
         self._exercise_re = re.compile(r"""\\begin{exercise}(.*?)\n
-                                    (.*?)
+                                    (?P<block_contents>.*?)
                                     \\end{exercise}""",
                                        flags=re.DOTALL + re.VERBOSE)
+
+        self._refs_re = re.compile(r"""\\ref{(?P<ref_name>.*?)}""", flags=re.DOTALL + re.VERBOSE)
+        self._page_refs_re = re.compile(r"""\\pageref{(?P<ref_name>.*?)}""", flags=re.DOTALL + re.VERBOSE)
 
         # Select all our headers
         self._header_re = re.compile(r"""\\(?P<header_name>chapter|section|subsection) # Header
@@ -281,9 +288,26 @@ class LaTeX2Markdown(object):
 
         return output_str.lstrip().rstrip()
 
+    def _refs_block(self, matchobj):
+        ref_name = matchobj.group('ref_name')
+        refs = self._refs.get(ref_name, {'counter': ref_name})
+        return '**{}**'.format(refs['counter'])
+
+    def _page_refs_block(self, matchobj):
+        ref_name = matchobj.group('ref_name')
+        refs = self._refs.get(ref_name, {'section': ref_name})
+        return 'in section **{}**'.format(refs['section'])
+
+    def _exercise_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+
+        self._exercise_counter += 1
+        prefix = "Exercise {}.{}:\n".format(self._chapter_num, self._exercise_counter)
+
+        return prefix + block_contents
+
     def _format_table(self, matchobj):
         block_contents = matchobj.group('block_contents')
-        block_name = matchobj.group('block_name')
 
         out_str = ""
         caption = ""
@@ -370,15 +394,13 @@ class LaTeX2Markdown(object):
         # Fix ``
         output = re.sub("''", "”", output)
 
-        # exercises refs?
-        output = re.sub(r"~\\ref{(.*?)}", r" **\1**", output)
-
         output = self._code_re.sub(r"```code\1```", output)
         output = self._trinket_re.sub(r"```code\2```", output)
         output = self._stdout_re.sub(r"```code\1```", output)
 
-        # todo: refs?
-        output = self._exercise_re.sub(r"Exercise X.X:\n\2", output)
+        output = self._exercise_re.sub(self._exercise_block, output)
+        output = self._refs_re.sub(self._refs_block, output)
+        output = self._page_refs_re.sub(self._page_refs_block, output)
 
         output = re.sub(r"\\java{(.*?)}", r"`\1`", output)
         output = re.sub(r"\\verb\"(.*?)\"", r"`\1`", output)
@@ -393,6 +415,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"[\\]+$", "", output)
 
         output = re.sub("^%(.*?)$", "", output)
+
+        output = re.sub(r"(\S+)(~)(\S+)", r"\1 \3", output)
 
         return output.lstrip().rstrip()
 

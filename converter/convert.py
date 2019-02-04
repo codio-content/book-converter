@@ -32,10 +32,6 @@ def prepare_codio_rules(config):
     return rules
 
 
-def apply_codio_transformation(lines):
-    return lines
-
-
 def cleanup_latex(lines):
     updated = []
     starts = (
@@ -116,6 +112,55 @@ def codio_transformations(toc, config):
     return updated_toc, tokens
 
 
+def make_refs(toc):
+    refs = {}
+    chapter_counter = 0
+    section_counter = 0
+    exercise_counter = 0
+    figs_counter = 0
+    chapter_name = None
+    is_figure = False
+    is_exercise = False
+
+    for item in toc:
+        if item.section_type == CHAPTER:
+            chapter_counter += 1
+            section_counter = 0
+            figs_counter = 0
+            exercise_counter = 0
+            chapter_name = item.section_name
+        else:
+            section_counter += 1
+        for line in item.lines:
+            if line.startswith("\\begin{figure}"):
+                figs_counter += 1
+                is_figure = True
+            if line.startswith("\\end{figure}"):
+                is_figure = False
+            if line.startswith("\\begin{exercise}"):
+                exercise_counter += 1
+                is_exercise = True
+            if line.startswith("\\end{exercise}"):
+                is_exercise = False
+            if line.startswith("\\label{"):
+                label = line[7:-1]
+                refs[label] = {
+                    'chapter': chapter_name,
+                    'section': item.section_name
+                }
+
+                if is_figure:
+                    refs[label]["counter"] = '{}.{}'.format(chapter_counter, figs_counter)
+                elif is_exercise:
+                    refs[label]["counter"] = '{}.{}'.format(chapter_counter, exercise_counter)
+                elif item.section_type == CHAPTER:
+                    refs[label]["counter"] = '{}'.format(chapter_counter)
+                else:
+                    refs[label]["counter"] = '{}.{}'.format(chapter_counter, section_counter)
+
+    return refs
+
+
 def convert(config, base_path):
     base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
@@ -132,6 +177,8 @@ def convert(config, base_path):
     toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
 
     toc, tokens = codio_transformations(toc, config)
+
+    refs = make_refs(toc)
 
     chapter = None
 
@@ -162,8 +209,11 @@ def convert(config, base_path):
 
     transformation_rules = prepare_codio_rules(config)
 
+    chapter_num = 0
+
     for item in toc:
         if item.section_type == CHAPTER:
+            chapter_num += 1
             slug_name = slugify(item.section_name)
             chapter = item.section_name
         else:
@@ -185,10 +235,9 @@ def convert(config, base_path):
             else:
                 book["children"].append(book_item)
 
-        lines = apply_codio_transformation(item.lines)
-        lines = cleanup_latex(lines)
+        lines = cleanup_latex(item.lines)
 
-        md_converter = LaTeX2Markdown('\n'.join(lines))
+        md_converter = LaTeX2Markdown('\n'.join(lines), refs, chapter_num)
         converted_md = md_converter.to_markdown()
 
         if slug_name in tokens:
