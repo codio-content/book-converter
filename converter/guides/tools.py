@@ -1,4 +1,5 @@
 import re
+import json
 
 
 def slugify(item, chapter=""):
@@ -9,3 +10,7 @@ def slugify(item, chapter=""):
 def write_file(file_path, content):
     with open(file_path, 'w') as f:
         f.write(content)
+
+
+def write_json(file_path, json_data):
+    write_file(file_path, json.dumps(json_data, sort_keys=True, indent=2, separators=(',', ': ')))

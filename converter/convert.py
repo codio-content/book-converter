@@ -1,12 +1,11 @@
 import logging
 import shutil
-import json
 import uuid
 
 from pathlib import Path
 
 from converter.toc import get_toc
-from converter.guides.tools import slugify, write_file
+from converter.guides.tools import slugify, write_file, write_json
 from converter.guides.item import CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
 from converter.assets import copy_assets
@@ -218,7 +217,7 @@ def convert(config, base_path):
 
     metadata_path = guides_dir.joinpath("metadata.json")
     book_path = guides_dir.joinpath("book.json")
-    write_file(metadata_path, json.dumps(metadata, sort_keys=True, indent=2, separators=(',', ': ')))
-    write_file(book_path, json.dumps(book, sort_keys=True, indent=2, separators=(',', ': ')))
+    write_json(metadata_path, metadata)
+    write_json(book_path, book)
 
     copy_assets(config, generate_dir)
