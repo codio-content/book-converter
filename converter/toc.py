@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from converter.guides.item import SectionItem, SECTION, CHAPTER
-from converter.guides.tools import write_file
+from converter.guides.tools import write_file, get_text_in_brackets
 
 
 def is_section(line):
@@ -25,11 +25,7 @@ def input_file(line):
 
 
 def get_name(line):
-    start = line.find('{')
-    end = line.rfind('}')
-    if start == end or start == -1 or end == -1:
-        return line
-    return line[start+1:end]
+    return get_text_in_brackets(line)
 
 
 def process_toc_lines(lines, tex_folder, tex_name):

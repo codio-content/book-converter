@@ -1,6 +1,8 @@
 import re
 from collections import defaultdict
 
+from converter.guides.tools import get_text_in_brackets
+
 # Basic configuration - modify this to change output formatting
 _block_configuration = {
     "chapter": {
@@ -104,6 +106,7 @@ class LaTeX2Markdown(object):
         self._refs = refs
         self._chapter_num = chapter_num
         self._exercise_counter = 0
+        self._figure_counter = 0
         self._block_configuration = block_configuration
         self._latex_string = latex_string
         self._block_counter = block_counter
@@ -152,6 +155,10 @@ class LaTeX2Markdown(object):
                                     (?P<block_contents>.*?)
                                     \\end{exercise}""",
                                        flags=re.DOTALL + re.VERBOSE)
+
+        self._figure_re = re.compile(r"""\\begin{figure}(.*?)\n
+                                    (?P<block_contents>.*?)
+                                    \\end{figure}""", flags=re.DOTALL + re.VERBOSE)
 
         self._refs_re = re.compile(r"""\\ref{(?P<ref_name>.*?)}""", flags=re.DOTALL + re.VERBOSE)
         self._page_refs_re = re.compile(r"""\\pageref{(?P<ref_name>.*?)}""", flags=re.DOTALL + re.VERBOSE)
@@ -298,6 +305,31 @@ class LaTeX2Markdown(object):
         refs = self._refs.get(ref_name, {'section': ref_name})
         return 'in section **{}**'.format(refs['section'])
 
+    def _figure_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        self._figure_counter += 1
+
+        images = []
+        caption = 'Figure {}.{} '.format(self._chapter_num, self._exercise_counter)
+
+        for line in block_contents.strip().split("\n"):
+            if line.startswith("\\includegraphics"):
+                images.append(get_text_in_brackets(line))
+            elif line.startswith("\\caption"):
+                caption += get_text_in_brackets(line)
+
+        markdown_images = []
+
+        for image in images:
+            markdown_images.append(
+                "![{}]({})".format(caption, image)
+            )
+
+        return '{}\n\n**{}**'.format(
+            '\n'.join(markdown_images),
+            caption
+        )
+
     def _exercise_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
 
@@ -313,7 +345,7 @@ class LaTeX2Markdown(object):
         caption = ""
         table = []
 
-        for line in block_contents.lstrip().rstrip().split("\n"):
+        for line in block_contents.strip().split("\n"):
             line = line.rstrip("\\")
             if line == "\\hline":
                 out_str += "\n"
@@ -399,6 +431,7 @@ class LaTeX2Markdown(object):
         output = self._stdout_re.sub(r"```code\1```", output)
 
         output = self._exercise_re.sub(self._exercise_block, output)
+        output = self._figure_re.sub(self._figure_block, output)
         output = self._refs_re.sub(self._refs_block, output)
         output = self._page_refs_re.sub(self._page_refs_block, output)
 
@@ -415,6 +448,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"[\\]+$", "", output)
 
         output = re.sub("^%(.*?)$", "", output)
+
+        output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
 
         output = re.sub(r"(\S+)(~)(\S+)", r"\1 \3", output)
 
