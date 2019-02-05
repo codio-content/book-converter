@@ -144,7 +144,7 @@ class LaTeX2Markdown(object):
         self._small_re = re.compile(r"""\\begin{small}
                                     (?P<block_contents>.*?) # Non-greedy list contents
                                     \\end{small}""",  # closing list
-                                   flags=re.DOTALL + re.VERBOSE)
+                                    flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
         self._trinket_re = re.compile(r"""\\begin{trinket}[\[\]0-9]*{(?P<block_name>.*?)}
@@ -174,14 +174,6 @@ class LaTeX2Markdown(object):
         self._header_re = re.compile(r"""\\(?P<header_name>chapter|section|subsection) # Header
                                     \**{(?P<header_contents>.*?)}""",  # Header title
                                      flags=re.DOTALL + re.VERBOSE)
-
-        # Select all our 'auxillary blocks' - these need special treatment
-        # for future use - e.g. pygments highlighting instead of code blocks
-        # in Markdown
-        self._aux_block_re = re.compile(r"""\\begin{(?P<block_name>lstlisting)} # block name
-                                    (?P<block_contents>.*?) # Non-greedy block contents
-                                    \\end{(?P=block_name)}""",  # closing block
-                                        flags=re.DOTALL + re.VERBOSE)
 
         self._table_re = re.compile(r"""\\begin{(?P<block_name>table|tabular)} # block name
                                     (?P<block_contents>.*?) # Non-greedy block contents
@@ -253,8 +245,6 @@ class LaTeX2Markdown(object):
         return output_str
 
     def _format_list_contents(self, block_name, block_contents):
-        """To format a list, we must remove the \item declaration in the
-        LaTeX source.  All else is as in the _format_block_contents method."""
         block_config = self._block_configuration[block_name]
 
         list_heading = block_config["list_heading"]
@@ -265,11 +255,11 @@ class LaTeX2Markdown(object):
 
             markdown_list_line = line.replace(r"\item", list_heading)
             if block_name == "description":
-                if "\\term" in markdown_list_line:
+                if "\\term" in line:
                     markdown_list_line = markdown_list_line.replace("\\term", list_heading)
                     markdown_list_line = markdown_list_line.replace("{", "**")
                     markdown_list_line = markdown_list_line.replace("}", "**")
-                elif "\\item" in markdown_list_line:
+                elif "\\item" in line:
                     markdown_list_line = markdown_list_line.replace("[", "**")
                     markdown_list_line = markdown_list_line.replace("]", "**")
             output_str += markdown_list_line + "\n"
@@ -405,7 +395,6 @@ class LaTeX2Markdown(object):
         output = self._lists_re.sub(self._replace_block, output)
         output = self._block_re.sub(self._replace_block, output)
         output = self._header_re.sub(self._replace_header, output)
-        output = self._aux_block_re.sub(self._replace_block, output)
         output = self._table_re.sub(self._format_table, output)
 
         # Fix \\ formatting for line breaks in align blocks
@@ -425,12 +414,9 @@ class LaTeX2Markdown(object):
 
         # Fix \% formatting
         output = re.sub(r"\\%", r"%", output)
-        # Fix argmax, etc.
-        output = re.sub(r"\\arg(max|min)", r"\\text{arg\1}", output)
 
         # Throw away content in IGNORE/END block
-        output = re.sub(r"% LaTeX2Markdown IGNORE(.*?)\% LaTeX2Markdown END",
-                        "", output, flags=re.DOTALL)
+        output = re.sub(r"% LaTeX2Markdown IGNORE(.*?)\% LaTeX2Markdown END", "", output, flags=re.DOTALL)
 
         # Fix ``
         output = re.sub("``", "“", output)
@@ -454,13 +440,13 @@ class LaTeX2Markdown(object):
 
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 
-        output = re.sub(r"\\href{(.*?)}{(\\[a-z]).\s?(.*?)}", r"[\1](\3)", output)
+        output = re.sub(r"\\href{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\1](\3)", output)
 
         output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 
         output = re.sub(r"[\\]+$", "", output)
 
-        output = re.sub("^%(.*?)$", "", output)
+        output = re.sub("^%(.*?)$", "", output, flags=re.MULTILINE)
 
         output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
 

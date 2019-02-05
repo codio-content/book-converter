@@ -1,0 +1,1 @@
+After you clone the repository or unzip the ZIP file, you should have a directory named `ThinkJavaCode2` with a subdirectory for each chapter in the book.

@@ -1,0 +1,1 @@
+A mapping of Think Java section numbers to the current AP course description is available on our website: [http://thinkjava.org/](http://thinkjava.org/).

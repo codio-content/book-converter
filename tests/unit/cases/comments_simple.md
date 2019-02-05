@@ -1,0 +1,2 @@
+To write a program, you have to understand the algorithm, know the programming language, and be able to debug errors.
+We discuss these and other aspects throughout the book, and include an appendix that summarizes our advice.
