@@ -16,5 +16,5 @@ class SectionItem(object):
         return str({
             'section_name': self.section_name,
             'section_type': self.section_type,
-            'lines_pos': self.line_pos
+            'line_pos': self.line_pos
         })

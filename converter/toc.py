@@ -28,7 +28,7 @@ def get_name(line):
     return get_text_in_brackets(line)
 
 
-def process_toc_lines(lines, tex_folder, tex_name):
+def process_toc_lines(lines, tex_folder):
     toc = []
     line_pos = 1
     item_lines = []
@@ -57,7 +57,7 @@ def get_toc(tex_folder, tex_name):
     a_path = tex_folder.joinpath(tex_name).resolve()
     with open(a_path) as file:
         lines = file.readlines()
-        return process_toc_lines(lines, tex_folder, tex_name)
+        return process_toc_lines(lines, tex_folder)
 
 
 def print_to_yaml(structure, tex):
@@ -77,13 +77,13 @@ sections:
     return yaml_structure
 
 
-def generate_toc(file_path, tex_path):
+def generate_toc(file_path, tex_path, ignore_exists=False):
     path = Path(file_path)
-    if path.exists():
+    if path.exists() and not ignore_exists:
         raise Exception("Path exists")
     tex = Path(tex_path)
     toc = get_toc(tex.parent, tex.name)
-    path.mkdir(parents=True, exist_ok=False)
+    path.mkdir(parents=True, exist_ok=ignore_exists)
 
     content = print_to_yaml(toc, tex)
     a_path = path.joinpath("codio_structure.yml").resolve()
