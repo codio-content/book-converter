@@ -124,3 +124,7 @@ Mac users will have to install [poppler for Mac](http://macappstore.org/poppler/
 Linux users will have both tools pre-installed with Ubuntu 16.04+ and Archlinux. If it's not, run `sudo apt install poppler-utils`
 
 Required a package `pip3 install pdf2image` 
+
+## codestyle
+
+[![wercker status](https://app.wercker.com/status/e4292419f5fdfef83fe74f7be72babb2/m/master "wercker status")](https://app.wercker.com/project/byKey/e4292419f5fdfef83fe74f7be72babb2)
