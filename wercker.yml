@@ -1,0 +1,16 @@
+box: python/3.6
+no-response-timeout: 10
+build:
+  steps:
+    - script:
+        name: install picode style
+        code: |
+          pip3 install pycodestyle
+    - script:
+        name: run style check
+        code: |
+          pycodestyle .
+    - script:
+        name: run unit tests
+        code: |
+          python3 -m unittest discover -s tests/unit -v
