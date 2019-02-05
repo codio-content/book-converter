@@ -1,9 +1,9 @@
-box: python/3.6
+box: python:3.6
 no-response-timeout: 10
 build:
   steps:
     - script:
-        name: install picode style
+        name: install pycode style
         code: |
           pip3 install pycodestyle
     - script:
