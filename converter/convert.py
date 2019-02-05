@@ -87,8 +87,7 @@ def apply_codio_rules_to_item(item, rules):
     return tokens
 
 
-def codio_transformations(toc, config):
-    transformation_rules = prepare_codio_rules(config)
+def codio_transformations(toc, transformation_rules):
     updated_toc = []
     chapter = None
     tokens = {}
@@ -135,14 +134,14 @@ def make_refs(toc):
             if line.startswith("\\begin{figure}"):
                 figs_counter += 1
                 is_figure = True
-            if line.startswith("\\end{figure}"):
+            elif line.startswith("\\end{figure}"):
                 is_figure = False
-            if line.startswith("\\begin{exercise}"):
+            elif line.startswith("\\begin{exercise}"):
                 exercise_counter += 1
                 is_exercise = True
-            if line.startswith("\\end{exercise}"):
+            elif line.startswith("\\end{exercise}"):
                 is_exercise = False
-            if line.startswith("\\label{"):
+            elif line.startswith("\\label{"):
                 label = line[7:-1]
                 refs[label] = {
                     'chapter': chapter_name,
@@ -161,31 +160,27 @@ def make_refs(toc):
     return refs
 
 
-def convert(config, base_path, yes=False):
-    base_dir = base_path
-    generate_dir = base_dir.joinpath("generate")
+def prepare_base_directory(generate_dir, yes=False):
     if generate_dir.exists():
         if not yes:
             name = input("destination directory exists, continue? Y/n: ")
             if name.lower().strip() == 'n':
-                return
+                return False
         shutil.rmtree(generate_dir, ignore_errors=True)
+    return True
 
-    logging.debug("start converting %s" % generate_dir)
 
+def prepare_structure(generate_dir):
     generate_dir.mkdir()
     guides_dir = generate_dir.joinpath(".guides")
     guides_dir.mkdir()
     content_dir = guides_dir.joinpath("content")
     content_dir.mkdir()
-    toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
 
-    toc, tokens = codio_transformations(toc, config)
+    return guides_dir, content_dir
 
-    refs = make_refs(toc)
 
-    chapter = None
-
+def make_metadata_items(config):
     book = {
         "name": "TODO: book name",
         "children": []
@@ -209,15 +204,77 @@ def convert(config, base_path, yes=False):
     predefined_metadata = config.get('metadata', {})
     metadata = {**metadata, **predefined_metadata}
 
-    current_chapter = None
+    return book, metadata
 
+
+def make_section_items(item, slug_name, md_path, transformation_rules):
+    book_item = {
+        "id": slug_name,
+        "title": item.section_name,
+        "type": "chapter" if item.section_type == CHAPTER else "page",
+        "pageId": slug_name
+    }
+    section = {
+        "id": slug_name,
+        "title": item.section_name,
+        "files": [],
+        "path": [],
+        "type": "markdown",
+        "content-file": get_guide_content_path(md_path),
+        "chapter": True if item.section_type == CHAPTER else False,
+        "reset": [],
+        "teacherOnly": False,
+        "learningObjectives": ""
+    }
+    if slug_name in transformation_rules:
+        configuration = transformation_rules[slug_name].get('configuration', {})
+        if configuration:
+            section = {**section, **configuration}
+
+    return section, book_item
+
+
+def place_section_items():
+    pass
+
+
+def process_assets(config, generate_dir, pdfs_for_convert):
+    logging.debug("copy assets")
+    copy_assets(config, generate_dir)
+
+    if pdfs_for_convert:
+        logging.debug("convert included pdfs")
+        convert_assets(config, generate_dir, pdfs_for_convert)
+
+
+def write_metadata(guides_dir, metadata, book):
+    logging.debug("write metadata")
+
+    metadata_path = guides_dir.joinpath("metadata.json")
+    book_path = guides_dir.joinpath("book.json")
+    write_json(metadata_path, metadata)
+    write_json(book_path, book)
+
+
+def convert(config, base_path, yes=False):
+    base_dir = base_path
+    generate_dir = base_dir.joinpath("generate")
+    if not prepare_base_directory(generate_dir, yes):
+        return
+
+    logging.debug("start converting %s" % generate_dir)
+    guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules = prepare_codio_rules(config)
+    toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
+    toc, tokens = codio_transformations(toc, transformation_rules)
+    refs = make_refs(toc)
+    book, metadata = make_metadata_items(config)
 
+    chapter = None
+    current_chapter = None
     chapter_num = 0
     figure_num = 0
-
     pdfs_for_convert = []
-
     logging.debug("convert selected pages")
 
     for item in toc:
@@ -231,12 +288,23 @@ def convert(config, base_path, yes=False):
 
         logging.debug("convert page %s" % slug_name)
 
-        book_item = {
-            "id": slug_name,
-            "title": item.section_name,
-            "type": "chapter" if item.section_type == CHAPTER else "page",
-            "pageId": slug_name
-        }
+        lines = cleanup_latex(item.lines)
+
+        md_converter = LaTeX2Markdown('\n'.join(lines), refs, chapter_num, figure_num)
+
+        converted_md = md_converter.to_markdown()
+        figure_num += md_converter.get_figure_counter()
+
+        if md_converter.get_pdfs_for_convert():
+            pdfs_for_convert += md_converter.get_pdfs_for_convert()
+
+        if slug_name in tokens:
+            for key, value in tokens.get(slug_name).items():
+                converted_md = converted_md.replace(key, value)
+
+        md_path = content_dir.joinpath(slug_name + ".md")
+        section, book_item = make_section_items(item, slug_name, md_path, transformation_rules)
+
         if item.section_type == CHAPTER:
             book_item["children"] = []
             current_chapter = book_item
@@ -247,48 +315,9 @@ def convert(config, base_path, yes=False):
             else:
                 book["children"].append(book_item)
 
-        lines = cleanup_latex(item.lines)
-
-        md_converter = LaTeX2Markdown('\n'.join(lines), refs, chapter_num, figure_num)
-        converted_md = md_converter.to_markdown()
-        figure_num += md_converter.get_figure_counter()
-        if md_converter.get_pdfs_for_convert():
-            pdfs_for_convert += md_converter.get_pdfs_for_convert()
-
-        if slug_name in tokens:
-            for key, value in tokens.get(slug_name).items():
-                converted_md = converted_md.replace(key, value)
-
-        md_path = content_dir.joinpath(slug_name + ".md")
-        section = {
-            "id": slug_name,
-            "title": item.section_name,
-            "files": [],
-            "path": [],
-            "type": "markdown",
-            "content-file": get_guide_content_path(md_path),
-            "chapter": True if item.section_type == CHAPTER else False,
-            "reset": [],
-            "teacherOnly": False,
-            "learningObjectives": ""
-        }
-        if slug_name in transformation_rules:
-            configuration = transformation_rules[slug_name].get('configuration', {})
-            if configuration:
-                section = {**section, **configuration}
         metadata["sections"].append(section)
+
         write_file(md_path, converted_md)
 
-    logging.debug("write metadata")
-
-    metadata_path = guides_dir.joinpath("metadata.json")
-    book_path = guides_dir.joinpath("book.json")
-    write_json(metadata_path, metadata)
-    write_json(book_path, book)
-
-    logging.debug("copy assets")
-    copy_assets(config, generate_dir)
-
-    if pdfs_for_convert:
-        logging.debug("convert included pdfs")
-        convert_assets(config, generate_dir, pdfs_for_convert)
+    write_metadata(guides_dir, metadata, book)
+    process_assets(config, generate_dir, pdfs_for_convert)
