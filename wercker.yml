@@ -14,3 +14,7 @@ build:
         name: run unit tests
         code: |
           python3 -m unittest discover -s tests/unit -v
+    - script:
+        name: run functional tests
+        code: |
+          python3 -m unittest discover -s tests/functional -v

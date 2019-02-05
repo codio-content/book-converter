@@ -53,7 +53,10 @@ def copy_assets(config, generate_dir):
     if assets:
         base_src_dir = Path(config['workspace']['directory'])
         for asset in assets:
-            if isinstance(asset, str):
-                copy_tree(asset, base_src_dir, generate_dir)
-            elif isinstance(asset, dict):
-                copy_globing(asset, base_src_dir, generate_dir)
+            try:
+                if isinstance(asset, str):
+                    copy_tree(asset, base_src_dir, generate_dir)
+                elif isinstance(asset, dict):
+                    copy_globing(asset, base_src_dir, generate_dir)
+            except BaseException as e:
+                logging.exception("can not copy asset {}".format(asset))
