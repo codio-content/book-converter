@@ -5,7 +5,7 @@ build:
     - script:
         name: install pycode style
         code: |
-          pip3 install pycodestyle
+          pip3 install pycodestyle pyyaml
     - script:
         name: run style check
         code: |

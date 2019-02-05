@@ -1,1 +1,2 @@
 pdf2image==1.4.1
+PyYAML==4.2b1
