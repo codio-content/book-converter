@@ -151,3 +151,6 @@ class TestSuite(unittest.TestCase):
     def test_math(self):
         self.write_md("math")
         self.run_case("math")
+
+    def test_eqnarray(self):
+        self.run_case("eqnarray")

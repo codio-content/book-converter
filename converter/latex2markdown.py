@@ -168,6 +168,10 @@ class LaTeX2Markdown(object):
                                     (?P<block_contents>.*?)
                                     \\end{figure}""", flags=re.DOTALL + re.VERBOSE)
 
+        self._eqnarray_re = re.compile(r"""\\begin{(?P<block_name>eqnarray\*)}
+                                    (?P<block_contents>.*?)
+                                    \\end{(?P=block_name)}""", flags=re.DOTALL + re.VERBOSE)
+
         self._refs_re = re.compile(r"""\\ref{(?P<ref_name>.*?)}""", flags=re.DOTALL + re.VERBOSE)
         self._page_refs_re = re.compile(r"""\\pageref{(?P<ref_name>.*?)}""", flags=re.DOTALL + re.VERBOSE)
 
@@ -303,6 +307,16 @@ class LaTeX2Markdown(object):
         refs = self._refs.get(ref_name, {'section': ref_name})
         return 'in section **{}**'.format(refs['section'])
 
+    def _eqnarray_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        print('block_contents', block_contents)
+        block_contents = re.sub(r"^&& {2}", "", block_contents, flags=re.MULTILINE)
+        block_contents = re.sub(r"^& ", "", block_contents, flags=re.MULTILINE)
+        block_contents = re.sub(r" &$", "", block_contents, flags=re.MULTILINE)
+        block_contents = re.sub(r" & \\\\$", " \\\\\\\\", block_contents, flags=re.MULTILINE)
+        print('block_contents', block_contents)
+        return "$${}$$".format(block_contents, flags=re.MULTILINE)
+
     def _figure_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         self._figure_counter += 1
@@ -404,11 +418,6 @@ class LaTeX2Markdown(object):
         output = self._header_re.sub(self._replace_header, output)
         output = self._table_re.sub(self._format_table, output)
 
-        # Fix \\ formatting for line breaks in align blocks
-        output = re.sub(r" \\\\", r" \\\\\\\\", output)
-        # Convert align* block  to align - this fixes formatting
-        output = re.sub(r"align\*", r"align", output)
-
         # Fix emph, textbf, texttt formatting
         output = re.sub(r"\\emph{(.*?)}", r"*\1*", output)
         output = re.sub(r"\\textbf{(.*?)}", r"**\1**", output)
@@ -440,6 +449,7 @@ class LaTeX2Markdown(object):
         output = self._figure_re.sub(self._figure_block, output)
         output = self._refs_re.sub(self._refs_block, output)
         output = self._page_refs_re.sub(self._page_refs_block, output)
+        output = self._eqnarray_re.sub(self._eqnarray_block, output)
 
         output = re.sub(r"\\java{(.*?)}", r"`\1`", output)
         output = re.sub(r"\\verb\"(.*?)\"", r"`\1`", output)

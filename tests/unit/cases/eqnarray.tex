@@ -1,0 +1,25 @@
+The goal of this exercise is to translate a recursive definition into a Java method.
+The Ackermann function is defined for non-negative integers as follows:
+\begin{eqnarray*}
+A(m, n) = \begin{cases}
+              n+1 & \mbox{if } m = 0 \\
+              A(m-1, 1) & \mbox{if } m > 0 \mbox{ and } n = 0 \\
+              A(m-1, A(m, n-1)) & \mbox{if } m > 0 \mbox{ and } n > 0
+\end{cases}
+\end{eqnarray*}
+
+Write a recursive method called \java{ack} that takes two \java{int}s as parameters and that computes and returns the value of the Ackermann function.
+
+For example, the {\bf factorial} of an integer $n$, which is written $n!$, is defined like this:
+%
+\begin{eqnarray*}
+&&  0! = 1 \\
+&&  n! = n \cdot(n-1)!
+\end{eqnarray*}
+%
+Don't confuse the mathematical symbol $!$, which means {\em factorial}, with the Java operator \java{!}, which means {\em not}.
+
+\begin{eqnarray*}
+& \sin \frac{\pi}{4} + \frac{\cos \frac{\pi}{4}}{2} & \\
+& \log 10 + \log 20 &
+\end{eqnarray*}
