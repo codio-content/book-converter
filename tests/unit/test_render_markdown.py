@@ -76,6 +76,9 @@ class TestSuite(unittest.TestCase):
     def test_markdown_comments_simple(self):
         self.run_case("comments_simple")
 
+    def test_markdown_comments(self):
+        self.run_case("comments")
+
     def test_markdown_href_simple(self):
         self.run_case("href_simple")
 

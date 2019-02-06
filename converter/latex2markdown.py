@@ -1,4 +1,5 @@
 import re
+import uuid
 from collections import defaultdict
 
 from converter.guides.tools import get_text_in_brackets
@@ -380,6 +381,12 @@ class LaTeX2Markdown(object):
 
         return out
 
+    def _code_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        # % in code block is not latex comments, escape it and replace later
+        block_contents = re.sub(r"%", r"\\%", block_contents)
+        return "```code{}```".format(block_contents)
+
     def _latex_to_markdown(self):
         """Main function, returns the formatted Markdown as a string.
         Uses a lot of custom regexes to fix a lot of content - you may have
@@ -412,22 +419,22 @@ class LaTeX2Markdown(object):
         output = re.sub(r"{\\bf (.*?)}", r"**\1**", output)
         output = re.sub(r"{\\sf (.*?)}", r"**\1**", output)
 
-        # Fix \% formatting
-        output = re.sub(r"\\%", r"%", output)
-
-        # Throw away content in IGNORE/END block
-        output = re.sub(r"% LaTeX2Markdown IGNORE(.*?)\% LaTeX2Markdown END", "", output, flags=re.DOTALL)
-
         # Fix ``
         output = re.sub("``", "“", output)
 
         # Fix ``
         output = re.sub("''", "”", output)
 
-        output = self._code_re.sub(r"```code\1```", output)
-        output = self._trinket_re.sub(r"```code\2```", output)
-        output = self._stdout_re.sub(r"```code\1```", output)
+        output = self._code_re.sub(self._code_block, output)
+        output = self._trinket_re.sub(self._code_block, output)
+        output = self._stdout_re.sub(self._code_block, output)
         output = self._small_re.sub(r"\1", output)
+
+        # Fix \% formatting
+        percent_token = str(uuid.uuid4())
+        output = re.sub(r"\\%", percent_token, output)
+        output = re.sub("%(.*?)$", "", output, flags=re.MULTILINE)
+        output = re.sub(percent_token, "%", output)
 
         output = self._exercise_re.sub(self._exercise_block, output)
         output = self._figure_re.sub(self._figure_block, output)
@@ -444,9 +451,7 @@ class LaTeX2Markdown(object):
 
         output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 
-        output = re.sub(r"[\\]+$", "", output)
-
-        output = re.sub("^%(.*?)$", "", output, flags=re.MULTILINE)
+        #output = re.sub(r"[\\]+$", "", output)
 
         output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
 
