@@ -51,6 +51,21 @@ metadata:
   protectLayout: false
 ```
 
+Available options:
+
+1. `scripts` - array of JS-script
+1. `lexikonTopic` - string
+1. `suppressPageNumbering` - `true|false` - Do not show section numbers
+1. `useSubmitButtons` - `true|false` - Use Submit buttons
+1. `useMarkAsComplete` - `true|false` - Show mark as complete
+1. `hideMenu` - `true|false` - Hide top menu
+1. `allowGuideClose` - `true|false` - Allow Guide to be closable
+1. `collapsedOnStart` - `true|false` - Collapsed on start
+1. `hideSectionsToggle` - `true|false` - Hide sections toggle
+1. `hideBackToDashboard` - `true|false` - Hide "Back to dashboard" button
+1. `protectLayout` - `true|false` - Prevent tabs closing by students
+
+
 ### sections
 
 Pages rules
