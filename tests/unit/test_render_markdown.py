@@ -147,3 +147,7 @@ class TestSuite(unittest.TestCase):
             'counter': '2.2'
         }
         self.run_case("pageref", refs=refs)
+
+    def test_math(self):
+        self.write_md("math")
+        self.run_case("math")
