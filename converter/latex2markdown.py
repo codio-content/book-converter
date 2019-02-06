@@ -245,6 +245,7 @@ class LaTeX2Markdown(object):
         output_str = ""
         for line in block_contents.lstrip().rstrip().split("\n"):
             line = line.lstrip().rstrip()
+            line = line.replace("\\\\", "<br/>")
             indented_line = line_indent_char + line + "\n"
             output_str += indented_line
         return output_str
@@ -257,6 +258,7 @@ class LaTeX2Markdown(object):
         output_str = ""
         for line in block_contents.lstrip().rstrip().split("\n"):
             line = line.lstrip().rstrip()
+            line = line.replace("\\\\", "<br/>")
 
             markdown_list_line = line.replace(r"\item", list_heading)
             if block_name == "description":
@@ -401,6 +403,11 @@ class LaTeX2Markdown(object):
         block_contents = re.sub(r"%", r"\\%", block_contents)
         return "```code{}```".format(block_contents)
 
+    def _inline_code_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_contents = re.sub(r"\\\\", r"\\", block_contents)
+        return "`{}`".format(block_contents)
+
     def _latex_to_markdown(self):
         """Main function, returns the formatted Markdown as a string.
         Uses a lot of custom regexes to fix a lot of content - you may have
@@ -451,9 +458,9 @@ class LaTeX2Markdown(object):
         output = self._page_refs_re.sub(self._page_refs_block, output)
         output = self._eqnarray_re.sub(self._eqnarray_block, output)
 
-        output = re.sub(r"\\java{(.*?)}", r"`\1`", output)
-        output = re.sub(r"\\verb\"(.*?)\"", r"`\1`", output)
-        output = re.sub(r"\\verb'(.*?)'", r"`\1`", output)
+        output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
+        output = re.compile(r"\\verb\"(?P<block_contents>.*?)\"").sub(self._inline_code_block, output)
+        output = re.compile(r"\\verb'(?P<block_contents>.*?)'").sub(self._inline_code_block, output)
 
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 
@@ -466,6 +473,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
 
         output = re.sub(r"(\S+)(~)(\S+)", r"\1 \3", output)
+
+        output = re.sub(r"^\\\\ ", "<br>", output, flags=re.MULTILINE)
 
         return output.lstrip().rstrip()
 

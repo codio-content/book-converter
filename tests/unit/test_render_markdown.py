@@ -154,3 +154,9 @@ class TestSuite(unittest.TestCase):
 
     def test_eqnarray(self):
         self.run_case("eqnarray")
+
+    def test_new_line(self):
+        self.run_case("new_line")
+
+    def test_esc_code(self):
+        self.run_case("esc_code")
