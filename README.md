@@ -77,6 +77,21 @@ Examples
 ```
 
 
+#### Supported layouts
+
+1. `1-panel-tree` - 1 Panel with tree
+1. `1-panel` - 1 Panel without tree
+1. `2-panels-tree` - 2 Panels with tree
+1. `2-panels` - 2 Panels without tree
+1. `2-panels-guides-left` - 2 Panels without tree (Guides Left)
+1. `3-columns-tree` - 3 Columns with tree
+1. `3-columns` - 3 Columns without tree
+1. `3-cell-tree` - 3 Panels with tree
+1. `3-cell` -  Panels without tree
+1. `3-cell-left` -  3 Panels without tree (Guides Left)
+1. `4-cell-tree` -  4 Panels with tree
+1. `4-cell` -  4 Panels without tree
+
 #### sections.transformations
 
 The page transformations
