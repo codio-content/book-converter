@@ -473,6 +473,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
 
         output = re.sub(r"(\S+)(~)(\S+)", r"\1 \3", output)
+        output = re.sub(r"(~)(\S+)", r" \2", output)
+        output = re.sub(r"(\S+)(~)", r"\1 ", output)
 
         output = re.sub(r"^\\\\ ", "<br>", output, flags=re.MULTILINE)
 

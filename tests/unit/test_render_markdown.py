@@ -72,6 +72,7 @@ class TestSuite(unittest.TestCase):
 
     def test_markdown_space(self):
         self.run_case("space")
+        self.run_case("space_both")
 
     def test_markdown_comments_simple(self):
         self.run_case("comments_simple")
