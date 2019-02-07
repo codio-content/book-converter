@@ -109,6 +109,7 @@ def generate_insert_items(insert_rules, slug_name):
             latex = rule.get('latex')
             markdown = rule.get('markdown')
             before = rule.get('before', False)
+            insert_item.codio_section = rule.get('codio_section')
             if latex:
                 insert_item.lines = latex.split('\n')
             elif markdown:
@@ -138,6 +139,9 @@ def codio_transformations(toc, transformation_rules, insert_rules):
 
         if slug_name in transformation_rules:
             rules = transformation_rules[slug_name].get("transformations")
+            codio_section = transformation_rules[slug_name].get('codio_section', None)
+            if codio_section:
+                item.codio_section = codio_section
             if isinstance(rules, str) and rules == "skip":
                 skip = True
             elif isinstance(rules, list) and rules:
@@ -204,11 +208,17 @@ def make_metadata_items(config):
     return book, metadata
 
 
+def get_section_type(item):
+    if item.codio_section == "start":
+        return "section"
+    return "chapter" if item.section_type == CHAPTER else "page"
+
+
 def make_section_items(item, slug_name, md_path, transformation_rules):
     book_item = {
         "id": slug_name,
         "title": item.section_name,
-        "type": "chapter" if item.section_type == CHAPTER else "page",
+        "type": get_section_type(item),
         "pageId": slug_name
     }
     section = {
@@ -269,9 +279,10 @@ def convert(config, base_path, yes=False):
     book, metadata = make_metadata_items(config)
 
     chapter = None
-    current_chapter = None
+    children_containers = [book["children"]]
     chapter_num = 0
     figure_num = 0
+    exercise_num = 0
     pdfs_for_convert = []
     logging.debug("convert selected pages")
 
@@ -279,6 +290,7 @@ def convert(config, base_path, yes=False):
         if item.section_type == CHAPTER:
             chapter_num += 1
             figure_num = 0
+            exercise_num = 0
             slug_name = slugify(item.section_name)
             chapter = item.section_name
         else:
@@ -291,10 +303,13 @@ def convert(config, base_path, yes=False):
         if not converted_md:
             lines = cleanup_latex(item.lines)
 
-            md_converter = LaTeX2Markdown('\n'.join(lines), refs, chapter_num, figure_num)
+            md_converter = LaTeX2Markdown(
+                '\n'.join(lines), refs=refs, chapter_num=chapter_num, figure_num=figure_num, exercise_num=exercise_num
+            )
 
             converted_md = md_converter.to_markdown()
             figure_num += md_converter.get_figure_counter()
+            exercise_num += md_converter.get_exercise_counter()
 
             if md_converter.get_pdfs_for_convert():
                 pdfs_for_convert += md_converter.get_pdfs_for_convert()
@@ -306,15 +321,17 @@ def convert(config, base_path, yes=False):
         md_path = content_dir.joinpath(slug_name + ".md")
         section, book_item = make_section_items(item, slug_name, md_path, transformation_rules)
 
-        if item.section_type == CHAPTER:
+        if item.section_type == CHAPTER or item.codio_section == "start":
             book_item["children"] = []
-            current_chapter = book_item
-            book["children"].append(book_item)
-        else:
-            if current_chapter:
-                current_chapter["children"].append(book_item)
-            else:
-                book["children"].append(book_item)
+            if item.section_type == CHAPTER:
+                children_containers = [children_containers[0]]
+        elif item.codio_section == "end" and len(children_containers) > 1:
+            children_containers.pop()
+
+        children_containers[len(children_containers) - 1].append(book_item)
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            children_containers.append(book_item["children"])
 
         metadata["sections"].append(section)
 

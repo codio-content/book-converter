@@ -99,19 +99,16 @@ class LaTeX2Markdown(object):
     To modify the outputted markdown, modify the _block_configuration variable
     before initializing the LaTeX2Markdown instance."""
 
-    def __init__(self, latex_string,
-                 refs={}, chapter_num=1, figure_num=0,
-                 block_configuration=_block_configuration,
-                 block_counter=defaultdict(lambda: 1)):
-
+    def __init__(self, latex_string, refs={}, chapter_num=1, figure_num=0, exercise_num=0):
         self._refs = refs
         self._chapter_num = chapter_num
         self._exercise_counter = 0
         self._figure_counter = 0
         self._figure_counter_offset = figure_num
-        self._block_configuration = block_configuration
+        self._exercise_counter_offset = exercise_num
+        self._block_configuration = _block_configuration
         self._latex_string = latex_string
-        self._block_counter = block_counter
+        self._block_counter = defaultdict(lambda: 1)
         self._pdfs = []
 
         # Precompile the regexes
@@ -493,3 +490,6 @@ class LaTeX2Markdown(object):
 
     def get_figure_counter(self):
         return self._figure_counter
+
+    def get_exercise_counter(self):
+        return self._exercise_counter
