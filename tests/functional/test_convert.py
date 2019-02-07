@@ -589,3 +589,31 @@ class TestSuite(unittest.TestCase):
 
             sections = metadata.get('sections')
             self.assertEqual(6, len(sections))
+
+    def test_trinket(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            generate = tmp.joinpath('generate')
+            config, base_path = load_config_file(get_file_path('toc_trinket', extension='yml'))
+            config['workspace']['directory'] = base_path
+            convert(config, tmp, True)
+
+            check_exists = [
+                'code/GuessSoln.java',
+                'code/Hello.java',
+                'code/1',
+                'code/Hello.java',
+                'code/GuessSoln.java',
+                '.guides/book.json',
+                '.guides/metadata.json',
+                '.guides/content/computer-programming.md',
+                '.guides/content/computer-programming-what-is-programming-.md',
+                '.guides/content/variables-and-operators.md',
+                '.guides/content/variables-and-operators-assigning-variables.md',
+                '.guides/content/variables-and-operators-declaring-variables.md',
+                '.guides/content/computer-programming-what-is-a-computer-.md'
+            ]
+
+            for path in check_exists:
+                check = generate.joinpath(path)
+                self.assertTrue(check.exists(), check)

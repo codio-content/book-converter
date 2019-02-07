@@ -1,8 +1,11 @@
 import re
 import uuid
 from collections import defaultdict
+from collections import namedtuple
 
 from converter.guides.tools import get_text_in_brackets
+
+Code = namedtuple('Code', ['name', 'source'])
 
 # Basic configuration - modify this to change output formatting
 _block_configuration = {
@@ -110,6 +113,7 @@ class LaTeX2Markdown(object):
         self._latex_string = latex_string
         self._block_counter = defaultdict(lambda: 1)
         self._pdfs = []
+        self._source_codes = []
 
         # Precompile the regexes
 
@@ -145,7 +149,7 @@ class LaTeX2Markdown(object):
                                     flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
-        self._trinket_re = re.compile(r"""\\begin{trinket}[\[\]0-9]*{(?P<block_name>.*?)}
+        self._trinket_re = re.compile(r"""\\begin{trinket}[\[\]0-9]*{(?P<file_name>.*?)}
                                     (?P<block_contents>.*?) # Non-greedy list contents
                                     \\end{trinket}""",  # closing list
                                       flags=re.DOTALL + re.VERBOSE)
@@ -398,6 +402,11 @@ class LaTeX2Markdown(object):
 
     def _code_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
+        try:
+            file_name = matchobj.group('file_name')
+            self._source_codes.append(Code(file_name, block_contents))
+        except IndexError:
+            pass
         # % in code block is not latex comments, escape it and replace later
         block_contents = re.sub(r"%", r"\\%", block_contents)
         return "```code{}```".format(block_contents)
@@ -493,3 +502,6 @@ class LaTeX2Markdown(object):
 
     def get_exercise_counter(self):
         return self._exercise_counter
+
+    def get_source_codes(self):
+        return self._source_codes

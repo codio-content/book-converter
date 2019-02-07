@@ -4,6 +4,8 @@ import shutil
 
 from pathlib import Path
 
+from converter.guides.tools import write_file
+
 
 def copy_tree(asset, base_src_dir, generate_dir):
     src = base_src_dir.joinpath(asset)
@@ -60,3 +62,22 @@ def copy_assets(config, generate_dir):
                     copy_globing(asset, base_src_dir, generate_dir)
             except BaseException as e:
                 logging.exception("can not copy asset {}".format(asset))
+
+
+def process_source_code(source_codes, generate_dir):
+    code_dir = generate_dir.joinpath('code')
+    counter = {}
+    for code in source_codes:
+        current = counter.setdefault(code.name, 0)
+        source_dir = code_dir
+        if current:
+            source_dir = source_dir.joinpath(str(current))
+        source_dir.mkdir(exist_ok=True, parents=True)
+        file_path = source_dir.joinpath(code.name)
+        if file_path.exists():
+            current += 1
+            source_dir = source_dir.joinpath(str(current))
+            file_path = source_dir.joinpath(code.name)
+        logging.info("write {} to {}".format(code.name, file_path))
+        write_file(file_path, code.source)
+        counter[code.name] = current + 1

@@ -8,7 +8,7 @@ from converter.toc import get_toc
 from converter.guides.tools import slugify, write_file, write_json
 from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
-from converter.assets import copy_assets, convert_assets
+from converter.assets import copy_assets, convert_assets, process_source_code
 from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from
 
 
@@ -241,17 +241,17 @@ def make_section_items(item, slug_name, md_path, transformation_rules):
     return section, book_item
 
 
-def place_section_items():
-    pass
-
-
-def process_assets(config, generate_dir, pdfs_for_convert):
+def process_assets(config, generate_dir, pdfs_for_convert, source_codes):
     logging.debug("copy assets")
     copy_assets(config, generate_dir)
 
     if pdfs_for_convert:
         logging.debug("convert included pdfs")
         convert_assets(config, generate_dir, pdfs_for_convert)
+
+    if source_codes:
+        logging.debug("process source codes")
+        process_source_code(source_codes, generate_dir)
 
 
 def write_metadata(guides_dir, metadata, book):
@@ -284,6 +284,7 @@ def convert(config, base_path, yes=False):
     figure_num = 0
     exercise_num = 0
     pdfs_for_convert = []
+    source_codes = []
     logging.debug("convert selected pages")
 
     for item in toc:
@@ -314,6 +315,9 @@ def convert(config, base_path, yes=False):
             if md_converter.get_pdfs_for_convert():
                 pdfs_for_convert += md_converter.get_pdfs_for_convert()
 
+            if md_converter.get_source_codes():
+                source_codes += md_converter.get_source_codes()
+
             if slug_name in tokens:
                 for key, value in tokens.get(slug_name).items():
                     converted_md = converted_md.replace(key, value)
@@ -338,4 +342,4 @@ def convert(config, base_path, yes=False):
         write_file(md_path, converted_md)
 
     write_metadata(guides_dir, metadata, book)
-    process_assets(config, generate_dir, pdfs_for_convert)
+    process_assets(config, generate_dir, pdfs_for_convert, source_codes)
