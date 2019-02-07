@@ -1,0 +1,22 @@
+workspace:
+  directory: cases
+  tex: toc.tex
+assets:
+  - code
+sections:
+  - name: Computer programming
+    type: chapter
+    configuration:
+      layout: 2-panels
+  - name: What is a computer?
+    type: section
+    transformations: skip
+  - name: What is programming?
+    type: section
+  - name: Variables and operators
+    type: chapter
+  - name: Declaring variables
+    type: section
+    transformations: skip
+  - name: Assigning variables
+    type: section

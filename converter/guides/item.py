@@ -8,6 +8,7 @@ class SectionItem(object):
         self.section_name = section_name
         self.line_pos = line_pos
         self.lines = []
+        self.markdown = None
 
     def __str__(self):
         return self.__repr__()

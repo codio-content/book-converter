@@ -6,7 +6,7 @@ from pathlib import Path
 
 from converter.toc import get_toc
 from converter.guides.tools import slugify, write_file, write_json
-from converter.guides.item import CHAPTER
+from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
 from converter.assets import copy_assets, convert_assets
 from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from
@@ -23,14 +23,24 @@ def get_guide_content_path(file_path):
 def prepare_codio_rules(config):
     chapter = None
     rules = {}
-    for section in config["sections"]:
+    sections = config.get('sections', list())
+    for section in sections:
         if section["type"] == CHAPTER:
             slug_name = slugify(section["name"])
             chapter = section["name"]
         else:
             slug_name = slugify(section["name"], chapter=chapter)
+        section["slug"] = slug_name
         rules[slug_name] = section
-    return rules
+
+    insert_rules = {}
+    insert_sections = config.get('insert_sections', [])
+    for section in insert_sections:
+        position = slugify(section["section"], chapter=section["chapter"])
+        section["position"] = position
+        insert_rules.setdefault(position, []).append(section)
+
+    return rules, insert_rules
 
 
 def cleanup_latex(lines):
@@ -89,7 +99,30 @@ def apply_codio_rules_to_item(item, rules):
     return tokens
 
 
-def codio_transformations(toc, transformation_rules):
+def generate_insert_items(insert_rules, slug_name):
+    inserts_before = []
+    inserts_after = []
+    if slug_name in insert_rules:
+        rules = insert_rules[slug_name]
+        for rule in rules:
+            insert_item = SectionItem(section_name=rule.get('name'), section_type=rule.get('type'), line_pos=1)
+            latex = rule.get('latex')
+            markdown = rule.get('markdown')
+            before = rule.get('before', False)
+            if latex:
+                insert_item.lines = latex.split('\n')
+            elif markdown:
+                insert_item.markdown = markdown
+            else:
+                continue
+            if before:
+                inserts_before.append(insert_item)
+            else:
+                inserts_after.append(insert_item)
+    return inserts_before, inserts_after
+
+
+def codio_transformations(toc, transformation_rules, insert_rules):
     updated_toc = []
     chapter = None
     tokens = {}
@@ -101,14 +134,25 @@ def codio_transformations(toc, transformation_rules):
         else:
             slug_name = slugify(item.section_name, chapter=chapter)
 
+        skip = False
+
         if slug_name in transformation_rules:
             rules = transformation_rules[slug_name].get("transformations")
             if isinstance(rules, str) and rules == "skip":
-                continue
+                skip = True
             elif isinstance(rules, list) and rules:
                 tokens[slug_name] = apply_codio_rules_to_item(item, rules)
 
-        updated_toc.append(item)
+        inserts_before, inserts_after = generate_insert_items(insert_rules, slug_name)
+
+        if inserts_before:
+            updated_toc += inserts_before
+
+        if not skip:
+            updated_toc.append(item)
+
+        if inserts_after:
+            updated_toc += inserts_after
 
     return updated_toc, tokens
 
@@ -217,9 +261,9 @@ def convert(config, base_path, yes=False):
 
     logging.debug("start converting %s" % generate_dir)
     guides_dir, content_dir = prepare_structure(generate_dir)
-    transformation_rules = prepare_codio_rules(config)
+    transformation_rules, insert_rules = prepare_codio_rules(config)
     toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
-    toc, tokens = codio_transformations(toc, transformation_rules)
+    toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     refs = make_refs(toc, chapter_counter_from=get_ref_chapter_counter_from(config))
     refs = override_refs(refs, config)
     book, metadata = make_metadata_items(config)
@@ -242,19 +286,22 @@ def convert(config, base_path, yes=False):
 
         logging.debug("convert page %s" % slug_name)
 
-        lines = cleanup_latex(item.lines)
+        converted_md = item.markdown
 
-        md_converter = LaTeX2Markdown('\n'.join(lines), refs, chapter_num, figure_num)
+        if not converted_md:
+            lines = cleanup_latex(item.lines)
 
-        converted_md = md_converter.to_markdown()
-        figure_num += md_converter.get_figure_counter()
+            md_converter = LaTeX2Markdown('\n'.join(lines), refs, chapter_num, figure_num)
 
-        if md_converter.get_pdfs_for_convert():
-            pdfs_for_convert += md_converter.get_pdfs_for_convert()
+            converted_md = md_converter.to_markdown()
+            figure_num += md_converter.get_figure_counter()
 
-        if slug_name in tokens:
-            for key, value in tokens.get(slug_name).items():
-                converted_md = converted_md.replace(key, value)
+            if md_converter.get_pdfs_for_convert():
+                pdfs_for_convert += md_converter.get_pdfs_for_convert()
+
+            if slug_name in tokens:
+                for key, value in tokens.get(slug_name).items():
+                    converted_md = converted_md.replace(key, value)
 
         md_path = content_dir.joinpath(slug_name + ".md")
         section, book_item = make_section_items(item, slug_name, md_path, transformation_rules)

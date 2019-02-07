@@ -152,6 +152,12 @@ Available options:
 
 #### sections.transformations
 
+transformation could be an string `skip` - remove item from procession or described below dicts
+
+```yaml
+    transformations: skip
+```
+
 The page transformations
 Supports 2 transformations:
 
@@ -173,6 +179,36 @@ Supports 2 transformations:
       - remove: 5
         position: 74
 ```
+
+### Content not existed in book
+
+It is possible to add own content via `insert_sections`
+
+You should specify `chapter` and `section` which exists in book for identify a place for insert
+
+```yaml
+    chapter: Computer programming
+    section: What is programming?
+```
+
+```yaml
+insert_sections:
+  - name: Exercises 1.1
+    type: section
+    chapter: Computer programming
+    section: What is programming?
+    before: false
+    latex: |
+      hello latex
+  - name: Exercises 1.2
+    type: section
+    chapter: Computer programming
+    section: What is programming?
+    before: false
+    markdown: |
+      hello markdown
+```
+
 
 ### Refs
 
