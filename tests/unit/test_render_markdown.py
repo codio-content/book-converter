@@ -134,20 +134,21 @@ class TestSuite(unittest.TestCase):
     def test_markdown_ref(self):
         refs = {}
         refs['javadoc'] = {
-            'chapter': 'javadoc',
-            'section': 'javadoc',
-            'counter': '2.2'
+            'pageref': 'javadoc',
+            'ref': '2.2'
         }
         self.run_case("ref", refs=refs)
 
     def test_markdown_pageref(self):
         refs = {}
         refs['code'] = {
-            'chapter': 'code',
-            'section': 'code',
-            'counter': '2.2'
+            'pageref': 'code'
+        }
+        refs['page'] = {
+            'pageref': 100
         }
         self.run_case("pageref", refs=refs)
+        self.run_case("pageref_num", refs=refs)
 
     def test_math(self):
         self.write_md("math")

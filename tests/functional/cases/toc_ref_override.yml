@@ -1,0 +1,31 @@
+workspace:
+  directory: cases
+  tex: toc_ref.tex
+assets:
+  - code
+sections:
+  - name: Computer programming
+    type: chapter
+    configuration:
+      layout: 2-panels
+  - name: What is a computer?
+    type: section
+  - name: What is programming?
+    type: section
+  - name: Variables and operators
+    type: chapter
+  - name: Declaring variables
+    type: section
+  - name: Assigning variables
+    type: section
+refs:
+  overrides:
+    computer_programing:
+      pageref: Override1
+      ref: 'override.1'
+    declaring_variables:
+      pageref: 100
+      ref: 'override.2'
+    assigning_variables:
+      pageref: 'override.3'
+      ref: 'override.4'

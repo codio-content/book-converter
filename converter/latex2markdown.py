@@ -301,22 +301,24 @@ class LaTeX2Markdown(object):
 
     def _refs_block(self, matchobj):
         ref_name = matchobj.group('ref_name')
-        refs = self._refs.get(ref_name, {'counter': ref_name})
-        return '**{}**'.format(refs['counter'])
+        refs = self._refs.get(ref_name, {'ref': ref_name})
+        return '{}'.format(refs.get('ref', ''))
 
     def _page_refs_block(self, matchobj):
         ref_name = matchobj.group('ref_name')
-        refs = self._refs.get(ref_name, {'section': ref_name})
-        return 'in section **{}**'.format(refs['section'])
+        refs = self._refs.get(ref_name, {'pageref': ref_name})
+        pageref = refs.get('pageref', '')
+        if isinstance(pageref, str):
+            return 'in section {}'.format(pageref)
+        else:
+            return str(pageref)
 
     def _eqnarray_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
-        print('block_contents', block_contents)
         block_contents = re.sub(r"^&& {2}", "", block_contents, flags=re.MULTILINE)
         block_contents = re.sub(r"^& ", "", block_contents, flags=re.MULTILINE)
         block_contents = re.sub(r" &$", "", block_contents, flags=re.MULTILINE)
         block_contents = re.sub(r" & \\\\$", " \\\\\\\\", block_contents, flags=re.MULTILINE)
-        print('block_contents', block_contents)
         return "$${}$$".format(block_contents, flags=re.MULTILINE)
 
     def _figure_block(self, matchobj):
