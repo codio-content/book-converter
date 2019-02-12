@@ -48,27 +48,27 @@ class TestSuite(unittest.TestCase):
             check_content = [
                 (
                     '.guides/content/computer-programming.md',
-                    '##  Computer programming\n\n\nComputer programming content'
+                    'Computer programming content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-a-computer-.md',
-                    '###  What is a computer?\n\n\nWhat is a computer? content'
+                    'What is a computer? content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    '###  What is programming?\n\n\nWhat is programming? content'
+                    'What is programming? content'
                 ),
                 (
                     '.guides/content/variables-and-operators.md',
-                    '##  Variables and operators\n\n\nVariables and operators content'
+                    'Variables and operators content'
                 ),
                 (
                     '.guides/content/variables-and-operators-assigning-variables.md',
-                    '###  Assigning variables\n\n\nAssigning variables content'
+                    'Assigning variables content'
                 ),
                 (
                     '.guides/content/variables-and-operators-declaring-variables.md',
-                    '###  Declaring variables\n\n\nDeclaring variables content'
+                    'Declaring variables content'
                 )
             ]
 
@@ -216,27 +216,27 @@ class TestSuite(unittest.TestCase):
             check_content = [
                 (
                     '.guides/content/computer-programming.md',
-                    '##  Computer programming\n\nMy simple text\n\nComputer programming content'
+                    'My simple text\n\nComputer programming content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-a-computer-.md',
-                    '###  What is a computer?\n\n\nWhat is a computer? content'
+                    'What is a computer? content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    '###  What is programming?'
+                    ''
                 ),
                 (
                     '.guides/content/variables-and-operators.md',
-                    '##  Variables and operators\n\n\nVariables and operators content'
+                    'Variables and operators content'
                 ),
                 (
                     '.guides/content/variables-and-operators-assigning-variables.md',
-                    '###  Assigning variables\n\n\nAssigning variables content'
+                    'Assigning variables content'
                 ),
                 (
                     '.guides/content/variables-and-operators-declaring-variables.md',
-                    '###  Declaring variables\n\n\nDeclaring variables content'
+                    'Declaring variables content'
                 )
             ]
 
@@ -271,27 +271,27 @@ class TestSuite(unittest.TestCase):
             check_content = [
                 (
                     '.guides/content/computer-programming.md',
-                    '##  Computer programming\n\nComputer programming content'
+                    'Computer programming content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-a-computer-.md',
-                    '###  What is a computer?\n\nWhat is a computer? content'
+                    'What is a computer? content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    '###  What is programming?\n\nWhat is programming? content\n\n1\nin section Declaring variables'
+                    'What is programming? content\n\n1\nin section Declaring variables'
                 ),
                 (
                     '.guides/content/variables-and-operators.md',
-                    '##  Variables and operators\n\nVariables and operators content'
+                    'Variables and operators content'
                 ),
                 (
                     '.guides/content/variables-and-operators-assigning-variables.md',
-                    '###  Assigning variables\n\nAssigning variables content\n\n1.1\nin section Assigning variables'
+                    'Assigning variables content\n\n1.1\nin section Assigning variables'
                 ),
                 (
                     '.guides/content/variables-and-operators-declaring-variables.md',
-                    '###  Declaring variables\n\nDeclaring variables content'
+                    'Declaring variables content'
                 )
             ]
 
@@ -326,27 +326,27 @@ class TestSuite(unittest.TestCase):
             check_content = [
                 (
                     '.guides/content/computer-programming.md',
-                    '##  Computer programming\n\nComputer programming content'
+                    'Computer programming content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-a-computer-.md',
-                    '###  What is a computer?\n\nWhat is a computer? content'
+                    'What is a computer? content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    '###  What is programming?\n\nWhat is programming? content\n\n0\nin section Declaring variables'
+                    'What is programming? content\n\n0\nin section Declaring variables'
                 ),
                 (
                     '.guides/content/variables-and-operators.md',
-                    '##  Variables and operators\n\nVariables and operators content'
+                    'Variables and operators content'
                 ),
                 (
                     '.guides/content/variables-and-operators-assigning-variables.md',
-                    '###  Assigning variables\n\nAssigning variables content\n\n0.1\nin section Assigning variables'
+                    'Assigning variables content\n\n0.1\nin section Assigning variables'
                 ),
                 (
                     '.guides/content/variables-and-operators-declaring-variables.md',
-                    '###  Declaring variables\n\nDeclaring variables content'
+                    'Declaring variables content'
                 )
             ]
 
@@ -381,27 +381,27 @@ class TestSuite(unittest.TestCase):
             check_content = [
                 (
                     '.guides/content/computer-programming.md',
-                    '##  Computer programming\n\nComputer programming content'
+                    'Computer programming content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-a-computer-.md',
-                    '###  What is a computer?\n\nWhat is a computer? content'
+                    'What is a computer? content'
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    '###  What is programming?\n\nWhat is programming? content\n\noverride.1\n100'
+                    'What is programming? content\n\noverride.1\n100'
                 ),
                 (
                     '.guides/content/variables-and-operators.md',
-                    '##  Variables and operators\n\nVariables and operators content'
+                    'Variables and operators content'
                 ),
                 (
                     '.guides/content/variables-and-operators-assigning-variables.md',
-                    '###  Assigning variables\n\nAssigning variables content\n\n1.1\nin section override.3'
+                    'Assigning variables content\n\n1.1\nin section override.3'
                 ),
                 (
                     '.guides/content/variables-and-operators-declaring-variables.md',
-                    '###  Declaring variables\n\nDeclaring variables content'
+                    'Declaring variables content'
                 )
             ]
 
