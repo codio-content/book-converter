@@ -20,6 +20,7 @@ Generated config will be placed to `example` folder
 ### workspace
 * **directory** base directory of book
 * **tex** book name
+* **removeTrinket** remove trinket entries
 
 Examples
 ```yaml

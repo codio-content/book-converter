@@ -277,6 +277,7 @@ def convert(config, base_path, yes=False):
     refs = make_refs(toc, chapter_counter_from=get_ref_chapter_counter_from(config))
     refs = override_refs(refs, config)
     book, metadata = make_metadata_items(config)
+    remove_trinket = config['workspace'].get('removeTrinket', False)
 
     chapter = None
     children_containers = [book["children"]]
@@ -305,7 +306,9 @@ def convert(config, base_path, yes=False):
             lines = cleanup_latex(item.lines)
 
             md_converter = LaTeX2Markdown(
-                '\n'.join(lines), refs=refs, chapter_num=chapter_num, figure_num=figure_num, exercise_num=exercise_num
+                '\n'.join(lines),
+                refs=refs, chapter_num=chapter_num, figure_num=figure_num,
+                exercise_num=exercise_num, remove_trinket=remove_trinket
             )
 
             converted_md = md_converter.to_markdown()

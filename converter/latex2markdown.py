@@ -102,7 +102,7 @@ class LaTeX2Markdown(object):
     To modify the outputted markdown, modify the _block_configuration variable
     before initializing the LaTeX2Markdown instance."""
 
-    def __init__(self, latex_string, refs={}, chapter_num=1, figure_num=0, exercise_num=0):
+    def __init__(self, latex_string, refs={}, chapter_num=1, figure_num=0, exercise_num=0, remove_trinket=False):
         self._refs = refs
         self._chapter_num = chapter_num
         self._exercise_counter = 0
@@ -114,6 +114,7 @@ class LaTeX2Markdown(object):
         self._block_counter = defaultdict(lambda: 1)
         self._pdfs = []
         self._source_codes = []
+        self._remove_trinket = remove_trinket
 
         # Precompile the regexes
 
@@ -138,9 +139,9 @@ class LaTeX2Markdown(object):
                                     flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
-        self._code_re = re.compile(r"""\\begin{code}
+        self._code_re = re.compile(r"""\\begin{(?P<block_name>code|stdout)}
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{code}""",  # closing list
+                                    \\end{(?P=block_name)}""",  # closing list
                                    flags=re.DOTALL + re.VERBOSE)
 
         self._small_re = re.compile(r"""\\begin{small}
@@ -149,16 +150,10 @@ class LaTeX2Markdown(object):
                                     flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
-        self._trinket_re = re.compile(r"""\\begin{trinket}[\[\]0-9]*{(?P<file_name>.*?)}
+        self._trinket_re = re.compile(r"""\\begin{(?P<block_name>trinket)}[\[\]0-9]*{(?P<file_name>.*?)}
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{trinket}""",  # closing list
+                                    \\end{(?P=block_name)}""",  # closing list
                                       flags=re.DOTALL + re.VERBOSE)
-
-        # Select all our code blocks
-        self._stdout_re = re.compile(r"""\\begin{stdout}
-                                    (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{stdout}""",  # closing list
-                                     flags=re.DOTALL + re.VERBOSE)
 
         self._exercise_re = re.compile(r"""\\begin{exercise}(.*?)\n
                                     (?P<block_contents>.*?)
@@ -407,6 +402,9 @@ class LaTeX2Markdown(object):
             self._source_codes.append(Code(file_name, block_contents))
         except IndexError:
             pass
+        block_name = matchobj.group('block_name')
+        if self._remove_trinket and block_name == 'trinket':
+            return ''
         # % in code block is not latex comments, escape it and replace later
         block_contents = re.sub(r"%", r"\\%", block_contents)
         return "```code{}```".format(block_contents)
@@ -451,7 +449,6 @@ class LaTeX2Markdown(object):
 
         output = self._code_re.sub(self._code_block, output)
         output = self._trinket_re.sub(self._code_block, output)
-        output = self._stdout_re.sub(self._code_block, output)
         output = self._small_re.sub(r"\1", output)
 
         # Fix \% formatting
