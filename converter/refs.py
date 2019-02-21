@@ -53,7 +53,7 @@ def override_refs(refs, config):
 
 def make_refs(toc, chapter_counter_from=1):
     refs = OrderedDict()
-    chapter_counter = 0
+    chapter_counter = None
     section_counter = 0
     exercise_counter = 0
     figs_counter = 0
@@ -62,7 +62,7 @@ def make_refs(toc, chapter_counter_from=1):
 
     for item in toc:
         if item.section_type == CHAPTER:
-            if not chapter_counter:
+            if chapter_counter is None:
                 chapter_counter = chapter_counter_from
             else:
                 chapter_counter += 1

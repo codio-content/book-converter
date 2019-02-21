@@ -737,3 +737,38 @@ public class Hello {
             for path, content in check_content:
                 file_content = load_file(generate.joinpath(path))
                 self.assertEqual(content, file_content)
+
+    def test_refs_multi(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            generate = tmp.joinpath('generate')
+            config, base_path = load_config_file(get_file_path('toc_ref_multi', extension='yml'))
+            config['workspace']['directory'] = base_path
+            convert(config, tmp, True)
+
+            check_content = [
+                (
+                    '.guides/content/computer-programming.md',
+                    'Computer programming content'
+                ),
+                (
+                    '.guides/content/computer-programming-what-is-a-computer-.md',
+                    'What is a computer? content'
+                ),
+                (
+                    '.guides/content/what-is-programming-.md',
+                    'What is programming? content\n\n0\nin section Declaring variables'
+                ),
+                (
+                    '.guides/content/what-is-programming-variables-and-operators.md',
+                    'Variables and operators content\n2'
+                ),
+                (
+                    '.guides/content/assigning-variables.md',
+                    'Assigning variables content\n\n0.1\nin section Assigning variables'
+                )
+            ]
+
+            for path, content in check_content:
+                file_content = load_file(generate.joinpath(path))
+                self.assertEqual(content, file_content)
