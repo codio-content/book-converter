@@ -142,6 +142,13 @@ Available options:
           action: open
 ```
 
+3\. python tutor visualizer, `panel` - panel number
+```yaml
+        - path: "#tutor: code/example.java"
+          panel: 0
+          action: open
+```
+
 3\. point code line in a file, `panel` - panel number, `ref` line content
 ```yaml
         - path: "test.html"
