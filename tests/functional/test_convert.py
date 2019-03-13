@@ -334,7 +334,7 @@ class TestSuite(unittest.TestCase):
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    'What is programming? content\n0 in section Declaring variables'
+                    'What is programming? content\n\n0 in section Declaring variables'
                 ),
                 (
                     '.guides/content/variables-and-operators.md',

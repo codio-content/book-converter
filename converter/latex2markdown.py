@@ -146,7 +146,6 @@ class LaTeX2Markdown(object):
         exercise_num=0, remove_trinket=False, remove_exercise=False
     ):
         latex_string = '\n'.join(self._make_paragraphs(latex_array))
-        print('latex_string', latex_string)
         self._refs = refs
         self._chapter_num = chapter_num
         self._exercise_counter = 0
