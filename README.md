@@ -1,6 +1,6 @@
 ```bash
 python3 converter.py
-usage: converter.py [-h] [--generate GENERATE] [-l LOG] [-y] PATH [PATH ...]
+usage: converter.py [-h] [--generate GENERATE] [-l LOG] [-y] [-r] PATH [PATH ...]
 ```
 
 ## Usage
@@ -21,6 +21,7 @@ Generated config will be placed to `example` folder
 * **directory** base directory of book
 * **tex** book name
 * **removeTrinket** remove trinket entries
+* **removeExercise** remove exercise headers
 
 Examples
 ```yaml

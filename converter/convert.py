@@ -278,10 +278,11 @@ def convert(config, base_path, yes=False):
     refs = override_refs(refs, config)
     book, metadata = make_metadata_items(config)
     remove_trinket = config['workspace'].get('removeTrinket', False)
+    remove_exercise = config['workspace'].get('removeExercise', False)
 
     chapter = None
     children_containers = [book["children"]]
-    chapter_num = 0
+    chapter_num = get_ref_chapter_counter_from(config) - 1
     figure_num = 0
     exercise_num = 0
     pdfs_for_convert = []
@@ -298,7 +299,7 @@ def convert(config, base_path, yes=False):
         else:
             slug_name = slugify(item.section_name, chapter=chapter)
 
-        logging.debug("convert page %s" % slug_name)
+        logging.debug("convert page {} - {}".format(slug_name, chapter_num))
 
         converted_md = item.markdown
 
@@ -306,9 +307,10 @@ def convert(config, base_path, yes=False):
             lines = cleanup_latex(item.lines)
 
             md_converter = LaTeX2Markdown(
-                '\n'.join(lines),
+                lines,
                 refs=refs, chapter_num=chapter_num, figure_num=figure_num,
-                exercise_num=exercise_num, remove_trinket=remove_trinket
+                exercise_num=exercise_num, remove_trinket=remove_trinket,
+                remove_exercise=remove_exercise
             )
 
             converted_md = md_converter.to_markdown()

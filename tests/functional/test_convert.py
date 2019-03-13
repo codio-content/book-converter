@@ -279,7 +279,7 @@ class TestSuite(unittest.TestCase):
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    'What is programming? content\n\n1\nin section Declaring variables'
+                    'What is programming? content\n\n1 in section Declaring variables'
                 ),
                 (
                     '.guides/content/variables-and-operators.md',
@@ -287,7 +287,7 @@ class TestSuite(unittest.TestCase):
                 ),
                 (
                     '.guides/content/variables-and-operators-assigning-variables.md',
-                    'Assigning variables content\n\n1.1\nin section Assigning variables'
+                    'Assigning variables content\n\n1.1 in section Assigning variables'
                 ),
                 (
                     '.guides/content/variables-and-operators-declaring-variables.md',
@@ -334,7 +334,7 @@ class TestSuite(unittest.TestCase):
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    'What is programming? content\n\n0\nin section Declaring variables'
+                    'What is programming? content\n0 in section Declaring variables'
                 ),
                 (
                     '.guides/content/variables-and-operators.md',
@@ -342,7 +342,7 @@ class TestSuite(unittest.TestCase):
                 ),
                 (
                     '.guides/content/variables-and-operators-assigning-variables.md',
-                    'Assigning variables content\n\n0.1\nin section Assigning variables'
+                    'Assigning variables content\n\n0.1 in section Assigning variables'
                 ),
                 (
                     '.guides/content/variables-and-operators-declaring-variables.md',
@@ -389,7 +389,7 @@ class TestSuite(unittest.TestCase):
                 ),
                 (
                     '.guides/content/computer-programming-what-is-programming-.md',
-                    'What is programming? content\n\noverride.1\n100'
+                    'What is programming? content\n\noverride.1 100'
                 ),
                 (
                     '.guides/content/variables-and-operators.md',
@@ -397,7 +397,7 @@ class TestSuite(unittest.TestCase):
                 ),
                 (
                     '.guides/content/variables-and-operators-assigning-variables.md',
-                    'Assigning variables content\n\n1.1\nin section override.3'
+                    'Assigning variables content\n\n1.1 in section override.3'
                 ),
                 (
                     '.guides/content/variables-and-operators-declaring-variables.md',
@@ -757,15 +757,15 @@ public class Hello {
                 ),
                 (
                     '.guides/content/what-is-programming-.md',
-                    'What is programming? content\n\n0\nin section Declaring variables'
+                    'What is programming? content\n\n0 in section Declaring variables'
                 ),
                 (
                     '.guides/content/what-is-programming-variables-and-operators.md',
-                    'Variables and operators content\n2'
+                    'Variables and operators content 2'
                 ),
                 (
                     '.guides/content/assigning-variables.md',
-                    'Assigning variables content\n\n0.1\nin section Assigning variables'
+                    'Assigning variables content\n\n0.1 in section Assigning variables'
                 )
             ]
 

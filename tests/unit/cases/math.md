@@ -1,5 +1,4 @@
-Here is the formula.
-Be careful not to use integer division!
+Here is the formula. Be careful not to use integer division!
 
 $ F = C \times \frac{9}{5} + 32 $
 

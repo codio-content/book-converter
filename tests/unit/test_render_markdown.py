@@ -29,12 +29,12 @@ def load_file(path):
 class TestSuite(unittest.TestCase):
     def write_md(self, name, refs={}, chapter_num=1):
         path = "cases/{}".format(name)
-        converter = LaTeX2Markdown(load_tex(path), refs=refs, chapter_num=chapter_num)
+        converter = LaTeX2Markdown(load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num)
         write_md_case(name, converter.to_markdown())
 
     def run_case(self, name, refs={}, chapter_num=1):
         path = "cases/{}".format(name)
-        converter = LaTeX2Markdown(load_tex(path), refs=refs, chapter_num=chapter_num)
+        converter = LaTeX2Markdown(load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num)
         self.assertEqual(converter.to_markdown(), load_md(path))
 
     def test_markdown_chapter_render(self):
@@ -151,7 +151,6 @@ class TestSuite(unittest.TestCase):
         self.run_case("pageref_num", refs=refs)
 
     def test_math(self):
-        self.write_md("math")
         self.run_case("math")
 
     def test_eqnarray(self):

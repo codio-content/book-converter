@@ -47,7 +47,6 @@ She has also worked on a Ruby version of the book.
 *  Waldo Ribeiro submitted a pull request that corrected a dozen typos.
 
 
-Unlike string literals, which appear in double quotes, character literals can only contain a single character.
-Escape sequences, like `'\t'`, are legal because they represent a single character.
+Unlike string literals, which appear in double quotes, character literals can only contain a single character. Escape sequences, like `'\t'`, are legal because they represent a single character.
 
 The increment and decrement operators also work with characters.

@@ -102,7 +102,51 @@ class LaTeX2Markdown(object):
     To modify the outputted markdown, modify the _block_configuration variable
     before initializing the LaTeX2Markdown instance."""
 
-    def __init__(self, latex_string, refs={}, chapter_num=1, figure_num=0, exercise_num=0, remove_trinket=False):
+    def _make_paragraphs(self, lines):
+        processed = []
+        current = ''
+        single_line = ('\\chapter', '\\section', '%', '\\index')
+        is_multi_line = False
+        for line in lines:
+            if line.startswith(single_line):
+                if current:
+                    processed.append(current)
+                    current = ''
+                processed.append(line)
+                continue
+            elif line.startswith('\\begin'):
+                if current:
+                    processed.append(current)
+                    current = ''
+                is_multi_line = True
+                processed.append(line)
+                continue
+            elif not line:
+                if current:
+                    processed.append(current)
+                    current = ''
+                processed.append(line)
+                continue
+
+            if is_multi_line:
+                processed.append(line)
+            else:
+                if current:
+                    current += ' ' + line
+                else:
+                    current = line
+            if line.startswith('\\end'):
+                is_multi_line = False
+        if current:
+            processed.append(current)
+        return processed
+
+    def __init__(
+        self, latex_array, refs={}, chapter_num=1, figure_num=0,
+        exercise_num=0, remove_trinket=False, remove_exercise=False
+    ):
+        latex_string = '\n'.join(self._make_paragraphs(latex_array))
+        print('latex_string', latex_string)
         self._refs = refs
         self._chapter_num = chapter_num
         self._exercise_counter = 0
@@ -115,6 +159,7 @@ class LaTeX2Markdown(object):
         self._pdfs = []
         self._source_codes = []
         self._remove_trinket = remove_trinket
+        self._remove_exercise = remove_exercise
 
         # Precompile the regexes
 
@@ -351,7 +396,10 @@ class LaTeX2Markdown(object):
         block_contents = matchobj.group('block_contents')
 
         self._exercise_counter += 1
-        prefix = "**Exercise {}.{}:**\n".format(self._chapter_num, self._exercise_counter)
+        prefix = "**Exercise {}.{}:**\n"\
+            .format(self._chapter_num, self._exercise_counter + self._exercise_counter_offset)
+        if self._remove_exercise:
+            prefix = ""
 
         return prefix + block_contents
 

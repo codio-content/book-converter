@@ -1,5 +1,4 @@
-The goal of this exercise is to translate a recursive definition into a Java method.
-The Ackermann function is defined for non-negative integers as follows:
+The goal of this exercise is to translate a recursive definition into a Java method. The Ackermann function is defined for non-negative integers as follows:
 $$
 A(m, n) = \begin{cases}
               n+1 & \mbox{if } m = 0 \\

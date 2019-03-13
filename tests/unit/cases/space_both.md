@@ -1,2 +1,1 @@
-Chapters  9 and 10 focus more on immutable vs mutable objects, and we added new sections on BigInteger and StringBuilder.
-Chapters  9 and 10 focus more on immutable vs mutable objects, and we added new sections on BigInteger and StringBuilder.
+Chapters  9 and 10 focus more on immutable vs mutable objects, and we added new sections on BigInteger and StringBuilder. Chapters  9 and 10 focus more on immutable vs mutable objects, and we added new sections on BigInteger and StringBuilder.
