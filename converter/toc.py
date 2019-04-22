@@ -31,7 +31,11 @@ def get_name(line):
 
 
 def get_bookdown_name(line):
-    return line[line.index(' ') + 1:].strip()
+    name = line[line.index(' ') + 1:].strip()
+    if '{' in name and name.endswith('}'):
+        name = name[0:name.rfind('{') - 1]
+        name = name.strip()
+    return name
 
 
 def process_toc_lines(lines, tex_folder):
@@ -73,9 +77,13 @@ def process_bookdown_lines(lines):
     quotes = False
     for line in lines:
         line = line.rstrip('\r\n')
-        if line.startswith('```'):
+        if '\\begin' in line:
+            line = line.strip()
+        if '```' in line:
+            line = line.strip()
             quotes = not quotes
-        if not quotes and (line.startswith('# ') or line.startswith('## ')):
+        top_level = not quotes and (line.startswith('# ') or line.startswith('## '))
+        if top_level:
             if toc:
                 if item_lines:
                     toc[len(toc) - 1].lines = item_lines
@@ -132,12 +140,13 @@ def generate_toc(file_path, structure_path, ignore_exists=False):
     if path.exists() and not ignore_exists:
         raise Exception("Path exists")
     tex = Path(structure_path)
-    if structure_path.endswith('_bookdown.yml'):
+    bookdown = structure_path.endswith('_bookdown.yml')
+    if bookdown:
         toc = get_bookdown_toc(tex.parent, tex.name)
     else:
         toc = get_latex_toc(tex.parent, tex.name)
     path.mkdir(parents=True, exist_ok=ignore_exists)
 
-    content = print_to_yaml(toc, tex)
+    content = print_to_yaml(toc, tex, bookdown=bookdown)
     a_path = path.joinpath("codio_structure.yml").resolve()
     write_file(a_path, content)

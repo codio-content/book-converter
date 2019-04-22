@@ -26,11 +26,17 @@ def copy_globing(asset, base_src_dir, generate_dir):
         shutil.copy(file, dst.joinpath(Path(file).name))
 
 
-def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path):
+def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path, bookdown=False):
     base_src_dir = Path(config['workspace']['directory'])
     for pdf in pdfs_for_convert:
         logging.debug("convert %s to jpg" % pdf)
-        pdf_file = base_src_dir.joinpath(pdf)
+        pdf_file = base_src_dir.joinpath('_bookdown_files').joinpath(pdf) if bookdown else base_src_dir.joinpath(pdf)
+        if not pdf_file.exists():
+            pdf = '{}.pdf'.format(pdf)
+            pdf_file = base_src_dir.joinpath('_bookdown_files').joinpath(pdf)\
+                if bookdown else base_src_dir.joinpath(pdf)
+            if not pdf_file.exists():
+                continue
         pages = convert_from_path(pdf_file, 500)
 
         dst_folder = Path(generate_dir).joinpath(Path(pdf).parent)
@@ -42,10 +48,10 @@ def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path):
             page.save(dst_folder.joinpath(image.name), 'JPEG')
 
 
-def convert_assets(config, generate_dir, pdfs_for_convert):
+def convert_assets(config, generate_dir, pdfs_for_convert, bookdown=False):
     try:
         from pdf2image import convert_from_path
-        _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path)
+        _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path, bookdown=bookdown)
     except Exception as e:
         logging.error("pdf2image is not installed", e)
 
