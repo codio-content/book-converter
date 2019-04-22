@@ -2,8 +2,10 @@ import re
 
 from converter.guides.tools import get_text_in_brackets
 
+
 def _assets_extension():
     return 'pdf'
+
 
 class BookDown2Markdown(object):
     def __init__(self, lines_array, chapter_num=1, figure_num=0, assets_extension=_assets_extension):
