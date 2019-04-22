@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from pathlib import Path
 
-from converter.convert import get_toc
+from converter.convert import get_latex_toc
 from converter.guides.item import CHAPTER
 
 
@@ -19,7 +19,7 @@ def ordered_dump(data, stream=None, **kwds):
 
 
 def ref_dict(config):
-    toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
+    toc = get_latex_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
     refs = make_refs(toc)
 
     out = {'refs': {'chapter_counter_from': 0, 'overrides': refs}}

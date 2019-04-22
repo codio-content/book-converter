@@ -4,7 +4,7 @@ import re
 
 from pathlib import Path
 
-from converter.toc import get_toc, print_to_yaml, generate_toc
+from converter.toc import get_latex_toc, print_to_yaml, generate_toc
 
 
 def get_file_path(name='', extension='tex'):
@@ -23,7 +23,7 @@ def load_file(name, extension=''):
 class TestSuite(unittest.TestCase):
     def test_toc_basic(self):
         path = Path(get_file_path('toc_simple'))
-        toc = get_toc(path.parent, path.name)
+        toc = get_latex_toc(path.parent, path.name)
         self.assertEqual(len(toc), 6)
 
         should_be = [
@@ -46,7 +46,7 @@ class TestSuite(unittest.TestCase):
 
     def test_toc_print_yaml(self):
         path = Path(get_file_path('toc_simple'))
-        toc = get_toc(path.parent, path.name)
+        toc = get_latex_toc(path.parent, path.name)
         yaml = print_to_yaml(toc, path)
 
         yaml = re.sub(r"directory:(.*)$", r"directory: toc_cases", yaml, flags=re.MULTILINE)

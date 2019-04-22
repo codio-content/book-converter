@@ -4,7 +4,7 @@ import uuid
 
 from pathlib import Path
 
-from converter.toc import get_toc
+from converter.toc import get_latex_toc
 from converter.guides.tools import slugify, write_file, write_json
 from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
@@ -272,7 +272,7 @@ def convert(config, base_path, yes=False):
     logging.debug("start converting %s" % generate_dir)
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
-    toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
+    toc = get_latex_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     refs = make_refs(toc, chapter_counter_from=get_ref_chapter_counter_from(config))
     refs = override_refs(refs, config)
