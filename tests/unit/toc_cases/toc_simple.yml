@@ -4,17 +4,17 @@ workspace:
 assets:
   - code
 sections:
-  - name: Computer programming
+  - name: "Computer programming"
     type: chapter
     configuration:
       layout: 2-panels
-  - name: What is a computer?
+  - name: "What is a computer?"
     type: section
-  - name: What is programming?
+  - name: "What is programming?"
     type: section
-  - name: Variables and operators
+  - name: "Variables and operators"
     type: chapter
-  - name: Declaring variables
+  - name: "Declaring variables"
     type: section
-  - name: Assigning variables
+  - name: "Assigning variables"
     type: section

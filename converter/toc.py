@@ -140,7 +140,7 @@ def generate_toc(file_path, structure_path, ignore_exists=False):
     if path.exists() and not ignore_exists:
         raise Exception("Path exists")
     tex = Path(structure_path)
-    bookdown = structure_path.endswith('_bookdown.yml')
+    bookdown = str(structure_path).endswith('_bookdown.yml')
     if bookdown:
         toc = get_bookdown_toc(tex.parent, tex.name)
     else:
