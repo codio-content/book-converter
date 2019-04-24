@@ -4,10 +4,11 @@ import uuid
 
 from pathlib import Path
 
-from converter.toc import get_toc
+from converter.toc import get_latex_toc, get_bookdown_toc
 from converter.guides.tools import slugify, write_file, write_json
 from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
+from converter.bookdown2markdown import BookDown2Markdown
 from converter.assets import copy_assets, convert_assets, process_source_code
 from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from
 
@@ -214,13 +215,15 @@ def get_section_type(item):
     return "chapter" if item.section_type == CHAPTER else "page"
 
 
-def make_section_items(item, slug_name, md_path, transformation_rules):
+def make_section_items(item, slug_name, md_path, transformation_rules, converted_md):
     book_item = {
         "id": slug_name,
         "title": item.section_name,
         "type": get_section_type(item),
         "pageId": slug_name
     }
+    if not converted_md:
+        del book_item["pageId"]
     section = {
         "id": slug_name,
         "title": item.section_name,
@@ -241,13 +244,13 @@ def make_section_items(item, slug_name, md_path, transformation_rules):
     return section, book_item
 
 
-def process_assets(config, generate_dir, pdfs_for_convert, source_codes):
+def process_assets(config, generate_dir, pdfs_for_convert, source_codes, bookdown=False):
     logging.debug("copy assets")
     copy_assets(config, generate_dir)
 
     if pdfs_for_convert:
         logging.debug("convert included pdfs")
-        convert_assets(config, generate_dir, pdfs_for_convert)
+        convert_assets(config, generate_dir, pdfs_for_convert, bookdown=bookdown)
 
     if source_codes:
         logging.debug("process source codes")
@@ -272,7 +275,7 @@ def convert(config, base_path, yes=False):
     logging.debug("start converting %s" % generate_dir)
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
-    toc = get_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
+    toc = get_latex_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     refs = make_refs(toc, chapter_counter_from=get_ref_chapter_counter_from(config))
     refs = override_refs(refs, config)
@@ -328,7 +331,7 @@ def convert(config, base_path, yes=False):
                     converted_md = converted_md.replace(key, value)
 
         md_path = content_dir.joinpath(slug_name + ".md")
-        section, book_item = make_section_items(item, slug_name, md_path, transformation_rules)
+        section, book_item = make_section_items(item, slug_name, md_path, transformation_rules, converted_md)
 
         if item.section_type == CHAPTER or item.codio_section == "start":
             book_item["children"] = []
@@ -348,3 +351,94 @@ def convert(config, base_path, yes=False):
 
     write_metadata(guides_dir, metadata, book)
     process_assets(config, generate_dir, pdfs_for_convert, source_codes)
+
+
+def assets_extension(base_src_dir):
+    possible_exts = ['pdf', 'png', 'jpg']
+
+    def detect_asset_ext(asset_path):
+        for ext in possible_exts:
+            file = base_src_dir.joinpath('_bookdown_files').joinpath('{}.{}'.format(asset_path, ext))
+            if file.exists():
+                return ext
+    return detect_asset_ext
+
+
+def cleanup_bookdown(lines):
+    lines = lines[1:]
+    return lines
+
+
+def convert_bookdown(config, base_path, yes=False):
+    base_dir = base_path
+    generate_dir = base_dir.joinpath("generate")
+    if not prepare_base_directory(generate_dir, yes):
+        return
+
+    logging.debug("start converting %s" % generate_dir)
+    guides_dir, content_dir = prepare_structure(generate_dir)
+    transformation_rules, insert_rules = prepare_codio_rules(config)
+    toc = get_bookdown_toc(Path(config['workspace']['directory']), Path(config['workspace']['bookdown']))
+    toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
+
+    book, metadata = make_metadata_items(config)
+
+    chapter = None
+    chapter_num = get_ref_chapter_counter_from(config) - 1
+    figure_num = 0
+    children_containers = [book["children"]]
+    pdfs_for_convert = []
+    logging.debug("convert selected pages")
+
+    detect_asset_ext = assets_extension(Path(config['workspace']['directory']))
+
+    for item in toc:
+        if item.section_type == CHAPTER:
+            chapter_num += 1
+            figure_num = 0
+            slug_name = slugify(item.section_name)
+            chapter = item.section_name
+        else:
+            slug_name = slugify(item.section_name, chapter=chapter)
+
+        logging.debug("convert page {} - {}".format(slug_name, chapter_num))
+
+        converted_md = item.markdown
+
+        if not converted_md:
+            lines = cleanup_bookdown(item.lines)
+            md_converter = BookDown2Markdown(
+                lines,
+                chapter_num=chapter_num, figure_num=figure_num, assets_extension=detect_asset_ext
+            )
+            figure_num += md_converter.get_figure_counter()
+            converted_md = md_converter.to_markdown()
+            if md_converter.get_pdfs_for_convert():
+                pdfs_for_convert += md_converter.get_pdfs_for_convert()
+
+            if slug_name in tokens:
+                for key, value in tokens.get(slug_name).items():
+                    converted_md = converted_md.replace(key, value)
+
+        md_path = content_dir.joinpath(slug_name + ".md")
+        section, book_item = make_section_items(item, slug_name, md_path, transformation_rules, converted_md)
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            book_item["children"] = []
+            if item.section_type == CHAPTER:
+                children_containers = [children_containers[0]]
+        elif item.codio_section == "end" and len(children_containers) > 1:
+            children_containers.pop()
+
+        children_containers[len(children_containers) - 1].append(book_item)
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            children_containers.append(book_item["children"])
+
+        metadata["sections"].append(section)
+
+        write_file(md_path, converted_md)
+
+    write_metadata(guides_dir, metadata, book)
+
+    process_assets(config, generate_dir, pdfs_for_convert, [], bookdown=True)
