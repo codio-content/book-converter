@@ -15,6 +15,10 @@ Example: `python3 converter.py --generate ThinkJava2/thinkjava.tex example`
 
 Generated config will be placed to `example` folder
 
+### R markdown convert
+
+[see subdocumentation](docs/bookdown.md)
+
 ## Config options
 
 ### workspace
