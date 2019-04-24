@@ -215,10 +215,16 @@ def get_section_type(item):
     return "chapter" if item.section_type == CHAPTER else "page"
 
 
+def fix_title(name):
+    if '----' in name:
+        return name[name.find('----') + 4:]
+    return name
+
+
 def make_section_items(item, slug_name, md_path, transformation_rules, converted_md):
     book_item = {
         "id": slug_name,
-        "title": item.section_name,
+        "title": fix_title(item.section_name),
         "type": get_section_type(item),
         "pageId": slug_name
     }
@@ -226,7 +232,7 @@ def make_section_items(item, slug_name, md_path, transformation_rules, converted
         del book_item["pageId"]
     section = {
         "id": slug_name,
-        "title": item.section_name,
+        "title": fix_title(item.section_name),
         "files": [],
         "path": [],
         "type": "markdown",

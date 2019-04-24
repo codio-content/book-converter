@@ -70,7 +70,7 @@ def get_latex_toc(tex_folder, tex_name):
         return process_toc_lines(lines, tex_folder)
 
 
-def process_bookdown_lines(lines):
+def process_bookdown_lines(lines, name_without_ext):
     toc = []
     item_lines = []
     line_pos = 1
@@ -89,7 +89,11 @@ def process_bookdown_lines(lines):
                     toc[len(toc) - 1].lines = item_lines
                 item_lines = []
             section_type = CHAPTER if line.startswith('# ') else SECTION
-            toc.append(SectionItem(section_name=get_bookdown_name(line), section_type=section_type, line_pos=line_pos))
+            toc.append(SectionItem(
+                section_name="{}----{}".format(name_without_ext, get_bookdown_name(line)),
+                section_type=section_type,
+                line_pos=line_pos)
+            )
         if toc:
             item_lines.append(line)
         line_pos += 1
@@ -98,11 +102,11 @@ def process_bookdown_lines(lines):
     return toc
 
 
-def process_bookdown_file(folder, name):
+def process_bookdown_file(folder, name, name_without_ext):
     a_path = folder.joinpath(name).resolve()
     with open(a_path) as file:
         lines = file.readlines()
-        return process_bookdown_lines(lines)
+        return process_bookdown_lines(lines, name_without_ext)
 
 
 def get_bookdown_toc(folder, name):
@@ -113,7 +117,7 @@ def get_bookdown_toc(folder, name):
         toc = []
         for file in rmd_files:
             name_without_ext = Path(file).stem
-            toc += process_bookdown_file(folder.joinpath('_book'), "{}.md".format(name_without_ext))
+            toc += process_bookdown_file(folder.joinpath('_book'), "{}.md".format(name_without_ext), name_without_ext)
         return toc
 
 
