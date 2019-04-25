@@ -183,7 +183,7 @@ class LaTeX2Markdown(object):
                                     flags=re.DOTALL + re.VERBOSE)
 
         # Select all our code blocks
-        self._code_re = re.compile(r"""\\begin{(?P<block_name>code|stdout)}
+        self._code_re = re.compile(r"""\\begin{(?P<block_name>code|stdout|verbatim)}
                                     (?P<block_contents>.*?) # Non-greedy list contents
                                     \\end{(?P=block_name)}""",  # closing list
                                    flags=re.DOTALL + re.VERBOSE)
