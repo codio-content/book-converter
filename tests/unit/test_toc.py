@@ -1,10 +1,26 @@
 import unittest
 import os
 import re
+import functools
 
 from pathlib import Path
 
-from converter.toc import get_latex_toc, print_to_yaml, generate_toc
+from converter.toc import get_latex_toc, print_to_yaml, generate_toc, get_name
+
+
+def cases(cases):
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(*args):
+            for index, c in enumerate(cases):
+                new_args = args + (c if isinstance(c, tuple) else (c,))
+                try:
+                    f(*new_args)
+                except BaseException as e:
+                    print("case #{} failed, arguments {}".format(index, c))
+                    raise e
+        return wrapper
+    return decorator
 
 
 def get_file_path(name='', extension='tex'):
@@ -76,3 +92,14 @@ class TestSuite(unittest.TestCase):
         with self.assertRaises(Exception):
             path = Path(get_file_path('toc_simple'))
             generate_toc(get_file_path(), path)
+
+    @cases([
+        ('\\section{Interpreting results}\\label{interpreting-results}', 'Interpreting results'),
+        ('\\section{Implementing {\\tt put}}', 'Implementing put'),
+        ('\\section{Profiling \\java{LinkedList} methods}', 'Profiling LinkedList methods'),
+        ('\\section{Adding to the end of a \\java{LinkedList}}', 'Adding to the end of a LinkedList'),
+        ('\\section{\\java{WikiFetcher}}', 'WikiFetcher'),
+        ('\\section{{\\tt Comparable} and {\\tt Comparator}}', 'Comparable and Comparator')
+    ])
+    def test_name_generation(self, case, should_be):
+        self.assertEqual(get_name(case), should_be)
