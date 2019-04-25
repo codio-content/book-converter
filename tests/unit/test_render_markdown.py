@@ -161,3 +161,6 @@ class TestSuite(unittest.TestCase):
 
     def test_esc_code(self):
         self.run_case("esc_code")
+
+    def test_verbatim(self):
+        self.run_case("verbatim")

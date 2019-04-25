@@ -1,0 +1,20 @@
+\begin{verbatim}
+public interface Comparable<T> {
+    public int compareTo(T o);
+}
+\end{verbatim}
+
+For example, here's the source code for \java{java.lang.Integer}:
+
+\begin{verbatim}
+public final class Integer extends Number implements Comparable<Integer> {
+
+    public int compareTo(Integer anotherInteger) {
+        int thisVal = this.value;
+        int anotherVal = anotherInteger.value;
+        return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
+    }
+
+    // other methods omitted
+}
+\end{verbatim}
