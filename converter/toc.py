@@ -26,8 +26,44 @@ def input_file(line):
     return line[7:-1]
 
 
+def cleanup_name(name):
+    l_pos = name.find('{')
+    r_pos = name.find('}')
+    cut_pos = l_pos + 1
+    if l_pos != -1 and r_pos != -1 and l_pos < r_pos:
+        if name[l_pos + 1] == '\\':
+            cut_pos = name.find(' ', l_pos)
+        else:
+            for pos in range(l_pos, -1, -1):
+                if name[pos] == '\\':
+                    l_pos = pos + 1
+                    break
+        if l_pos != 0:
+            l_pos = l_pos - 1
+        else:
+            cut_pos += 1
+        res = name[0:l_pos] + name[cut_pos:r_pos] + name[r_pos+1:]
+        return cleanup_name(res)
+    return name
+
+
 def get_name(line):
-    return get_text_in_brackets(line)
+    level = 0
+    start = 0
+    end = len(line)
+    for pos, ch in enumerate(line):
+        if ch == '{':
+            if start == 0:
+                start = pos
+            else:
+                level += 1
+        elif ch == '}':
+            if level == 0:
+                end = pos
+                break
+            else:
+                level -= 1
+    return cleanup_name(line[start + 1:end])
 
 
 def get_bookdown_name(line):
