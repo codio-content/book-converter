@@ -305,21 +305,20 @@ class LaTeX2Markdown(object):
             line = line.replace("\\\\", "<br/>")
 
             markdown_list_line = line.replace(r"\item", list_heading)
-            if block_name == "description":
-                if not line:
-                    continue
-                if "\\term" in line:
-                    if output_str:
-                        output_str += "\n"
-                    markdown_list_line = markdown_list_line.replace("\\term", list_heading)
-                    markdown_list_line = markdown_list_line.replace("{", "**")
-                    markdown_list_line = markdown_list_line.replace("}", "**")
-                elif "\\item" in line:
-                    if output_str:
-                        output_str += "\n"
-                    markdown_list_line = markdown_list_line.replace("[", "**")
-                    markdown_list_line = markdown_list_line.replace("]", "**")
-            output_str += markdown_list_line + "\n"
+            if not line:
+                continue
+            if "\\term" in line:
+                if output_str:
+                    output_str = output_str.strip() + "\n"
+                markdown_list_line = markdown_list_line.replace("\\term", list_heading)
+                markdown_list_line = markdown_list_line.replace("{", "**")
+                markdown_list_line = markdown_list_line.replace("}", "**")
+            elif "\\item" in line:
+                if output_str:
+                    output_str = output_str.strip() + "\n"
+                markdown_list_line = markdown_list_line.replace("[", "**")
+                markdown_list_line = markdown_list_line.replace("]", "**")
+            output_str += markdown_list_line + ' '
         return output_str
 
     def _format_block_name(self, block_name, block_title=None):
