@@ -167,3 +167,6 @@ class TestSuite(unittest.TestCase):
 
     def test_verbatim(self):
         self.run_case("verbatim")
+
+    def test_redis(self):
+        self.run_case("redis")

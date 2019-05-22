@@ -531,6 +531,7 @@ class LaTeX2Markdown(object):
         output = self._eqnarray_re.sub(self._eqnarray_block, output)
 
         output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
+        output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb\"(?P<block_contents>.*?)\"").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb'(?P<block_contents>.*?)'").sub(self._inline_code_block, output)
 
