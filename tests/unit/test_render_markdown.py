@@ -89,6 +89,9 @@ class TestSuite(unittest.TestCase):
     def test_markdown_figure(self):
         self.run_case("figure")
 
+    def test_markdown_figure_complex(self):
+        self.run_case("figure_complex")
+
     def test_markdown_trinket(self):
         self.run_case("trinket")
 
