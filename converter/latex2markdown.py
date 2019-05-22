@@ -377,11 +377,24 @@ class LaTeX2Markdown(object):
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
 
+        caption_line = None
+
         for line in block_contents.strip().split("\n"):
-            if line.startswith("\\includegraphics"):
+            if "\\includegraphics" in line:
+                if not line.startswith("\\includegraphics"):
+                    line = get_text_in_brackets(line)
                 images.append(get_text_in_brackets(line))
             elif line.startswith("\\caption"):
-                caption += get_text_in_brackets(line)
+                if '}' in line:
+                    caption += get_text_in_brackets(line)
+                else:
+                    caption_line = line
+            elif caption_line:
+                if '}' in line:
+                    caption += get_text_in_brackets(caption_line + ' ' + line)
+                    caption_line = None
+                else:
+                    caption_line += ' ' + line
 
         markdown_images = []
 
