@@ -541,6 +541,8 @@ class LaTeX2Markdown(object):
 
         output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 
+        output = re.sub(r"\\\[ (.*?)\\runtime(.*?) \\\]", r"\[ \1runtime\2 \]", output)
+
         output = re.sub(r"\\\[ (.*?) \\\]", r"$ \1 $", output)
 
         output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
