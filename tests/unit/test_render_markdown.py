@@ -170,3 +170,6 @@ class TestSuite(unittest.TestCase):
 
     def test_redis(self):
         self.run_case("redis")
+
+    def test_math_runtime(self):
+        self.run_case("math_runtime")
