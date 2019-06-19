@@ -9,7 +9,7 @@ from converter.guides.tools import slugify, write_file, write_json
 from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
 from converter.bookdown2markdown import BookDown2Markdown
-from converter.assets import copy_assets, convert_assets, process_source_code
+from converter.assets import copy_assets, convert_assets, process_source_code, copy_files_from_bookdown_folder
 from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from
 
 
@@ -253,6 +253,9 @@ def make_section_items(item, slug_name, md_path, transformation_rules, converted
 def process_assets(config, generate_dir, pdfs_for_convert, source_codes, bookdown=False):
     logging.debug("copy assets")
     copy_assets(config, generate_dir)
+
+    if bookdown:
+        copy_files_from_bookdown_folder(config, generate_dir)
 
     if pdfs_for_convert:
         logging.debug("convert included pdfs")

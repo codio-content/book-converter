@@ -1,6 +1,8 @@
 import logging
 import glob
 import shutil
+from os import listdir
+from os.path import isdir
 
 from pathlib import Path
 
@@ -23,6 +25,9 @@ def copy_globing(asset, base_src_dir, generate_dir):
     dst.mkdir(exist_ok=True, parents=True)
 
     for file in glob.glob(str(src.joinpath(value))):
+        shutil.copy(file, dst.joinpath(Path(file).name))
+
+    for file in glob.glob(str(src.joinpath('**/{}'.format(value)))):
         shutil.copy(file, dst.joinpath(Path(file).name))
 
 
@@ -87,3 +92,11 @@ def process_source_code(source_codes, generate_dir):
         logging.info("write {} to {}".format(code.name, file_path))
         write_file(file_path, code.source)
         counter[code.name] = current + 1
+
+
+def copy_files_from_bookdown_folder(config, generate_dir):
+    base_src_dir = Path(config['workspace']['directory'])
+    bookdown_dir = base_src_dir.joinpath('_bookdown_files')
+    for f_item in listdir(base_src_dir.joinpath('_bookdown_files')):
+        copy_globing({f_item: '*.png'}, bookdown_dir, generate_dir)
+        copy_globing({f_item: '*.jpg'}, bookdown_dir, generate_dir)
