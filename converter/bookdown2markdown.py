@@ -45,7 +45,6 @@ class BookDown2Markdown(object):
                 caption += get_text_in_brackets(line)
 
         markdown_images = []
-
         for image in images:
             if '.' not in image:
                 ext = self.assets_extension(image)
@@ -63,11 +62,31 @@ class BookDown2Markdown(object):
             caption
         )
 
+    def _includegraphics_block(self, matchobj):
+        image = matchobj.group('block_contents')
+        self._figure_counter += 1
+
+        if '.' not in image:
+            ext = self.assets_extension(image)
+            if ext:
+                image = '{}.{}'.format(image, ext)
+        if image.lower().endswith('.pdf'):
+            self._pdfs.append(image)
+            image = image.replace('.pdf', '.jpg')
+
+        caption = 'Figure {}.{}'.format(
+            self._chapter_num, self._figure_counter + self._figure_counter_offset
+        )
+
+        return '{}\n\n**{}**\n\n'.format(
+            "![{}]({})".format(caption, image), caption
+        )
+
     def _to_markdown(self):
         output = '\n'.join(self.lines_array)
         output = self._figure_re.sub(self._figure_block, output)
         output = self._figure_center_re.sub(self._figure_block, output)
-        output = self._includegraphics_re.sub(self._figure_block, output)
+        output = self._includegraphics_re.sub(self._includegraphics_block, output)
         return output
 
     def to_markdown(self):
