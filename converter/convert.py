@@ -367,6 +367,9 @@ def assets_extension(base_src_dir):
             file = base_src_dir.joinpath('_bookdown_files').joinpath('{}.{}'.format(asset_path, ext))
             if file.exists():
                 return ext
+            file = base_src_dir.joinpath('{}.{}'.format(asset_path, ext))
+            if file.exists():
+                return ext
     return detect_asset_ext
 
 
