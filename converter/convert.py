@@ -228,8 +228,6 @@ def make_section_items(item, slug_name, md_path, transformation_rules, converted
         "type": get_section_type(item),
         "pageId": slug_name
     }
-    if not converted_md:
-        del book_item["pageId"]
     section = {
         "id": slug_name,
         "title": fix_title(item.section_name),
@@ -246,7 +244,9 @@ def make_section_items(item, slug_name, md_path, transformation_rules, converted
         configuration = transformation_rules[slug_name].get('configuration', {})
         if configuration:
             section = {**section, **configuration}
-
+    if not converted_md:
+        del book_item["pageId"]
+        section = None
     return section, book_item
 
 
@@ -353,8 +353,8 @@ def convert(config, base_path, yes=False):
 
         if item.section_type == CHAPTER or item.codio_section == "start":
             children_containers.append(book_item["children"])
-
-        metadata["sections"].append(section)
+        if section:
+            metadata["sections"].append(section)
 
         write_file(md_path, converted_md)
 
@@ -447,7 +447,8 @@ def convert_bookdown(config, base_path, yes=False):
         if item.section_type == CHAPTER or item.codio_section == "start":
             children_containers.append(book_item["children"])
 
-        metadata["sections"].append(section)
+        if section:
+            metadata["sections"].append(section)
 
         write_file(md_path, converted_md)
 
