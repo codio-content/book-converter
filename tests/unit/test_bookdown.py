@@ -20,10 +20,24 @@ def load_file(path):
 
 
 class TestSuite(unittest.TestCase):
-    def run_case(self, name):
+    def run_case(self, name, refs={}):
         path = "bookdown_cases/{}".format(name)
-        converter = BookDown2Markdown(load_book_md(path).split('\n'), assets_extension=lambda x: "jpg")
+        converter = BookDown2Markdown(load_book_md(path).split('\n'), assets_extension=lambda x: "jpg", refs=refs)
         self.assertEqual(converter.to_markdown(), load_md(path))
 
     def test_includegraphics(self):
         self.run_case("includegraphics")
+
+    def test_refs(self):
+        refs = {
+            "data visualisation": {
+                "ref": "Data Visualisation Chapter"
+            },
+            "wrangle": {
+                "ref": "Wrangle Chapter"
+            },
+            "fig:tidy-structure": {
+                "ref": "Tidy Structure"
+            }
+        }
+        self.run_case("refs", refs)

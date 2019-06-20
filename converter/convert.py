@@ -10,7 +10,7 @@ from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
 from converter.bookdown2markdown import BookDown2Markdown
 from converter.assets import copy_assets, convert_assets, process_source_code, copy_files_from_bookdown_folder
-from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from
+from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from, make_bookdown_refs
 
 
 def get_guide_content_path(file_path):
@@ -403,6 +403,7 @@ def convert_bookdown(config, base_path, yes=False):
     logging.debug("convert selected pages")
 
     detect_asset_ext = assets_extension(Path(config['workspace']['directory']))
+    refs = make_bookdown_refs(config)
 
     for item in toc:
         if item.section_type == CHAPTER:
@@ -421,7 +422,7 @@ def convert_bookdown(config, base_path, yes=False):
             lines = cleanup_bookdown(item.lines)
             md_converter = BookDown2Markdown(
                 lines,
-                chapter_num=chapter_num, figure_num=figure_num, assets_extension=detect_asset_ext
+                chapter_num=chapter_num, figure_num=figure_num, assets_extension=detect_asset_ext, refs=refs
             )
             figure_num += md_converter.get_figure_counter()
             converted_md = md_converter.to_markdown()
