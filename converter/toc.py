@@ -19,11 +19,21 @@ def is_toc(line):
 
 
 def is_input(line):
+    line = line.lstrip()
     return line.startswith('\\input')
 
 
+def is_include(line):
+    line = line.lstrip()
+    return line.startswith('\\include')
+
+
 def input_file(line):
-    return line[7:-1]
+    return get_text_in_brackets(line)
+
+
+def include_file(line):
+    return get_text_in_brackets(line)
 
 
 def cleanup_name(name):
@@ -87,8 +97,11 @@ def process_toc_lines(lines, tex_folder):
                 item_lines = []
             section_type = CHAPTER if is_chapter(line) else SECTION
             toc.append(SectionItem(section_name=get_name(line), section_type=section_type, line_pos=line_pos))
-        elif is_input(line):
-            sub_toc = get_latex_toc(tex_folder, input_file(line))
+        elif is_input(line) or is_include(line):
+            if is_input(line):
+                sub_toc = get_latex_toc(tex_folder, input_file(line))
+            else:
+                sub_toc = get_latex_toc(tex_folder, include_file(line))
             if sub_toc:
                 toc = toc + sub_toc
         line_pos += 1
@@ -101,6 +114,10 @@ def process_toc_lines(lines, tex_folder):
 
 def get_latex_toc(tex_folder, tex_name):
     a_path = tex_folder.joinpath(tex_name).resolve()
+    if not str(a_path).endswith(".tex"):
+        a_path = tex_folder.joinpath("{}.tex".format(tex_name)).resolve()
+    if not a_path.exists():
+        return None
     with open(a_path) as file:
         lines = file.readlines()
         return process_toc_lines(lines, tex_folder)
