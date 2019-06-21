@@ -52,7 +52,7 @@ def override_refs(refs, config):
 
 
 def make_bookdown_refs(config):
-    return config.get('refs', {}).get('overrides')
+    return config.get('refs', {}).get('overrides', {})
 
 
 def make_refs(toc, chapter_counter_from=1):
