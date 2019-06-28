@@ -28,7 +28,10 @@ def copy_globing(asset, base_src_dir, generate_dir):
         shutil.copy(file, dst.joinpath(Path(file).name))
 
     for file in glob.glob(str(src.joinpath('**/{}'.format(value)))):
-        shutil.copy(file, dst.joinpath(Path(file).name))
+        name = str(file).replace(str(src), '').lstrip('/')
+        file_path = dst.joinpath(name)
+        file_path.parent.mkdir(exist_ok=True, parents=True)
+        shutil.copy(file, file_path)
 
 
 def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path, bookdown=False):
