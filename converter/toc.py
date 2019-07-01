@@ -1,4 +1,5 @@
 import yaml
+import re
 
 from pathlib import Path
 
@@ -84,7 +85,26 @@ def get_bookdown_name(line):
     return name
 
 
-def process_toc_lines(lines, tex_folder):
+def is_section_file(line):
+    return line.strip().startswith("\\sectionfile")
+
+
+def get_section_lines(line, tex_folder):
+    section_line_re = re.compile(r"""\\sectionfile{(?P<block_name>.*?)}{(?P<block_path>.*?)}""")
+    result = section_line_re.search(line)
+    if result:
+        file = result.group("block_path")
+        if '.tex' not in file:
+            file = '_{}.tex'.format(file)
+        tex_file = tex_folder.joinpath(file)
+        if tex_file.exists():
+            with open(tex_file, 'r', errors='replace') as file:
+                return file.readlines()
+
+    return []
+
+
+def process_toc_lines(lines, tex_folder, parent_folder):
     toc = []
     line_pos = 1
     item_lines = []
@@ -97,6 +117,10 @@ def process_toc_lines(lines, tex_folder):
                 item_lines = []
             section_type = CHAPTER if is_chapter(line) else SECTION
             toc.append(SectionItem(section_name=get_name(line), section_type=section_type, line_pos=line_pos))
+            if is_section_file(line):
+                section_lines = get_section_lines(line, parent_folder)
+                for sub_line in section_lines:
+                    item_lines.append(sub_line)
         elif is_input(line) or is_include(line):
             if is_input(line):
                 sub_toc = get_latex_toc(tex_folder, input_file(line))
@@ -120,7 +144,7 @@ def get_latex_toc(tex_folder, tex_name):
         return None
     with open(a_path, 'r', errors='replace') as file:
         lines = file.readlines()
-        return process_toc_lines(lines, tex_folder)
+        return process_toc_lines(lines, tex_folder, a_path.parent)
 
 
 def process_bookdown_lines(lines, name_without_ext):
