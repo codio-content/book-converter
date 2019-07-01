@@ -579,6 +579,7 @@ class LaTeX2Markdown(object):
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 
         output = re.sub(r"\\href{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\1](\3)", output)
+        output = re.sub(r"\\weblink{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\3](\1)", output)
 
         output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 

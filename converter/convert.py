@@ -49,7 +49,7 @@ def cleanup_latex(lines):
     starts = (
         '%', '\\index{', '\\label{', '\\markboth{', '\\addcontentsline{',
         '\\begin{center}', '\\vspace', '\\end{center}', '\\newpage', '\\noindent',
-        '\\ttfamily', '\\chapter', '\\section', '\\newcommand'
+        '\\ttfamily', '\\chapter', '\\section', '\\newcommand', '\\vfill', '\\pagebreak'
     )
     for line in lines:
         if line.startswith(starts):
