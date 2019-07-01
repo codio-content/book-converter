@@ -5,8 +5,8 @@ The remainder operator looks like a percent sign, but you might find it helpful 
 
 
 
-\index{divisible}
-\index{extract digits}
+
+
 
 Modular arithmetic turns out to be surprisingly useful. For example, you can check whether one number is divisible by another: if `x % y` is zero, then `x` is divisible by `y`. You can use remainder to “extract” digits from a number: `x % 10` yields the rightmost digit of `x`, and `x % 100` yields the last two digits. And many encryption algorithms use the remainder operator extensively.
 
@@ -36,7 +36,7 @@ At this point, you have seen enough Java to write useful programs that solve eve
 
 
 
-\index{Convert.java}
+
 
 ```code
 import java.util.Scanner;
