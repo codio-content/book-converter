@@ -214,6 +214,9 @@ class LaTeX2Markdown(object):
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
 
+        self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}(\s)?{(?P<block_author>.*?)}""",
+                                            flags=re.DOTALL + re.VERBOSE)
+
         self._eqnarray_re = re.compile(r"""\\begin{(?P<block_name>eqnarray\*)}
                                     (?P<block_contents>.*?)
                                     \\end{(?P=block_name)}""", flags=re.DOTALL + re.VERBOSE)
@@ -373,6 +376,13 @@ class LaTeX2Markdown(object):
         block_contents = re.sub(r" &$", "", block_contents, flags=re.MULTILINE)
         block_contents = re.sub(r" & \\\\$", " \\\\\\\\", block_contents, flags=re.MULTILINE)
         return "$${}$$".format(block_contents, flags=re.MULTILINE)
+
+    def _makequotation_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_author = matchobj.group('block_author')
+        block_contents = ''.join(block_contents.split('\n'))
+
+        return '> {}\n>\n> __{}__'.format(block_contents, block_author)
 
     def _sidebargraphic_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
@@ -559,6 +569,7 @@ class LaTeX2Markdown(object):
         output = self._eqnarray_re.sub(self._eqnarray_block, output)
 
         output = self._sidebargraphic_re.sub(self._sidebargraphic_block, output)
+        output = self._makequotation_re.sub(self._makequotation_block, output)
 
         output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)

@@ -178,3 +178,6 @@ class TestSuite(unittest.TestCase):
 
     def test_sidebargraphic(self):
         self.run_case("sidebargraphic")
+
+    def test_makequotation(self):
+        self.run_case("makequotation")
