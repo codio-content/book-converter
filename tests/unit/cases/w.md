@@ -1,1 +1,1 @@
-Many SaaS apps, including those based on Rails, follow the _**Model-View-Controller**_ (MVC) architectural pattern.
+Many SaaS apps, including those based on Rails, follow the _**Model-View-Controller**_ (MVC) architectural pattern. In MVC, Models deal with the app's _**resources**_ such as users or blog posts, Views present information to the user via the browser, and Controllers  map the user's browser actions to application code.

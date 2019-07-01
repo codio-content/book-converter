@@ -513,6 +513,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"{\\bf (.*?)}", r"**\1**", output)
         output = re.sub(r"{\\sf (.*?)}", r"**\1**", output)
 
+        output = re.sub(r"\\ldots", r"...", output)
+
         # Fix ``
         output = re.sub("``", "“", output)
 
@@ -541,7 +543,7 @@ class LaTeX2Markdown(object):
         output = re.compile(r"\\verb'(?P<block_contents>.*?)'").sub(self._inline_code_block, output)
         output = re.compile(r"\\T{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
 
-        output = re.compile(r"\\w{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
+        output = re.compile(r"\\w(\[.*\])?{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
         output = re.compile(r"\\x{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
 
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)

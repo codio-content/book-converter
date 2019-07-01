@@ -182,3 +182,9 @@ class TestSuite(unittest.TestCase):
 
     def test_t_directive(self):
         self.run_case("T")
+
+    def test_emph_directive(self):
+        self.run_case("emph")
+
+    def test_ldots_directive(self):
+        self.run_case("ldots")
