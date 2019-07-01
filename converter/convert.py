@@ -292,6 +292,8 @@ def convert(config, base_path, yes=False):
     remove_trinket = config['workspace'].get('removeTrinket', False)
     remove_exercise = config['workspace'].get('removeExercise', False)
 
+    detect_asset_ext = assets_extension(Path(config['workspace']['directory']))
+
     chapter = None
     children_containers = [book["children"]]
     chapter_num = get_ref_chapter_counter_from(config) - 1
@@ -322,7 +324,7 @@ def convert(config, base_path, yes=False):
                 lines,
                 refs=refs, chapter_num=chapter_num, figure_num=figure_num,
                 exercise_num=exercise_num, remove_trinket=remove_trinket,
-                remove_exercise=remove_exercise
+                remove_exercise=remove_exercise, detect_asset_ext=detect_asset_ext
             )
 
             converted_md = md_converter.to_markdown()

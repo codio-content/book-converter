@@ -34,7 +34,9 @@ class TestSuite(unittest.TestCase):
 
     def run_case(self, name, refs={}, chapter_num=1):
         path = "cases/{}".format(name)
-        converter = LaTeX2Markdown(load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num)
+        converter = LaTeX2Markdown(
+            load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num, detect_asset_ext=lambda _: "png"
+        )
         self.assertEqual(converter.to_markdown(), load_md(path))
 
     def test_markdown_chapter_render(self):
@@ -173,3 +175,6 @@ class TestSuite(unittest.TestCase):
 
     def test_math_runtime(self):
         self.run_case("math_runtime")
+
+    def test_sidebargraphic(self):
+        self.run_case("sidebargraphic")
