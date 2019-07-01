@@ -118,7 +118,7 @@ def get_latex_toc(tex_folder, tex_name):
         a_path = tex_folder.joinpath("{}.tex".format(tex_name)).resolve()
     if not a_path.exists():
         return None
-    with open(a_path) as file:
+    with open(a_path, 'r', errors='replace') as file:
         lines = file.readlines()
         return process_toc_lines(lines, tex_folder)
 
@@ -157,14 +157,14 @@ def process_bookdown_lines(lines, name_without_ext):
 
 def process_bookdown_file(folder, name, name_without_ext):
     a_path = folder.joinpath(name).resolve()
-    with open(a_path) as file:
+    with open(a_path, 'r', errors='replace') as file:
         lines = file.readlines()
         return process_bookdown_lines(lines, name_without_ext)
 
 
 def get_bookdown_toc(folder, name):
     a_path = folder.joinpath(name).resolve()
-    with open(a_path, 'r') as stream:
+    with open(a_path, 'r', errors='replace') as stream:
         content = yaml.load(stream)
         rmd_files = content.get('rmd_files')
         toc = []
