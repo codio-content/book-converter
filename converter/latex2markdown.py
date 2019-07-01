@@ -504,7 +504,7 @@ class LaTeX2Markdown(object):
         output = self._table_re.sub(self._format_table, output)
 
         # Fix emph, textbf, texttt formatting
-        output = re.sub(r"\\emph{(.*?)}", r"*\1*", output)
+        output = re.sub(r"\\emph{(.*?)}", r"*\1*", output, flags=re.MULTILINE)
         output = re.sub(r"\\textbf{(.*?)}", r"**\1**", output)
         output = re.sub(r"\\texttt{(.*?)}", r"`\1`", output)
 
