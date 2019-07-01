@@ -181,3 +181,6 @@ class TestSuite(unittest.TestCase):
 
     def test_makequotation(self):
         self.run_case("makequotation")
+
+    def test_weblink(self):
+        self.run_case("weblink")
