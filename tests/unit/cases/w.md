@@ -1,0 +1,1 @@
+Many SaaS apps, including those based on Rails, follow the _**Model-View-Controller**_ (MVC) architectural pattern.

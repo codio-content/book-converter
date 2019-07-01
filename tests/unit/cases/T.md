@@ -1,0 +1,1 @@
+HTTP methods---`GET`, `POST`, `PUT` and `DELETE`---and even use

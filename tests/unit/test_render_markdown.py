@@ -173,3 +173,12 @@ class TestSuite(unittest.TestCase):
 
     def test_math_runtime(self):
         self.run_case("math_runtime")
+
+    def test_w_directive(self):
+        self.run_case("w")
+
+    def test_x_directive(self):
+        self.run_case("x")
+
+    def test_t_directive(self):
+        self.run_case("T")

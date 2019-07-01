@@ -476,6 +476,11 @@ class LaTeX2Markdown(object):
         block_contents = re.sub(r"%", r"\\%", block_contents)
         return "```code{}```".format(block_contents)
 
+    def _italic_bold(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_contents = re.sub(r"\\\\", r"\\", block_contents)
+        return "_**{}**_".format(block_contents)
+
     def _inline_code_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         block_contents = re.sub(r"\\\\", r"\\", block_contents)
@@ -534,6 +539,10 @@ class LaTeX2Markdown(object):
         output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb\"(?P<block_contents>.*?)\"").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb'(?P<block_contents>.*?)'").sub(self._inline_code_block, output)
+        output = re.compile(r"\\T{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
+
+        output = re.compile(r"\\w{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
+        output = re.compile(r"\\x{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
 
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 
