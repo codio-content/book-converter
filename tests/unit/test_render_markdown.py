@@ -37,7 +37,7 @@ class TestSuite(unittest.TestCase):
         converter = LaTeX2Markdown(
             load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num, detect_asset_ext=lambda _: "png"
         )
-        self.assertEqual(converter.to_markdown(), load_md(path))
+        self.assertEqual(load_md(path), converter.to_markdown())
 
     def test_markdown_chapter_render(self):
         self.run_case("chapter")
