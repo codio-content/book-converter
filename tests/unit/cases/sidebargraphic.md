@@ -10,7 +10,7 @@ Alan Perlis
   including C and Java.  To avoid FORTRAN's
   syntactic and semantic problems, ALGOL was the first language
   described in terms of a formal grammar, the eponymous
-  \w[Backus-Naur_Form]{Backus-Naur form} (named for Turing award
+  _**Backus-Naur form**_ (named for Turing award
   
   
   winner Jim Backus and his colleague Peter Naur).

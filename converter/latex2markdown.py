@@ -514,6 +514,11 @@ class LaTeX2Markdown(object):
         block_contents = re.sub(r"%", r"\\%", block_contents)
         return "```code{}```".format(block_contents)
 
+    def _italic_bold(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_contents = re.sub(r"\\\\", r"\\", block_contents)
+        return "_**{}**_".format(block_contents)
+
     def _inline_code_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         block_contents = re.sub(r"\\\\", r"\\", block_contents)
@@ -537,7 +542,7 @@ class LaTeX2Markdown(object):
         output = self._table_re.sub(self._format_table, output)
 
         # Fix emph, textbf, texttt formatting
-        output = re.sub(r"\\emph{(.*?)}", r"*\1*", output)
+        output = re.sub(r"\\emph{(.*?)}", r"*\1*", output, flags=re.MULTILINE)
         output = re.sub(r"\\textbf{(.*?)}", r"**\1**", output)
         output = re.sub(r"\\texttt{(.*?)}", r"`\1`", output)
 
@@ -545,6 +550,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"{\\it (.*?)}", r"*\1*", output)
         output = re.sub(r"{\\bf (.*?)}", r"**\1**", output)
         output = re.sub(r"{\\sf (.*?)}", r"**\1**", output)
+
+        output = re.sub(r"\\ldots", r"...", output)
 
         # Fix ``
         output = re.sub("``", "“", output)
@@ -575,6 +582,11 @@ class LaTeX2Markdown(object):
         output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb\"(?P<block_contents>.*?)\"").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb'(?P<block_contents>.*?)'").sub(self._inline_code_block, output)
+        output = re.compile(r"\\T{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
+
+        output = re.compile(r"\\w(\[.*\])?{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
+        output = re.compile(r"\\x{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
+        output = re.sub(r"\\tbd{(.*?)}", r"\1", output)
 
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 

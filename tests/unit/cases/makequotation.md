@@ -2,7 +2,7 @@
 >
 > __Brad Green, Engineering Manager, Google Inc.__
 
-> Many congratulations\ldots Very proud of including the SPOC in our redeveloped Bachelors' in Software Engineering degree\ldots{} The book is the best I've bought, within minutes of seeing it at ICSE.
+> Many congratulations... Very proud of including the SPOC in our redeveloped Bachelors' in Software Engineering degree...{} The book is the best I've bought, within minutes of seeing it at ICSE.
 >
 > __Ali Babar, University of Adelaide__
 

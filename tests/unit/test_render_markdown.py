@@ -176,6 +176,21 @@ class TestSuite(unittest.TestCase):
     def test_math_runtime(self):
         self.run_case("math_runtime")
 
+    def test_w_directive(self):
+        self.run_case("w")
+
+    def test_x_directive(self):
+        self.run_case("x")
+
+    def test_t_directive(self):
+        self.run_case("T")
+
+    def test_emph_directive(self):
+        self.run_case("emph")
+
+    def test_ldots_directive(self):
+        self.run_case("ldots")
+
     def test_sidebargraphic(self):
         self.run_case("sidebargraphic")
 
@@ -184,3 +199,6 @@ class TestSuite(unittest.TestCase):
 
     def test_weblink(self):
         self.run_case("weblink")
+
+    def test_tbd(self):
+        self.run_case("tbd")
