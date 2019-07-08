@@ -586,6 +586,7 @@ class LaTeX2Markdown(object):
 
         output = re.compile(r"\\w(\[.*\])?{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
         output = re.compile(r"\\x{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
+        output = re.sub(r"\\tbd{(.*?)}", r"\1", output)
 
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 

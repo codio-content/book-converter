@@ -1,0 +1,1 @@
+The example doesn't show how to define class (static) methods
