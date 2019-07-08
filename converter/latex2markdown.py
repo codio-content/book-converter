@@ -105,14 +105,17 @@ class LaTeX2Markdown(object):
     def _make_paragraphs(self, lines):
         processed = []
         current = ''
-        single_line = ('\\chapter', '\\section', '%', '\\index')
+        single_line = ('\\chapter', '\\section', '\\index', '%')
         is_multi_line = False
         for line in lines:
-            if line.startswith(single_line):
+            if line.strip().startswith(single_line):
                 if current:
                     processed.append(current)
                     current = ''
-                processed.append(line)
+                if line.strip().startswith('%'):
+                    processed.append(line.strip())
+                else:
+                    processed.append(line)
                 continue
             elif line.startswith('\\begin'):
                 if current:
@@ -214,8 +217,8 @@ class LaTeX2Markdown(object):
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
 
-        self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}(\s)?{(?P<block_author>.*?)}""",
-                                            flags=re.DOTALL + re.VERBOSE)
+        self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}(\s)?
+                                        {(?P<block_author>.*?)}$""", flags=re.DOTALL + re.VERBOSE + re.MULTILINE)
 
         self._eqnarray_re = re.compile(r"""\\begin{(?P<block_name>eqnarray\*)}
                                     (?P<block_contents>.*?)
