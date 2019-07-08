@@ -143,7 +143,8 @@ class LaTeX2Markdown(object):
 
     def __init__(
         self, latex_array, refs={}, chapter_num=1, figure_num=0,
-        exercise_num=0, remove_trinket=False, remove_exercise=False
+        exercise_num=0, remove_trinket=False, remove_exercise=False,
+        detect_asset_ext=lambda _: _
     ):
         latex_string = '\n'.join(self._make_paragraphs(latex_array))
         self._refs = refs
@@ -159,6 +160,7 @@ class LaTeX2Markdown(object):
         self._source_codes = []
         self._remove_trinket = remove_trinket
         self._remove_exercise = remove_exercise
+        self.detect_asset_ext = detect_asset_ext
 
         # Precompile the regexes
 
@@ -207,6 +209,13 @@ class LaTeX2Markdown(object):
         self._figure_re = re.compile(r"""\\begin{figure}(.*?)\n
                                     (?P<block_contents>.*?)
                                     \\end{figure}""", flags=re.DOTALL + re.VERBOSE)
+
+        self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}{(?P<block_graphics>.*?)}{(?P<block_name>.*?)}\n
+                                    (?P<block_contents>.*?)
+                                    \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
+
+        self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}(\s)?{(?P<block_author>.*?)}""",
+                                            flags=re.DOTALL + re.VERBOSE)
 
         self._eqnarray_re = re.compile(r"""\\begin{(?P<block_name>eqnarray\*)}
                                     (?P<block_contents>.*?)
@@ -368,6 +377,31 @@ class LaTeX2Markdown(object):
         block_contents = re.sub(r" & \\\\$", " \\\\\\\\", block_contents, flags=re.MULTILINE)
         return "$${}$$".format(block_contents, flags=re.MULTILINE)
 
+    def _makequotation_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_author = matchobj.group('block_author')
+        block_contents = ''.join(block_contents.split('\n'))
+
+        return '> {}\n>\n> __{}__'.format(block_contents, block_author)
+
+    def _sidebargraphic_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        image = matchobj.group('block_graphics')
+        block_name = matchobj.group('block_name')
+
+        if '.' not in image:
+            ext = self.detect_asset_ext(image)
+            if ext:
+                image = '{}.{}'.format(image, ext)
+
+        if image.lower().endswith('.pdf'):
+            self._pdfs.append(image)
+            image = image.replace('.pdf', '.jpg')
+
+        image_src = "![{}]({})".format(block_name, image)
+
+        return '{}{}{}'.format(block_name, block_contents, image_src)
+
     def _figure_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         self._figure_counter += 1
@@ -399,6 +433,10 @@ class LaTeX2Markdown(object):
         markdown_images = []
 
         for image in images:
+            if '.' not in image:
+                ext = self.detect_asset_ext(image)
+                if ext:
+                    image = '{}.{}'.format(image, ext)
             if image.lower().endswith('.pdf'):
                 self._pdfs.append(image)
                 image = image.replace('.pdf', '.jpg')
@@ -537,6 +575,9 @@ class LaTeX2Markdown(object):
         output = self._page_refs_re.sub(self._page_refs_block, output)
         output = self._eqnarray_re.sub(self._eqnarray_block, output)
 
+        output = self._sidebargraphic_re.sub(self._sidebargraphic_block, output)
+        output = self._makequotation_re.sub(self._makequotation_block, output)
+
         output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb\"(?P<block_contents>.*?)\"").sub(self._inline_code_block, output)
@@ -549,6 +590,7 @@ class LaTeX2Markdown(object):
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 
         output = re.sub(r"\\href{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\1](\3)", output)
+        output = re.sub(r"\\weblink{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\3](\1)", output)
 
         output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 
@@ -563,6 +605,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"(\S+)(~)", r"\1 ", output)
 
         output = re.sub(r"^\\\\ ", "<br>", output, flags=re.MULTILINE)
+
+        output = re.sub(r"\\index{(.*?)}", r"", output)
 
         return output.lstrip().rstrip()
 

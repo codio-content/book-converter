@@ -34,7 +34,9 @@ class TestSuite(unittest.TestCase):
 
     def run_case(self, name, refs={}, chapter_num=1):
         path = "cases/{}".format(name)
-        converter = LaTeX2Markdown(load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num)
+        converter = LaTeX2Markdown(
+            load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num, detect_asset_ext=lambda _: "png"
+        )
         self.assertEqual(converter.to_markdown(), load_md(path))
 
     def test_markdown_chapter_render(self):
@@ -188,3 +190,12 @@ class TestSuite(unittest.TestCase):
 
     def test_ldots_directive(self):
         self.run_case("ldots")
+
+    def test_sidebargraphic(self):
+        self.run_case("sidebargraphic")
+
+    def test_makequotation(self):
+        self.run_case("makequotation")
+
+    def test_weblink(self):
+        self.run_case("weblink")
