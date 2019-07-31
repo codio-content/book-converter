@@ -1,4 +1,6 @@
-Many people (and textbooks) incorrectly refer to `%` as the “modulus operator”. In mathematics, however, **modulus** is the number you're dividing by. In the previous example, the modulus is 12. The Java language specification refers to  `%` as the “remainder operator”.
+Many people (and textbooks) incorrectly refer to `%` as the “modulus operator”.
+In mathematics, however, **modulus** is the number you're dividing by. In the previous example, the modulus is 12.
+The Java language specification refers to  `%` as the “remainder operator”.
 
 The remainder operator looks like a percent sign, but you might find it helpful to think of it as a division sign ($\div$) rotated to the left.
 
@@ -8,7 +10,10 @@ The remainder operator looks like a percent sign, but you might find it helpful 
 
 
 
-Modular arithmetic turns out to be surprisingly useful. For example, you can check whether one number is divisible by another: if `x % y` is zero, then `x` is divisible by `y`. You can use remainder to “extract” digits from a number: `x % 10` yields the rightmost digit of `x`, and `x % 100` yields the last two digits. And many encryption algorithms use the remainder operator extensively.
+Modular arithmetic turns out to be surprisingly useful.
+For example, you can check whether one number is divisible by another: if `x % y` is zero, then `x` is divisible by `y`.
+You can use remainder to “extract” digits from a number: `x % 10` yields the rightmost digit of `x`, and `x % 100` yields the last two digits.
+And many encryption algorithms use the remainder operator extensively.
 
 
 ###  Putting it all together
@@ -29,7 +34,8 @@ Using division and modulo, we can convert to feet and inches like this:
 
 The first line yields 6. The second line, which is pronounced “76 mod 12”, yields 4. So 76 inches is 6 feet, 4 inches.
 
-Addition, subtraction, and multiplication all do what you expect, but you might be surprised by division. For example, the following fragment tries to compute the fraction of an hour that has elapsed:
+Addition, subtraction, and multiplication all do what you expect, but you might be surprised by division.
+For example, the following fragment tries to compute the fraction of an hour that has elapsed:
 
 At this point, you have seen enough Java to write useful programs that solve everyday problems. You can (1) import Java library classes, (2) create a `Scanner`, (3) get input from the keyboard, (4) format output with `printf`, and (5) divide and mod integers. Now we will put everything together in a complete program:
 

@@ -108,7 +108,7 @@ class LaTeX2Markdown(object):
         single_line = ('\\chapter', '\\section', '\\index', '%')
         is_multi_line = False
         for line in lines:
-            if line.strip().startswith(single_line):
+            if line.strip().startswith(single_line) or '%' in line:
                 if current:
                     processed.append(current)
                     current = ''
@@ -221,8 +221,8 @@ class LaTeX2Markdown(object):
                                     (?P<block_contents>.*?)
                                     \\end{sidebar}""", flags=re.DOTALL + re.VERBOSE)
 
-        self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}(\s)?
-                                        {(?P<block_author>.*?)}$""", flags=re.DOTALL + re.VERBOSE + re.MULTILINE)
+        self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}([\s]+)?
+                                        {(?P<block_author>.*?)}([ \t]+)?$""", flags=re.DOTALL + re.VERBOSE + re.MULTILINE)
 
         self._eqnarray_re = re.compile(r"""\\begin{(?P<block_name>eqnarray\*)}
                                     (?P<block_contents>.*?)
@@ -239,6 +239,10 @@ class LaTeX2Markdown(object):
         self._table_re = re.compile(r"""\\begin{(?P<block_name>table|tabular)} # block name
                                     (?P<block_contents>.*?) # Non-greedy block contents
                                     \\end{(?P=block_name)}""",  # closing block
+                                    flags=re.DOTALL + re.VERBOSE)
+
+        self._saas_icons_re = re.compile(r"""\\(dry|reuse|codegen|concise|coc|legacy|beauty|tool|
+                                    learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*\})?""",
                                     flags=re.DOTALL + re.VERBOSE)
 
     def _replace_header(self, matchobj):
@@ -387,7 +391,7 @@ class LaTeX2Markdown(object):
     def _makequotation_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         block_author = matchobj.group('block_author')
-        block_contents = ''.join(block_contents.split('\n'))
+        block_contents = ' '.join(block_contents.split('\n'))
 
         return '> {}\n>\n> __{}__'.format(block_contents, block_author)
 
@@ -558,6 +562,9 @@ class LaTeX2Markdown(object):
         block_contents = re.sub(r"\\\\", r"\\", block_contents)
         return "`{}`".format(block_contents)
 
+    def _saas_icons_block(self, matchobj):
+        return ""
+
     def _latex_to_markdown(self):
         """Main function, returns the formatted Markdown as a string.
         Uses a lot of custom regexes to fix a lot of content - you may have
@@ -584,13 +591,13 @@ class LaTeX2Markdown(object):
         output = re.sub(r"{\\it (.*?)}", r"*\1*", output)
         output = re.sub(r"{\\bf (.*?)}", r"**\1**", output)
         output = re.sub(r"{\\sf (.*?)}", r"**\1**", output)
+        output = re.sub(r"\\B{(.*?)}", r"**\1**", output)
+        output = re.sub(r"\\C{(.*?)}", r"**\1**", output)
 
-        output = re.sub(r"\\ldots", r"...", output)
+        output = re.sub(r"\\ldots({\})?", r"...", output)
 
         # Fix ``
         output = re.sub("``", "“", output)
-
-        # Fix ``
         output = re.sub("''", "”", output)
 
         output = self._code_re.sub(self._code_block, output)
@@ -600,7 +607,7 @@ class LaTeX2Markdown(object):
         # Fix \% formatting
         percent_token = str(uuid.uuid4())
         output = re.sub(r"\\%", percent_token, output)
-        output = re.sub("%(.*?)$", "", output, flags=re.MULTILINE)
+        output = re.sub("%(.*?)?$", "", output, flags=re.MULTILINE)
         output = re.sub(percent_token, "%", output)
 
         output = self._exercise_re.sub(self._exercise_block, output)
@@ -612,6 +619,7 @@ class LaTeX2Markdown(object):
         output = self._sidebargraphic_re.sub(self._sidebargraphic_block, output)
         output = self._sidebar_re.sub(self._sidebar_block, output)
         output = self._makequotation_re.sub(self._makequotation_block, output)
+        output = self._saas_icons_re.sub(self._saas_icons_block, output)
 
         output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
@@ -643,6 +651,8 @@ class LaTeX2Markdown(object):
         output = re.sub(r"^\\\\ ", "<br>", output, flags=re.MULTILINE)
 
         output = re.sub(r"\\index{(.*?)}", r"", output)
+
+        output = re.sub(r"\\label{(.*?)}", "", output)
 
         return output.lstrip().rstrip()
 
