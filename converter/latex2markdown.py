@@ -217,6 +217,10 @@ class LaTeX2Markdown(object):
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
 
+        self._sidebar_re = re.compile(r"""\\begin{sidebar}
+                                    (?P<block_contents>.*?)
+                                    \\end{sidebar}""", flags=re.DOTALL + re.VERBOSE)
+
         self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}(\s)?
                                         {(?P<block_author>.*?)}$""", flags=re.DOTALL + re.VERBOSE + re.MULTILINE)
 
@@ -386,6 +390,33 @@ class LaTeX2Markdown(object):
         block_contents = ''.join(block_contents.split('\n'))
 
         return '> {}\n>\n> __{}__'.format(block_contents, block_author)
+
+    def _sidebar_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        lines = block_contents.split('\n')
+        head = lines[0]
+        title = ''
+        additional = ''
+
+        lines = lines[1:]
+
+        matches = re.match(r"(\[.*\])?({.*?\})(.*)?", head)
+        if matches:
+            title = matches.group(2).strip()
+            title = get_text_in_brackets(title)
+            additional = matches.group(3).strip()
+
+        if additional:
+            lines.insert(0, additional)
+
+        if title:
+            lines.insert(0, '## {}'.format(title))
+
+        lines = map(lambda line: line.strip(), lines)
+        block_contents = '\n'.join(lines)
+        block_contents = block_contents.strip()
+
+        return '|||info\n{}\n\n|||'.format(block_contents)
 
     def _sidebargraphic_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
@@ -579,6 +610,7 @@ class LaTeX2Markdown(object):
         output = self._eqnarray_re.sub(self._eqnarray_block, output)
 
         output = self._sidebargraphic_re.sub(self._sidebargraphic_block, output)
+        output = self._sidebar_re.sub(self._sidebar_block, output)
         output = self._makequotation_re.sub(self._makequotation_block, output)
 
         output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)

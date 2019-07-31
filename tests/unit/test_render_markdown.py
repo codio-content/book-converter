@@ -202,3 +202,6 @@ class TestSuite(unittest.TestCase):
 
     def test_tbd(self):
         self.run_case("tbd")
+
+    def test_sidebar(self):
+        self.run_case("sidebar")
