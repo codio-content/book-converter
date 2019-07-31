@@ -205,3 +205,9 @@ class TestSuite(unittest.TestCase):
 
     def test_sidebar(self):
         self.run_case("sidebar")
+
+    def test_saas_icons(self):
+        self.run_case("saas_icons")
+
+    def test_bc(self):
+        self.run_case("bc")

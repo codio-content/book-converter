@@ -86,8 +86,10 @@ def make_refs(toc, chapter_counter_from=1):
                 is_exercise = True
             elif line.startswith("\\end{exercise}"):
                 is_exercise = False
-            elif line.startswith("\\label{"):
-                label = line[7:-1]
+            elif "\\label{" in line:
+                start_pos = line.find("\\label{")
+                end_pos = line.find("}", start_pos)
+                label = line[start_pos + 7:end_pos]
                 refs[label] = {
                     'pageref': item.section_name
                 }
