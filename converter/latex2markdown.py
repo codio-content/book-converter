@@ -222,7 +222,8 @@ class LaTeX2Markdown(object):
                                     \\end{sidebar}""", flags=re.DOTALL + re.VERBOSE)
 
         self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}([\s]+)?
-                                        {(?P<block_author>.*?)}([ \t]+)?$""", flags=re.DOTALL + re.VERBOSE + re.MULTILINE)
+                                            {(?P<block_author>.*?)}([ \t]+)?$""",
+                                            flags=re.DOTALL + re.VERBOSE + re.MULTILINE)
 
         self._eqnarray_re = re.compile(r"""\\begin{(?P<block_name>eqnarray\*)}
                                     (?P<block_contents>.*?)
@@ -242,8 +243,8 @@ class LaTeX2Markdown(object):
                                     flags=re.DOTALL + re.VERBOSE)
 
         self._saas_icons_re = re.compile(r"""\\(dry|reuse|codegen|concise|coc|legacy|beauty|tool|
-                                    learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*\})?""",
-                                    flags=re.DOTALL + re.VERBOSE)
+                                         learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*\})?""",
+                                         flags=re.DOTALL + re.VERBOSE)
 
     def _replace_header(self, matchobj):
         """Creates a header string for a section/subsection/chapter match.
@@ -491,7 +492,7 @@ class LaTeX2Markdown(object):
         block_contents = matchobj.group('block_contents')
 
         self._exercise_counter += 1
-        prefix = "**Exercise {}.{}:**\n"\
+        prefix = "**Exercise {}.{}:**\n" \
             .format(self._chapter_num, self._exercise_counter + self._exercise_counter_offset)
         if self._remove_exercise:
             prefix = ""
