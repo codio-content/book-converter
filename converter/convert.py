@@ -48,7 +48,7 @@ def cleanup_latex(lines):
     updated = []
     starts = (
         '%', '\\index{', '\\label{', '\\markboth{', '\\addcontentsline{',
-        '\\begin{center}', '\\vspace', '\\end{center}', '\\newpage', '\\noindent',
+        '\\vspace', '\\newpage', '\\noindent',
         '\\ttfamily', '\\chapter', '\\section', '\\newcommand', '\\vfill', '\\pagebreak'
     )
     for line in lines:

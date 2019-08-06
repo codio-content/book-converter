@@ -1,0 +1,5 @@
+---
+**Summary:**
+Following the Agile Manifesto's emphasis on customer cooperation over contracts, an Agile team's notion of “cost estimation” is therefore more about advising the client on what team size can provide the maximum efficiency, following Brooks's Law that there is a point of diminishing returns on team size (see Section  sec:bdd_idea_FnP).  The Agile team's goal in the scoping process is to identify that point, then ramp the team up to that size over time. Agile companies bid costs for time and materials based on short discussions with external customers. As we shall see in Section sec:BDD_P_and_D, this approach is in sharp contrast with companies that follow plan-and-document processes, which promise customers a set of features for an agreed upon cost by an agreed upon date.
+
+---

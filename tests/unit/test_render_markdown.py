@@ -26,17 +26,21 @@ def load_file(path):
         return file.read()
 
 
+def make_converter(path, refs, chapter_num):
+    return LaTeX2Markdown(
+        load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num, detect_asset_ext=lambda _: "png"
+    )
+
+
 class TestSuite(unittest.TestCase):
     def write_md(self, name, refs={}, chapter_num=1):
         path = "cases/{}".format(name)
-        converter = LaTeX2Markdown(load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num)
+        converter = make_converter(path, refs, chapter_num)
         write_md_case(name, converter.to_markdown())
 
     def run_case(self, name, refs={}, chapter_num=1):
         path = "cases/{}".format(name)
-        converter = LaTeX2Markdown(
-            load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num, detect_asset_ext=lambda _: "png"
-        )
+        converter = make_converter(path, refs, chapter_num)
         self.assertEqual(load_md(path), converter.to_markdown())
 
     def test_markdown_chapter_render(self):
@@ -211,3 +215,24 @@ class TestSuite(unittest.TestCase):
 
     def test_bc(self):
         self.run_case("bc")
+
+    def test_picfigure(self):
+        self.run_case("picfigure")
+
+    def test_summary(self):
+        self.run_case("summary")
+
+    def test_checkyourself(self):
+        self.run_case("checkyourself")
+
+    def test_cite(self):
+        self.run_case("cite")
+
+    def test_center(self):
+        self.run_case("center")
+
+    def test_concepts(self):
+        self.run_case("concepts")
+
+    def test_elaboration(self):
+        self.run_case("elaboration")

@@ -45,15 +45,19 @@ def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path, b
                 if bookdown else base_src_dir.joinpath(pdf)
             if not pdf_file.exists():
                 continue
-        pages = convert_from_path(pdf_file, 500)
 
         dst_folder = Path(generate_dir).joinpath(Path(pdf).parent)
         dst_folder.mkdir(exist_ok=True, parents=True)
 
-        if pages:
-            image = Path(pdf.replace('.pdf', '.jpg'))
-            page = pages[0]
-            page.save(dst_folder.joinpath(image.name), 'JPEG')
+        try:
+            pages = convert_from_path(pdf_file, 500)
+            if pages:
+                image = Path(pdf.replace('.pdf', '.jpg'))
+                page = pages[0]
+                page.save(dst_folder.joinpath(image.name), 'JPEG')
+        except BaseException as e:
+            logging.error("convert %s to jpg error" % pdf)
+            logging.error(e)
 
 
 def convert_assets(config, generate_dir, pdfs_for_convert, bookdown=False):
