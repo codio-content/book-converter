@@ -1,7 +1,7 @@
 import re
 
-elaboration_re = re.compile(r"""\\begin{elaboration}{(?P<title>.*?)}(?P<block_contents>.*?)\\end{elaboration}""",
-                            flags=re.DOTALL + re.VERBOSE)
+fallacy_re = re.compile(r"""\\begin{fallacy}{(?P<title>.*?)}(?P<block_contents>.*?)\\end{fallacy}""",
+                        flags=re.DOTALL + re.VERBOSE)
 
 
 def make_block(matchobj):
@@ -12,4 +12,4 @@ def make_block(matchobj):
 
 
 def convert(input_str):
-    return elaboration_re.sub(make_block, input_str)
+    return fallacy_re.sub(make_block, input_str)

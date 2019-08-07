@@ -236,3 +236,9 @@ class TestSuite(unittest.TestCase):
 
     def test_elaboration(self):
         self.run_case("elaboration")
+
+    def test_pitfall(self):
+        self.run_case("pitfall")
+
+    def test_fallacy(self):
+        self.run_case("fallacy")

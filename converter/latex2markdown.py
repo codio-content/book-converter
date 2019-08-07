@@ -13,6 +13,8 @@ from converter.markdown.center import convert as center_convert
 from converter.markdown.concepts import convert as concepts_convert
 from converter.markdown.saas_specific import convert as saas_convert
 from converter.markdown.elaboration import convert as elaboration_convert
+from converter.markdown.pitfall import convert as pitfall_convert
+from converter.markdown.fallacy import convert as fallacy_convert
 
 Code = namedtuple('Code', ['name', 'source'])
 
@@ -640,6 +642,8 @@ class LaTeX2Markdown(object):
         output = center_convert(output)
         output = concepts_convert(output)
         output = elaboration_convert(output)
+        output = pitfall_convert(output)
+        output = fallacy_convert(output)
 
         output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
