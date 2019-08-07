@@ -1,0 +1,49 @@
+\begin{concepts}
+
+\w{JavaScript} is a dynamic, interpreted scripting language built into
+modern browsers.
+This chapter describes its main features, including some that we
+recommend avoiding
+because they represent questionable design choices, and how it extends
+the types of content and applications that can be delivered as SaaS.
+
+\begin{itemize}
+
+\item A browser represents a web
+page as a data structure called the \w{Document Object Model} (DOM). \js{}
+code running in the browser can inspect and modify this data
+structure, causing the browser to redraw the modified page elements.
+
+\item When a user interacts with the browser (for example, by
+typing, clicking, or moving the mouse) or the browser makes progress
+in an interaction with a server, the browser generates an
+\w[Event (computing)]{event} indicating what happened.  Your
+\js{} code can take app-specific actions to modify the DOM when such
+events occur.
+
+\item Using \w[Ajax (programming)]{AJAX}, or Asynchronous \js{} And XML,
+\js{} code can make
+HTTP requests to a Web server \emph{without} triggering a page
+reload.  The information in the response can then be used to modify page
+elements in place, giving a richer and often more responsive
+user experience than traditional
+Web pages.  Rails partials and controller actions
+can be readily used to handle AJAX interactions.
+
+\item Just as we use the highly-productive Rails framework
+(Chapter~\ref{chap:rails_intro}) and RSpec
+TDD tool (Chapter~\ref{chap:tdd}) for server-side SaaS code, here we use
+the highly-productive \w{jQuery} framework and
+\weblink{http://pivotal.github.com/jasmine}{Jasmine}
+TDD tool to develop
+client-side code.
+
+\item We follow the best practice of ``graceful degradation,'' also
+referred to as ``progressive enhancement'':
+legacy browsers lacking \js{} support will still provide a good
+user experience, while \js-enabled browsers will provide an even
+better experience.
+
+\end{itemize}
+
+\end{concepts}

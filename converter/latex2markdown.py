@@ -5,6 +5,17 @@ from collections import namedtuple
 
 from converter.guides.tools import get_text_in_brackets
 
+from converter.markdown.summary import convert as summary_convert
+from converter.markdown.checkyourself import convert as checkyourself_convert
+from converter.markdown.picfigure import convert as picfigure_convert
+from converter.markdown.cite import convert as cite_convert
+from converter.markdown.center import convert as center_convert
+from converter.markdown.concepts import convert as concepts_convert
+from converter.markdown.saas_specific import convert as saas_convert
+from converter.markdown.elaboration import convert as elaboration_convert
+from converter.markdown.pitfall import convert as pitfall_convert
+from converter.markdown.fallacy import convert as fallacy_convert
+
 Code = namedtuple('Code', ['name', 'source'])
 
 # Basic configuration - modify this to change output formatting
@@ -213,7 +224,7 @@ class LaTeX2Markdown(object):
                                     (?P<block_contents>.*?)
                                     \\end{figure}""", flags=re.DOTALL + re.VERBOSE)
 
-        self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}{(?P<block_graphics>.*?)}{(?P<block_name>.*?)}\n
+        self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}{(?P<block_graphics>.*?)}{(?P<block_name>.*?)}
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
 
@@ -577,14 +588,12 @@ class LaTeX2Markdown(object):
         except AttributeError:
             output = self._latex_string
 
-        # Reformat, lists, blocks, and headers.
-        output = self._lists_re.sub(self._replace_block, output)
-        output = self._block_re.sub(self._replace_block, output)
-        output = self._header_re.sub(self._replace_header, output)
-        output = self._table_re.sub(self._format_table, output)
+        output = re.sub(r"\\index{(.*?)}", "", output)
+        output = re.sub(r"\\label{(.*?)}", "", output)
+        output = saas_convert(output)
 
         # Fix emph, textbf, texttt formatting
-        output = re.sub(r"\\emph{(.*?)}", r"*\1*", output, flags=re.MULTILINE)
+        output = re.sub(r"\\emph{(.*?)}", r"*\1*", output, flags=re.DOTALL + re.VERBOSE)
         output = re.sub(r"\\textbf{(.*?)}", r"**\1**", output)
         output = re.sub(r"\\texttt{(.*?)}", r"`\1`", output)
 
@@ -617,10 +626,24 @@ class LaTeX2Markdown(object):
         output = self._page_refs_re.sub(self._page_refs_block, output)
         output = self._eqnarray_re.sub(self._eqnarray_block, output)
 
+        output = re.sub(r"\\weblink{(.*?)}{(.*?)}", r"[\2](\1)", output, flags=re.DOTALL + re.VERBOSE)
+        output = re.sub(r"\\weblink{(.*?)}", r"[\1](\1)", output, flags=re.MULTILINE)
+
         output = self._sidebargraphic_re.sub(self._sidebargraphic_block, output)
         output = self._sidebar_re.sub(self._sidebar_block, output)
         output = self._makequotation_re.sub(self._makequotation_block, output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)
+        output = summary_convert(output)
+        output = checkyourself_convert(output)
+        output, pic_pdfs = picfigure_convert(output)
+        if pic_pdfs:
+            self._pdfs.extend(pic_pdfs)
+        output = cite_convert(output)
+        output = center_convert(output)
+        output = concepts_convert(output)
+        output = elaboration_convert(output)
+        output = pitfall_convert(output)
+        output = fallacy_convert(output)
 
         output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
@@ -635,7 +658,6 @@ class LaTeX2Markdown(object):
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
 
         output = re.sub(r"\\href{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\1](\3)", output)
-        output = re.sub(r"\\weblink{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\3](\1)", output)
 
         output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
 
@@ -649,11 +671,14 @@ class LaTeX2Markdown(object):
         output = re.sub(r"(~)(\S+)", r" \2", output)
         output = re.sub(r"(\S+)(~)", r"\1 ", output)
 
-        output = re.sub(r"^\\\\ ", "<br>", output, flags=re.MULTILINE)
+        output = re.sub(r"^\\\\ ", "<br/>", output, flags=re.MULTILINE)
+        output = re.sub(r"\\newline ", "<br/>", output, flags=re.MULTILINE)
 
-        output = re.sub(r"\\index{(.*?)}", r"", output)
-
-        output = re.sub(r"\\label{(.*?)}", "", output)
+        # Reformat, lists, blocks, and headers.
+        output = self._lists_re.sub(self._replace_block, output)
+        output = self._block_re.sub(self._replace_block, output)
+        output = self._header_re.sub(self._replace_header, output)
+        output = self._table_re.sub(self._format_table, output)
 
         return output.lstrip().rstrip()
 

@@ -1,5 +1,5 @@
-|newline|newline |
+|newline|newline <br/>|
 |-|-|
-|tab|tab |
-|double quote|double quote |
-|backslash|backslash |
+|tab|tab <br/>|
+|double quote|double quote <br/>|
+|backslash|backslash <br/>|

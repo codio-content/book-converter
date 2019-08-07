@@ -1,0 +1,12 @@
+\begin{fallacy}{100\% test coverage with all tests passing means
+no bugs.}
+There are many reasons this statement can be false.
+Complete test coverage says nothing about the quality of the individual
+tests.  As well, some bugs may require passing a certain value as a method
+argument (for example, to trigger a divide-by-zero error), and control
+flow testing often cannot reveal such a bug.
+There may be bugs in the interaction between your app and an external
+service such as TMDb; stubbing out the service so you can perform local
+testing might mask such bugs.
+
+\end{fallacy}

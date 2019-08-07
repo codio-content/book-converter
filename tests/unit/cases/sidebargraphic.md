@@ -1,4 +1,5 @@
-Alan Perlis  
+Alan Perlis
+  
   (1922--1990) was the first recipient of the Turing Award (1966), conferred
   
   for his influence on advanced programming languages and compilers.
@@ -16,3 +17,9 @@ Alan Perlis
   winner Jim Backus and his colleague Peter Naur).
   
 ![Alan Perlis](ch_javascript/figs/perlis.png)
+
+![](ch_foreword/figs/patterson.png)
+\noindent
+**David Patterson** recently retired from a 40-year career as a
+Professor of Computer Science at
+UC Berkeley. In the

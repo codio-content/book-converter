@@ -1,0 +1,1 @@
+Once the app is running in development, have one or two experienced customers demonstrate how they use the app, indicating during the demo what changes they have in mind (nierstrasz:reengineering).
