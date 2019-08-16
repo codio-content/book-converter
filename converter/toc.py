@@ -120,7 +120,7 @@ def process_toc_lines(lines, tex_folder, parent_folder):
             if is_section_file(line):
                 section_lines = get_section_lines(line, parent_folder)
                 for sub_line in section_lines:
-                    item_lines.append(sub_line)
+                    item_lines.append(sub_line.rstrip('\n'))
         elif is_input(line) or is_include(line):
             if is_input(line):
                 sub_toc = get_latex_toc(tex_folder, input_file(line))
