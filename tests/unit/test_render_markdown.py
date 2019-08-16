@@ -242,3 +242,6 @@ class TestSuite(unittest.TestCase):
 
     def test_fallacy(self):
         self.run_case("fallacy")
+
+    def test_saas(self):
+        self.run_case("saas")

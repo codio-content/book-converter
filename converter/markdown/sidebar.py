@@ -41,13 +41,13 @@ class Sidebar(TextAsParagraph):
         block_contents = '\n'.join(lines)
         block_contents = self.to_paragraph(block_contents)
 
-        if title:
-            return '|||info{caret_token}## {}{caret_token}{}{caret_token}{caret_token}|||'.format(
-                title, block_contents, caret_token=self._caret_token
-            )
-
         caret_token = self._caret_token
-        return f'|||info{caret_token}{block_contents}{caret_token}{caret_token}|||'
+        if title:
+            return f'{caret_token}{caret_token}|||info{caret_token}## {title}' \
+                f'{caret_token}{block_contents}{caret_token}|||{caret_token}{caret_token}'
+
+        return f'{caret_token}{caret_token}|||info{caret_token}{block_contents}' \
+            f'{caret_token}{caret_token}|||{caret_token}{caret_token}'
 
     def _sidebargraphic_block(self, matchobj):
         block_contents = matchobj.group('block_contents')

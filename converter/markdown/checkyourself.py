@@ -22,7 +22,7 @@ class CheckYouself(TextAsParagraph):
         block_contents = matchobj.group('block_contents')
         answer_str = answer_re.sub(self.make_answer_block, block_contents)
         caret_token = self._caret_token
-        return f'|||challenge{caret_token}{answer_str}{caret_token}|||'
+        return f'{caret_token}|||challenge{caret_token}{answer_str}{caret_token}|||{caret_token}'
 
     def convert(self):
         return checkyourself_re.sub(self.make_block, self.str)
