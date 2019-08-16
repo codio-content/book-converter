@@ -66,7 +66,6 @@ class LaTeX2Markdown(object):
         output = NewLine(output).convert()
         output = ItalicBold(output).convert()
         output = Links(output).convert()
-
         output, source_codes = CodeBlock(
             output, self._percent_token, self._caret_token, self._remove_trinket
         ).convert()
@@ -77,6 +76,7 @@ class LaTeX2Markdown(object):
 
         # remove comments
         output = re.sub("%(.*?)?$", "", output, flags=re.MULTILINE)
+        output = Quotation(output, self._caret_token).convert()
         output = Paragraph(output).convert_without_tags()
 
         output = InlineMath(output).convert()
@@ -106,7 +106,6 @@ class LaTeX2Markdown(object):
             output, self._exercise_counter_offset, self._chapter_num, self._remove_exercise, self._caret_token
         ).convert()
         output = EqnArray(output).convert()
-        output = Quotation(output, self._caret_token).convert()
 
         output = Header(output).convert()
         output = Table(output, self._caret_token).convert()

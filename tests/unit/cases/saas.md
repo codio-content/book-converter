@@ -31,7 +31,7 @@ Unsurprisingly, given the popularity of SaaS, Figure fig:SaaS_frameworks lists t
 Ruby is typical of modern scripting languages in including automatic memory management and dynamic typing. By including important advances in programming languages, Ruby goes beyond languages like Perl in supporting multiple programming paradigms such as object oriented and functional programming.
 
 
-Useful additional features that help productivity via reuse include _**mix-ins**_, which collect related behaviors and make it easy to add them to many different classes, and _**metaprogramming**_, which allows Ruby programs to synthesize code at runtime. Reuse is also enhanced with Ruby's support for _**blocks**_ and _**yield**_. Chapter chap:ruby_intro is a short description of Ruby for those who already know Java, and Chapter chap:rails_intro introduces Rails.
+Useful additional features that help productivity via reuse include _**mix-ins**_, which collect related behaviors and make it easy to add them to many different classes, and _**metaprogramming**_, which allows Ruby programs to synthesize code at runtime. Reuse is also enhanced with Ruby's support for _**closures**_ via _**blocks**_ and _**yield**_. Chapter chap:ruby_intro is a short description of Ruby for those who already know Java, and Chapter chap:rails_intro introduces Rails.
 
 
 

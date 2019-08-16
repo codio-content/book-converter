@@ -40,8 +40,7 @@
 >
 > __Prof. Rakhi Saxena, Assistant Professor, Delhi University, India__
 
-> The authors have accomplished a very welcome   juxtaposition of theory and practice for any modern beginning to   advanced Software Engineering course ...
-I have used the Beta   Edition of this book very successfully in my advanced undergraduate   software engineering course, where it beautifully complements both my   lectures and the team project.
+> The authors have accomplished a very welcome   juxtaposition of theory and practice for any modern beginning to   advanced Software Engineering course ... I have used the Beta   Edition of this book very successfully in my advanced undergraduate   software engineering course, where it beautifully complements both my   lectures and the team project.
 >
 > __Prof. Ingolf Krueger, Professor, University of California at San Diego__
 

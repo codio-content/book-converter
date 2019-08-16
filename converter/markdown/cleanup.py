@@ -15,6 +15,7 @@ class Cleanup(object):
 
         output = self._small_re.sub(r"\1", output)
         output = re.sub(r"\\tbd{(.*?)}", r"\1", output)
+        output = re.sub(r"\\\$", r"$", output)
 
         output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
 

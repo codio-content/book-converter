@@ -36,6 +36,7 @@ class Paragraph(object):
                         processed.append(' '.join(local_lines))
                         local_lines = []
                     processed.append('')
+                    empty_lines_count = 0
                 elif level > 0:
                     processed.append(line)
                 elif line:

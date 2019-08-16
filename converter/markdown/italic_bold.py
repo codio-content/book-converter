@@ -12,7 +12,9 @@ class ItalicBold(object):
 
     def convert(self):
         output = self.str
-        output = re.compile(r"\\w(\[.*\])?{(?P<block_contents>.*?)}").sub(self.make_block, output)
-        output = re.compile(r"\\x{(?P<block_contents>.*?)}").sub(self.make_block, output)
+        output = re.compile(r"\\w{(?P<block_contents>.*?)}", flags=re.DOTALL + re.VERBOSE).sub(self.make_block, output)
+        output = re.compile(r"\\w(\[(?P<name>.*?)]){(?P<block_contents>.*?)}", flags=re.DOTALL + re.VERBOSE) \
+            .sub(self.make_block, output)
+        output = re.compile(r"\\x{(?P<block_contents>.*?)}", flags=re.DOTALL + re.VERBOSE).sub(self.make_block, output)
 
         return output
