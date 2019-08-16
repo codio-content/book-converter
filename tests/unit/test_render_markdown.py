@@ -246,9 +246,14 @@ class TestSuite(unittest.TestCase):
     def test_saas(self):
         self.run_case("saas")
         self.run_case("saas1")
+        self.run_case("saas2")
+        self.run_case("saas3")
 
     def test_italic_bold(self):
         self.run_case("italic_bold")
 
     def test_esc_dollar(self):
         self.run_case("esc_dol")
+
+    def test_index(self):
+        self.run_case("index")

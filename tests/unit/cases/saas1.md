@@ -130,6 +130,7 @@ The Rational Unified Process lifecycle allows the project to have multiple itera
 
 An unfortunate downside to teaching a Plan-and-Document approach is that students may find software development tedious (Nawrocki02,Estler12). Given the importance of predictable software development, this is hardly a strong enough reason not to teach it; the good news is that there are alternatives that work just as well for many projects that are a better fit to the classroom, as we describe in the next section.
 
+
 ---
 **Summary:** The basic *activities* of software engineering are the same in all the software development process or _**lifecycles**_, but their interaction over time relative to product releases differs among the models. The Waterfall lifecycle is characterized by much of the design being done in advance of coding, completing each phase before going on to the next one. The Spiral lifecycle iterates through all the development phases to produce prototypes, but like Waterfall, the customers may only get involved every 6 to 24 months. The more recent Rational Unified Process lifecycle includes phases, iterations, and prototypes, while identifying the people skills needed for the project. All rely on careful planning and thorough documentation, and all measure progress against a plan.
 

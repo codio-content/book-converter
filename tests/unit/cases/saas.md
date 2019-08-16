@@ -42,6 +42,7 @@ In addition to our view of Rails being technically superior for Agile and SaaS, 
 
 Note that frequent upgrades of SaaS---due to only having a single copy of the software---perfectly align with the Agile software lifecycle. Hence, Amazon, eBay, Facebook, Google,             and other SaaS providers all rely on the Agile lifecycle, and traditional software companies like Microsoft are increasingly using Agile in their product development.    The Agile process is an excellent match to the fast-changing nature of SaaS applications.
 
+
 ---
 **Summary:** _**Software as a Service (SaaS)**_ is attractive to both customers and providers because the universal client (the Web browser) makes it easier for customers to use the service and the single version of the software at a centralized site makes it easier for the provider to deliver and improve the service. Given the ability and desire to frequently upgrade SaaS, the Agile software development process is popular for SaaS, and so there are many frameworks to support Agile and SaaS. This book uses Ruby on Rails.
 

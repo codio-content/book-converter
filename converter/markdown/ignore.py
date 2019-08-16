@@ -5,9 +5,28 @@ class Ignore(object):
     def __init__(self, latex_str):
         self.str = latex_str
 
+    def remove_chars(self, output, chars):
+        pos = output.find(chars)
+        if pos == -1:
+            return output
+        level = 0
+        for index in range(pos + 7, len(output), 1):
+            ch = output[index]
+            if ch == '}':
+                if level == 0:
+                    output = output[0:pos] + output[index + 1:]
+                    break
+                else:
+                    level += 1
+            elif ch == '{':
+                level -= 1
+        if chars in output:
+            return self.remove_chars(output, chars)
+        return output
+
     def convert(self):
         output = self.str
-        output = re.sub(r"\\index{(.*?)}", "", output, flags=re.DOTALL + re.VERBOSE)
-        output = re.sub(r"\\label{(.*?)}", "", output, flags=re.DOTALL + re.VERBOSE)
+        output = self.remove_chars(output, "\\index{")
+        output = self.remove_chars(output, "\\label{")
 
         return output
