@@ -1,15 +1,22 @@
 import re
 
+from converter.markdown.text_as_paragraph import TextAsParagraph
+
 fallacy_re = re.compile(r"""\\begin{fallacy}{(?P<title>.*?)}(?P<block_contents>.*?)\\end{fallacy}""",
                         flags=re.DOTALL + re.VERBOSE)
 
 
-def make_block(matchobj):
-    block_contents = matchobj.group('block_contents')
-    title = matchobj.group('title')
-    title = re.sub(r"\n", " ", title)
-    return '## {}\n{}'.format(title, block_contents)
+class Fallacy(TextAsParagraph):
+    def __init__(self, latex_str, caret_token):
+        super().__init__(latex_str, caret_token)
 
+    def make_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_contents = self.to_paragraph(block_contents)
+        title = matchobj.group('title')
+        title = self.to_paragraph(title)
+        caret_token = self._caret_token
+        return f'## {title}{caret_token}{block_contents}'
 
-def convert(input_str):
-    return fallacy_re.sub(make_block, input_str)
+    def convert(self):
+        return fallacy_re.sub(self.make_block, self.str)

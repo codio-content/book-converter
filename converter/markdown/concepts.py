@@ -1,12 +1,19 @@
 import re
 
+from converter.markdown.text_as_paragraph import TextAsParagraph
+
 concepts_re = re.compile(r"""\\begin{concepts}(?P<block_contents>.*?)\\end{concepts}""", flags=re.DOTALL + re.VERBOSE)
 
 
-def make_block(matchobj):
-    block_contents = matchobj.group('block_contents')
-    return '## Concepts\n{}'.format(block_contents)
+class Consents(TextAsParagraph):
+    def __init__(self, latex_str, caret_token):
+        super().__init__(latex_str, caret_token)
 
+    def make_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_contents = self.to_paragraph(block_contents)
+        caret_token = self._caret_token
+        return f'## Concepts{caret_token}{block_contents}'
 
-def convert(input_str):
-    return concepts_re.sub(make_block, input_str)
+    def convert(self):
+        return concepts_re.sub(self.make_block, self.str)

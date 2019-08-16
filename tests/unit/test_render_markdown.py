@@ -41,7 +41,7 @@ class TestSuite(unittest.TestCase):
     def run_case(self, name, refs={}, chapter_num=1):
         path = "cases/{}".format(name)
         converter = make_converter(path, refs, chapter_num)
-        self.assertEqual(load_md(path), converter.to_markdown())
+        self.assertEqual(load_md(path), converter.to_markdown().rstrip('\n'))
 
     def test_markdown_chapter_render(self):
         self.run_case("chapter")

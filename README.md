@@ -277,3 +277,13 @@ Required a package `pip3 install pdf2image`
 ## codestyle
 
 [![wercker status](https://app.wercker.com/status/e4292419f5fdfef83fe74f7be72babb2/m/master "wercker status")](https://app.wercker.com/project/byKey/e4292419f5fdfef83fe74f7be72babb2)
+
+## tests
+
+Unit
+
+`python3 -m unittest discover -s tests/unit -v`
+
+Functional
+
+`python3 -m unittest discover -s tests/functional -v`

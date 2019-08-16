@@ -25,10 +25,10 @@ class TestSuite(unittest.TestCase):
         converter = BookDown2Markdown(load_book_md(path).split('\n'), assets_extension=lambda x: "jpg", refs=refs)
         self.assertEqual(converter.to_markdown(), load_md(path))
 
-    def test_includegraphics(self):
+    def test_bookdown_includegraphics(self):
         self.run_case("includegraphics")
 
-    def test_refs(self):
+    def test_bookdown_refs(self):
         refs = {
             "data visualisation": {
                 "ref": "Data Visualisation Chapter"

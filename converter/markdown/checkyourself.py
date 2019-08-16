@@ -1,5 +1,7 @@
 import re
 
+from converter.markdown.text_as_paragraph import TextAsParagraph
+
 checkyourself_re = re.compile(r"""\\begin{checkyourself}(?P<block_contents>.*?)\\end{checkyourself}""",
                               flags=re.DOTALL + re.VERBOSE)
 
@@ -7,18 +9,20 @@ answer_re = re.compile(r"""\\begin{answer}(?P<answer_block_contents>.*?)\\end{an
                        flags=re.DOTALL + re.VERBOSE)
 
 
-def make_answer_block(matchobj):
-    answer_block_contents = matchobj.group('answer_block_contents')
-    return '<details><summary>Check yourself</summary>{}</details>'.format(answer_block_contents)
+class CheckYouself(TextAsParagraph):
+    def __init__(self, latex_str, caret_token):
+        super().__init__(latex_str, caret_token)
 
+    def make_answer_block(self, matchobj):
+        answer_block_contents = matchobj.group('answer_block_contents')
+        answer_block_contents = self.to_paragraph(answer_block_contents)
+        return '<details><summary>Check yourself</summary>{}</details>'.format(answer_block_contents)
 
-def make_block(matchobj):
-    block_contents = matchobj.group('block_contents')
+    def make_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        answer_str = answer_re.sub(self.make_answer_block, block_contents)
+        caret_token = self._caret_token
+        return f'|||challenge{caret_token}{answer_str}{caret_token}|||'
 
-    answer_str = answer_re.sub(make_answer_block, block_contents)
-
-    return '|||challenge\n{}\n|||'.format(answer_str)
-
-
-def convert(input_str):
-    return checkyourself_re.sub(make_block, input_str)
+    def convert(self):
+        return checkyourself_re.sub(self.make_block, self.str)

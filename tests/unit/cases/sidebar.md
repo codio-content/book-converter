@@ -1,7 +1,6 @@
 |||info
 ## printf debugging
-
-is an old name for this technique, from the C library function that     prints a string on the terminal.
+is an old name for this technique, from the C library function that prints a string on the terminal.
 
 |||
 

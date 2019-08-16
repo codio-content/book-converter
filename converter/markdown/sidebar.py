@@ -1,0 +1,76 @@
+import re
+
+from converter.guides.tools import get_text_in_brackets
+from converter.markdown.text_as_paragraph import TextAsParagraph
+
+
+class Sidebar(TextAsParagraph):
+    def __init__(self, latex_str, detect_asset_ext, caret_token):
+        super().__init__(latex_str, caret_token)
+        self._detect_asset_ext = detect_asset_ext
+
+        self._pdfs = []
+
+        self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}{(?P<block_graphics>.*?)}{(?P<block_name>.*?)}
+                                    (?P<block_contents>.*?)
+                                    \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
+
+        self._sidebar_re = re.compile(r"""\\begin{sidebar}
+                                    (?P<block_contents>.*?)
+                                    \\end{sidebar}""", flags=re.DOTALL + re.VERBOSE)
+
+    def _sidebar_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        lines = block_contents.split('\n')
+        head = lines[0]
+        title = ''
+        additional = ''
+
+        lines = lines[1:]
+
+        matches = re.match(r"(\[.*\])?({.*?\})(.*)?", head)
+        if matches:
+            title = matches.group(2).strip()
+            title = get_text_in_brackets(title)
+            additional = matches.group(3).strip()
+
+        if additional:
+            lines.insert(0, additional)
+
+        lines = map(lambda line: line.strip(), lines)
+        block_contents = '\n'.join(lines)
+        block_contents = self.to_paragraph(block_contents)
+
+        if title:
+            return '|||info{caret_token}## {}{caret_token}{}{caret_token}{caret_token}|||'.format(
+                title, block_contents, caret_token=self._caret_token
+            )
+
+        caret_token = self._caret_token
+        return f'|||info{caret_token}{block_contents}{caret_token}{caret_token}|||'
+
+    def _sidebargraphic_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        image = matchobj.group('block_graphics')
+        block_name = matchobj.group('block_name')
+
+        if '.' not in image:
+            ext = self._detect_asset_ext(image)
+            if ext:
+                image = '{}.{}'.format(image, ext)
+
+        if image.lower().endswith('.pdf'):
+            self._pdfs.append(image)
+            image = image.replace('.pdf', '.jpg')
+
+        image_src = "![{}]({})".format(block_name, image)
+
+        return '{}{}{}'.format(block_name, block_contents, image_src)
+
+    def convert(self):
+        output = self.str
+
+        output = self._sidebargraphic_re.sub(self._sidebargraphic_block, output)
+        output = self._sidebar_re.sub(self._sidebar_block, output)
+
+        return output, self._pdfs
