@@ -34,6 +34,7 @@ from converter.markdown.lists import Lists
 from converter.markdown.block import Block
 from converter.markdown.paragraph import Paragraph
 from converter.markdown.tablefigure import TableFigure
+from converter.markdown.chips import Chips
 
 
 class LaTeX2Markdown(object):
@@ -92,6 +93,7 @@ class LaTeX2Markdown(object):
         output = Fallacy(output, self._caret_token).convert()
         output = PitFall(output, self._caret_token).convert()
         output = Summary(output, self._caret_token).convert()
+        output = Chips(output, self._caret_token).convert()
         output = Cleanup(output).convert()
 
         output, images = PicFigure(output).convert()

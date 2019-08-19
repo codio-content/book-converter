@@ -264,3 +264,6 @@ class TestSuite(unittest.TestCase):
 
     def test_tablefigure(self):
         self.run_case("tablefigure", load_workspace_file=lambda _: "file content\n content")
+
+    def test_chips(self):
+        self.run_case("chips")
