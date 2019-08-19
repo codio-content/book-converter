@@ -36,6 +36,7 @@ from converter.markdown.paragraph import Paragraph
 from converter.markdown.tablefigure import TableFigure
 from converter.markdown.chips import Chips
 from converter.markdown.dedicationwithpic import DedicationWithPic
+from converter.markdown.codefilefigure import CodeFigure
 
 
 class LaTeX2Markdown(object):
@@ -64,8 +65,8 @@ class LaTeX2Markdown(object):
         output = self._latex_string
 
         output = TableFigure(output, self._caret_token, self._load_workspace_file).convert()
-
         output = Quotes(output).convert()
+        output = CodeFigure(output, self._caret_token, self._percent_token, self._load_workspace_file).convert()
         output = Bold(output).convert()
         output = Italic(output).convert()
         output = Ignore(output).convert()

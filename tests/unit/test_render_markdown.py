@@ -272,5 +272,7 @@ class TestSuite(unittest.TestCase):
         self.run_case("dedicationwithpic")
 
     def test_tolearnmore(self):
-        self.write_md("tolearnmore")
         self.run_case("tolearnmore")
+
+    def test_codefigure(self):
+        self.run_case("codefigure", load_workspace_file=lambda _: "file content")
