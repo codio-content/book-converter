@@ -35,6 +35,7 @@ from converter.markdown.block import Block
 from converter.markdown.paragraph import Paragraph
 from converter.markdown.tablefigure import TableFigure
 from converter.markdown.chips import Chips
+from converter.markdown.dedicationwithpic import DedicationWithPic
 
 
 class LaTeX2Markdown(object):
@@ -105,6 +106,9 @@ class LaTeX2Markdown(object):
         if images:
             self._pdfs.extend(images)
         output, images = Sidebar(output, self._detect_asset_ext, self._caret_token).convert()
+        if images:
+            self._pdfs.extend(images)
+        output, images = DedicationWithPic(output, self._caret_token).convert()
         if images:
             self._pdfs.extend(images)
 

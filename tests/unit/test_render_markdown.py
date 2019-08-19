@@ -267,3 +267,10 @@ class TestSuite(unittest.TestCase):
 
     def test_chips(self):
         self.run_case("chips")
+
+    def test_dedicationwithpic(self):
+        self.run_case("dedicationwithpic")
+
+    def test_tolearnmore(self):
+        self.write_md("tolearnmore")
+        self.run_case("tolearnmore")

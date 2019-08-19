@@ -2,7 +2,10 @@ import re
 
 from converter.markdown.text_as_paragraph import TextAsParagraph
 
-summary_re = re.compile(r"""\\begin{summary}(?P<block_contents>.*?)\\end{summary}""", flags=re.DOTALL + re.VERBOSE)
+summary_re = re.compile(
+    r"""\\begin{(summary|comment|tolearnmore)}(?P<block_contents>.*?)\\end{(summary|comment|tolearnmore)}""",
+    flags=re.DOTALL + re.VERBOSE
+)
 
 
 class Summary(TextAsParagraph):
