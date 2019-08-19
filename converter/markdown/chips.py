@@ -3,7 +3,7 @@ import re
 from converter.markdown.text_as_paragraph import TextAsParagraph
 
 chips_re = re.compile(r"""\\begin{chips}{(?P<title>.*?)}(?P<block_contents>.*?)\\end{chips}""",
-                        flags=re.DOTALL + re.VERBOSE)
+                      flags=re.DOTALL + re.VERBOSE)
 
 
 class Chips(TextAsParagraph):

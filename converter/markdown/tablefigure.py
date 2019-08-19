@@ -4,7 +4,7 @@ import uuid
 from converter.markdown.text_as_paragraph import TextAsParagraph
 
 table_re = re.compile(r"""\\tablefigure{(?P<file_path>.*?)}{(?P<label>.*?)}""",
-                        flags=re.DOTALL + re.VERBOSE)
+                      flags=re.DOTALL + re.VERBOSE)
 
 
 class TableFigure(TextAsParagraph):
@@ -33,7 +33,7 @@ class TableFigure(TextAsParagraph):
             ch = output[index]
             if ch == '}':
                 if level == 0:
-                    output = output[0:pos] + output[pos+token_len:index - 1] + output[index + 1:]
+                    output = output[0:pos] + output[pos + token_len:index - 1] + output[index + 1:]
                     break
                 else:
                     level += 1
