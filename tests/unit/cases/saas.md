@@ -22,7 +22,9 @@ Lest you think the perceived need to improve a successful service is just softwa
 
 Combining the advantages to the customer and the developer together explains why SaaS is rapidly growing and why traditional software products are increasingly being transformed to offer SaaS versions. An example of the latter is Microsoft Office 365, which allows you to use the popular Word, Excel, and PowerPoint productivity programs as a remote service by paying for use rather than pre-purchasing software and installing it on your local computer.    Another example is TurboTax Online, which offers the same deal for another shrink-wrap standard-bearer.   
 
-\tablefigure{ch_intro/tables/SaaS_frameworks}{fig:SaaS_frameworks}{   Examples of SaaS programming frameworks and the programming languages   they are written in.}
+file content
+
+   Examples of SaaS programming frameworks and the programming languages   they are written in
 
 
 Unsurprisingly, given the popularity of SaaS, Figure fig:SaaS_frameworks lists the many programming frameworks that claim to help.   In this book, we use Ruby on Rails (“Rails”), although the ideas we cover will work with other programming frameworks as well. We chose Rails because it came from a community that had already embraced the Agile lifecycle, so the tools support Agile particularly well.

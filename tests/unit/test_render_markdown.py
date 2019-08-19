@@ -245,7 +245,7 @@ class TestSuite(unittest.TestCase):
         self.run_case("fallacy")
 
     def test_saas(self):
-        self.run_case("saas")
+        self.run_case("saas", load_workspace_file=lambda _: "file content")
         self.run_case("saas1")
         self.run_case("saas2")
         self.run_case("saas3")
