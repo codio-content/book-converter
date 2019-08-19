@@ -1,5 +1,9 @@
 import re
 
+ifhtml_re = re.compile(
+    r"""\\ifhtmloutput(?P<if_block>.*?)\\else(?P<else_block>.*?)\\fi""", flags=re.DOTALL + re.VERBOSE
+)
+
 
 class Ignore(object):
     def __init__(self, latex_str):
@@ -24,9 +28,13 @@ class Ignore(object):
             return self.remove_chars(output, chars)
         return output
 
+    def make_block(self, group):
+        return ''
+
     def convert(self):
         output = self.str
         output = self.remove_chars(output, "\\index{")
         output = self.remove_chars(output, "\\label{")
+        output = ifhtml_re.sub(self.make_block, output)
 
         return output

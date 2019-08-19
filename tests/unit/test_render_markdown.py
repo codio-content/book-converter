@@ -257,3 +257,6 @@ class TestSuite(unittest.TestCase):
 
     def test_index(self):
         self.run_case("index")
+
+    def test_ifhtmloutput(self):
+        self.run_case("ifhtmloutput")
