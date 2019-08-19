@@ -33,13 +33,14 @@ from converter.markdown.table import Table
 from converter.markdown.lists import Lists
 from converter.markdown.block import Block
 from converter.markdown.paragraph import Paragraph
+from converter.markdown.tablefigure import TableFigure
 
 
 class LaTeX2Markdown(object):
     def __init__(
             self, latex_array, refs={}, chapter_num=1, figure_num=0,
             exercise_num=0, remove_trinket=False, remove_exercise=False,
-            detect_asset_ext=lambda _: _
+            detect_asset_ext=lambda _: _, load_workspace_file=lambda _: ''
     ):
         self._latex_string = '\n'.join(latex_array)
         self._percent_token = str(uuid.uuid4())
@@ -55,9 +56,13 @@ class LaTeX2Markdown(object):
         self._remove_trinket = remove_trinket
         self._remove_exercise = remove_exercise
         self._detect_asset_ext = detect_asset_ext
+        self._load_workspace_file = load_workspace_file
 
     def _latex_to_markdown(self):
         output = self._latex_string
+
+        output = TableFigure(output, self._caret_token, self._load_workspace_file).convert()
+
         output = Quotes(output).convert()
         output = Bold(output).convert()
         output = Italic(output).convert()

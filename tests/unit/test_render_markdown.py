@@ -26,21 +26,22 @@ def load_file(path):
         return file.read()
 
 
-def make_converter(path, refs, chapter_num):
+def make_converter(path, refs, chapter_num, load_workspace_file):
     return LaTeX2Markdown(
-        load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num, detect_asset_ext=lambda _: "png"
+        load_tex(path).split('\n'), refs=refs, chapter_num=chapter_num, detect_asset_ext=lambda _: "png",
+        load_workspace_file=load_workspace_file
     )
 
 
 class TestSuite(unittest.TestCase):
-    def write_md(self, name, refs={}, chapter_num=1):
+    def write_md(self, name, refs={}, chapter_num=1, load_workspace_file=lambda _: _):
         path = "cases/{}".format(name)
-        converter = make_converter(path, refs, chapter_num)
+        converter = make_converter(path, refs, chapter_num, load_workspace_file)
         write_md_case(name, converter.to_markdown())
 
-    def run_case(self, name, refs={}, chapter_num=1):
+    def run_case(self, name, refs={}, chapter_num=1, load_workspace_file=lambda _: _):
         path = "cases/{}".format(name)
-        converter = make_converter(path, refs, chapter_num)
+        converter = make_converter(path, refs, chapter_num, load_workspace_file)
         self.assertEqual(load_md(path), converter.to_markdown().rstrip('\n'))
 
     def test_markdown_chapter_render(self):
@@ -260,3 +261,6 @@ class TestSuite(unittest.TestCase):
 
     def test_ifhtmloutput(self):
         self.run_case("ifhtmloutput")
+
+    def test_tablefigure(self):
+        self.run_case("tablefigure", load_workspace_file=lambda _: "file content\n content")

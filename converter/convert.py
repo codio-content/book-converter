@@ -324,7 +324,8 @@ def convert(config, base_path, yes=False):
                 lines,
                 refs=refs, chapter_num=chapter_num, figure_num=figure_num,
                 exercise_num=exercise_num, remove_trinket=remove_trinket,
-                remove_exercise=remove_exercise, detect_asset_ext=detect_asset_ext
+                remove_exercise=remove_exercise, detect_asset_ext=detect_asset_ext,
+                load_workspace_file=workspace_file(Path(config['workspace']['directory']))
             )
 
             converted_md = md_converter.to_markdown()
@@ -362,6 +363,19 @@ def convert(config, base_path, yes=False):
 
     write_metadata(guides_dir, metadata, book)
     process_assets(config, generate_dir, pdfs_for_convert, source_codes)
+
+
+def workspace_file(base_src_dir):
+    def load_workspace_file(path):
+        if '.' not in path:
+            path = f"{path}.tex"
+        file = base_src_dir.joinpath(path)
+        if file.exists():
+            with open(file, 'r', errors='replace') as file:
+                return file.read()
+        return ''
+
+    return load_workspace_file
 
 
 def assets_extension(base_src_dir):
