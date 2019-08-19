@@ -1,13 +1,19 @@
 import re
 
+from converter.markdown.text_as_paragraph import TextAsParagraph
+
 center_re = re.compile(r"""\\begin{center}(?P<block_contents>.*?)\\end{center}""", flags=re.DOTALL + re.VERBOSE)
 
 
-def make_block(matchobj):
-    block_contents = matchobj.group('block_contents')
-    block_contents = re.sub(r"\\\\", "<br/>", block_contents, flags=re.MULTILINE)
-    return '<center>{}</center>'.format(block_contents)
+class Center(TextAsParagraph):
+    def __init__(self, latex_str):
+        super().__init__(latex_str, '')
 
+    def make_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_contents = re.sub(r"\\\\", "<br/>", block_contents, flags=re.MULTILINE)
+        block_contents = self.to_paragraph(block_contents)
+        return '<center>{}</center>'.format(block_contents)
 
-def convert(input_str):
-    return center_re.sub(make_block, input_str)
+    def convert(self):
+        return center_re.sub(self.make_block, self.str)

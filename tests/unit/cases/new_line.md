@@ -8,7 +8,7 @@
 
 *  On Linux, it's likely under: `/usr/lib/jvm/openjdk-.../` <br/>If not, then install the `openjdk-...-source` package.
 *  On MacOS, it's likely under: <br/> `/Library/Java/JavaVirtualMachines/jdk.../Contents/Home/`
-*  On Windows, it's likely under: `C:\Program Files\Java\jdk...\` 
+*  On Windows, it's likely under: `C:\Program Files\Java\jdk...\`
 
 
 
@@ -25,7 +25,7 @@
 *  James Riely ported the textbook source from LaTeX to Sphinx. <br/>[http://fpl.cs.depaul.edu/jriely/thinkapjava/](http://fpl.cs.depaul.edu/jriely/thinkapjava/)
 *  Peter Knaggs ported the book to C\#. <br/>[http://www.rigwit.co.uk/think/sharp/](http://www.rigwit.co.uk/think/sharp/)
 *  Heidi Gentry-Kolen recorded several video lectures that follow the book. <br/>[https://www.youtube.com/user/digipipeline](https://www.youtube.com/user/digipipeline)
-*  Waldo Ribeiro submitted a pull request that corrected a dozen typos. 
+*  Waldo Ribeiro submitted a pull request that corrected a dozen typos.
 
 Unlike string literals, which appear in double quotes, character literals can only contain a single character. Escape sequences, like `'\t'`, are legal because they represent a single character.
 

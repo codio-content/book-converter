@@ -1,685 +1,133 @@
-import re
 import uuid
-from collections import defaultdict
-from collections import namedtuple
+import re
 
-from converter.guides.tools import get_text_in_brackets
-
-from converter.markdown.summary import convert as summary_convert
-from converter.markdown.checkyourself import convert as checkyourself_convert
-from converter.markdown.picfigure import convert as picfigure_convert
-from converter.markdown.cite import convert as cite_convert
-from converter.markdown.center import convert as center_convert
-from converter.markdown.concepts import convert as concepts_convert
-from converter.markdown.saas_specific import convert as saas_convert
-from converter.markdown.elaboration import convert as elaboration_convert
-from converter.markdown.pitfall import convert as pitfall_convert
-from converter.markdown.fallacy import convert as fallacy_convert
-
-Code = namedtuple('Code', ['name', 'source'])
-
-# Basic configuration - modify this to change output formatting
-_block_configuration = {
-    "chapter": {
-        "markdown_heading": "##",
-        "pretty_name": "",
-        "show_count": False
-    },
-    "enumerate": {
-        "line_indent_char": "",
-        "list_heading": "1. ",
-        "markdown_heading": "",
-        "pretty_name": "",
-        "show_count": False
-    },
-    "exer": {
-        "line_indent_char": "> ",
-        "markdown_heading": "####",
-        "pretty_name": "Exercise",
-        "show_count": True
-    },
-    "itemize": {
-        "line_indent_char": "",
-        "list_heading": "* ",
-        "markdown_heading": "",
-        "pretty_name": "",
-        "show_count": False
-    },
-    "description": {
-        "line_indent_char": "",
-        "list_heading": "* ",
-        "markdown_heading": "",
-        "pretty_name": "",
-        "show_count": False
-    },
-    "lem": {
-        "line_indent_char": "> ",
-        "markdown_heading": "####",
-        "pretty_name": "Lemma",
-        "show_count": True
-    },
-    "lstlisting": {
-        "line_indent_char": "    ",
-        "markdown_heading": "",
-        "pretty_name": "",
-        "show_count": False
-    },
-    "proof": {
-        "line_indent_char": "",
-        "markdown_heading": "####",
-        "pretty_name": "Proof",
-        "show_count": False
-    },
-    "prop": {
-        "line_indent_char": "> ",
-        "markdown_heading": "####",
-        "pretty_name": "Proposition",
-        "show_count": True
-    },
-    "section": {
-        "markdown_heading": "###",
-        "pretty_name": "",
-        "show_count": False
-    },
-    "subsection": {
-        "markdown_heading": "####",
-        "pretty_name": "",
-        "show_count": False
-    },
-    "thm": {
-        "line_indent_char": "> ",
-        "markdown_heading": "####",
-        "pretty_name": "Theorem",
-        "show_count": True
-    },
-    "quote": {
-        "line_indent_char": "> ",
-        "markdown_heading": "",
-        "pretty_name": "",
-        "show_count": False
-    },
-    "quotation": {
-        "line_indent_char": "> ",
-        "markdown_heading": "",
-        "pretty_name": "",
-        "show_count": False
-    }
-}
+from converter.markdown.inline_code_block import InlineCodeBlock
+from converter.markdown.code_block import CodeBlock
+from converter.markdown.bold import Bold
+from converter.markdown.italic import Italic
+from converter.markdown.ignore import Ignore
+from converter.markdown.saas_specific import SaasSpecific
+from converter.markdown.center import Center
+from converter.markdown.checkyourself import CheckYouself
+from converter.markdown.cite import Cite
+from converter.markdown.concepts import Consents
+from converter.markdown.elaboration import Elaboration
+from converter.markdown.fallacy import Fallacy
+from converter.markdown.picfigure import PicFigure
+from converter.markdown.pitfall import PitFall
+from converter.markdown.summary import Summary
+from converter.markdown.quotes import Quotes
+from converter.markdown.links import Links
+from converter.markdown.newline import NewLine
+from converter.markdown.italic_bold import ItalicBold
+from converter.markdown.inline_math import InlineMath
+from converter.markdown.cleanup import Cleanup
+from converter.markdown.exercise import Exercise
+from converter.markdown.figure import Figure
+from converter.markdown.refs import Refs
+from converter.markdown.sidebar import Sidebar
+from converter.markdown.eqnarray import EqnArray
+from converter.markdown.quotation import Quotation
+from converter.markdown.header import Header
+from converter.markdown.table import Table
+from converter.markdown.lists import Lists
+from converter.markdown.block import Block
+from converter.markdown.paragraph import Paragraph
+from converter.markdown.tablefigure import TableFigure
+from converter.markdown.chips import Chips
+from converter.markdown.dedicationwithpic import DedicationWithPic
+from converter.markdown.codefilefigure import CodeFigure
 
 
 class LaTeX2Markdown(object):
-    """Initialise with a LaTeX string - see the main routine for examples of
-    reading this string from an existing .tex file.
-    To modify the outputted markdown, modify the _block_configuration variable
-    before initializing the LaTeX2Markdown instance."""
-
-    def _make_paragraphs(self, lines):
-        processed = []
-        current = ''
-        single_line = ('\\chapter', '\\section', '\\index', '%')
-        is_multi_line = False
-        for line in lines:
-            if line.strip().startswith(single_line) or '%' in line:
-                if current:
-                    processed.append(current)
-                    current = ''
-                if line.strip().startswith('%'):
-                    processed.append(line.strip())
-                else:
-                    processed.append(line)
-                continue
-            elif line.startswith('\\begin'):
-                if current:
-                    processed.append(current)
-                    current = ''
-                is_multi_line = True
-                processed.append(line)
-                continue
-            elif not line:
-                if current:
-                    processed.append(current)
-                    current = ''
-                processed.append(line)
-                continue
-
-            if is_multi_line:
-                processed.append(line)
-            else:
-                if current:
-                    current += ' ' + line
-                else:
-                    current = line
-            if line.startswith('\\end'):
-                is_multi_line = False
-        if current:
-            processed.append(current)
-        return processed
-
     def __init__(
-        self, latex_array, refs={}, chapter_num=1, figure_num=0,
-        exercise_num=0, remove_trinket=False, remove_exercise=False,
-        detect_asset_ext=lambda _: _
+            self, latex_array, refs={}, chapter_num=1, figure_num=0,
+            exercise_num=0, remove_trinket=False, remove_exercise=False,
+            detect_asset_ext=lambda _: _, load_workspace_file=lambda _: ''
     ):
-        latex_string = '\n'.join(self._make_paragraphs(latex_array))
+        self._latex_string = '\n'.join(latex_array)
+        self._percent_token = str(uuid.uuid4())
+        self._caret_token = str(uuid.uuid4())
         self._refs = refs
         self._chapter_num = chapter_num
         self._exercise_counter = 0
         self._figure_counter = 0
         self._figure_counter_offset = figure_num
         self._exercise_counter_offset = exercise_num
-        self._block_configuration = _block_configuration
-        self._latex_string = latex_string
-        self._block_counter = defaultdict(lambda: 1)
         self._pdfs = []
         self._source_codes = []
         self._remove_trinket = remove_trinket
         self._remove_exercise = remove_exercise
-        self.detect_asset_ext = detect_asset_ext
-
-        # Precompile the regexes
-
-        # Select everything in the main matter
-        self._main_re = re.compile(r"""\\begin{document}
-                                    (?P<main>.*)
-                                    \\end{document}""",
-                                   flags=re.DOTALL + re.VERBOSE)
-
-        # Select all our block materials.
-        self._block_re = re.compile(r"""\\begin{(?P<block_name>exer|proof|thm|lem|prop|quote|quotation)} # block name
-                                    (\[(?P<block_title>.*?)\])? # Optional block title
-                                    (?P<block_contents>.*?) # Non-greedy block contents
-                                    \\end{(?P=block_name)}""",  # closing block
-                                    flags=re.DOTALL + re.VERBOSE)
-
-        # Select all our list blocks
-        self._lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize|description)} # list name
-                                    (\[.*?\])? # Optional enumerate settings i.e. (a)
-                                    (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{(?P=block_name)}""",  # closing list
-                                    flags=re.DOTALL + re.VERBOSE)
-
-        # Select all our code blocks
-        self._code_re = re.compile(r"""\\begin{(?P<block_name>code|stdout|verbatim)}
-                                    (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{(?P=block_name)}""",  # closing list
-                                   flags=re.DOTALL + re.VERBOSE)
-
-        self._small_re = re.compile(r"""\\begin{small}
-                                    (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{small}""",  # closing list
-                                    flags=re.DOTALL + re.VERBOSE)
-
-        # Select all our code blocks
-        self._trinket_re = re.compile(r"""\\begin{(?P<block_name>trinket)}[\[\]0-9]*{(?P<file_name>.*?)}
-                                    (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{(?P=block_name)}""",  # closing list
-                                      flags=re.DOTALL + re.VERBOSE)
-
-        self._exercise_re = re.compile(r"""\\begin{exercise}(.*?)\n
-                                    (?P<block_contents>.*?)
-                                    \\end{exercise}""",
-                                       flags=re.DOTALL + re.VERBOSE)
-
-        self._figure_re = re.compile(r"""\\begin{figure}(.*?)\n
-                                    (?P<block_contents>.*?)
-                                    \\end{figure}""", flags=re.DOTALL + re.VERBOSE)
-
-        self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}{(?P<block_graphics>.*?)}{(?P<block_name>.*?)}
-                                    (?P<block_contents>.*?)
-                                    \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
-
-        self._sidebar_re = re.compile(r"""\\begin{sidebar}
-                                    (?P<block_contents>.*?)
-                                    \\end{sidebar}""", flags=re.DOTALL + re.VERBOSE)
-
-        self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}([\s]+)?
-                                            {(?P<block_author>.*?)}([ \t]+)?$""",
-                                            flags=re.DOTALL + re.VERBOSE + re.MULTILINE)
-
-        self._eqnarray_re = re.compile(r"""\\begin{(?P<block_name>eqnarray\*)}
-                                    (?P<block_contents>.*?)
-                                    \\end{(?P=block_name)}""", flags=re.DOTALL + re.VERBOSE)
-
-        self._refs_re = re.compile(r"""\\ref{(?P<ref_name>.*?)}""", flags=re.DOTALL + re.VERBOSE)
-        self._page_refs_re = re.compile(r"""\\pageref{(?P<ref_name>.*?)}""", flags=re.DOTALL + re.VERBOSE)
-
-        # Select all our headers
-        self._header_re = re.compile(r"""\\(?P<header_name>chapter|section|subsection) # Header
-                                    \**{(?P<header_contents>.*?)}""",  # Header title
-                                     flags=re.DOTALL + re.VERBOSE)
-
-        self._table_re = re.compile(r"""\\begin{(?P<block_name>table|tabular)} # block name
-                                    (?P<block_contents>.*?) # Non-greedy block contents
-                                    \\end{(?P=block_name)}""",  # closing block
-                                    flags=re.DOTALL + re.VERBOSE)
-
-        self._saas_icons_re = re.compile(r"""\\(dry|reuse|codegen|concise|coc|legacy|beauty|tool|
-                                         learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*\})?""",
-                                         flags=re.DOTALL + re.VERBOSE)
-
-    def _replace_header(self, matchobj):
-        """Creates a header string for a section/subsection/chapter match.
-        For example, "### 2 - Integral Calculus\n" """
-
-        header_name = matchobj.group('header_name')
-        header_contents = matchobj.group('header_contents')
-
-        header = self._format_block_name(header_name)
-
-        block_config = self._block_configuration[header_name]
-
-        # If we have a count, separate the title from the count with a dash
-        separator = "-" if block_config.get("show_count") else ""
-
-        output_str = "{header} {separator} {title}\n".format(
-            header=header,
-            title=header_contents,
-            separator=separator)
-
-        return output_str
-
-    def _replace_block(self, matchobj):
-        """Create a string that replaces an entire block.
-        The string consists of a header (e.g. ### Exercise 1)
-        and a block, containing the LaTeX code.
-        The block may be optionally indented, blockquoted, etc.
-        These settings are customizable through the config.json
-        file"""
-
-        block_name = matchobj.group('block_name')
-        block_contents = matchobj.group('block_contents')
-        # Block title may not exist, so use .get method
-        block_title = matchobj.groupdict().get('block_title')
-
-        # We have to format differently for lists
-        if block_name in {"itemize", "enumerate", "description"}:
-            formatted_contents = self._format_list_contents(block_name,
-                                                            block_contents)
-        else:
-            formatted_contents = self._format_block_contents(block_name,
-                                                             block_contents)
-
-        header = self._format_block_name(block_name, block_title)
-
-        output_str = "{header}\n\n{block_contents}".format(
-            header=header,
-            block_contents=formatted_contents)
-        if block_name == "description":
-            output_str = "{header}{block_contents}".format(
-                header=header,
-                block_contents=formatted_contents)
-        return output_str
-
-    def _format_block_contents(self, block_name, block_contents):
-        """Format the contents of a block with configuration parameters
-        provided in the self._block_configuration attribute"""
-
-        block_config = self._block_configuration[block_name]
-
-        line_indent_char = block_config["line_indent_char"]
-
-        output_str = ""
-        for line in block_contents.lstrip().rstrip().split("\n"):
-            line = line.lstrip().rstrip()
-            line = line.replace("\\\\", "<br/>")
-            indented_line = line_indent_char + line + "\n"
-            output_str += indented_line
-        return output_str
-
-    def _format_list_contents(self, block_name, block_contents):
-        block_config = self._block_configuration[block_name]
-
-        list_heading = block_config["list_heading"]
-
-        output_str = ""
-        for line in block_contents.lstrip().rstrip().split("\n"):
-            line = line.lstrip().rstrip()
-            line = line.replace("\\\\", "<br/>")
-
-            markdown_list_line = line.replace(r"\item", list_heading)
-            if not line:
-                continue
-            if "\\term" in line:
-                if output_str:
-                    output_str = output_str.strip() + "\n"
-                markdown_list_line = markdown_list_line.replace("\\term", list_heading)
-                markdown_list_line = markdown_list_line.replace("{", "**")
-                markdown_list_line = markdown_list_line.replace("}", "**")
-            elif "\\item" in line:
-                if output_str:
-                    output_str = output_str.strip() + "\n"
-                markdown_list_line = markdown_list_line.replace("[", "**")
-                markdown_list_line = markdown_list_line.replace("]", "**")
-            output_str += markdown_list_line + ' '
-        return output_str
-
-    def _format_block_name(self, block_name, block_title=None):
-        """Format the Markdown header associated with a block.
-        Due to the optional block_title, we split the string construction
-        into two parts."""
-
-        block_config = self._block_configuration[block_name]
-        pretty_name = block_config["pretty_name"]
-        show_count = block_config["show_count"]
-        markdown_heading = block_config["markdown_heading"]
-
-        block_count = self._block_counter[block_name] if show_count else ""
-        self._block_counter[block_name] += 1
-
-        output_str = "{markdown_heading} {pretty_name} {block_count}".format(
-            markdown_heading=markdown_heading,
-            pretty_name=pretty_name,
-            block_count=block_count)
-
-        if block_title:
-            output_str = "{output_str} ({block_title})".format(
-                output_str=output_str,
-                block_title=block_title)
-
-        return output_str.lstrip().rstrip()
-
-    def _refs_block(self, matchobj):
-        ref_name = matchobj.group('ref_name')
-        refs = self._refs.get(ref_name, {'ref': ref_name})
-        return '{}'.format(refs.get('ref', ''))
-
-    def _page_refs_block(self, matchobj):
-        ref_name = matchobj.group('ref_name')
-        refs = self._refs.get(ref_name, {'pageref': ref_name})
-        pageref = refs.get('pageref', '')
-        if isinstance(pageref, str):
-            return 'in section {}'.format(pageref)
-        else:
-            return str(pageref)
-
-    def _eqnarray_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        block_contents = re.sub(r"^&& {2}", "", block_contents, flags=re.MULTILINE)
-        block_contents = re.sub(r"^& ", "", block_contents, flags=re.MULTILINE)
-        block_contents = re.sub(r" &$", "", block_contents, flags=re.MULTILINE)
-        block_contents = re.sub(r" & \\\\$", " \\\\\\\\", block_contents, flags=re.MULTILINE)
-        return "$${}$$".format(block_contents, flags=re.MULTILINE)
-
-    def _makequotation_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        block_author = matchobj.group('block_author')
-        block_contents = ' '.join(block_contents.split('\n'))
-
-        return '> {}\n>\n> __{}__'.format(block_contents, block_author)
-
-    def _sidebar_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        lines = block_contents.split('\n')
-        head = lines[0]
-        title = ''
-        additional = ''
-
-        lines = lines[1:]
-
-        matches = re.match(r"(\[.*\])?({.*?\})(.*)?", head)
-        if matches:
-            title = matches.group(2).strip()
-            title = get_text_in_brackets(title)
-            additional = matches.group(3).strip()
-
-        if additional:
-            lines.insert(0, additional)
-
-        if title:
-            lines.insert(0, '## {}'.format(title))
-
-        lines = map(lambda line: line.strip(), lines)
-        block_contents = '\n'.join(lines)
-        block_contents = block_contents.strip()
-
-        return '|||info\n{}\n\n|||'.format(block_contents)
-
-    def _sidebargraphic_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        image = matchobj.group('block_graphics')
-        block_name = matchobj.group('block_name')
-
-        if '.' not in image:
-            ext = self.detect_asset_ext(image)
-            if ext:
-                image = '{}.{}'.format(image, ext)
-
-        if image.lower().endswith('.pdf'):
-            self._pdfs.append(image)
-            image = image.replace('.pdf', '.jpg')
-
-        image_src = "![{}]({})".format(block_name, image)
-
-        return '{}{}{}'.format(block_name, block_contents, image_src)
-
-    def _figure_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        self._figure_counter += 1
-
-        images = []
-        caption = 'Figure {}.{} '.format(
-            self._chapter_num, self._figure_counter + self._figure_counter_offset
-        )
-
-        caption_line = None
-
-        for line in block_contents.strip().split("\n"):
-            if "\\includegraphics" in line:
-                if not line.startswith("\\includegraphics"):
-                    line = get_text_in_brackets(line)
-                images.append(get_text_in_brackets(line))
-            elif line.startswith("\\caption"):
-                if '}' in line:
-                    caption += get_text_in_brackets(line)
-                else:
-                    caption_line = line
-            elif caption_line:
-                if '}' in line:
-                    caption += get_text_in_brackets(caption_line + ' ' + line)
-                    caption_line = None
-                else:
-                    caption_line += ' ' + line
-
-        markdown_images = []
-
-        for image in images:
-            if '.' not in image:
-                ext = self.detect_asset_ext(image)
-                if ext:
-                    image = '{}.{}'.format(image, ext)
-            if image.lower().endswith('.pdf'):
-                self._pdfs.append(image)
-                image = image.replace('.pdf', '.jpg')
-            markdown_images.append(
-                "![{}]({})".format(caption, image)
-            )
-
-        return '{}\n\n**{}**'.format(
-            '\n'.join(markdown_images),
-            caption
-        )
-
-    def _exercise_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-
-        self._exercise_counter += 1
-        prefix = "**Exercise {}.{}:**\n" \
-            .format(self._chapter_num, self._exercise_counter + self._exercise_counter_offset)
-        if self._remove_exercise:
-            prefix = ""
-
-        return prefix + block_contents
-
-    def _format_table(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-
-        out_str = ""
-        caption = ""
-        table = []
-
-        for line in block_contents.strip().split("\n"):
-            line = line.rstrip("\\")
-            if line == "\\hline":
-                out_str += "\n"
-                continue
-            elif line.startswith("\\end") or line.startswith("\\begin") or line.startswith("[!ht]") or '&' not in line:
-                continue
-            elif line.startswith("\\caption"):
-                caption = line[9:-1]
-                continue
-            out_str += line
-            table.append(line.split(' & '))
-
-        heading = True
-        out = ""
-
-        if caption:
-            out += "**Table: " + caption + "**\n"
-
-        for row in table:
-            pos = 0
-            for col in row:
-                out += "|" + col.replace('|', '&#124;')
-            if heading:
-                out += '|\n'
-                for _ in row:
-                    out += "|-"
-                    pos += 1
-            heading = False
-            out += '|\n'
-
-        return out
-
-    def _code_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        try:
-            file_name = matchobj.group('file_name')
-            self._source_codes.append(Code(file_name, block_contents))
-        except IndexError:
-            pass
-        block_name = matchobj.group('block_name')
-        if self._remove_trinket and block_name == 'trinket':
-            return ''
-        # % in code block is not latex comments, escape it and replace later
-        block_contents = re.sub(r"%", r"\\%", block_contents)
-        return "```code{}```".format(block_contents)
-
-    def _italic_bold(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        block_contents = re.sub(r"\\\\", r"\\", block_contents)
-        return "_**{}**_".format(block_contents)
-
-    def _inline_code_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        block_contents = re.sub(r"\\\\", r"\\", block_contents)
-        return "`{}`".format(block_contents)
-
-    def _saas_icons_block(self, matchobj):
-        return ""
+        self._detect_asset_ext = detect_asset_ext
+        self._load_workspace_file = load_workspace_file
 
     def _latex_to_markdown(self):
-        """Main function, returns the formatted Markdown as a string.
-        Uses a lot of custom regexes to fix a lot of content - you may have
-        to add or remove some regexes to suit your own needs."""
+        output = self._latex_string
 
-        # Get main content, skipping preamble and closing tags.
-        try:
-            output = self._main_re.search(self._latex_string).group("main")
-        except AttributeError:
-            output = self._latex_string
+        output = TableFigure(output, self._caret_token, self._load_workspace_file).convert()
+        output = Quotes(output).convert()
+        output = CodeFigure(output, self._caret_token, self._percent_token, self._load_workspace_file).convert()
+        output = Bold(output).convert()
+        output = Italic(output).convert()
+        output = Ignore(output).convert()
+        output = SaasSpecific(output).convert()
+        output = NewLine(output).convert()
+        output = ItalicBold(output).convert()
+        output = Links(output).convert()
+        output, source_codes = CodeBlock(
+            output, self._percent_token, self._caret_token, self._remove_trinket
+        ).convert()
+        output = re.sub(r"\\%", self._percent_token, output)
+        output = InlineCodeBlock(output, self._percent_token).convert()
+        if source_codes:
+            self._source_codes.extend(source_codes)
 
-        output = re.sub(r"\\index{(.*?)}", "", output)
-        output = re.sub(r"\\label{(.*?)}", "", output)
-        output = saas_convert(output)
-
-        # Fix emph, textbf, texttt formatting
-        output = re.sub(r"\\emph{(.*?)}", r"*\1*", output, flags=re.DOTALL + re.VERBOSE)
-        output = re.sub(r"\\textbf{(.*?)}", r"**\1**", output)
-        output = re.sub(r"\\texttt{(.*?)}", r"`\1`", output)
-
-        output = re.sub(r"{\\em (.*?)}", r"*\1*", output)
-        output = re.sub(r"{\\it (.*?)}", r"*\1*", output)
-        output = re.sub(r"{\\bf (.*?)}", r"**\1**", output)
-        output = re.sub(r"{\\sf (.*?)}", r"**\1**", output)
-        output = re.sub(r"\\B{(.*?)}", r"**\1**", output)
-        output = re.sub(r"\\C{(.*?)}", r"**\1**", output)
-
-        output = re.sub(r"\\ldots({\})?", r"...", output)
-
-        # Fix ``
-        output = re.sub("``", "“", output)
-        output = re.sub("''", "”", output)
-
-        output = self._code_re.sub(self._code_block, output)
-        output = self._trinket_re.sub(self._code_block, output)
-        output = self._small_re.sub(r"\1", output)
-
-        # Fix \% formatting
-        percent_token = str(uuid.uuid4())
-        output = re.sub(r"\\%", percent_token, output)
+        # remove comments
         output = re.sub("%(.*?)?$", "", output, flags=re.MULTILINE)
-        output = re.sub(percent_token, "%", output)
+        output = Quotation(output, self._caret_token).convert()
+        output = Paragraph(output).convert_without_tags()
 
-        output = self._exercise_re.sub(self._exercise_block, output)
-        output = self._figure_re.sub(self._figure_block, output)
-        output = self._refs_re.sub(self._refs_block, output)
-        output = self._page_refs_re.sub(self._page_refs_block, output)
-        output = self._eqnarray_re.sub(self._eqnarray_block, output)
+        output = InlineMath(output).convert()
+        output = CheckYouself(output, self._caret_token).convert()
+        output = Cite(output).convert()
+        output = Consents(output, self._caret_token).convert()
+        output = Elaboration(output, self._caret_token).convert()
+        output = Fallacy(output, self._caret_token).convert()
+        output = PitFall(output, self._caret_token).convert()
+        output = Summary(output, self._caret_token).convert()
+        output = Chips(output, self._caret_token).convert()
+        output = Cleanup(output).convert()
 
-        output = re.sub(r"\\weblink{(.*?)}{(.*?)}", r"[\2](\1)", output, flags=re.DOTALL + re.VERBOSE)
-        output = re.sub(r"\\weblink{(.*?)}", r"[\1](\1)", output, flags=re.MULTILINE)
+        output, images = PicFigure(output).convert()
+        if images:
+            self._pdfs.extend(images)
+        output, images = Figure(
+            output, self._figure_counter_offset, self._chapter_num, self._detect_asset_ext, self._caret_token
+        ).convert()
+        if images:
+            self._pdfs.extend(images)
+        output, images = Sidebar(output, self._detect_asset_ext, self._caret_token).convert()
+        if images:
+            self._pdfs.extend(images)
+        output, images = DedicationWithPic(output, self._caret_token).convert()
+        if images:
+            self._pdfs.extend(images)
 
-        output = self._sidebargraphic_re.sub(self._sidebargraphic_block, output)
-        output = self._sidebar_re.sub(self._sidebar_block, output)
-        output = self._makequotation_re.sub(self._makequotation_block, output)
-        output = self._saas_icons_re.sub(self._saas_icons_block, output)
-        output = summary_convert(output)
-        output = checkyourself_convert(output)
-        output, pic_pdfs = picfigure_convert(output)
-        if pic_pdfs:
-            self._pdfs.extend(pic_pdfs)
-        output = cite_convert(output)
-        output = center_convert(output)
-        output = concepts_convert(output)
-        output = elaboration_convert(output)
-        output = pitfall_convert(output)
-        output = fallacy_convert(output)
+        output = Refs(output, self._refs).convert()
+        output = Exercise(
+            output, self._exercise_counter_offset, self._chapter_num, self._remove_exercise, self._caret_token
+        ).convert()
+        output = EqnArray(output).convert()
 
-        output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
-        output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
-        output = re.compile(r"\\verb\"(?P<block_contents>.*?)\"").sub(self._inline_code_block, output)
-        output = re.compile(r"\\verb'(?P<block_contents>.*?)'").sub(self._inline_code_block, output)
-        output = re.compile(r"\\T{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
+        output = Header(output).convert()
+        output = Table(output, self._caret_token).convert()
+        output = Lists(output, self._caret_token).convert()
+        output = Block(output, self._caret_token).convert()
+        output = Center(output).convert()
 
-        output = re.compile(r"\\w(\[.*\])?{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
-        output = re.compile(r"\\x{(?P<block_contents>.*?)}").sub(self._italic_bold, output)
-        output = re.sub(r"\\tbd{(.*?)}", r"\1", output)
-
-        output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
-
-        output = re.sub(r"\\href{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\1](\3)", output)
-
-        output = re.sub(r"{\\tt (.*?)}", r"`\1`", output)
-
-        output = re.sub(r"\\\[ (.*?)\\runtime(.*?) \\\]", r"\[ \1runtime\2 \]", output)
-
-        output = re.sub(r"\\\[ (.*?) \\\]", r"$ \1 $", output)
-
-        output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
-
-        output = re.sub(r"(\S+)(~)(\S+)", r"\1 \3", output)
-        output = re.sub(r"(~)(\S+)", r" \2", output)
-        output = re.sub(r"(\S+)(~)", r"\1 ", output)
-
-        output = re.sub(r"^\\\\ ", "<br/>", output, flags=re.MULTILINE)
-        output = re.sub(r"\\newline ", "<br/>", output, flags=re.MULTILINE)
-
-        # Reformat, lists, blocks, and headers.
-        output = self._lists_re.sub(self._replace_block, output)
-        output = self._block_re.sub(self._replace_block, output)
-        output = self._header_re.sub(self._replace_header, output)
-        output = self._table_re.sub(self._format_table, output)
-
+        # convert all matched % back
+        output = re.sub(self._percent_token, "%", output)
+        output = re.sub(self._caret_token, "\n", output)
         return output.lstrip().rstrip()
 
     def to_markdown(self):

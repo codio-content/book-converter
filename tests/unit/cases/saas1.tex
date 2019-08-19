@@ -1,0 +1,255 @@
+\section{Software Development Processes: Plan and Document}
+\label{sec:waterfall}
+  \index{Software development processes!plan-and-document|textbf}%
+  \index{Plan-and-Document!overview|textbf}%
+  \index{Software as a Service (SaaS)!plan-and-document|textbf}%
+
+\makequotation{If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.\\}{Gerald Weinberg, \emph{Weinberg's Second Law}}
+
+The general unpredictability of software development in the late 1960s,
+along with the software disasters similar to ACA, led to the study of
+how high-quality software could be developed on a predictable schedule
+and budget. Drawing the analogy to other engineering fields, the term
+\w{software engineering} was coined~(\cite{Naur69}). The goal was to
+discover methods to build software that were as predictable in quality,
+cost, and time as those used to build bridges in civil engineering.
+  \index{Software engineering, coining of term}%
+% The hardware community developed a rigid development process that
+% starts, sensibly enough, with a thorough, detailed, written
+% specification of what the product should do. What follows are a series
+% of refinements that descend through levels of abstraction until there is
+% description of the design at a low enough level that it can be
+% manufactured. A great deal of time and effort is then expended to test
+% that the low-level design matches the high level specification until it
+% passes acceptance tests. Indeed, given the cost of mistakes, as much
+% effort can be spent on verification as was spent on design.
+
+One thrust of software engineering was to bring an engineering discipline to what was often unplanned software development. Before starting to code, come up with a plan for the project, including extensive, detailed documentation of all phases of that plan. Progress is then measured against the plan. Changes to the project must be reflected in the documentation and possibly to the plan.
+
+The goal of all these ``Plan-and-Document'' software development processes
+  \index{Plan-and-Document!lifecycle goals}%
+is to improve predictability via extensive documentation,
+which must be changed whenever the goals change. Here is how textbook
+authors put it~(\cite{Lethbridge02,Braude01}):
+
+\makequotation{Documentation should be written at all stages of development, and includes requirements, designs, user manuals, instructions for testers and project plans.}{Timothy Lethbridge and Robert Laganiere, 2002}
+
+\makequotation{Documentation is the lifeblood of software engineering.}{Eric Braude, 2001}
+This process is even embraced with an official standard of
+documentation: IEEE/ANSI standard 830/1993.
+  \index{IEEE/ANSI standard 830/1993}%
+
+Governments like that of the US have elaborate regulations to prevent corruption when acquiring new equipment, which lead to lengthy specifications and contracts. Since the goal of software engineering was to make software development as predictable as building bridges, including elaborate specifications, government contracts were a natural match to Plan-and-Document software development. Thus, like many countries, US acquisition regulations left the ACA developers little choice but to follow a Plan-and-Document lifecycle.
+  \index{Affordable Care Act (ACA)!plan-and-document approach}%
+  \index{Plan-and-Document!ACA website}%
+
+\begin{sidebar}[-1.00in]{CGI Group} won the contract for the backend of the ACA website. The initial estimate ballooned from US\$94M to \$292M (\cite{Begley13}). This same company was involved in a Canadian firearms registry whose costs skyrocketed, from an initial estimate of US\$2M to \$2B. When MITRE investigated the problems with Massachusetts' ACA website, it said CGI Group did not have the expertise to build the site, lost data, failed to adequately test functions, and managed the project poorly (\cite{Bidgood14}).
+\end{sidebar}
+  \index{MITRE, ACA website investigation}%
+  \index{Affordable Care Act (ACA)!CGI Group contract}%
+  \index{CGI group, ACA website development}%
+
+Of course, like other engineering fields, the government has
+escape clauses in the contracts that let it still acquire the product even if it is late. Ironically, the contractor makes more money the longer it takes to develop the software. Thus, the art is negotiating the contract and the penalty clauses. As one commentator on ACA noted (\cite{Howard13}), ``The firms that typically get contracts are the firms that are good at getting contracts, not typically good at executing on them.'' Another noted that the Plan-and-Document approach is not well suited to modern practices, especially when government contractors focus on maximizing profits (\cite{Chung13}).
+
+
+
+An early version of this Plan-and-Document software development process
+was developed in 1970~(\cite{Royce70}). It follows this sequence of
+phases:
+  \index{Plan-and-Document!early version}%
+\begin{enumerate}
+
+\item Requirements analysis and specification
+
+\item Architectural design
+
+\item Implementation and Integration
+
+\item Verification
+
+\item Operation and Maintenance
+
+\end{enumerate}
+
+Given that the earlier you find an error the cheaper it is to fix, the philosophy of this process is to complete a phase before going on to the next one, thereby removing as many errors as early as possible. Getting the early phases right could also prevent unnecessary work downstream. As this process could take years, the extensive documentation helps to ensure that important information is not lost if a person leaves the project and that new people can get up to speed quickly when they join the project.
+
+Because it flows from the top down to completion, this process is called
+the \w[Waterfall model]{Waterfall} software development process or
+Waterfall software development \w[Product lifecycle]{lifecycle}.
+  \index{Plan-and-Document!Waterfall lifecycle}%
+  \index{Waterfall lifecycle!plan-and-document}%
+Understandably, given the complexity of each stage in the Waterfall
+lifecycle, product releases are major events toward which engineers
+worked feverishly and which are accompanied by much fanfare.
+\begin{sidebar}[-0.6in]{Windows 95}
+   was heralded by a
+  \weblink{http://www.youtube.com/watch?v=DeBi2ZxUZiM}{US\$300 million
+  outdoor party} for which Microsoft hired comedian Jay Leno,
+  lit up New York's Empire State Building using the Microsoft
+  Windows logo colors, and licensed ``Start Me Up'' by the
+  Rolling Stones as the celebration's theme song.
+  \index{Windows 95, release celebration|textit}%
+\end{sidebar}
+
+In the Waterfall lifecycle, the long life of software is acknowledged by
+a maintenance phase that repairs errors as they are discovered. New
+versions of software developed in the Waterfall model go through the
+same several phases, and take typically between 6 and 18 months.
+
+The Waterfall model can work well with well-specified tasks like NASA space flights,
+but it runs into trouble when customers change their minds about what
+they want. A Turing Award winner captures this observation:
+
+\makequotation{Plan to throw one [implementation] away; you will,
+  anyhow.}{Fred Brooks, Jr.}
+  \index{Brooks, Fred, Jr.}%
+  \index{Turing Award!Brooks, Fred, Jr.}%
+
+That is, it's easier for customers to understand what they want once they see a prototype and for engineers to understand how to build it better once they've done it the first time.
+
+This observation led to a software development lifecycle developed in the 1980s that combines prototypes with the Waterfall model~(\cite{boehm86}). The idea is to iterate through a sequence of four phases, with each iteration resulting in a prototype that is a refinement of the previous version. Figure~\ref{fig:spiral} illustrates this model of development across the four phases, which gives this lifecycle its name: the
+\w{Spiral model}.
+  \index{Prototyping, Spiral lifecycle}%
+  \index{Plan-and-Document!Spiral lifecycle}%
+  \index{Spiral lifecycle!plan-and-document}%
+The phases are
+\begin{enumerate}
+
+\item Determine objectives and constraints of this iteration
+
+\item Evaluate alternatives and identify and resolve risks
+
+\item Develop and verify the prototype for this iteration
+
+\item Plan the next iteration
+
+\end{enumerate}
+
+\picfigure{ch_intro/figs/Spiral.pdf}{fig:spiral}{%
+The Spiral lifecycle combines Waterfall with prototyping. It starts at the center, with each iteration around the spiral going through the four phases and resulting in a revised prototype until the product is ready for release.
+  \protect\index{Spiral lifecycle!overview|textit}%
+  \protect\index{Prototyping, Spiral lifecycle|textit}%
+  \protect\index{Plan-and-Document!Spiral lifecycle|textit}%
+  \protect\index{Waterfall lifecycle!Spiral lifecycle|textit}%
+}
+
+Rather than document all the requirements at the beginning, as in the Waterfall model, the requirement documents are developed across the iteration as they are needed and evolve with the project. Iterations involve the customer before the product is completed, which reduces chances of misunderstandings. However, as originally envisioned, these iterations were 6 to 24 months long, so there is plenty of time for customers to change their minds during an iteration! Thus, Spiral still relies on planning and extensive documentation, but the plan is expected to evolve on each iteration.
+
+\begin{sidebar}[-0.50in]{Big Design Up Front}, abbreviated \w[Big Design
+    Up Front]{BDUF}, is a name some use for software processes like
+  Waterfall, Spiral, and RUP that depend on extensive planning and
+  documentation. They are also known variously as \x{heavyweight},
+  \x{plan-driven}, \x{disciplined}, or \x{structured} processes.
+  \protect\index{Big Design Up Front (BDUF)|textit}%
+  \protect\index{Disciplined processes|textit}%
+  \protect\index{Heavyweight processes|textit}%
+  \protect\index{Structured processes|textit}%
+  \protect\index{Plan-driven processes|textit}%
+\end{sidebar}
+Given the importance of software development, many variations of
+Plan-and-Document methodologies were proposed beyond these two. A recent
+one is called the \w{Rational Unified Process} (\w[Rational Unified
+  Process]{RUP})~(\cite{Kruchten03}),
+  \index{Plan-and-Document!RUP}%
+  \index{Rational Unified Process (RUP)!plan-and-document}%
+which combines features of both Waterfall and Spiral lifecycles
+  \index{Waterfall lifecycle!RUP}%
+  \index{Spiral lifecycle!RUP}%
+as well standards for diagrams and
+documentation.
+We'll use RUP as a representative of the latest thinking
+in Plan-and-Document lifecycles. Unlike Waterfall and Spiral, it is more
+closely allied to business issues than to technical issues.
+
+Like Waterfall and Spiral, RUP has phases:
+
+\begin{enumerate}
+
+\item Inception: makes the business case for the software and scopes the project to set the schedule and budget, which is used to judge progress and justify expenditures, and initial assessment of risks to schedule and budget.
+  \index{Inception, RUP phase}%
+
+\item Elaboration: works with stakeholders to identify use cases, designs a software architecture, sets the development plan, and builds an initial prototype.
+  \index{Elaboration, RUP phase}%
+
+\item Construction: codes and tests the product, resulting in the first
+  external release.
+  \index{Construction, RUP phase}%
+
+\item Transition: moves the product from development to production in the real environment, including customer acceptance testing and user training.
+  \index{Transition, RUP phase}%
+\end{enumerate}
+
+Unlike Waterfall, each phase involves iteration. For example, a project might have one inception phase iteration, two elaboration phase iterations, four construction phase iterations, and two transition phase iterations. Like Spiral, a project could also iterate across all four phases repeatedly.
+
+In addition to the dynamically changing phases of the project, RUP
+identifies six ``engineering disciplines''
+  \index{Engineering disciplines}%
+(also known as workflows) that people working on the project should
+  collectively cover:
+  \index{Workflows, RUP}%
+
+\begin{enumerate}
+\item    Business Modeling
+\item    Requirements
+\item    Analysis and Design
+\item    Implementation
+\item    Test
+\item    Deployment
+\end{enumerate}
+
+These disciplines are more static than the phases, in that they nominally exist over the whole lifetime of the project. However, some disciplines get used more in earlier phases (like business modeling), some periodically throughout the process (like test), and some more towards the end (deployment).
+Figure~\ref{fig:RUP} shows the relationship of the phases and the disciplines, with the area indicating the amount of effort in each discipline over time.
+
+\picfigure{ch_intro/figs/RUP.pdf}{fig:RUP}{%
+  \protect\index{Rational Unified Process (RUP)!overview|textit}%
+  \protect\index{Plan-and-Document!RUP|textit}%
+The Rational Unified Process lifecycle allows the project to have multiple iterations in each phase and identifies the skills needed by the project team, which vary in effort over time. RUP also has three ``supporting disciplines'' not shown in this figure: Configuration and Change Management, Project Management, and
+Environment. (Image from Wikipedia Commons by Dutchgilder.)
+}
+
+
+An unfortunate downside to teaching a Plan-and-Document approach is that students may find software development tedious~(\cite{Nawrocki02,Estler12}). Given the importance of predictable software development, this is hardly a strong enough reason not to teach it; the good news is that there are alternatives that work just as well for many projects that are a better fit to the classroom, as we describe in the next section.
+
+\begin{summary}
+\B{Summary:} The basic \emph{activities} of software engineering are the same in all the software development process or \w[Product lifecycle]{lifecycles}, but their interaction over time relative to product releases differs among the models. The Waterfall lifecycle is characterized by much of the design being done in advance of coding, completing each phase before going on to the next one. The Spiral lifecycle iterates through all the development phases to produce prototypes, but like Waterfall, the customers may only get involved every 6 to 24 months. The more recent Rational Unified Process lifecycle includes phases, iterations, and prototypes, while identifying the people skills needed for the project. All rely on careful planning and thorough documentation, and all measure progress against a plan.
+\end{summary}
+
+\begin{checkyourself}
+  What are a major similarity and a major difference between processes like Spiral and RUP versus Waterfall?
+  \begin{answer}
+  All rely on planning and documentation, but Spiral and RUP use iteration and prototypes to improve them over time versus a single long path to the product.
+  \end{answer}
+\end{checkyourself}
+
+\begin{checkyourself}
+  What are the differences between the phases of these Plan-and-Document processes?
+  \begin{answer}
+  Waterfall phases separate planning (requirements and architectural design) from implementation. Testing the product before release is next, followed by a separate operations phase. The Spiral phases are aimed at an iteration: set the goals for an iteration; explore alternatives; develop and verify the prototype for this iteration; and plan the next iteration. RUP phases are tied closer to business objectives: inception makes business case and sets schedule and budget; elaboration works with customers to build an initial prototype; construction builds and test the first version; and transition deploys the product.
+  \end{answer}
+\end{checkyourself}
+
+\begin{elaboration}{SEI Capability Maturity Model (CMM)}
+  \protect\index{Capability Maturity Model (CMM)|textit}%
+  \protect\index{Plan-and-Document!CMM|textit}%
+The Software Engineering Institute at Carnegie Mellon University
+proposed the \w{Capability Maturity Model} (CMM)~(\cite{Paulk05})
+to evaluate  organizations'
+software-development processes based on Plan-and-Document methodologies.
+The idea is that by modeling the software development process, an
+organization can improve them. SEI studies observed five levels of
+software practice:
+\begin{enumerate}
+\item Initial or Chaotic---undocumented/\emph{ad hoc}/unstable software development.
+
+\item Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
+
+\item Defined---Defined and documented standard processes that improve over time.
+
+\item Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
+
+\item Optimizing---Deliberate process optimization improvements as part of management process.
+
+\end{enumerate}
+CMM implicitly encourages an organization to move up the CMM levels. While not proposed as a software development methodology, many consider it one. For example, ~(\cite{Nawrocki02}) compares CMM Level 2 to the Agile software methodology (see next section).
+\end{elaboration}
