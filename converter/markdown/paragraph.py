@@ -27,6 +27,8 @@ class Paragraph(object):
                     processed.append(' '.join(local_lines))
                     local_lines = []
                 processed.append(line)
+                if '\\end' in line:
+                    level -= 1
             elif '\\end' in line:
                 processed.append(line)
                 level -= 1
@@ -40,7 +42,7 @@ class Paragraph(object):
                 elif level > 0:
                     processed.append(line)
                 elif line:
-                    local_lines.append(line)
+                    local_lines.append(line.lstrip())
 
         if local_lines:
             processed.append(' '.join(local_lines))
@@ -49,10 +51,4 @@ class Paragraph(object):
         return output
 
     def convert(self):
-        output = self.str
-
-        output = re.sub(r"[\n]{2,}", self._local_caret_token, output)
-        output = re.sub(r"\n", ' ', output)
-        output = re.sub(self._local_caret_token, '\n', output)
-
-        return output
+        return self.convert_without_tags()

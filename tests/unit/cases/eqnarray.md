@@ -10,12 +10,10 @@ $$
 Write a recursive method called `ack` that takes two `int`s as parameters and that computes and returns the value of the Ackermann function.
 
 For example, the **factorial** of an integer $n$, which is written $n!$, is defined like this:
-
 $$
 0! = 1 \\
 n! = n \cdot(n-1)!
 $$
-
 Don't confuse the mathematical symbol $!$, which means *factorial*, with the Java operator `!`, which means *not*.
 
 $$

@@ -2,4 +2,4 @@ Many SaaS apps, including those based on Rails, follow the _**Model-View-Control
 
 
 
-*  Using _**AJAX**_, or Asynchronous JavaScript And XML, JavaScript code can make HTTP requests to a Web server *without* triggering a page reload.  The information in the response can then be used to modify page elements in place, giving a richer and often more responsive user experience than traditional Web pages.  Rails partials and controller actions can be readily used to handle AJAX interactions.
+* Using _**AJAX**_, or Asynchronous JavaScript And XML, JavaScript code can make HTTP requests to a Web server *without* triggering a page reload.  The information in the response can then be used to modify page elements in place, giving a richer and often more responsive user experience than traditional Web pages.  Rails partials and controller actions can be readily used to handle AJAX interactions.

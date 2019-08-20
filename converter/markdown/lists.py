@@ -48,7 +48,7 @@ class Lists(TextAsParagraph):
             line = line.lstrip().rstrip()
             line = line.replace("\\\\", "<br/>")
 
-            markdown_list_line = line.replace(r"\item", list_heading)
+            markdown_list_line = re.sub(r"\\item(\s+)?", list_heading, line)
             if not line:
                 continue
             if "\\term" in line:

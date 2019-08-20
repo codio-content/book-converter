@@ -25,7 +25,8 @@ class TableFigure(TextAsParagraph):
 
     def remove_matched_token(self, output, chars):
         pos = output.find(chars)
-        token_len = len(chars) + 1
+        br_pos = output.find('{', pos) + 1
+        token_len = br_pos - pos
         if pos == -1:
             return output
         level = 0

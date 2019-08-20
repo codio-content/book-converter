@@ -1,4 +1,4 @@
-`source:ch_instructors_manual/code/project_checkout.sh`
+**source:ch_instructors_manual/code/project_checkout.sh**
 ```code
 file content
 ```

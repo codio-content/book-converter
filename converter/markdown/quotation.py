@@ -15,8 +15,9 @@ class Quotation(TextAsParagraph):
         block_contents = matchobj.group('block_contents')
         block_author = matchobj.group('block_author')
         block_contents = self.to_paragraph(block_contents)
+        block_contents = re.sub(r"\\\\", '<br/>', block_contents)
         caret_token = self._caret_token
-        return f'> {block_contents}{caret_token}>{caret_token}> __{block_author}__'
+        return f'> {block_contents}{caret_token}>{caret_token}> __{block_author}__{caret_token}{caret_token}'
 
     def convert(self):
         output = self.str

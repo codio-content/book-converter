@@ -1,7 +1,7 @@
 ---
 
 
-*  The [Git Community Book](http://book.git-scm.com/) is a   good online reference that can also be downloaded as a PDF file.
+* The [Git Community Book](http://book.git-scm.com/) is a good online reference that can also be downloaded as a PDF file.
 
 ---
 

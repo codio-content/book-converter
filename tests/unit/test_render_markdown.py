@@ -279,3 +279,6 @@ class TestSuite(unittest.TestCase):
 
     def test_codefile(self):
         self.run_case("codefile", load_workspace_file=lambda _: "file content")
+
+    def test_checkyourself_complex(self):
+        self.run_case("checkyourself_complex")

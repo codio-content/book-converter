@@ -6,14 +6,15 @@ center_re = re.compile(r"""\\begin{center}(?P<block_contents>.*?)\\end{center}""
 
 
 class Center(TextAsParagraph):
-    def __init__(self, latex_str):
-        super().__init__(latex_str, '')
+    def __init__(self, latex_str, caret_token):
+        super().__init__(latex_str, caret_token)
 
     def make_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         block_contents = re.sub(r"\\\\", "<br/>", block_contents, flags=re.MULTILINE)
         block_contents = self.to_paragraph(block_contents)
-        return '<center>{}</center>'.format(block_contents)
+        caret_token = self._caret_token
+        return f'<center>{caret_token}{block_contents}{caret_token}</center>'
 
     def convert(self):
         return center_re.sub(self.make_block, self.str)

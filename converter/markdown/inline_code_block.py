@@ -18,7 +18,6 @@ class InlineCodeBlock(object):
         output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb\"(?P<block_contents>.*?)\"").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb'(?P<block_contents>.*?)'").sub(self._inline_code_block, output)
-        output = re.compile(r"\\T{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\texttt{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         output = re.compile(r"{\\tt (?P<block_contents>.*?)}").sub(self._inline_code_block, output)
         return output
