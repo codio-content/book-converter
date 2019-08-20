@@ -1,7 +1,6 @@
 ###  Software Development Processes: Plan and Document
 
 
-  
 
 > If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.<br/>
 >
@@ -9,20 +8,11 @@
 
 
 
-The general unpredictability of software development in the late 1960s, along with the software disasters similar to ACA, led to the study of how high-quality software could be developed on a predictable schedule and budget. Drawing the analogy to other engineering fields, the term _**software engineering**_ was coined (Naur69). The goal was to discover methods to build software that were as predictable in quality, cost, and time as those used to build bridges in civil engineering. 
-
-
-
-
-
-
-
-
-
+The general unpredictability of software development in the late 1960s, along with the software disasters similar to ACA, led to the study of how high-quality software could be developed on a predictable schedule and budget. Drawing the analogy to other engineering fields, the term _**software engineering**_ was coined (Naur69). The goal was to discover methods to build software that were as predictable in quality, cost, and time as those used to build bridges in civil engineering.
 
 One thrust of software engineering was to bring an engineering discipline to what was often unplanned software development. Before starting to code, come up with a plan for the project, including extensive, detailed documentation of all phases of that plan. Progress is then measured against the plan. Changes to the project must be reflected in the documentation and possibly to the plan.
 
-The goal of all these “Plan-and-Document” software development processes  is to improve predictability via extensive documentation, which must be changed whenever the goals change. Here is how textbook authors put it (Lethbridge02,Braude01):
+The goal of all these “Plan-and-Document” software development processes is to improve predictability via extensive documentation, which must be changed whenever the goals change. Here is how textbook authors put it (Lethbridge02,Braude01):
 
 > Documentation should be written at all stages of development, and includes requirements, designs, user manuals, instructions for testers and project plans.
 >
@@ -34,9 +24,9 @@ The goal of all these “Plan-and-Document” software development processes  is
 >
 > __Eric Braude, 2001__
 
- This process is even embraced with an official standard of documentation: IEEE/ANSI standard 830/1993. 
+ This process is even embraced with an official standard of documentation: IEEE/ANSI standard 830/1993.
 
-Governments like that of the US have elaborate regulations to prevent corruption when acquiring new equipment, which lead to lengthy specifications and contracts. Since the goal of software engineering was to make software development as predictable as building bridges, including elaborate specifications, government contracts were a natural match to Plan-and-Document software development. Thus, like many countries, US acquisition regulations left the ACA developers little choice but to follow a Plan-and-Document lifecycle.  
+Governments like that of the US have elaborate regulations to prevent corruption when acquiring new equipment, which lead to lengthy specifications and contracts. Since the goal of software engineering was to make software development as predictable as building bridges, including elaborate specifications, government contracts were a natural match to Plan-and-Document software development. Thus, like many countries, US acquisition regulations left the ACA developers little choice but to follow a Plan-and-Document lifecycle.
 
 
 
@@ -46,13 +36,12 @@ won the contract for the backend of the ACA website. The initial estimate balloo
 |||
 
 
-  
 
 Of course, like other engineering fields, the government has escape clauses in the contracts that let it still acquire the product even if it is late. Ironically, the contractor makes more money the longer it takes to develop the software. Thus, the art is negotiating the contract and the penalty clauses. As one commentator on ACA noted (Howard13), “The firms that typically get contracts are the firms that are good at getting contracts, not typically good at executing on them.” Another noted that the Plan-and-Document approach is not well suited to modern practices, especially when government contractors focus on maximizing profits (Chung13).
 
 
 
-An early version of this Plan-and-Document software development process was developed in 1970 (Royce70). It follows this sequence of phases: 
+An early version of this Plan-and-Document software development process was developed in 1970 (Royce70). It follows this sequence of phases:
 
 
 1.  Requirements analysis and specification
@@ -63,7 +52,7 @@ An early version of this Plan-and-Document software development process was deve
 
 Given that the earlier you find an error the cheaper it is to fix, the philosophy of this process is to complete a phase before going on to the next one, thereby removing as many errors as early as possible. Getting the early phases right could also prevent unnecessary work downstream. As this process could take years, the extensive documentation helps to ensure that important information is not lost if a person leaves the project and that new people can get up to speed quickly when they join the project.
 
-Because it flows from the top down to completion, this process is called the _**Waterfall**_ software development process or Waterfall software development _**lifecycle**_.   Understandably, given the complexity of each stage in the Waterfall lifecycle, product releases are major events toward which engineers worked feverishly and which are accompanied by much fanfare.
+Because it flows from the top down to completion, this process is called the _**Waterfall**_ software development process or Waterfall software development _**lifecycle**_. Understandably, given the complexity of each stage in the Waterfall lifecycle, product releases are major events toward which engineers worked feverishly and which are accompanied by much fanfare.
 
 
 |||info
@@ -77,15 +66,15 @@ In the Waterfall lifecycle, the long life of software is acknowledged by a maint
 
 The Waterfall model can work well with well-specified tasks like NASA space flights, but it runs into trouble when customers change their minds about what they want. A Turing Award winner captures this observation:
 
-> Plan to throw one [implementation] away; you will,   anyhow.
+> Plan to throw one [implementation] away; you will, anyhow.
 >
 > __Fred Brooks, Jr.__
 
-  
+
 
 That is, it's easier for customers to understand what they want once they see a prototype and for engineers to understand how to build it better once they've done it the first time.
 
-This observation led to a software development lifecycle developed in the 1980s that combines prototypes with the Waterfall model (boehm86). The idea is to iterate through a sequence of four phases, with each iteration resulting in a prototype that is a refinement of the previous version. Figure fig:spiral illustrates this model of development across the four phases, which gives this lifecycle its name: the _**Spiral model**_.    The phases are
+This observation led to a software development lifecycle developed in the 1980s that combines prototypes with the Waterfall model (boehm86). The idea is to iterate through a sequence of four phases, with each iteration resulting in a prototype that is a refinement of the previous version. Figure fig:spiral illustrates this model of development across the four phases, which gives this lifecycle its name: the _**Spiral model**_. The phases are
 
 
 1.  Determine objectives and constraints of this iteration
@@ -106,7 +95,7 @@ Rather than document all the requirements at the beginning, as in the Waterfall 
 |||
 
 
-Given the importance of software development, many variations of Plan-and-Document methodologies were proposed beyond these two. A recent one is called the _**Rational Unified Process**_ (_**RUP**_) (Kruchten03),   which combines features of both Waterfall and Spiral lifecycles   as well standards for diagrams and documentation. We'll use RUP as a representative of the latest thinking in Plan-and-Document lifecycles. Unlike Waterfall and Spiral, it is more closely allied to business issues than to technical issues.
+Given the importance of software development, many variations of Plan-and-Document methodologies were proposed beyond these two. A recent one is called the _**Rational Unified Process**_ (_**RUP**_) (Kruchten03), which combines features of both Waterfall and Spiral lifecycles as well standards for diagrams and documentation. We'll use RUP as a representative of the latest thinking in Plan-and-Document lifecycles. Unlike Waterfall and Spiral, it is more closely allied to business issues than to technical issues.
 
 Like Waterfall and Spiral, RUP has phases:
 
@@ -119,7 +108,7 @@ Like Waterfall and Spiral, RUP has phases:
 
 Unlike Waterfall, each phase involves iteration. For example, a project might have one inception phase iteration, two elaboration phase iterations, four construction phase iterations, and two transition phase iterations. Like Spiral, a project could also iterate across all four phases repeatedly.
 
-In addition to the dynamically changing phases of the project, RUP identifies six “engineering disciplines”  (also known as workflows) that people working on the project should collectively cover: 
+In addition to the dynamically changing phases of the project, RUP identifies six “engineering disciplines” (also known as workflows) that people working on the project should collectively cover:
 
 
 
@@ -164,10 +153,12 @@ An unfortunate downside to teaching a Plan-and-Document approach is that student
 
 
 ## SEI Capability Maturity Model (CMM)
-The Software Engineering Institute at Carnegie Mellon University proposed the _**Capability Maturity Model**_ (CMM) (Paulk05) to evaluate  organizations' software-development processes based on Plan-and-Document methodologies. The idea is that by modeling the software development process, an organization can improve them. SEI studies observed five levels of software practice: 
+The Software Engineering Institute at Carnegie Mellon University proposed the _**Capability Maturity Model**_ (CMM) (Paulk05) to evaluate  organizations' software-development processes based on Plan-and-Document methodologies. The idea is that by modeling the software development process, an organization can improve them. SEI studies observed five levels of software practice:
+
 
 1.  Initial or Chaotic---undocumented/*ad hoc*/unstable software development.
 1.  Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
 1.  Defined---Defined and documented standard processes that improve over time.
 1.  Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
-1.  Optimizing---Deliberate process optimization improvements as part of management process. CMM implicitly encourages an organization to move up the CMM levels. While not proposed as a software development methodology, many consider it one. For example,  (Nawrocki02) compares CMM Level 2 to the Agile software methodology (see next section).
+1.  Optimizing---Deliberate process optimization improvements as part of management process.
+CMM implicitly encourages an organization to move up the CMM levels. While not proposed as a software development methodology, many consider it one. For example,  (Nawrocki02) compares CMM Level 2 to the Agile software methodology (see next section).

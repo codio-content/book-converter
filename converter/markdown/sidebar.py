@@ -70,6 +70,7 @@ class Sidebar(TextAsParagraph):
         caret_token = self._caret_token
 
         if block_name:
+            block_name = block_name.strip()
             return f'**{block_name}** {block_contents}{caret_token}{image_src}{caret_token}'
         return f'{block_contents}{caret_token}{image_src}{caret_token}'
 

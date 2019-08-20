@@ -38,6 +38,7 @@ from converter.markdown.chips import Chips
 from converter.markdown.dedicationwithpic import DedicationWithPic
 from converter.markdown.codefilefigure import CodeFigure
 from converter.markdown.codefile import CodeFile
+from converter.markdown.remove_comments import RemoveComments
 
 
 class LaTeX2Markdown(object):
@@ -93,7 +94,7 @@ class LaTeX2Markdown(object):
         output = InlineCodeBlock(output, self._percent_token).convert()
 
         # remove comments
-        output = re.sub("%(.*?)?$", "", output, flags=re.MULTILINE)
+        output = RemoveComments(output).convert()
         output = Quotation(output, self._caret_token).convert()
         output = Paragraph(output).convert_without_tags()
 

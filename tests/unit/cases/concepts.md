@@ -2,6 +2,7 @@
 _**JavaScript**_ is a dynamic, interpreted scripting language built into modern browsers. This chapter describes its main features, including some that we recommend avoiding because they represent questionable design choices, and how it extends the types of content and applications that can be delivered as SaaS.
 
 
+
 *  A browser represents a web page as a data structure called the _**Document Object Model**_ (DOM). JavaScript code running in the browser can inspect and modify this data structure, causing the browser to redraw the modified page elements.
 *  When a user interacts with the browser (for example, by typing, clicking, or moving the mouse) or the browser makes progress in an interaction with a server, the browser generates an _**event**_ indicating what happened.  Your JavaScript code can take app-specific actions to modify the DOM when such events occur.
 *  Using _**AJAX**_, or Asynchronous JavaScript And XML, JavaScript code can make HTTP requests to a Web server *without* triggering a page reload.  The information in the response can then be used to modify page elements in place, giving a richer and often more responsive user experience than traditional Web pages.  Rails partials and controller actions can be readily used to handle AJAX interactions.

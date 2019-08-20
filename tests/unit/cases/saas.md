@@ -20,7 +20,7 @@ Lest you think the perceived need to improve a successful service is just softwa
 1.  SaaS companies compete regularly on bringing out new features to help ensure that their customers do not abandon them for a competitor who offers a better service.
 1.  Since only developers have a copy of the software, they can upgrade the software and underlying hardware frequently as long as they don't violate the external application program interfaces (API). Moreover, developers don't need to annoy users with the seemingly endless requests for permission to upgrade their applications.
 
-Combining the advantages to the customer and the developer together explains why SaaS is rapidly growing and why traditional software products are increasingly being transformed to offer SaaS versions. An example of the latter is Microsoft Office 365, which allows you to use the popular Word, Excel, and PowerPoint productivity programs as a remote service by paying for use rather than pre-purchasing software and installing it on your local computer.  Another example is TurboTax Online, which offers the same deal for another shrink-wrap standard-bearer. 
+Combining the advantages to the customer and the developer together explains why SaaS is rapidly growing and why traditional software products are increasingly being transformed to offer SaaS versions. An example of the latter is Microsoft Office 365, which allows you to use the popular Word, Excel, and PowerPoint productivity programs as a remote service by paying for use rather than pre-purchasing software and installing it on your local computer. Another example is TurboTax Online, which offers the same deal for another shrink-wrap standard-bearer.
 
 file content
 
@@ -29,20 +29,16 @@ file content
 
 Unsurprisingly, given the popularity of SaaS, Figure fig:SaaS_frameworks lists the many programming frameworks that claim to help.   In this book, we use Ruby on Rails (“Rails”), although the ideas we cover will work with other programming frameworks as well. We chose Rails because it came from a community that had already embraced the Agile lifecycle, so the tools support Agile particularly well.
 
-
 Ruby is typical of modern scripting languages in including automatic memory management and dynamic typing. By including important advances in programming languages, Ruby goes beyond languages like Perl in supporting multiple programming paradigms such as object oriented and functional programming.
 
 
 Useful additional features that help productivity via reuse include _**mix-ins**_, which collect related behaviors and make it easy to add them to many different classes, and _**metaprogramming**_, which allows Ruby programs to synthesize code at runtime. Reuse is also enhanced with Ruby's support for _**closures**_ via _**blocks**_ and _**yield**_. Chapter chap:ruby_intro is a short description of Ruby for those who already know Java, and Chapter chap:rails_intro introduces Rails.
 
-
-
 In addition to our view of Rails being technically superior for Agile and SaaS, Ruby and Rails are widely used. For example, Ruby routinely appears among top 10 most popular programming languages. A well-known SaaS app associated with Rails is Twitter, which began as a Rails app in 2006 and grew from 20,000 tweets per day in 2007 to 200,000,000 in 2011, during which time other frameworks replaced various parts of it.
-
 
 software engineering skill: use the right tool for the job, even if it means learning a new tool or new language! Indeed, an attractive feature of the Rails community is that its contributors routinely improve productivity by inventing new tools to automate tasks that were formerly done manually.
 
-Note that frequent upgrades of SaaS---due to only having a single copy of the software---perfectly align with the Agile software lifecycle. Hence, Amazon, eBay, Facebook, Google,     and other SaaS providers all rely on the Agile lifecycle, and traditional software companies like Microsoft are increasingly using Agile in their product development.  The Agile process is an excellent match to the fast-changing nature of SaaS applications.
+Note that frequent upgrades of SaaS---due to only having a single copy of the software---perfectly align with the Agile software lifecycle. Hence, Amazon, eBay, Facebook, Google, and other SaaS providers all rely on the Agile lifecycle, and traditional software companies like Microsoft are increasingly using Agile in their product development. The Agile process is an excellent match to the fast-changing nature of SaaS applications.
 
 
 ---
@@ -55,7 +51,8 @@ Note that frequent upgrades of SaaS---due to only having a single copy of the so
 |||challenge
 
 Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar, YouTube, and Documents---is the *best* match to each of the six arguments given in this section for SaaS, reproduced below.
-  <details><summary>Check yourself</summary>While you can argue the mappings, below is our answer. (Note that we cheated and put some apps in multiple categories) 	
+  <details><summary>Check yourself</summary>While you can argue the mappings, below is our answer. (Note that we cheated and put some apps in multiple categories)
+	
 
 1.  No user installation: Documents
 1.  Can't lose data: Gmail, Calendar.
