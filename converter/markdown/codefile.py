@@ -6,7 +6,7 @@ from converter.markdown.text_as_paragraph import TextAsParagraph
 
 Code = namedtuple('Code', ['name', 'source'])
 
-code_re = re.compile(r"""\\codefile(\[(?P<guid>.*?)]){(?P<file_path>.*?)}""",
+code_re = re.compile(r"""\\codefile(\[(?P<guid>.*?)])?{(?P<file_path>.*?)}""",
                      flags=re.DOTALL + re.VERBOSE)
 
 
@@ -27,7 +27,7 @@ class CodeFile(TextAsParagraph):
         file_content = re.sub(r"%", self._percent_token, file_content)
         file_content = re.sub(r"\n", self._caret_token, file_content)
 
-        return f'{caret_token}`source:{file_path}`{caret_token}' \
+        return f'{caret_token}**source:{file_path}**{caret_token}' \
             f'```code{caret_token}{file_content}{caret_token}```{caret_token}'
 
     def convert(self):

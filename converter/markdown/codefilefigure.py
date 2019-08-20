@@ -7,7 +7,7 @@ from converter.markdown.text_as_paragraph import TextAsParagraph
 
 Code = namedtuple('Code', ['name', 'source'])
 
-code_re = re.compile(r"""\\codefilefigure(\[(?P<guid>.*?)]){(?P<file_path>.*?)}(?P<fuck>.*?){(?P<label>.*?)}""",
+code_re = re.compile(r"""\\codefilefigure(\[(?P<guid>.*?)])?{(?P<file_path>.*?)}(?P<fuck>.*?){(?P<label>.*?)}""",
                      flags=re.DOTALL + re.VERBOSE)
 
 
@@ -32,7 +32,7 @@ class CodeFigure(TextAsParagraph):
 
         self._matches.append(replace_token)
 
-        return f'{caret_token}`source:{file_path}`{caret_token}' \
+        return f'{caret_token}**source:{file_path}**{caret_token}' \
             f'```code{caret_token}{file_content}{caret_token}```{caret_token}{replace_token}'
 
     def remove_matched_token(self, output, chars):
