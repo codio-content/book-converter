@@ -19,5 +19,8 @@ class SaasSpecific(object):
         output = re.sub(r"\\js({\})?", "JavaScript", output)
         output = re.sub(r"\\slash({\})?", "/", output)
         output = re.sub(r"\\ldots({\})?", r"...", output)
+        output = re.sub(r"\\LaTeX({\})?", r"LaTeX", output)
+        output = re.sub(r"\\TeX({\})?", r"TeX", output)
+        output = re.sub(r"\\\"{(.*?)\}", r"\1", output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)
         return output

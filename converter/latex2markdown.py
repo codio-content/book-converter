@@ -133,7 +133,7 @@ class LaTeX2Markdown(object):
         output = Table(output, self._caret_token).convert()
         output = Lists(output, self._caret_token).convert()
         output = Block(output, self._caret_token).convert()
-        output = Center(output).convert()
+        output = Center(output, self._caret_token).convert()
 
         # convert all matched % back
         output = re.sub(self._percent_token, "%", output)

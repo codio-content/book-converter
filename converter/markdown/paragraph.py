@@ -40,7 +40,7 @@ class Paragraph(object):
                 elif level > 0:
                     processed.append(line)
                 elif line:
-                    local_lines.append(line)
+                    local_lines.append(line.lstrip())
 
         if local_lines:
             processed.append(' '.join(local_lines))

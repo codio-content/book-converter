@@ -1,6 +1,8 @@
-> To me programming is more than an important practical art. It is also a gigantic undertaking in the foundations of knowledge.\\
+> To me programming is more than an important practical art. It is also a gigantic undertaking in the foundations of knowledge.<br/>
 >
 > __Grace Murray Hopper__
+
+
 
 
 Grace Murray Hopper

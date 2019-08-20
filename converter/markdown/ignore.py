@@ -4,6 +4,10 @@ ifhtml_re = re.compile(
     r"""\\ifhtmloutput(?P<if_block>.*?)\\else(?P<else_block>.*?)\\fi""", flags=re.DOTALL + re.VERBOSE
 )
 
+ifmobile_re = re.compile(
+    r"""\\ifmobioutput(?P<if_block>.*?)\\else(?P<else_block>.*?)\\fi""", flags=re.DOTALL + re.VERBOSE
+)
+
 
 class Ignore(object):
     def __init__(self, latex_str):
@@ -36,5 +40,6 @@ class Ignore(object):
         output = self.remove_chars(output, "\\index{")
         output = self.remove_chars(output, "\\label{")
         output = ifhtml_re.sub(self.make_block, output)
+        output = ifmobile_re.sub(self.make_block, output)
 
         return output
