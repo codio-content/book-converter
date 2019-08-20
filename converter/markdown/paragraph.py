@@ -50,10 +50,3 @@ class Paragraph(object):
 
     def convert(self):
         return self.convert_without_tags()
-        #output = self.str
-
-        #output = re.sub(r"[\n]{2,}", self._local_caret_token, output)
-        #output = re.sub(r"\n", ' ', output)
-        #output = re.sub(self._local_caret_token, '\n', output)
-
-        #return output
