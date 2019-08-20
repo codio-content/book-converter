@@ -15,5 +15,6 @@ class Bold(object):
 
         output = match_block("\\B{", output, lambda match: f"**{match}**")
         output = match_block("\\C{", output, lambda match: f"**{match}**")
+        output = match_block("\\T{", output, lambda match: f"**{match}**")
 
         return output
