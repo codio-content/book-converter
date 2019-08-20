@@ -23,6 +23,7 @@ class SaasSpecific(object):
         output = re.sub(r"\\TeX({\})?", r"TeX", output)
         output = re.sub(r"\\\"{(.*?)\}", r"\1", output)
         output = re.sub(r"\\spaceship({\})?", r"<=>", output)
+        output = re.sub(r"\\thinspace({\})?", r" ", output)
         output = re.sub(r"\\tl({\})?", r"<", output)
         output = re.sub(r"\\tg({\})?", r">", output)
         output = re.sub(r"\\ttil({\})?", r"~", output)

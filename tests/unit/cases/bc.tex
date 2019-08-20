@@ -1,3 +1,27 @@
 \B{Summary of legacy code exploration}
 
 \C{Voucher}
+
+jQuery defines a global function \C{jQuery()} (aliased as \C{\$()})
+that, when passed a CSS selector (examples of which we saw in
+Figure~\ref{fig:css_cheat}), returns all of the current page's DOM
+elements matching that selector.  For example,
+\C{jQuery('\#movies')}
+or \C{\$('\#movies')} would return the single element whose ID is
+\T{movies}, if one exists on the page;
+\C{\$('h1.title')} would return all the \T{h1} elements whose CSS class
+is \T{title}.
+A more general version of this functionality is
+\C{.find(}\emph{selector}\C{)},
+which only searches the DOM subtree rooted at the target.  To illustrate
+the distinction, \C{\$('p~span')} finds \emph{any} \T{span} element that
+is contained inside a \T{p} element, whereas if \C{elt} already refers
+to a \emph{particular} \T{p} element, then \C{elt.find('span')} only
+finds \T{span} elements that are descendants of \C{elt}.
+\begin{sidebar}[-0.5in]{}%
+    The call \C{jQuery.noConflict()} ``undefines'' the \C{\$} alias,
+    in case your app uses the browser's built-in \C{\$} (usually an alias
+    for \C{document.\-getElementById}) or loads another \js{} library such as
+    \weblink{http://prototypejs.org}{Prototype} that also tries to define
+    \C{\$}.
+\end{sidebar}

@@ -32,7 +32,7 @@ Governments like that of the US have elaborate regulations to prevent corruption
 
 |||info
 ## CGI Group
-won the contract for the backend of the ACA website. The initial estimate ballooned from US<span>$</span>94M to <span>$</span>292M (Begley13). This same company was involved in a Canadian firearms registry whose costs skyrocketed, from an initial estimate of US<span>$</span>2M to <span>$</span>2B. When MITRE investigated the problems with Massachusetts' ACA website, it said CGI Group did not have the expertise to build the site, lost data, failed to adequately test functions, and managed the project poorly (Bidgood14).
+won the contract for the backend of the ACA website. The initial estimate ballooned from US<span>\$</span>94M to <span>\$</span>292M (Begley13). This same company was involved in a Canadian firearms registry whose costs skyrocketed, from an initial estimate of US<span>\$</span>2M to <span>\$</span>2B. When MITRE investigated the problems with Massachusetts' ACA website, it said CGI Group did not have the expertise to build the site, lost data, failed to adequately test functions, and managed the project poorly (Bidgood14).
 |||
 
 
@@ -57,7 +57,7 @@ Because it flows from the top down to completion, this process is called the _**
 
 |||info
 ## Windows 95
-was heralded by a [US<span>$</span>300 million outdoor party](http://www.youtube.com/watch?v=DeBi2ZxUZiM) for which Microsoft hired comedian Jay Leno, lit up New York's Empire State Building using the Microsoft Windows logo colors, and licensed “Start Me Up” by the Rolling Stones as the celebration's theme song.
+was heralded by a [US<span>\$</span>300 million outdoor party](http://www.youtube.com/watch?v=DeBi2ZxUZiM) for which Microsoft hired comedian Jay Leno, lit up New York's Empire State Building using the Microsoft Windows logo colors, and licensed “Start Me Up” by the Rolling Stones as the celebration's theme song.
 |||
 
 
