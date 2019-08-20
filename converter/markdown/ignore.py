@@ -1,11 +1,11 @@
 import re
 
 ifhtml_re = re.compile(
-    r"""\\ifhtmloutput(?P<if_block>.*?)\\else(?P<else_block>.*?)\\fi""", flags=re.DOTALL + re.VERBOSE
+    r"""\\ifhtmloutput(?P<if_block>.*?)\\fi""", flags=re.DOTALL + re.VERBOSE
 )
 
 ifmobile_re = re.compile(
-    r"""\\ifmobioutput(?P<if_block>.*?)\\else(?P<else_block>.*?)\\fi""", flags=re.DOTALL + re.VERBOSE
+    r"""\\ifmobioutput(?P<if_block>.*?)\\fi""", flags=re.DOTALL + re.VERBOSE
 )
 
 
