@@ -44,11 +44,11 @@ Of course, like other engineering fields, the government has escape clauses in t
 An early version of this Plan-and-Document software development process was developed in 1970 (Royce70). It follows this sequence of phases:
 
 
-1.  Requirements analysis and specification
-1.  Architectural design
-1.  Implementation and Integration
-1.  Verification
-1.  Operation and Maintenance
+1. Requirements analysis and specification
+1. Architectural design
+1. Implementation and Integration
+1. Verification
+1. Operation and Maintenance
 
 Given that the earlier you find an error the cheaper it is to fix, the philosophy of this process is to complete a phase before going on to the next one, thereby removing as many errors as early as possible. Getting the early phases right could also prevent unnecessary work downstream. As this process could take years, the extensive documentation helps to ensure that important information is not lost if a person leaves the project and that new people can get up to speed quickly when they join the project.
 
@@ -77,10 +77,10 @@ That is, it's easier for customers to understand what they want once they see a 
 This observation led to a software development lifecycle developed in the 1980s that combines prototypes with the Waterfall model (boehm86). The idea is to iterate through a sequence of four phases, with each iteration resulting in a prototype that is a refinement of the previous version. Figure fig:spiral illustrates this model of development across the four phases, which gives this lifecycle its name: the _**Spiral model**_. The phases are
 
 
-1.  Determine objectives and constraints of this iteration
-1.  Evaluate alternatives and identify and resolve risks
-1.  Develop and verify the prototype for this iteration
-1.  Plan the next iteration
+1. Determine objectives and constraints of this iteration
+1. Evaluate alternatives and identify and resolve risks
+1. Develop and verify the prototype for this iteration
+1. Plan the next iteration
 
 ![The Spiral lifecycle combines Waterfall with prototyping. It starts at the center, with each iteration around the spiral going through the four phases and resulting in a revised prototype until the product is ready for release.](ch_intro/figs/Spiral.jpg)  
 The Spiral lifecycle combines Waterfall with prototyping. It starts at the center, with each iteration around the spiral going through the four phases and resulting in a revised prototype until the product is ready for release.
@@ -101,10 +101,10 @@ Like Waterfall and Spiral, RUP has phases:
 
 
 
-1.  Inception: makes the business case for the software and scopes the project to set the schedule and budget, which is used to judge progress and justify expenditures, and initial assessment of risks to schedule and budget.
-1.  Elaboration: works with stakeholders to identify use cases, designs a software architecture, sets the development plan, and builds an initial prototype.
-1.  Construction: codes and tests the product, resulting in the first external release.
-1.  Transition: moves the product from development to production in the real environment, including customer acceptance testing and user training.
+1. Inception: makes the business case for the software and scopes the project to set the schedule and budget, which is used to judge progress and justify expenditures, and initial assessment of risks to schedule and budget.
+1. Elaboration: works with stakeholders to identify use cases, designs a software architecture, sets the development plan, and builds an initial prototype.
+1. Construction: codes and tests the product, resulting in the first external release.
+1. Transition: moves the product from development to production in the real environment, including customer acceptance testing and user training.
 
 Unlike Waterfall, each phase involves iteration. For example, a project might have one inception phase iteration, two elaboration phase iterations, four construction phase iterations, and two transition phase iterations. Like Spiral, a project could also iterate across all four phases repeatedly.
 
@@ -112,12 +112,12 @@ In addition to the dynamically changing phases of the project, RUP identifies si
 
 
 
-1.     Business Modeling
-1.     Requirements
-1.     Analysis and Design
-1.     Implementation
-1.     Test
-1.     Deployment
+1. Business Modeling
+1. Requirements
+1. Analysis and Design
+1. Implementation
+1. Test
+1. Deployment
 
 These disciplines are more static than the phases, in that they nominally exist over the whole lifetime of the project. However, some disciplines get used more in earlier phases (like business modeling), some periodically throughout the process (like test), and some more towards the end (deployment). Figure fig:RUP shows the relationship of the phases and the disciplines, with the area indicating the amount of effort in each discipline over time.
 
@@ -156,9 +156,9 @@ An unfortunate downside to teaching a Plan-and-Document approach is that student
 The Software Engineering Institute at Carnegie Mellon University proposed the _**Capability Maturity Model**_ (CMM) (Paulk05) to evaluate  organizations' software-development processes based on Plan-and-Document methodologies. The idea is that by modeling the software development process, an organization can improve them. SEI studies observed five levels of software practice:
 
 
-1.  Initial or Chaotic---undocumented/*ad hoc*/unstable software development.
-1.  Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
-1.  Defined---Defined and documented standard processes that improve over time.
-1.  Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
-1.  Optimizing---Deliberate process optimization improvements as part of management process.
+1. Initial or Chaotic---undocumented/*ad hoc*/unstable software development.
+1. Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
+1. Defined---Defined and documented standard processes that improve over time.
+1. Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
+1. Optimizing---Deliberate process optimization improvements as part of management process.
 CMM implicitly encourages an organization to move up the CMM levels. While not proposed as a software development methodology, many consider it one. For example,  (Nawrocki02) compares CMM Level 2 to the Agile software methodology (see next section).
