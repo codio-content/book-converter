@@ -66,7 +66,12 @@ class Sidebar(TextAsParagraph):
 
         image_src = "![{}]({})".format(block_name, image)
 
-        return '{}{}{}'.format(block_name, block_contents, image_src)
+        block_contents = self.to_paragraph(block_contents)
+        caret_token = self._caret_token
+
+        if block_name:
+            return f'**{block_name}** {block_contents}{caret_token}{image_src}{caret_token}'
+        return f'{block_contents}{caret_token}{image_src}{caret_token}'
 
     def convert(self):
         output = self.str
