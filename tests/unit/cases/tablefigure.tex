@@ -15,3 +15,14 @@ extended from December 15, 2013 to March 31, 2014, which explains the
 lower goal in customers per day in December. Note that availability for
 ACA does \emph{not} include time for ``scheduled maintenance,'' which
 Amazon does include (\cite{Zients13}). The error rate was for significant errors on the forms sent to insurance companies (\cite{Horsley13}). The site was widely labeled by security experts as insecure, as the developers were under tremendous pressure to get proper functionality, and little attention was paid to security (\cite{Harrington13}).}
+
+\tablefigure{ch_ruby_rails/tables/ruby_collection_methods}{fig:functional} {%
+   Some common Ruby methods on collections.  For those that expect a block,
+   the ``Block'' column shows the number of arguments expected by the block; if
+   blank, the method doesn't expect a block.  For
+   example, a call to \C{sort}, whose block expects 2 arguments, might look like: \C{c.sort~\{~\textbar{}a,b\textbar{}~a~$<=>$~b~\}}.
+   These methods all return a new object rather than modifying the
+   receiver, but some methods also have a \emph{destructive} variant ending in
+   \C{!}, for example \C{sort!}, that modify their argument in place  (and also return the new value).
+   Use destructive methods with extreme care, if at all.
+  }

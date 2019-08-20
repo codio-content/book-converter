@@ -25,19 +25,24 @@ class CodeFigure(TextAsParagraph):
         caret_token = self._caret_token
         replace_token = str(uuid.uuid4())
 
+        self._matches.append(replace_token)
+
+        if not file_content:
+            return replace_token
+
         self._source_codes.append(Code(file_path, file_content))
 
         file_content = re.sub(r"%", self._percent_token, file_content)
         file_content = re.sub(r"\n", self._caret_token, file_content)
-
-        self._matches.append(replace_token)
 
         return f'{caret_token}**source:{file_path}**{caret_token}' \
             f'```code{caret_token}{file_content}{caret_token}```{caret_token}{replace_token}'
 
     def remove_matched_token(self, output, chars):
         pos = output.find(chars)
-        token_len = len(chars) + 1
+        br_pos = output.find('{', pos) + 1
+        token_len = br_pos - pos
+
         if pos == -1:
             return output
         level = 0

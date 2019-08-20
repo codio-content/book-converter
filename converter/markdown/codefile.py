@@ -22,6 +22,9 @@ class CodeFile(TextAsParagraph):
         file_content = self._load_file(file_path)
         caret_token = self._caret_token
 
+        if not file_content:
+            return ''
+
         self._source_codes.append(Code(file_path, file_content))
 
         file_content = re.sub(r"%", self._percent_token, file_content)
