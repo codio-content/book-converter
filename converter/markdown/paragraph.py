@@ -27,6 +27,8 @@ class Paragraph(object):
                     processed.append(' '.join(local_lines))
                     local_lines = []
                 processed.append(line)
+                if '\\end' in line:
+                    level -= 1
             elif '\\end' in line:
                 processed.append(line)
                 level -= 1

@@ -5,7 +5,5 @@
 
 ![](ch_foreword/figs/patterson.png)
 
-\noindent
-**David Patterson** recently retired from a 40-year career as a
-Professor of Computer Science at
-UC Berkeley. In the
+
+**David Patterson** recently retired from a 40-year career as a Professor of Computer Science at UC Berkeley. In the
