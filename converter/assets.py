@@ -2,7 +2,6 @@ import logging
 import glob
 import shutil
 from os import listdir
-from os.path import isdir
 
 from pathlib import Path
 
@@ -82,8 +81,9 @@ def copy_assets(config, generate_dir):
                 logging.exception("can not copy asset {}".format(asset))
 
 
-def process_source_code(source_codes, generate_dir):
-    code_dir = generate_dir.joinpath('code')
+def process_source_code(source_codes, generate_dir, use_code_folder=True):
+    print('use_code_folder', use_code_folder)
+    code_dir = generate_dir.joinpath('code') if use_code_folder else generate_dir
     counter = {}
     for code in source_codes:
         current = counter.setdefault(code.name, 0)
@@ -92,6 +92,7 @@ def process_source_code(source_codes, generate_dir):
             source_dir = source_dir.joinpath(str(current))
         source_dir.mkdir(exist_ok=True, parents=True)
         file_path = source_dir.joinpath(code.name)
+        file_path.parent.mkdir(exist_ok=True, parents=True)
         if file_path.exists():
             current += 1
             source_dir = source_dir.joinpath(str(current))

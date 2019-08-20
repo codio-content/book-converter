@@ -1,3 +1,4 @@
+`source:ch_javascript/code/json_example.js`
 ```code
 file content
 ```

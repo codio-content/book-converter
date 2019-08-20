@@ -37,6 +37,7 @@ from converter.markdown.tablefigure import TableFigure
 from converter.markdown.chips import Chips
 from converter.markdown.dedicationwithpic import DedicationWithPic
 from converter.markdown.codefilefigure import CodeFigure
+from converter.markdown.codefile import CodeFile
 
 
 class LaTeX2Markdown(object):
@@ -66,7 +67,6 @@ class LaTeX2Markdown(object):
 
         output = TableFigure(output, self._caret_token, self._load_workspace_file).convert()
         output = Quotes(output).convert()
-        output = CodeFigure(output, self._caret_token, self._percent_token, self._load_workspace_file).convert()
         output = Bold(output).convert()
         output = Italic(output).convert()
         output = Ignore(output).convert()
@@ -77,10 +77,20 @@ class LaTeX2Markdown(object):
         output, source_codes = CodeBlock(
             output, self._percent_token, self._caret_token, self._remove_trinket
         ).convert()
-        output = re.sub(r"\\%", self._percent_token, output)
-        output = InlineCodeBlock(output, self._percent_token).convert()
         if source_codes:
             self._source_codes.extend(source_codes)
+        output, source_codes = CodeFigure(
+            output, self._caret_token, self._percent_token, self._load_workspace_file
+        ).convert()
+        if source_codes:
+            self._source_codes.extend(source_codes)
+        output, source_codes = CodeFile(
+            output, self._caret_token, self._percent_token, self._load_workspace_file
+        ).convert()
+        if source_codes:
+            self._source_codes.extend(source_codes)
+        output = re.sub(r"\\%", self._percent_token, output)
+        output = InlineCodeBlock(output, self._percent_token).convert()
 
         # remove comments
         output = re.sub("%(.*?)?$", "", output, flags=re.MULTILINE)

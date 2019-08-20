@@ -2,7 +2,7 @@ import re
 
 from converter.markdown.text_as_paragraph import TextAsParagraph
 
-pitfall_re = re.compile(r"""\\begin{pitfall}{(?P<title>.*?)}(?P<block_contents>.*?)\\end{pitfall}""",
+pitfall_re = re.compile(r"""\\begin{pitfall}(\s+)?{(?P<title>.*?)}(?P<block_contents>.*?)\\end{pitfall}""",
                         flags=re.DOTALL + re.VERBOSE)
 
 

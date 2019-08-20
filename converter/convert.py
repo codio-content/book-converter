@@ -263,7 +263,8 @@ def process_assets(config, generate_dir, pdfs_for_convert, source_codes, bookdow
 
     if source_codes:
         logging.debug("process source codes")
-        process_source_code(source_codes, generate_dir)
+        use_code_folder = bool(config.get('workspace', {}).get('useCodeFolder', True))
+        process_source_code(source_codes, generate_dir, use_code_folder)
 
 
 def write_metadata(guides_dir, metadata, book):
