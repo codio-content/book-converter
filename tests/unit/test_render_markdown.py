@@ -276,3 +276,6 @@ class TestSuite(unittest.TestCase):
 
     def test_codefigure(self):
         self.run_case("codefigure", load_workspace_file=lambda _: "file content")
+
+    def test_codefile(self):
+        self.run_case("codefile", load_workspace_file=lambda _: "file content")

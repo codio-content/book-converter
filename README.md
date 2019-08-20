@@ -26,6 +26,7 @@ Generated config will be placed to `example` folder
 * **tex** book name
 * **removeTrinket** remove trinket entries
 * **removeExercise** remove exercise headers
+* **useCodeFolder** put source code files to `code` directory
 
 Examples
 ```yaml
