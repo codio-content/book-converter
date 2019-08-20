@@ -1,0 +1,10 @@
+\begin{checkyourself}
+  Suppose you mix \C{Enumerable} into a class \C{Foo} that does not
+  provide the \C{each} method.  What error will be raised when you
+  call \C{Foo.new.map~\{~\textbar{}elt\textbar{}~puts~elt~\}}?
+  \begin{answer}
+  The \C{map} method in \C{Enumerable} will attempt to call \C{each} on its receiver,
+  but since the new \C{Foo} object doesn't define \C{each}, Ruby will raise an
+  Undefined Method error.
+  \end{answer}
+\end{checkyourself}

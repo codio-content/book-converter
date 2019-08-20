@@ -18,7 +18,7 @@ class Ignore(object):
         if pos == -1:
             return output
         level = 0
-        for index in range(pos + 7, len(output), 1):
+        for index in range(pos + len(chars), len(output), 1):
             ch = output[index]
             if ch == '}':
                 if level == 0:

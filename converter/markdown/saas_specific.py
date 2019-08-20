@@ -22,5 +22,12 @@ class SaasSpecific(object):
         output = re.sub(r"\\LaTeX({\})?", r"LaTeX", output)
         output = re.sub(r"\\TeX({\})?", r"TeX", output)
         output = re.sub(r"\\\"{(.*?)\}", r"\1", output)
+        output = re.sub(r"\\spaceship({\})?", r"<=>", output)
+        output = re.sub(r"\\tl({\})?", r"<", output)
+        output = re.sub(r"\\tg({\})?", r">", output)
+        output = re.sub(r"\\ttil({\})?", r"~", output)
+        output = re.sub(r"\\textbar({\})?", r"|", output)
+        output = re.sub(r"\\{", r"{", output)
+        output = re.sub(r"\\}", r"}", output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)
         return output
