@@ -1,6 +1,7 @@
 import re
 import uuid
 
+from converter.guides.tools import get_text_in_brackets
 from converter.markdown.text_as_paragraph import TextAsParagraph
 
 
@@ -8,7 +9,7 @@ class Tabular(TextAsParagraph):
     def __init__(self, latex_str, caret_token):
         super().__init__(latex_str, caret_token)
 
-        self._table_re = re.compile(r"""\\begin{(?P<block_name>tabular)}{(?P<size>.*?)}
+        self._table_re = re.compile(r"""\\begin{(?P<block_name>tabular)}
                                     (?P<block_contents>.*?)
                                     \\end{(?P=block_name)}""",
                                     flags=re.DOTALL + re.VERBOSE)
@@ -21,17 +22,23 @@ class Tabular(TextAsParagraph):
 
     def _format_table(self, matchobj):
         block_contents = matchobj.group('block_contents')
-        size = matchobj.group('size')
+
         block_contents = block_contents.strip()
+        sub_lines = block_contents.split('\n')
+        size = get_text_in_brackets(sub_lines[0])
+        block_contents = '\n'.join(sub_lines[1:])
+        block_contents = block_contents.replace('\\hline', '')
+
         token = str(uuid.uuid4())
 
-        items = block_contents.split('\\hline')
+        items = block_contents.split('\\\\')
 
         table_size = size.strip().strip('|').split('|')
 
         heading = True
         out = ''
         for row in items:
+            row = row.strip()
             if not row:
                 continue
             pos = 0

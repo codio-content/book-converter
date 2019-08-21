@@ -76,7 +76,6 @@ class LaTeX2Markdown(object):
         output = Italic(output).convert()
         output = Ignore(output).convert()
         output = SaasSpecific(output, self._caret_token).convert()
-        output = NewLine(output).convert()
         output = ItalicBold(output).convert()
         output, source_codes = CodeBlock(
             output, self._percent_token, self._caret_token, self._remove_trinket
@@ -144,6 +143,7 @@ class LaTeX2Markdown(object):
         output = Center(output, self._caret_token).convert()
 
         output = UnEscape(output).convert()
+        output = NewLine(output).convert()
 
         # convert all matched % back
         output = re.sub(self._percent_token, "%", output)
