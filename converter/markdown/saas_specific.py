@@ -13,7 +13,7 @@ class SaasSpecific(TextAsParagraph):
                                          flags=re.DOTALL + re.VERBOSE)
 
         self._new_re = re.compile(r"""\\begin{NEW}(?P<block_contents>.*?)\\end{NEW}""",
-                                flags=re.DOTALL + re.VERBOSE)
+                                  flags=re.DOTALL + re.VERBOSE)
 
     def _saas_icons_block(self, matchobj):
         return ""

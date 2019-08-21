@@ -24,14 +24,15 @@ class Screencast(TextAsParagraph):
         self._matches.append(replace_token)
 
         caret_token = self._caret_token
-        return f'<hr>{caret_token}**Screencast: {name}**{caret_token}<iframe width="560" height="315" ' \
+        return f'<hr>{caret_token}{caret_token}**Screencast: {name}**{caret_token}{caret_token}' \
+            f'<iframe width="560" height="315" ' \
             f'src="//www.youtube.com/embed/{youtube_hash}" frameborder="0" allowfullscreen>' \
-            f'</iframe>{caret_token}{replace_token}'
+            f'</iframe>{caret_token}{caret_token}{caret_token}{replace_token}'
 
     def make_content(self, line):
         caret_token = self._caret_token
         line = self.to_paragraph(line)
-        return f"{line}{caret_token}<hr>{caret_token}"
+        return f"{line}{caret_token}{caret_token}<hr>{caret_token}"
 
     def convert(self):
         output = self.str
