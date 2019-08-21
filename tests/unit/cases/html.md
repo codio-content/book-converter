@@ -24,9 +24,14 @@ There is an unfortunate and confusing mess of terminology surrounding the [linea
 Of particular interest are the HTML tag attributes **id** and **class**, because they figure heavily into connecting the HTML structure of a page with its visual appearance.  The following screencast illustrates the use of Firefox's Web Developer toolbar to quickly identify the ID's and Classes of HTML elements on a page.
 
 <hr>
+
 **Screencast: Inspecting the ID and Class attributes**
+
 <iframe width="560" height="315" src="//www.youtube.com/embed/X5ArSbUea_o" frameborder="0" allowfullscreen></iframe>
+
+
 CSS uses _**selector notations**_ such as **div#***name* to indicate a **div** element whose **id** is *name* and **div.***name* to indicate a **div** element with class *name*. Only one element in an HTML document can have a given **id**, whereas many elements (even of different tag types) can share the same **class**. All three aspects of an element---its tag type, its **id** (if it has one), and its **class** attributes (if it has any)---can be used to identify an element as a candidate for visual formatting.
+
 <hr>
 
 
@@ -43,9 +48,14 @@ As the next screencast shows, the _**CSS**_ (_**Cascading Style Sheets**_) stand
 
 
 <hr>
+
 **Screencast: Introduction to CSS**
+
 <iframe width="560" height="315" src="//www.youtube.com/embed/E5ZVorHn_fs" frameborder="0" allowfullscreen></iframe>
+
+
 There are four basic mechanisms by which a selector in a CSS file can match an HTML element: by tag name, by class, by ID, and by hierarchy. If multiple selectors match a given element, the rules for which properties to apply are complex, so most designers try to avoid such ambiguities by keeping their CSS simple.  A useful way to see the “bones” of a page is to select \Sf{CSS>-Disable Styles>-All Styles} from the Firefox Web Developer toolbar; most developer-friendly browsers offer a “developer mode” featuring similar behaviors. Disabling styles will display the page with all CSS formatting turned off, showing the extent to which CSS can be used to separate visual appearance from logical structure.
+
 <hr>
 
 
