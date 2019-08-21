@@ -39,11 +39,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\tg({\})?", r">", output)
         output = re.sub(r"\\ttil({\})?", r"~", output)
         output = re.sub(r"\\textbar({\})?", r"|", output)
-        output = re.sub(r"\\{", r"{", output)
-        output = re.sub(r"\\}", r"}", output)
-        output = re.sub(r"\\#", "#", output)
-        output = re.sub(r"\\_", "_", output)
-        output = re.sub(r"\\-", "-", output)
+        output = re.sub(r"\\hrule", "<hr>", output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)
         output = self._new_re.sub(self.make_block, output)
         return output

@@ -1,7 +1,7 @@
 import re
+import uuid
 
 from converter.markdown.text_as_paragraph import TextAsParagraph
-from converter.markdown.block_matcher import match_block
 
 
 class Tabularx(TextAsParagraph):
@@ -23,12 +23,9 @@ class Tabularx(TextAsParagraph):
         block_contents = matchobj.group('block_contents')
         size = matchobj.group('size')
         block_contents = block_contents.strip()
-        print('block_contents', block_contents)
-        print('size', size)
+        token = str(uuid.uuid4())
 
         items = block_contents.split('\\hline')
-
-        print('items', items, len(items))
 
         table_size = size.strip().strip('|').split('|')
 
@@ -38,6 +35,7 @@ class Tabularx(TextAsParagraph):
             if not row:
                 continue
             pos = 0
+            row = row.replace('\\&', token)
             for ind in range(0, len(table_size)):
                 data = row.split('&')
                 col = self.safe_list_get(data, ind, '').strip()
@@ -51,6 +49,8 @@ class Tabularx(TextAsParagraph):
                     pos += 1
             heading = False
             out += '|' + self._caret_token
+
+        out = out.replace(token, '\\&')
 
         return out
 

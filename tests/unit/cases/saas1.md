@@ -2,7 +2,7 @@
 
 
 
-> If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.\
+> If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.<br/>
 >
 > __Gerald Weinberg, *Weinberg's Second Law*__
 

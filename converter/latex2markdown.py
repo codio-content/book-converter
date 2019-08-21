@@ -41,6 +41,7 @@ from converter.markdown.codefile import CodeFile
 from converter.markdown.remove_comments import RemoveComments
 from converter.markdown.screencast import Screencast
 from converter.markdown.tabularx import Tabularx
+from converter.markdown.unescape import UnEscape
 
 
 class LaTeX2Markdown(object):
@@ -139,6 +140,8 @@ class LaTeX2Markdown(object):
         output = Lists(output, self._caret_token).convert()
         output = Block(output, self._caret_token).convert()
         output = Center(output, self._caret_token).convert()
+
+        output = UnEscape(output).convert()
 
         # convert all matched % back
         output = re.sub(self._percent_token, "%", output)
