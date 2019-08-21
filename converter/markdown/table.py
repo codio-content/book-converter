@@ -6,7 +6,7 @@ class Table(object):
         self.str = latex_str
         self._caret_token = caret_token
 
-        self._table_re = re.compile(r"""\\begin{(?P<block_name>table|tabular)} # block name
+        self._table_re = re.compile(r"""\\begin{(?P<block_name>table)}(\[.*])? # block name
                                     (?P<block_contents>.*?) # Non-greedy block contents
                                     \\end{(?P=block_name)}""",  # closing block
                                     flags=re.DOTALL + re.VERBOSE)
@@ -16,40 +16,23 @@ class Table(object):
 
         out_str = ""
         caption = ""
-        table = []
+
+        table_lines = []
 
         for line in block_contents.strip().split("\n"):
-            line = line.rstrip("\\")
-            if line == "\\hline":
-                out_str += self._caret_token
-                continue
-            elif line.startswith("\\end") or line.startswith("\\begin") or line.startswith("[!ht]") or '&' not in line:
-                continue
-            elif line.startswith("\\caption"):
+            if line.startswith("\\caption"):
                 caption = line[9:-1]
-                continue
-            out_str += line
-            table.append(line.split(' & '))
-
-        heading = True
-        out = ""
+            else:
+                table_lines.append(line)
 
         if caption:
-            out += "**Table: " + caption + "**" + self._caret_token
+            out_str += "**Table: " + caption + "**"
 
-        for row in table:
-            pos = 0
-            for col in row:
-                out += "|" + col.replace('|', '&#124;')
-            if heading:
-                out += '|' + self._caret_token
-                for _ in row:
-                    out += "|-"
-                    pos += 1
-            heading = False
-            out += '|' + self._caret_token
+        table_content = '\n'.join(table_lines)
 
-        return out
+        caret_token = self._caret_token
+
+        return f'{caret_token}{table_content}{caret_token}{out_str}{caret_token}'
 
     def convert(self):
         output = self.str

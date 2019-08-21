@@ -41,6 +41,7 @@ from converter.markdown.codefile import CodeFile
 from converter.markdown.remove_comments import RemoveComments
 from converter.markdown.screencast import Screencast
 from converter.markdown.tabularx import Tabularx
+from converter.markdown.tabular import Tabular
 from converter.markdown.unescape import UnEscape
 
 
@@ -135,8 +136,9 @@ class LaTeX2Markdown(object):
         output = Screencast(output, self._caret_token).convert()
 
         output = Header(output).convert()
-        output = Table(output, self._caret_token).convert()
+        output = Tabular(output, self._caret_token).convert()
         output = Tabularx(output, self._caret_token).convert()
+        output = Table(output, self._caret_token).convert()
         output = Lists(output, self._caret_token).convert()
         output = Block(output, self._caret_token).convert()
         output = Center(output, self._caret_token).convert()
