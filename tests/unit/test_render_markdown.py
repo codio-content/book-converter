@@ -282,3 +282,6 @@ class TestSuite(unittest.TestCase):
 
     def test_checkyourself_complex(self):
         self.run_case("checkyourself_complex")
+
+    def test_screencast(self):
+        self.run_case("screencast")

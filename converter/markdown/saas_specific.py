@@ -30,5 +30,8 @@ class SaasSpecific(object):
         output = re.sub(r"\\textbar({\})?", r"|", output)
         output = re.sub(r"\\{", r"{", output)
         output = re.sub(r"\\}", r"}", output)
+        output = re.sub(r"\\#", "#", output)
+        output = re.sub(r"\\_", "_", output)
+        output = re.sub(r"\\-", "-", output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)
         return output

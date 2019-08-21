@@ -39,6 +39,7 @@ from converter.markdown.dedicationwithpic import DedicationWithPic
 from converter.markdown.codefilefigure import CodeFigure
 from converter.markdown.codefile import CodeFile
 from converter.markdown.remove_comments import RemoveComments
+from converter.markdown.screencast import Screencast
 
 
 class LaTeX2Markdown(object):
@@ -129,6 +130,7 @@ class LaTeX2Markdown(object):
             output, self._exercise_counter_offset, self._chapter_num, self._remove_exercise, self._caret_token
         ).convert()
         output = EqnArray(output).convert()
+        output = Screencast(output, self._caret_token).convert()
 
         output = Header(output).convert()
         output = Table(output, self._caret_token).convert()
