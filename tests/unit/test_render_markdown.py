@@ -285,3 +285,7 @@ class TestSuite(unittest.TestCase):
 
     def test_screencast(self):
         self.run_case("screencast")
+
+    def test_html(self):
+        self.maxDiff = None
+        self.run_case("html")

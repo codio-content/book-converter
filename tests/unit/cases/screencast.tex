@@ -22,3 +22,15 @@ the result discarded, and lines \mbox{\C{=beginning with an equals
 sign}} are executed as Ruby code with the result interpolated
 into the HTML output.
 }
+
+\screencast[X5ArSbUea_o]{html-class-id-attributes}{Inspecting the ID and Class attributes}%
+{ch_arch/mov/html-class-id-attributes.mp4}{%
+CSS uses \w[CSS selector]{selector notations} such as \T{div\#}\emph{name} to
+indicate a \T{div} element whose \T{id} is \emph{name} and
+\T{div.}\emph{name} to indicate a \T{div} element with class \emph{name}.
+Only one element in an HTML document can have a given \T{id}, whereas many
+elements (even of different tag types) can share the same \T{class}.
+All three aspects of an element---its tag type, its \T{id} (if it has
+one), and its \T{class} attributes (if it has any)---can be used to
+identify an element as a candidate for visual formatting.
+}\index{Selector notations, CSS|textit}
