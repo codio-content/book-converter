@@ -23,7 +23,7 @@
 * Leslie Klein discovered another error in the series expansion of $\exp(-x^2)$, identified typos in the card array figures, and gave helpful suggestions to clarify several exercises.
 * Micah Lindstrom reported half a dozen typos and sent corrections.
 * James Riely ported the textbook source from LaTeX to Sphinx. <br/>[http://fpl.cs.depaul.edu/jriely/thinkapjava/](http://fpl.cs.depaul.edu/jriely/thinkapjava/)
-* Peter Knaggs ported the book to C\#. <br/>[http://www.rigwit.co.uk/think/sharp/](http://www.rigwit.co.uk/think/sharp/)
+* Peter Knaggs ported the book to C#. <br/>[http://www.rigwit.co.uk/think/sharp/](http://www.rigwit.co.uk/think/sharp/)
 * Heidi Gentry-Kolen recorded several video lectures that follow the book. <br/>[https://www.youtube.com/user/digipipeline](https://www.youtube.com/user/digipipeline)
 * Waldo Ribeiro submitted a pull request that corrected a dozen typos.
 

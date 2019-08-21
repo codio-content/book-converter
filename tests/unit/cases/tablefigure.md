@@ -1,4 +1,4 @@
-We can therefore say that the expression **3+2** results in calling **Fixnum\#+** on the receiver **3**.
+We can therefore say that the expression **3+2** results in calling **Fixnum#+** on the receiver **3**.
 
 file content content
 

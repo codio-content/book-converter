@@ -39,6 +39,7 @@ from converter.markdown.dedicationwithpic import DedicationWithPic
 from converter.markdown.codefilefigure import CodeFigure
 from converter.markdown.codefile import CodeFile
 from converter.markdown.remove_comments import RemoveComments
+from converter.markdown.screencast import Screencast
 
 
 class LaTeX2Markdown(object):
@@ -71,10 +72,9 @@ class LaTeX2Markdown(object):
         output = Bold(output).convert()
         output = Italic(output).convert()
         output = Ignore(output).convert()
-        output = SaasSpecific(output).convert()
+        output = SaasSpecific(output, self._caret_token).convert()
         output = NewLine(output).convert()
         output = ItalicBold(output).convert()
-        output = Links(output).convert()
         output, source_codes = CodeBlock(
             output, self._percent_token, self._caret_token, self._remove_trinket
         ).convert()
@@ -97,6 +97,8 @@ class LaTeX2Markdown(object):
         output = RemoveComments(output).convert()
         output = Quotation(output, self._caret_token).convert()
         output = Paragraph(output).convert_without_tags()
+        output = Refs(output, self._refs).convert()
+        output = Links(output).convert()
 
         output = InlineMath(output).convert()
         output = CheckYouself(output, self._caret_token).convert()
@@ -124,11 +126,11 @@ class LaTeX2Markdown(object):
         if images:
             self._pdfs.extend(images)
 
-        output = Refs(output, self._refs).convert()
         output = Exercise(
             output, self._exercise_counter_offset, self._chapter_num, self._remove_exercise, self._caret_token
         ).convert()
         output = EqnArray(output).convert()
+        output = Screencast(output, self._caret_token).convert()
 
         output = Header(output).convert()
         output = Table(output, self._caret_token).convert()

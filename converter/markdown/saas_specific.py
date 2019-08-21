@@ -1,16 +1,27 @@
 import re
 
+from converter.markdown.text_as_paragraph import TextAsParagraph
 
-class SaasSpecific(object):
-    def __init__(self, latex_str):
+
+class SaasSpecific(TextAsParagraph):
+    def __init__(self, latex_str, caret_token):
+        super().__init__(latex_str, caret_token)
         self.str = latex_str
 
         self._saas_icons_re = re.compile(r"""\\(dry|reuse|codegen|concise|coc|legacy|beauty|tool|
                                          learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*\})?""",
                                          flags=re.DOTALL + re.VERBOSE)
 
+        self._new_re = re.compile(r"""\\begin{NEW}(?P<block_contents>.*?)\\end{NEW}""",
+                                  flags=re.DOTALL + re.VERBOSE)
+
     def _saas_icons_block(self, matchobj):
         return ""
+
+    def make_block(self, matchobj):
+        block_contents = matchobj.group('block_contents')
+        block_contents = self.to_paragraph(block_contents)
+        return f'{block_contents}'
 
     def convert(self):
         output = self.str
@@ -30,5 +41,9 @@ class SaasSpecific(object):
         output = re.sub(r"\\textbar({\})?", r"|", output)
         output = re.sub(r"\\{", r"{", output)
         output = re.sub(r"\\}", r"}", output)
+        output = re.sub(r"\\#", "#", output)
+        output = re.sub(r"\\_", "_", output)
+        output = re.sub(r"\\-", "-", output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)
+        output = self._new_re.sub(self.make_block, output)
         return output
