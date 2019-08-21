@@ -40,6 +40,7 @@ from converter.markdown.codefilefigure import CodeFigure
 from converter.markdown.codefile import CodeFile
 from converter.markdown.remove_comments import RemoveComments
 from converter.markdown.screencast import Screencast
+from converter.markdown.tabularx import Tabularx
 
 
 class LaTeX2Markdown(object):
@@ -134,6 +135,7 @@ class LaTeX2Markdown(object):
 
         output = Header(output).convert()
         output = Table(output, self._caret_token).convert()
+        output = Tabularx(output, self._caret_token).convert()
         output = Lists(output, self._caret_token).convert()
         output = Block(output, self._caret_token).convert()
         output = Center(output, self._caret_token).convert()
