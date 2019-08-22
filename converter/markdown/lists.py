@@ -93,6 +93,9 @@ class Lists(TextAsParagraph):
         block_contents = matchobj.group('block_contents')
         block_title = matchobj.groupdict().get('block_title')
 
+        if '\\begin{enumerate' in block_contents or '\\begin{itemize' in block_contents:
+            block_contents = self._lists_re.sub(self._replace_block, block_contents)
+
         formatted_contents = self._format_list_contents(block_name, block_contents)
         formatted_contents = self.to_paragraph(formatted_contents)
 

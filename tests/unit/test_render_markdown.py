@@ -288,3 +288,9 @@ class TestSuite(unittest.TestCase):
 
     def test_html(self):
         self.run_case("html")
+
+    def test_nested_list(self):
+        self.run_case("nested_list")
+
+    def test_tabularx(self):
+        self.run_case("tabularx")

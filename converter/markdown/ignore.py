@@ -39,6 +39,7 @@ class Ignore(object):
         output = self.str
         output = self.remove_chars(output, "\\index{")
         output = self.remove_chars(output, "\\label{")
+        output = self.remove_chars(output, "\\vspace{")
         output = re.sub(r"\\noindent", "", output)
         output = ifhtml_re.sub(self.make_block, output)
         output = ifmobile_re.sub(self.make_block, output)
