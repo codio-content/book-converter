@@ -113,7 +113,7 @@ class LaTeX2Markdown(object):
         output = Chips(output, self._caret_token).convert()
         output = Cleanup(output).convert()
 
-        output, images = PicFigure(output).convert()
+        output, images = PicFigure(output, self._detect_asset_ext).convert()
         if images:
             self._pdfs.extend(images)
         output, images = Figure(

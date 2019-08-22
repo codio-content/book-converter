@@ -275,6 +275,25 @@ Linux users will have both tools pre-installed with Ubuntu 16.04+ and Archlinux.
 
 Required a package `pip3 install pdf2image` 
 
+## Image optimization
+
+If you want to resize all images or optimize them add following directives
+
+```yaml
+optimization:
+  imageWidth: 660
+  imageHeight: 400
+  optimizeImages: true
+```
+
+* **imageWidth** image max width, resize with aspect ration
+* **imageHeight** image max height, resize with aspect ration
+
+**optimizeImages** - run program for optimizations, requires `jpegoptim` and `optipng` to be installed
+
+* Mac OS X: `brew install OptiPNG` and `brew install jpegoptim`
+* Ubuntu: `sudo apt-get install optipng` and `sudo apt-get install jpegoptim`
+
 ## codestyle
 
 [![wercker status](https://app.wercker.com/status/e4292419f5fdfef83fe74f7be72babb2/m/master "wercker status")](https://app.wercker.com/project/byKey/e4292419f5fdfef83fe74f7be72babb2)

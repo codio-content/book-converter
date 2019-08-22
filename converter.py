@@ -20,6 +20,8 @@ if __name__ == '__main__':
                         format='[%(asctime)s] %(levelname).5s %(message)s',
                         datefmt='%Y.%m.%d %H:%M:%S')
 
+    logging.getLogger('PIL').setLevel(logging.WARN)
+
     if args.generate:
         generate_toc(args.paths[0], args.generate)
     elif args.ref:
