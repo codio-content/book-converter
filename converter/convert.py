@@ -11,6 +11,7 @@ from converter.latex2markdown import LaTeX2Markdown
 from converter.bookdown2markdown import BookDown2Markdown
 from converter.assets import copy_assets, convert_assets, process_source_code, copy_files_from_bookdown_folder
 from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from, make_bookdown_refs
+from converter.optimizer import optimize
 
 
 def get_guide_content_path(file_path):
@@ -265,6 +266,8 @@ def process_assets(config, generate_dir, pdfs_for_convert, source_codes, bookdow
         logging.debug("process source codes")
         use_code_folder = bool(config.get('workspace', {}).get('useCodeFolder', True))
         process_source_code(source_codes, generate_dir, use_code_folder)
+
+    optimize(config, generate_dir)
 
 
 def write_metadata(guides_dir, metadata, book):
