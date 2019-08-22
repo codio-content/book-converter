@@ -33,12 +33,12 @@ def resize_images(image_path, options):
         image.save(image_path)
 
 
-def optimize_jpg(image_path, options):
+def optimize_jpg(image_path, _):
     logging.debug(f"optimize jpg {image_path}")
     run_command(['jpegoptim', image_path])
 
 
-def optimize_png(image_path, options):
+def optimize_png(image_path, _):
     logging.debug(f"optimize png {image_path}")
     run_command(['optipng', image_path])
 
@@ -66,4 +66,3 @@ def optimize(config, directory):
     optimization_config = config.get('optimization', {})
     if optimization_config:
         run_resize_images(optimization_config, directory)
-
