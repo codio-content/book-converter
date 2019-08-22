@@ -43,7 +43,7 @@ def optimize_png(image_path, _):
     run_command(['optipng', image_path])
 
 
-def run_resize_images(config, directory):
+def optimize(config, directory):
     width = config.get('imageWidth', 0)
     height = config.get('imageHeight', 0)
     if width > 0 and height > 0:
@@ -60,9 +60,3 @@ def run_resize_images(config, directory):
 
         recursive_images_search(directory, '**/*.png', optimize_png, None)
         recursive_images_search(directory, '*.png', optimize_png, None)
-
-
-def optimize(config, directory):
-    optimization_config = config.get('optimization', {})
-    if optimization_config:
-        run_resize_images(optimization_config, directory)

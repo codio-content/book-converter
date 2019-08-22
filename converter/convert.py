@@ -267,7 +267,9 @@ def process_assets(config, generate_dir, pdfs_for_convert, source_codes, bookdow
         use_code_folder = bool(config.get('workspace', {}).get('useCodeFolder', True))
         process_source_code(source_codes, generate_dir, use_code_folder)
 
-    optimize(config, generate_dir)
+    optimization_config = config.get('optimization', {})
+    if optimization_config:
+        optimize(optimization_config, generate_dir)
 
 
 def write_metadata(guides_dir, metadata, book):
