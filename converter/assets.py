@@ -35,7 +35,7 @@ def copy_globing(asset, base_src_dir, generate_dir):
 
 def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path, bookdown=False):
     base_src_dir = Path(config['workspace']['directory'])
-    for pdf in pdfs_for_convert:
+    for pdf in set(pdfs_for_convert):
         logging.debug("convert %s to jpg" % pdf)
         pdf_file = base_src_dir.joinpath('_bookdown_files').joinpath(pdf) if bookdown else base_src_dir.joinpath(pdf)
         if not pdf_file.exists():
@@ -82,7 +82,6 @@ def copy_assets(config, generate_dir):
 
 
 def process_source_code(source_codes, generate_dir, use_code_folder=True):
-    print('use_code_folder', use_code_folder)
     code_dir = generate_dir.joinpath('code') if use_code_folder else generate_dir
     counter = {}
     for code in source_codes:

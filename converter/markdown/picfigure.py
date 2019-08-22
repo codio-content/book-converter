@@ -5,13 +5,18 @@ picfigure_re = re.compile(r"""\\picfigure{(?P<image>.*?)}{(?P<refs>.*?)}{(?P<con
 
 
 class PicFigure(object):
-    def __init__(self, latex_str):
+    def __init__(self, latex_str, detect_asset_ext):
         self.str = latex_str
         self.images = []
+        self._detect_asset_ext = detect_asset_ext
 
     def make_block(self, matchobj):
         content = matchobj.group('content').strip()
         image = matchobj.group('image').strip()
+        if '.' not in image:
+            ext = self._detect_asset_ext(image)
+            if ext:
+                image = '{}.{}'.format(image, ext)
         if image.lower().endswith('.pdf'):
             self.images.append(image)
             image = image.replace('.pdf', '.jpg')
