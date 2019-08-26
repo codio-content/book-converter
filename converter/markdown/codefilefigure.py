@@ -12,12 +12,15 @@ code_re = re.compile(r"""\\codefilefigure(\[(?P<guid>.*?)])?{(?P<file_path>.*?)}
 
 
 class CodeFigure(TextAsParagraph):
-    def __init__(self, latex_str, caret_token, percent_token, load_workspace_file):
+    def __init__(self, latex_str, caret_token, percent_token, load_workspace_file, figure_counter_offset, chapter_num):
         super().__init__(latex_str, caret_token)
         self._load_file = load_workspace_file
         self._percent_token = percent_token
         self._matches = []
         self._source_codes = []
+        self._figure_counter = 0
+        self._figure_counter_offset = figure_counter_offset
+        self._chapter_num = chapter_num
 
     def make_block(self, matchobj):
         file_path = matchobj.group('file_path')
@@ -35,7 +38,12 @@ class CodeFigure(TextAsParagraph):
         file_content = re.sub(r"%", self._percent_token, file_content)
         file_content = re.sub(r"\n", self._caret_token, file_content)
 
-        return f'{caret_token}**source:{file_path}**{caret_token}' \
+        self._figure_counter += 1
+        caption = '**Figure {}.{}**'.format(
+            self._chapter_num, self._figure_counter + self._figure_counter_offset
+        )
+
+        return f'{caret_token}{caption}{caret_token}**source:{file_path}**{caret_token}' \
             f'```code{caret_token}{file_content}{caret_token}```{caret_token}{replace_token}'
 
     def remove_matched_token(self, output, chars):
@@ -66,4 +74,4 @@ class CodeFigure(TextAsParagraph):
         for token in self._matches:
             output = self.remove_matched_token(output, token)
 
-        return output, self._source_codes
+        return output, self._source_codes, self._figure_counter

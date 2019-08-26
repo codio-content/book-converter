@@ -1,6 +1,7 @@
 import yaml
-from collections import OrderedDict
+import re
 
+from collections import OrderedDict
 from pathlib import Path
 
 from converter.convert import get_latex_toc
@@ -86,6 +87,15 @@ def make_refs(toc, chapter_counter_from=1):
                 is_exercise = True
             elif line.startswith("\\end{exercise}"):
                 is_exercise = False
+            elif "figure{" in line:
+                result = re.match(r'\\(?P<block_name>pic|table|codefile)figure{(?P<path>.*?)\}{(?P<ref>.*?)\}', line)
+                if result:
+                    ref = result.group('ref')
+                    figs_counter += 1
+                    refs[ref] = {
+                        'pageref': item.section_name
+                    }
+                    refs[ref]["ref"] = f'{chapter_counter}.{figs_counter}'
             elif "\\label{" in line:
                 start_pos = line.find("\\label{")
                 end_pos = line.find("}", start_pos)

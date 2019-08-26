@@ -70,7 +70,12 @@ class LaTeX2Markdown(object):
     def _latex_to_markdown(self):
         output = self._latex_string
 
-        output = TableFigure(output, self._caret_token, self._load_workspace_file).convert()
+        output, figure_counter = TableFigure(
+            output, self._caret_token, self._load_workspace_file,
+            self._figure_counter_offset, self._chapter_num
+        ).convert()
+        if figure_counter:
+            self._figure_counter += figure_counter
         output = Quotes(output).convert()
         output = Bold(output).convert()
         output = Italic(output).convert()
@@ -82,9 +87,12 @@ class LaTeX2Markdown(object):
         ).convert()
         if source_codes:
             self._source_codes.extend(source_codes)
-        output, source_codes = CodeFigure(
-            output, self._caret_token, self._percent_token, self._load_workspace_file
+        output, source_codes, figure_counter = CodeFigure(
+            output, self._caret_token, self._percent_token, self._load_workspace_file,
+            self._figure_counter_offset, self._chapter_num
         ).convert()
+        if figure_counter:
+            self._figure_counter += figure_counter
         if source_codes:
             self._source_codes.extend(source_codes)
         output, source_codes = CodeFile(
@@ -113,14 +121,20 @@ class LaTeX2Markdown(object):
         output = Chips(output, self._caret_token).convert()
         output = Cleanup(output).convert()
 
-        output, images = PicFigure(output, self._detect_asset_ext).convert()
+        output, images, figure_counter = PicFigure(
+            output, self._caret_token, self._detect_asset_ext, self._figure_counter_offset, self._chapter_num
+        ).convert()
+        if figure_counter:
+            self._figure_counter += figure_counter
         if images:
             self._pdfs.extend(images)
-        output, images = Figure(
+        output, images, figure_counter = Figure(
             output, self._figure_counter_offset, self._chapter_num, self._detect_asset_ext, self._caret_token
         ).convert()
         if images:
             self._pdfs.extend(images)
+        if figure_counter:
+            self._figure_counter += figure_counter
         output, images = Sidebar(output, self._detect_asset_ext, self._caret_token).convert()
         if images:
             self._pdfs.extend(images)

@@ -294,3 +294,6 @@ class TestSuite(unittest.TestCase):
 
     def test_tabularx(self):
         self.run_case("tabularx")
+
+    def test_twoicons(self):
+        self.run_case("twoicons")
