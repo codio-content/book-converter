@@ -76,7 +76,7 @@ class LaTeX2Markdown(object):
 
         output, figure_counter = TableFigure(
             output, self._caret_token, self._load_workspace_file,
-            self._figure_counter_offset, self._chapter_num
+            self._figure_counter_offset, self._chapter_num, self._refs
         ).convert()
         if figure_counter:
             self.increment_figure_counter(figure_counter)
@@ -93,7 +93,7 @@ class LaTeX2Markdown(object):
             self._source_codes.extend(source_codes)
         output, source_codes, figure_counter = CodeFigure(
             output, self._caret_token, self._percent_token, self._load_workspace_file,
-            self._figure_counter_offset, self._chapter_num
+            self._figure_counter_offset, self._chapter_num, self._refs
         ).convert()
         if figure_counter:
             self.increment_figure_counter(figure_counter)
@@ -126,7 +126,8 @@ class LaTeX2Markdown(object):
         output = Cleanup(output).convert()
 
         output, images, figure_counter = PicFigure(
-            output, self._caret_token, self._detect_asset_ext, self._figure_counter_offset, self._chapter_num
+            output, self._caret_token, self._detect_asset_ext,
+            self._figure_counter_offset, self._chapter_num, self._refs
         ).convert()
         if figure_counter:
             self.increment_figure_counter(figure_counter)
