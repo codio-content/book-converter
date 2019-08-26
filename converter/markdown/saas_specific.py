@@ -12,6 +12,13 @@ class SaasSpecific(TextAsParagraph):
                                          learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*\})?""",
                                          flags=re.DOTALL + re.VERBOSE)
 
+        self._saas_2icons_re = re.compile(
+            r"""\\twoicons(\[.*?\])?
+            {(dry|reuse|codegen|concise|coc|legacy|beauty|tool|learnbydoing|automation|curric|idio|lookout)\}
+            {(dry|reuse|codegen|concise|coc|legacy|beauty|tool|learnbydoing|automation|curric|idio|lookout)\}""",
+            flags=re.DOTALL + re.VERBOSE
+        )
+
         self._new_re = re.compile(r"""\\begin{NEW}(?P<block_contents>.*?)\\end{NEW}""",
                                   flags=re.DOTALL + re.VERBOSE)
 
@@ -41,5 +48,6 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\textbar({\})?", r"|", output)
         output = re.sub(r"\\hrule", "<hr>", output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)
+        output = self._saas_2icons_re.sub(self._saas_icons_block, output)
         output = self._new_re.sub(self.make_block, output)
         return output
