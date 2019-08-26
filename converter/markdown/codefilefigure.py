@@ -46,9 +46,9 @@ class CodeFigure(TextAsParagraph):
         caption = '**Figure {}.{}**'.format(
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
-        if self._refs.get(label, ''):
+        if self._refs.get(label, {}):
             caption = '**Figure {}**'.format(
-                self._refs.get(label, '')
+                self._refs.get(label).get('ref')
             )
 
         return f'{caret_token}{caption}{caret_token}**source:{file_path}**{caret_token}' \

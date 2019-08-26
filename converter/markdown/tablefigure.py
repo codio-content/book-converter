@@ -30,9 +30,9 @@ class TableFigure(TextAsParagraph):
         caption = '**Figure {}.{}**'.format(
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
-        if self._refs.get(label, ''):
+        if self._refs.get(label, {}):
             caption = '**Figure {}**'.format(
-                self._refs.get(label, '')
+                self._refs.get(label).get('ref')
             )
 
         return f'{file_content}{caret_token}{caret_token}{caption}{caret_token}{caret_token}{replace_token}'
