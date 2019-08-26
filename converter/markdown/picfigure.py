@@ -26,7 +26,7 @@ class PicFigure(TextAsParagraph):
             self.images.append(image)
             image = image.replace('.pdf', '.jpg')
         self._figure_counter += 1
-        caption = 'Figure {}.{} '.format(
+        caption = '**Figure {}.{}**'.format(
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
         caret_token = self._caret_token

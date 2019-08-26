@@ -39,7 +39,7 @@ class CodeFigure(TextAsParagraph):
         file_content = re.sub(r"\n", self._caret_token, file_content)
 
         self._figure_counter += 1
-        caption = 'Figure {}.{} '.format(
+        caption = '**Figure {}.{}**'.format(
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
 

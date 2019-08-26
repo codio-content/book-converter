@@ -24,7 +24,7 @@ Combining the advantages to the customer and the developer together explains why
 
 file content
 
-Figure 1.1 
+**Figure 1.1**
 
  Examples of SaaS programming frameworks and the programming languages they are written in
 

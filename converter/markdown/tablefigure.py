@@ -25,7 +25,7 @@ class TableFigure(TextAsParagraph):
         self._matches.append(replace_token)
 
         self._figure_counter += 1
-        caption = 'Figure {}.{} '.format(
+        caption = '**Figure {}.{}**'.format(
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
 
