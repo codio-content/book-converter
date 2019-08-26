@@ -36,4 +36,4 @@ class Exercise(TextAsParagraph):
 
         output = self._exercise_re.sub(self._exercise_block, output)
 
-        return output
+        return output, self._exercise_counter

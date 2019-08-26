@@ -8,16 +8,18 @@ table_re = re.compile(r"""\\tablefigure{(?P<file_path>.*?)}{(?P<label>.*?)}""",
 
 
 class TableFigure(TextAsParagraph):
-    def __init__(self, latex_str, caret_token, load_workspace_file, figure_counter_offset, chapter_num):
+    def __init__(self, latex_str, caret_token, load_workspace_file, figure_counter_offset, chapter_num, refs):
         super().__init__(latex_str, caret_token)
         self._load_file = load_workspace_file
         self._matches = []
         self._figure_counter = 0
         self._figure_counter_offset = figure_counter_offset
         self._chapter_num = chapter_num
+        self._refs = refs
 
     def make_block(self, matchobj):
         file_path = matchobj.group('file_path')
+        label = matchobj.group('label')
         file_content = self._load_file(file_path)
         caret_token = self._caret_token
         replace_token = str(uuid.uuid4())
@@ -28,6 +30,10 @@ class TableFigure(TextAsParagraph):
         caption = '**Figure {}.{}**'.format(
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
+        if self._refs.get(label, {}):
+            caption = '**Figure {}**'.format(
+                self._refs.get(label).get('ref')
+            )
 
         return f'{file_content}{caret_token}{caret_token}{caption}{caret_token}{caret_token}{replace_token}'
 

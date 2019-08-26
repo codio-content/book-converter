@@ -67,15 +67,19 @@ class LaTeX2Markdown(object):
         self._detect_asset_ext = detect_asset_ext
         self._load_workspace_file = load_workspace_file
 
+    def increment_figure_counter(self, figure_counter):
+        self._figure_counter += figure_counter
+        self._figure_counter_offset += figure_counter
+
     def _latex_to_markdown(self):
         output = self._latex_string
 
         output, figure_counter = TableFigure(
             output, self._caret_token, self._load_workspace_file,
-            self._figure_counter_offset, self._chapter_num
+            self._figure_counter_offset, self._chapter_num, self._refs
         ).convert()
         if figure_counter:
-            self._figure_counter += figure_counter
+            self.increment_figure_counter(figure_counter)
         output = Quotes(output).convert()
         output = Bold(output).convert()
         output = Italic(output).convert()
@@ -89,10 +93,10 @@ class LaTeX2Markdown(object):
             self._source_codes.extend(source_codes)
         output, source_codes, figure_counter = CodeFigure(
             output, self._caret_token, self._percent_token, self._load_workspace_file,
-            self._figure_counter_offset, self._chapter_num
+            self._figure_counter_offset, self._chapter_num, self._refs
         ).convert()
         if figure_counter:
-            self._figure_counter += figure_counter
+            self.increment_figure_counter(figure_counter)
         if source_codes:
             self._source_codes.extend(source_codes)
         output, source_codes = CodeFile(
@@ -122,10 +126,11 @@ class LaTeX2Markdown(object):
         output = Cleanup(output).convert()
 
         output, images, figure_counter = PicFigure(
-            output, self._caret_token, self._detect_asset_ext, self._figure_counter_offset, self._chapter_num
+            output, self._caret_token, self._detect_asset_ext,
+            self._figure_counter_offset, self._chapter_num, self._refs
         ).convert()
         if figure_counter:
-            self._figure_counter += figure_counter
+            self.increment_figure_counter(figure_counter)
         if images:
             self._pdfs.extend(images)
         output, images, figure_counter = Figure(
@@ -134,7 +139,7 @@ class LaTeX2Markdown(object):
         if images:
             self._pdfs.extend(images)
         if figure_counter:
-            self._figure_counter += figure_counter
+            self.increment_figure_counter(figure_counter)
         output, images = Sidebar(output, self._detect_asset_ext, self._caret_token).convert()
         if images:
             self._pdfs.extend(images)
@@ -142,9 +147,11 @@ class LaTeX2Markdown(object):
         if images:
             self._pdfs.extend(images)
 
-        output = Exercise(
+        output, exercise_counter = Exercise(
             output, self._exercise_counter_offset, self._chapter_num, self._remove_exercise, self._caret_token
         ).convert()
+        if exercise_counter:
+            self._exercise_counter += exercise_counter
         output = EqnArray(output).convert()
         output = Screencast(output, self._caret_token).convert()
 
