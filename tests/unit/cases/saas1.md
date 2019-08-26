@@ -82,7 +82,8 @@ This observation led to a software development lifecycle developed in the 1980s 
 1. Develop and verify the prototype for this iteration
 1. Plan the next iteration
 
-![The Spiral lifecycle combines Waterfall with prototyping. It starts at the center, with each iteration around the spiral going through the four phases and resulting in a revised prototype until the product is ready for release.](ch_intro/figs/Spiral.jpg)  
+![The Spiral lifecycle combines Waterfall with prototyping. It starts at the center, with each iteration around the spiral going through the four phases and resulting in a revised prototype until the product is ready for release.](ch_intro/figs/Spiral.jpg)
+Figure 1.1 
 The Spiral lifecycle combines Waterfall with prototyping. It starts at the center, with each iteration around the spiral going through the four phases and resulting in a revised prototype until the product is ready for release.
 
 Rather than document all the requirements at the beginning, as in the Waterfall model, the requirement documents are developed across the iteration as they are needed and evolve with the project. Iterations involve the customer before the product is completed, which reduces chances of misunderstandings. However, as originally envisioned, these iterations were 6 to 24 months long, so there is plenty of time for customers to change their minds during an iteration! Thus, Spiral still relies on planning and extensive documentation, but the plan is expected to evolve on each iteration.
@@ -121,7 +122,8 @@ In addition to the dynamically changing phases of the project, RUP identifies si
 
 These disciplines are more static than the phases, in that they nominally exist over the whole lifetime of the project. However, some disciplines get used more in earlier phases (like business modeling), some periodically throughout the process (like test), and some more towards the end (deployment). Figure fig:RUP shows the relationship of the phases and the disciplines, with the area indicating the amount of effort in each discipline over time.
 
-![The Rational Unified Process lifecycle allows the project to have multiple iterations in each phase and identifies the skills needed by the project team, which vary in effort over time. RUP also has three “supporting disciplines” not shown in this figure: Configuration and Change Management, Project Management, and Environment. (Image from Wikipedia Commons by Dutchgilder.)](ch_intro/figs/RUP.jpg)  
+![The Rational Unified Process lifecycle allows the project to have multiple iterations in each phase and identifies the skills needed by the project team, which vary in effort over time. RUP also has three “supporting disciplines” not shown in this figure: Configuration and Change Management, Project Management, and Environment. (Image from Wikipedia Commons by Dutchgilder.)](ch_intro/figs/RUP.jpg)
+Figure 1.2 
 The Rational Unified Process lifecycle allows the project to have multiple iterations in each phase and identifies the skills needed by the project team, which vary in effort over time. RUP also has three “supporting disciplines” not shown in this figure: Configuration and Change Management, Project Management, and Environment. (Image from Wikipedia Commons by Dutchgilder.)
 
 

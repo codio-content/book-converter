@@ -68,4 +68,4 @@ class Figure(TextAsParagraph):
 
         output = self._figure_re.sub(self._figure_block, output)
 
-        return output, self._pdfs
+        return output, self._pdfs, self._figure_counter
