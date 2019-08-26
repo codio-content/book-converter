@@ -70,7 +70,7 @@ ch_arch/tables/css_cheat
 Using this new information, Figure fig:10k  expands steps 2 and 3 from the previous section's summary of how SaaS works.
 
 ![SaaS from 10,000 feet.  Compared to Figure fig:50k, step 2 has been expanded to describe the content returned by the Web server, and step 3 has been expanded to describe the role of CSS in how the Web browser renders the content.](ch_arch/figs/saas10k.jpg)
-**Figure 1.1**
+**Figure 1.3**
 SaaS from 10,000 feet.  Compared to Figure fig:50k, step 2 has been expanded to describe the content returned by the Web server, and step 3 has been expanded to describe the role of CSS in how the Web browser renders the content.
 
 CSS provides for sophisticated layout behaviors, but can be tricky to use in 2 regards. First, some background in layout and graphic design is helpful in deciding how to style site elements - spacing, typography, color palette. Second, even if you know what you want the site to look like, it can be tricky to write the necessary CSS to achieve complex layouts, in which elements may "float" to the far left or far right of the page while text flows around them, or rearrange themselves responsively when the screen geometry changes (browser window resized, phone rotates) to provide a defensible user experience on both desktop and mobile devices.
