@@ -25,9 +25,8 @@ Combining the advantages to the customer and the developer together explains why
 
 file content
 
-**Figure 1.1**
+**Figure 1.1:  Examples of SaaS programming frameworks and the programming languages they are written in**
 
- Examples of SaaS programming frameworks and the programming languages they are written in
 
 
 Unsurprisingly, given the popularity of SaaS, Figure fig:SaaS_frameworks lists the many programming frameworks that claim to help.   In this book, we use Ruby on Rails (“Rails”), although the ideas we cover will work with other programming frameworks as well. We chose Rails because it came from a community that had already embraced the Agile lifecycle, so the tools support Agile particularly well.
