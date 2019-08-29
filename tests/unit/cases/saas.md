@@ -12,21 +12,21 @@ The power of SOA combined with the power of the Internet led to a special case o
 1. Only a single copy of the server software runs in a uniform, tightly-controlled hardware and operating system environment selected by the developer, which avoids the compatibility hassles of distributing binaries that must run on wide-ranging computers and operating systems. In addition, developers can test new versions of the application on a small fraction of the real customers temporarily without disturbing most customers. (If the SaaS client runs in a browser, there still are compatibility challenges, which we describe in Chapter chap:arch.) 
 
 |||info
-## SaaS: Innovate or Die?
-Lest you think the perceived need to improve a successful service is just software engineering paranoia, the most popular search engine used to be AltaVista and the most popular social networking site used to be MySpace.
+**SaaS: Innovate or Die?** Lest you think the perceived need to improve a successful service is just software engineering paranoia, the most popular search engine used to be AltaVista and the most popular social networking site used to be MySpace.
 |||
 
 
 1. SaaS companies compete regularly on bringing out new features to help ensure that their customers do not abandon them for a competitor who offers a better service.
 1. Since only developers have a copy of the software, they can upgrade the software and underlying hardware frequently as long as they don't violate the external application program interfaces (API). Moreover, developers don't need to annoy users with the seemingly endless requests for permission to upgrade their applications.
 
+
+
 Combining the advantages to the customer and the developer together explains why SaaS is rapidly growing and why traditional software products are increasingly being transformed to offer SaaS versions. An example of the latter is Microsoft Office 365, which allows you to use the popular Word, Excel, and PowerPoint productivity programs as a remote service by paying for use rather than pre-purchasing software and installing it on your local computer. Another example is TurboTax Online, which offers the same deal for another shrink-wrap standard-bearer.
 
 file content
 
-**Figure 1.1**
+**Figure 1.1:  Examples of SaaS programming frameworks and the programming languages they are written in**
 
- Examples of SaaS programming frameworks and the programming languages they are written in
 
 
 Unsurprisingly, given the popularity of SaaS, Figure fig:SaaS_frameworks lists the many programming frameworks that claim to help.   In this book, we use Ruby on Rails (“Rails”), although the ideas we cover will work with other programming frameworks as well. We chose Rails because it came from a community that had already embraced the Agile lifecycle, so the tools support Agile particularly well.
@@ -61,7 +61,9 @@ Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar
 1. Users cooperating: Documents.
 1. Large/changing datasets: Search, Maps, News, and YouTube.
 1. Software centralized in single environment: Search.
-1. No field upgrades when improve app: Documents.</details>
+1. No field upgrades when improve app: Documents.
+
+</details>
 
 |||
 

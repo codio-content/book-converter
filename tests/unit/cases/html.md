@@ -62,9 +62,8 @@ There are four basic mechanisms by which a selector in a CSS file can match an H
 
 ch_arch/tables/css_cheat
 
-**Figure 1.1**
+**Figure 1.1:  A few CSS constructs, including those explained in Screencast css-intro.  The top table shows some CSS *selectors*, which identify the elements to be styled; the bottom table shows a few of the many attributes, whose names are usually self-explanatory, and example values they can be assigned.  Not all attributes are valid on all elements.**
 
- A few CSS constructs, including those explained in Screencast css-intro.  The top table shows some CSS *selectors*, which identify the elements to be styled; the bottom table shows a few of the many attributes, whose names are usually self-explanatory, and example values they can be assigned.  Not all attributes are valid on all elements.
 
 
 Using this new information, Figure fig:10k  expands steps 2 and 3 from the previous section's summary of how SaaS works.
@@ -99,6 +98,8 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 * _**Cascading Style Sheets**_ (CSS) is a stylesheet language describing visual attributes of elements on a Web page.  A stylesheet associates sets of visual properties with  selectors.  A special **link** element inside the **head** element of an HTML document associates a stylesheet with that document.
 * The “developer tools” in each browser, such as the Firefox Web Developer toolbar, are invaluable in peeking under the hood to examine both the structure of a page and its stylesheets.
 
+
+
 ---
 
 
@@ -115,8 +116,7 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 
 |||info
-## GitHub Gists
-make it easy to copy-and-paste the code.
+**GitHub Gists** make it easy to copy-and-paste the code.
 |||
 
 

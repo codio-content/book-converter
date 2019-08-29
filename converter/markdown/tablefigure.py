@@ -27,15 +27,15 @@ class TableFigure(TextAsParagraph):
         self._matches.append(replace_token)
 
         self._figure_counter += 1
-        caption = '**Figure {}.{}**'.format(
+        caption = '**Figure {}.{}: '.format(
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
         if self._refs.get(label, {}):
-            caption = '**Figure {}**'.format(
+            caption = '**Figure {}: '.format(
                 self._refs.get(label).get('ref')
             )
 
-        return f'{file_content}{caret_token}{caret_token}{caption}{caret_token}{caret_token}{replace_token}'
+        return f'{file_content}{caret_token}{caret_token}{caption}{replace_token}'
 
     def remove_matched_token(self, output, chars):
         pos = output.find(chars)
@@ -48,7 +48,10 @@ class TableFigure(TextAsParagraph):
             ch = output[index]
             if ch == '}':
                 if level == 0:
-                    output = output[0:pos] + output[pos + token_len:index - 1] + output[index + 1:]
+                    caret_token = self._caret_token
+                    content = output[pos + token_len:index - 1]
+                    content = content.strip()
+                    output = output[0:pos] + content + "**" + caret_token + output[index + 1:]
                     break
                 else:
                     level += 1

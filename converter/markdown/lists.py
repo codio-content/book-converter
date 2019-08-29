@@ -100,16 +100,11 @@ class Lists(TextAsParagraph):
         formatted_contents = self.to_paragraph(formatted_contents)
 
         header = self._format_block_name(block_name, block_title)
+        caret_token = self._caret_token
 
-        output_str = "{header}{caret_token}{caret_token}{block_contents}".format(
-            header=header,
-            block_contents=formatted_contents,
-            caret_token=self._caret_token
-        )
+        output_str = f"{header}{caret_token}{caret_token}{formatted_contents}{caret_token}{caret_token}"
         if block_name == "description":
-            output_str = "{header}{block_contents}".format(
-                header=header,
-                block_contents=formatted_contents)
+            output_str = f"{header}{formatted_contents}{caret_token}{caret_token}"
         return output_str
 
     def convert(self):

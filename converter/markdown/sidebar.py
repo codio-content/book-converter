@@ -44,8 +44,8 @@ class Sidebar(TextAsParagraph):
 
         caret_token = self._caret_token
         if title:
-            return f'{caret_token}{caret_token}|||info{caret_token}## {title}' \
-                f'{caret_token}{block_contents}{caret_token}|||{caret_token}{caret_token}'
+            return f'{caret_token}{caret_token}|||info{caret_token}**{title}** ' \
+                f'{block_contents}{caret_token}|||{caret_token}{caret_token}'
 
         return f'{caret_token}{caret_token}|||info{caret_token}{block_contents}' \
             f'{caret_token}{caret_token}|||{caret_token}{caret_token}'
@@ -70,9 +70,11 @@ class Sidebar(TextAsParagraph):
         caret_token = self._caret_token
 
         if block_name:
-            block_name = block_name.strip()
-            return f'**{block_name}** {block_contents}{caret_token}{image_src}{caret_token}'
-        return f'{block_contents}{caret_token}{image_src}{caret_token}'
+            return f'{caret_token}{caret_token}|||xdiscipline{caret_token}**{block_name}** ' \
+                f'{block_contents}{caret_token}{image_src}{caret_token}|||{caret_token}{caret_token}'
+
+        return f'{caret_token}{caret_token}|||xdiscipline{caret_token}{block_contents}' \
+            f'{caret_token}{image_src}{caret_token}|||{caret_token}{caret_token}'
 
     def convert(self):
         output = self.str
