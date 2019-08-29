@@ -1,6 +1,5 @@
 |||info
-## printf debugging
-is an old name for this technique, from the C library function that prints a string on the terminal.
+**printf debugging** is an old name for this technique, from the C library function that prints a string on the terminal.
 |||
 
 
@@ -8,8 +7,7 @@ is an old name for this technique, from the C library function that prints a str
 
 
 |||info
-## PERT
-stands for Program Evaluation and Review Technique, which was invented by the US Navy in the 1950s for its nuclear submarine program.
+**PERT** stands for Program Evaluation and Review Technique, which was invented by the US Navy in the 1950s for its nuclear submarine program.
 |||
 
 

@@ -3,8 +3,7 @@
 
 
 |||info
-## Tracker intro
-Pivotal Labs has produced an [excellent 3-minute video intro](http://www.youtube.com/watch?v=mTYcHg51sWY) to using Tracker.
+**Tracker intro** Pivotal Labs has produced an [excellent 3-minute video intro](http://www.youtube.com/watch?v=mTYcHg51sWY) to using Tracker.
 |||
 
 

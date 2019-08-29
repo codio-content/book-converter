@@ -12,8 +12,7 @@ The power of SOA combined with the power of the Internet led to a special case o
 1. Only a single copy of the server software runs in a uniform, tightly-controlled hardware and operating system environment selected by the developer, which avoids the compatibility hassles of distributing binaries that must run on wide-ranging computers and operating systems. In addition, developers can test new versions of the application on a small fraction of the real customers temporarily without disturbing most customers. (If the SaaS client runs in a browser, there still are compatibility challenges, which we describe in Chapter chap:arch.) 
 
 |||info
-## SaaS: Innovate or Die?
-Lest you think the perceived need to improve a successful service is just software engineering paranoia, the most popular search engine used to be AltaVista and the most popular social networking site used to be MySpace.
+**SaaS: Innovate or Die?** Lest you think the perceived need to improve a successful service is just software engineering paranoia, the most popular search engine used to be AltaVista and the most popular social networking site used to be MySpace.
 |||
 
 

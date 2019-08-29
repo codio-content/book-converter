@@ -115,8 +115,7 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 
 |||info
-## GitHub Gists
-make it easy to copy-and-paste the code.
+**GitHub Gists** make it easy to copy-and-paste the code.
 |||
 
 
