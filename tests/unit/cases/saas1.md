@@ -49,6 +49,8 @@ An early version of this Plan-and-Document software development process was deve
 1. Verification
 1. Operation and Maintenance
 
+
+
 Given that the earlier you find an error the cheaper it is to fix, the philosophy of this process is to complete a phase before going on to the next one, thereby removing as many errors as early as possible. Getting the early phases right could also prevent unnecessary work downstream. As this process could take years, the extensive documentation helps to ensure that important information is not lost if a person leaves the project and that new people can get up to speed quickly when they join the project.
 
 Because it flows from the top down to completion, this process is called the _**Waterfall**_ software development process or Waterfall software development _**lifecycle**_. Understandably, given the complexity of each stage in the Waterfall lifecycle, product releases are major events toward which engineers worked feverishly and which are accompanied by much fanfare.
@@ -80,6 +82,8 @@ This observation led to a software development lifecycle developed in the 1980s 
 1. Develop and verify the prototype for this iteration
 1. Plan the next iteration
 
+
+
 ![The Spiral lifecycle combines Waterfall with prototyping. It starts at the center, with each iteration around the spiral going through the four phases and resulting in a revised prototype until the product is ready for release.](ch_intro/figs/Spiral.jpg)
 **Figure 1.1**
 The Spiral lifecycle combines Waterfall with prototyping. It starts at the center, with each iteration around the spiral going through the four phases and resulting in a revised prototype until the product is ready for release.
@@ -104,6 +108,8 @@ Like Waterfall and Spiral, RUP has phases:
 1. Construction: codes and tests the product, resulting in the first external release.
 1. Transition: moves the product from development to production in the real environment, including customer acceptance testing and user training.
 
+
+
 Unlike Waterfall, each phase involves iteration. For example, a project might have one inception phase iteration, two elaboration phase iterations, four construction phase iterations, and two transition phase iterations. Like Spiral, a project could also iterate across all four phases repeatedly.
 
 In addition to the dynamically changing phases of the project, RUP identifies six “engineering disciplines” (also known as workflows) that people working on the project should collectively cover:
@@ -116,6 +122,8 @@ In addition to the dynamically changing phases of the project, RUP identifies si
 1. Implementation
 1. Test
 1. Deployment
+
+
 
 These disciplines are more static than the phases, in that they nominally exist over the whole lifetime of the project. However, some disciplines get used more in earlier phases (like business modeling), some periodically throughout the process (like test), and some more towards the end (deployment). Figure fig:RUP shows the relationship of the phases and the disciplines, with the area indicating the amount of effort in each discipline over time.
 
@@ -160,4 +168,6 @@ The Software Engineering Institute at Carnegie Mellon University proposed the _*
 1. Defined---Defined and documented standard processes that improve over time.
 1. Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
 1. Optimizing---Deliberate process optimization improvements as part of management process.
+
+
 CMM implicitly encourages an organization to move up the CMM levels. While not proposed as a software development methodology, many consider it one. For example,  (Nawrocki02) compares CMM Level 2 to the Agile software methodology (see next section).

@@ -99,6 +99,8 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 * _**Cascading Style Sheets**_ (CSS) is a stylesheet language describing visual attributes of elements on a Web page.  A stylesheet associates sets of visual properties with  selectors.  A special **link** element inside the **head** element of an HTML document associates a stylesheet with that document.
 * The “developer tools” in each browser, such as the Firefox Web Developer toolbar, are invaluable in peeking under the hood to examine both the structure of a page and its stylesheets.
 
+
+
 ---
 
 

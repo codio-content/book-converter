@@ -17,5 +17,7 @@ ch_bdd/code/unmeasurablefeature.rb
 1. Why does it matter if they enjoy the show more? I think we will sell more tickets.
 1. Why do you want to sell more tickets? Because then the theater makes more money.
 1. Why does theater want to make more money? We want to make more money so that we don't go out of business.
-1. Why does it matter that theater is in business next year? If not, I have no job. (We're pretty sure the business value is now apparent to at least one stakeholder!)
+1. Why does it matter that theater is in business next year? If not, I have no job.
+
+ (We're pretty sure the business value is now apparent to at least one stakeholder!)
 * *Timeboxed.* Timeboxing means that you stop developing a story once you've exceeded the time budget. Either you give up, divide the user story into smaller ones, or reschedule what is left according to a new estimate. If dividing looks like it won't help, then you go back to the customers to find the highest value part of the story that you can do quickly. The reason for a time budget per user story is that it is extremely easy to underestimate the length of a software project. Without careful accounting of each iteration, the whole project could be late, and thus fail. Learning to budget a software project is a critical skill, and exceeding a story budget and then refactoring it is one way to acquire that skill.

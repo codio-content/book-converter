@@ -19,6 +19,8 @@ The power of SOA combined with the power of the Internet led to a special case o
 1. SaaS companies compete regularly on bringing out new features to help ensure that their customers do not abandon them for a competitor who offers a better service.
 1. Since only developers have a copy of the software, they can upgrade the software and underlying hardware frequently as long as they don't violate the external application program interfaces (API). Moreover, developers don't need to annoy users with the seemingly endless requests for permission to upgrade their applications.
 
+
+
 Combining the advantages to the customer and the developer together explains why SaaS is rapidly growing and why traditional software products are increasingly being transformed to offer SaaS versions. An example of the latter is Microsoft Office 365, which allows you to use the popular Word, Excel, and PowerPoint productivity programs as a remote service by paying for use rather than pre-purchasing software and installing it on your local computer. Another example is TurboTax Online, which offers the same deal for another shrink-wrap standard-bearer.
 
 file content
@@ -60,7 +62,9 @@ Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar
 1. Users cooperating: Documents.
 1. Large/changing datasets: Search, Maps, News, and YouTube.
 1. Software centralized in single environment: Search.
-1. No field upgrades when improve app: Documents.</details>
+1. No field upgrades when improve app: Documents.
+
+</details>
 
 |||
 
