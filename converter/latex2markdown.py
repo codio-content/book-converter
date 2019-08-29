@@ -116,7 +116,7 @@ class LaTeX2Markdown(object):
 
         output = InlineMath(output).convert()
         output = CheckYouself(output, self._caret_token).convert()
-        output = Cite(output).convert()
+        output = Cite(output, self._load_workspace_file).convert()
         output = Consents(output, self._caret_token).convert()
         output = Elaboration(output, self._caret_token).convert()
         output = Fallacy(output, self._caret_token).convert()
