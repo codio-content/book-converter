@@ -42,14 +42,13 @@ class Cite(object):
                                     key = sub_items[0].strip().lower()
                                     if value.startswith('{'):
                                         value = get_text_in_brackets(value)
+                                    value = ' '.join(value.split('\n'))
                                     bib_entry[key] = value
                             Cite._bib_file[ref.lower()] = bib_entry
                             return ''
                         match_block(token, content, make_bib_content)
                 except BaseException as e:
                     logging.error('can not process bibfile', e)
-
-            print('Cite._bib_file', Cite._bib_file)
 
     def make_bib_block(self, matchobj):
         type = matchobj.group('type')
