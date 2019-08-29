@@ -71,10 +71,10 @@ class Sidebar(TextAsParagraph):
 
         if block_name:
             return f'{caret_token}{caret_token}|||xdiscipline{caret_token}{block_name}' \
-                f' {block_contents}{caret_token}|||{caret_token}{caret_token}'
+                f' {block_contents}{caret_token}{image_src}{caret_token}|||{caret_token}{caret_token}'
 
         return f'{caret_token}{caret_token}|||xdiscipline{caret_token}{block_contents}' \
-            f'{caret_token}{caret_token}|||{caret_token}{caret_token}'
+            f'{caret_token}{image_src}{caret_token}|||{caret_token}{caret_token}'
 
     def convert(self):
         output = self.str
