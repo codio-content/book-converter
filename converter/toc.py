@@ -128,6 +128,14 @@ def process_toc_lines(lines, tex_folder, parent_folder):
                 sub_toc = get_latex_toc(tex_folder, include_file(line))
             if sub_toc:
                 toc = toc + sub_toc
+            else:
+                r_file = input_file(line) if is_input(line) else include_file(line)
+                sub_content = get_include_lines(tex_folder, r_file)
+                if sub_content:
+                    item_lines.extend(sub_content)
+                    line_pos += len(sub_content)
+                    continue
+
         line_pos += 1
         if toc:
             item_lines.append(line)
@@ -136,15 +144,22 @@ def process_toc_lines(lines, tex_folder, parent_folder):
     return toc
 
 
-def get_latex_toc(tex_folder, tex_name):
+def get_include_lines(tex_folder, tex_name):
     a_path = tex_folder.joinpath(tex_name).resolve()
     if not str(a_path).endswith(".tex"):
         a_path = tex_folder.joinpath("{}.tex".format(tex_name)).resolve()
     if not a_path.exists():
         return None
     with open(a_path, 'r', errors='replace') as file:
-        lines = file.readlines()
-        return process_toc_lines(lines, tex_folder, a_path.parent)
+        return file.readlines()
+
+
+def get_latex_toc(tex_folder, tex_name):
+    lines = get_include_lines(tex_folder, tex_name)
+    if not lines:
+        return None
+    a_path = tex_folder.joinpath(tex_name).resolve()
+    return process_toc_lines(lines, tex_folder, a_path.parent)
 
 
 def process_bookdown_lines(lines, name_without_ext):
