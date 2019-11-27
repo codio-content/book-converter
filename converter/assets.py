@@ -54,6 +54,8 @@ def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path, b
                 image = Path(pdf.replace('.pdf', '.jpg'))
                 page = pages[0]
                 page.save(dst_folder.joinpath(image.name), 'JPEG')
+        except KeyboardInterrupt as e:
+            raise e
         except BaseException as e:
             logging.error("convert %s to jpg error" % pdf)
             logging.error(e)

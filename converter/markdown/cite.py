@@ -40,7 +40,7 @@ class Cite(object):
                                 if len(sub_items) > 1:
                                     value = sub_items[1].strip()
                                     key = sub_items[0].strip().lower()
-                                    if value.startswith('{'):
+                                    if value.startswith('{') or value.startswith('"{') or value.startswith('\'{'):
                                         value = get_text_in_brackets(value)
                                     value = ' '.join(value.split('\n'))
                                     bib_entry[key] = value

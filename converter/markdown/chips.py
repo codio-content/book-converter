@@ -11,12 +11,13 @@ class Chips(TextAsParagraph):
         super().__init__(latex_str, caret_token)
 
     def make_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        block_contents = self.to_paragraph(block_contents)
-        title = matchobj.group('title')
-        title = self.to_paragraph(title)
-        caret_token = self._caret_token
-        return f'## {title}{caret_token}{block_contents}{caret_token}'
+        # block_contents = matchobj.group('block_contents')
+        # block_contents = self.to_paragraph(block_contents)
+        # title = matchobj.group('title')
+        # title = self.to_paragraph(title)
+        # caret_token = self._caret_token
+        # return f'## {title}{caret_token}{block_contents}{caret_token}'
+        return ''
 
     def convert(self):
         return chips_re.sub(self.make_block, self.str)

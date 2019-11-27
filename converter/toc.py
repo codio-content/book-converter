@@ -74,7 +74,7 @@ def get_name(line):
                 break
             else:
                 level -= 1
-    return cleanup_name(line[start + 1:end])
+    return cleanup_name(line[start + 1:end]), line[end + 1:].strip()
 
 
 def get_bookdown_name(line):
@@ -116,11 +116,21 @@ def process_toc_lines(lines, tex_folder, parent_folder):
                     toc[len(toc) - 1].lines = item_lines
                 item_lines = []
             section_type = CHAPTER if is_chapter(line) else SECTION
-            toc.append(SectionItem(section_name=get_name(line), section_type=section_type, line_pos=line_pos))
+            section_name, additional_content_in_name = get_name(line)
+            toc.append(SectionItem(section_name=section_name, section_type=section_type, line_pos=line_pos))
             if is_section_file(line):
                 section_lines = get_section_lines(line, parent_folder)
                 for sub_line in section_lines:
-                    item_lines.append(sub_line.rstrip('\n'))
+                    if is_input(sub_line):
+                        sub_content = get_include_lines(tex_folder, input_file(sub_line))
+                        if sub_content:
+                            item_lines.extend(sub_content)
+                            line_pos += len(sub_content)
+                    else:
+                        item_lines.append(sub_line.rstrip('\n'))
+            elif additional_content_in_name:
+                item_lines.append(additional_content_in_name)
+                line_pos += 1
         elif is_input(line) or is_include(line):
             if is_input(line):
                 sub_toc = get_latex_toc(tex_folder, input_file(line))

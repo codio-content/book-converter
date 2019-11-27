@@ -2,7 +2,7 @@ import re
 
 from converter.markdown.text_as_paragraph import TextAsParagraph
 
-elaboration_re = re.compile(r"""\\begin{elaboration}{(?P<title>.*?)}(?P<block_contents>.*?)\\end{elaboration}""",
+elaboration_re = re.compile(r"""(\s+)?\\begin{elaboration}{(?P<title>.*?)}(?P<block_contents>.*?)\\end{elaboration}""",
                             flags=re.DOTALL + re.VERBOSE)
 
 

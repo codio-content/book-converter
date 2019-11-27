@@ -28,15 +28,15 @@ class PicFigure(TextAsParagraph):
             self.images.append(image)
             image = image.replace('.pdf', '.jpg')
         self._figure_counter += 1
-        caption = '**Figure {}.{}**'.format(
+        caption = '**<p style="font-size: 10px">Figure {}.{}'.format(
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
         if self._refs.get(label, {}):
-            caption = '**Figure {}**'.format(
+            caption = '**<p style="font-size: 10px">Figure {}'.format(
                 self._refs.get(label).get('ref')
             )
         caret_token = self._caret_token
-        return f"![{content}]({image}){caret_token}{caption}{caret_token}{content}"
+        return f"![{content}]({image}){caret_token}{caption}: {content}</p>**{caret_token}"
 
     def convert(self):
         self.images.clear()

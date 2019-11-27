@@ -64,14 +64,18 @@ class Sidebar(TextAsParagraph):
             self._pdfs.append(image)
             image = image.replace('.pdf', '.jpg')
 
-        image_src = "![{}]({})".format(block_name, image)
+        image_src = "<img alt='{}' src='{}' style='width:200px' />".format(block_name, image)
 
         block_contents = self.to_paragraph(block_contents)
         caret_token = self._caret_token
 
         if block_name:
+            block_name = block_name.strip()
             return f'{caret_token}{caret_token}|||xdiscipline{caret_token}**{block_name}** ' \
                 f'{block_contents}{caret_token}{image_src}{caret_token}|||{caret_token}{caret_token}'
+
+        if not block_contents:
+            return f'{caret_token}{image_src}{caret_token}'
 
         return f'{caret_token}{caret_token}|||xdiscipline{caret_token}{block_contents}' \
             f'{caret_token}{image_src}{caret_token}|||{caret_token}{caret_token}'

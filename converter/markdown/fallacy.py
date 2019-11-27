@@ -16,7 +16,7 @@ class Fallacy(TextAsParagraph):
         title = matchobj.group('title')
         title = self.to_paragraph(title)
         caret_token = self._caret_token
-        return f'## {title}{caret_token}{block_contents}'
+        return f'{caret_token}## {title}{caret_token}{block_contents}'
 
     def convert(self):
         return fallacy_re.sub(self.make_block, self.str)
