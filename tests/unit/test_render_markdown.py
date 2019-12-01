@@ -297,3 +297,6 @@ class TestSuite(unittest.TestCase):
 
     def test_twoicons(self):
         self.run_case("twoicons")
+
+    def test_turingwinner(self):
+        self.run_case("turingwinner")

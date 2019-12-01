@@ -1,4 +1,0 @@
-## Regular Expressions
-_**Regular expressions**_, sometimes abbreviated *regexps* or *regexes*, are sequences of characters that define a search pattern.  A regex can be applied to a string to determine whether the string contains those patterns.  Given the preponderance of string manipulation in interactive and Web applications, all modern programming languages support regexes either within the language or as part of a library.  This exercise will help you refresh your skills at constructing regular expressions.
-
-(Other skill “refreshers” needed?  Some general questions about encapsulation and inheritance, before moving on to concrete examples in Ruby?)

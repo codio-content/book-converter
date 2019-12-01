@@ -8,7 +8,7 @@
 
 |||xdiscipline
 **Grace Murray Hopper** (1906--1992) was one of the first programmers, developed the first compiler, and was referred to as “Amazing Grace.” She became a Rear Admiral in the US Navy, and in 1997, a warship was named for her: the USS Hopper.
-![Grace Murray Hopper](ch_backwards_forwards/figs/Hopper.png)
+<img alt='Grace Murray Hopper' src='ch_backwards_forwards/figs/Hopper.png' style='width:200px' />
 |||
 
 

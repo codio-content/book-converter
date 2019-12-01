@@ -62,15 +62,15 @@ There are four basic mechanisms by which a selector in a CSS file can match an H
 
 ch_arch/tables/css_cheat
 
-**Figure 1.1:  A few CSS constructs, including those explained in Screencast css-intro.  The top table shows some CSS *selectors*, which identify the elements to be styled; the bottom table shows a few of the many attributes, whose names are usually self-explanatory, and example values they can be assigned.  Not all attributes are valid on all elements.**
+**<p style="font-size: 10px">Figure 1.1:  A few CSS constructs, including those explained in Screencast css-intro.  The top table shows some CSS *selectors*, which identify the elements to be styled; the bottom table shows a few of the many attributes, whose names are usually self-explanatory, and example values they can be assigned.  Not all attributes are valid on all elements.</p>**
 
 
 
 Using this new information, Figure fig:10k  expands steps 2 and 3 from the previous section's summary of how SaaS works.
 
 ![SaaS from 10,000 feet.  Compared to Figure fig:50k, step 2 has been expanded to describe the content returned by the Web server, and step 3 has been expanded to describe the role of CSS in how the Web browser renders the content.](ch_arch/figs/saas10k.jpg)
-**Figure 1.3**
-SaaS from 10,000 feet.  Compared to Figure fig:50k, step 2 has been expanded to describe the content returned by the Web server, and step 3 has been expanded to describe the role of CSS in how the Web browser renders the content.
+**<p style="font-size: 10px">Figure 1.3: SaaS from 10,000 feet.  Compared to Figure fig:50k, step 2 has been expanded to describe the content returned by the Web server, and step 3 has been expanded to describe the role of CSS in how the Web browser renders the content.</p>**
+
 
 CSS provides for sophisticated layout behaviors, but can be tricky to use in 2 regards. First, some background in layout and graphic design is helpful in deciding how to style site elements - spacing, typography, color palette. Second, even if you know what you want the site to look like, it can be tricky to write the necessary CSS to achieve complex layouts, in which elements may "float" to the far left or far right of the page while text flows around them, or rearrange themselves responsively when the screen geometry changes (browser window resized, phone rotates) to provide a defensible user experience on both desktop and mobile devices.
 
@@ -82,9 +82,7 @@ JavaScript - more sophisticated behaviors such as animations, collapsing menus, 
 
 Rather than delving deeply into the aesthetics of graphic design, our goal for you as a well-rounded full-stack developer is that you should know how to provide well-structured pages with proper element nesting and clean CSS class tags, for two reasons. First, with a good front-end framework, just doing this will be enough to provide an AURA site (aesthetic, usable, responsive, accessible). Second, a clean site layout and classing allows designers to refine, customize, or work separately on the site's visual appearance.
 
-There are 2 principles to using front-end frameworks successfully in this way: semantic styling and grid layout. Semantic styling means First, think of your page's visual elements not in terms of their visual characteristics ("This message should appear in a red box with bold text") but in terms of their function ("This message signals an error", "This text is the page title", "This list of items is a menu of navigation options"). A good front-end framework names its styles according to the function they enable an element to fulfill, rather than according to their visual appearance.
-
-## SPA or MPA?
+There are 2 principles to using front-end frameworks successfully in this way: semantic styling and grid layout. Semantic styling means First, think of your page's visual elements not in terms of their visual characteristics ("This message should appear in a red box with bold text") but in terms of their function ("This message signals an error", "This text is the page title", "This list of items is a menu of navigation options"). A good front-end framework names its styles according to the function they enable an element to fulfill, rather than according to their visual appearance.## SPA or MPA?
 SPA vs MPA: Are you building something that's more like a website (transactional? lots of different possible screens? user navigates large amounts of data in a typical session? multi-screen workflows?) or more like a desktop app (few screens? continuous interaction vs transactional, eg something like Pivotal Tracker? user navigates modest amounts of data in a typical session? short workflows or interactions typically limited to 1 screen?)  If it's primarily a website, use HTML5 + jQuery where needed. If primarily an app, may be better off using a framework. [Need a checklist like "when to use agile" for "when to build a SPA vs MPA"].  Examples of popular SPAs: Gmail, Google Docs, Pivotal Tracker.  Popular MPAs: IMDb, Amazon.com, Google Search.  *MPA vs SPA is primarily a user experience question, not a technical one!*
 
 

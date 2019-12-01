@@ -43,6 +43,7 @@ from converter.markdown.screencast import Screencast
 from converter.markdown.tabularx import Tabularx
 from converter.markdown.tabular import Tabular
 from converter.markdown.unescape import UnEscape
+from converter.markdown.turingwinner import TuringWinner
 
 
 class LaTeX2Markdown(object):
@@ -123,6 +124,9 @@ class LaTeX2Markdown(object):
         output = PitFall(output, self._caret_token).convert()
         output = Summary(output, self._caret_token).convert()
         output = Chips(output, self._caret_token).convert()
+        output, images = TuringWinner(output, self._caret_token, self._detect_asset_ext,).convert()
+        if images:
+            self._pdfs.extend(images)
         output = Cleanup(output).convert()
 
         output, images, figure_counter = PicFigure(
