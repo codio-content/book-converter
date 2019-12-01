@@ -102,4 +102,5 @@ class TestSuite(unittest.TestCase):
         ('\\section{{\\tt Comparable} and {\\tt Comparator}}', 'Comparable and Comparator')
     ])
     def test_name_generation(self, case, should_be):
-        self.assertEqual(get_name(case), should_be)
+        name, _ = get_name(case)
+        self.assertEqual(name, should_be)
