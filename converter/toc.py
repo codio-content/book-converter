@@ -95,7 +95,9 @@ def get_section_lines(line, tex_folder):
     if result:
         file = result.group("block_path")
         if '.tex' not in file:
-            file = '_{}.tex'.format(file)
+            dirname = Path(tex_folder).name
+            prefix = dirname.split('ch_')[-1]
+            file = f'{prefix}_{file}.tex'
         tex_file = tex_folder.joinpath(file)
         if tex_file.exists():
             with open(tex_file, 'r', errors='replace') as file:

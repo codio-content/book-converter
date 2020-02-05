@@ -55,7 +55,7 @@ def cleanup_latex(lines):
     for line in lines:
         if line.startswith(starts):
             continue
-        updated.append(line)
+        updated.append(line.rstrip('\n'))
     return updated
 
 
