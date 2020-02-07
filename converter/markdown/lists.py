@@ -53,14 +53,14 @@ class Lists(TextAsParagraph):
                 continue
             if "\\term" in line:
                 if output_str:
-                    output_str = output_str.strip() + self._caret_token
+                    output_str = output_str.strip()
                 markdown_list_line = markdown_list_line.replace("\\term", list_heading)
                 if "\\term{" in line:
                     markdown_list_line = markdown_list_line.replace("{", "**", 1)
                     markdown_list_line = markdown_list_line.replace("}", "**", 1)
             elif "\\item" in line:
                 if output_str:
-                    output_str = output_str.strip() + self._caret_token
+                    output_str = output_str.strip()
                 if "\\item[" in line:
                     markdown_list_line = markdown_list_line.replace("[", "**", 1)
                     markdown_list_line = markdown_list_line.replace("]", "**", 1)

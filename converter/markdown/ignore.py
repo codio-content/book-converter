@@ -40,6 +40,7 @@ class Ignore(object):
         output = self.remove_chars(output, "\\index{")
         output = self.remove_chars(output, "\\label{")
         output = self.remove_chars(output, "\\vspace{")
+        output = self.remove_chars(output, "\\addtocounter{")
         output = re.sub(r"\\noindent", "", output)
         output = ifhtml_re.sub(self.make_block, output)
         output = ifmobile_re.sub(self.make_block, output)
