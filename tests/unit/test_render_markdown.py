@@ -34,6 +34,9 @@ def make_converter(path, refs, chapter_num, load_workspace_file):
 
 
 class TestSuite(unittest.TestCase):
+
+    maxDiff = None
+
     def write_md(self, name, refs={}, chapter_num=1, load_workspace_file=lambda _: _):
         path = "cases/{}".format(name)
         converter = make_converter(path, refs, chapter_num, load_workspace_file)

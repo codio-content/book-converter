@@ -2,7 +2,8 @@
 
 
 
-> If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.<br/>
+
+> If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.
 >
 > __Gerald Weinberg, *Weinberg's Second Law*__
 
@@ -14,9 +15,11 @@ One thrust of software engineering was to bring an engineering discipline to wha
 
 The goal of all these “Plan-and-Document” software development processes is to improve predictability via extensive documentation, which must be changed whenever the goals change. Here is how textbook authors put it (Lethbridge02,Braude01):
 
+
 > Documentation should be written at all stages of development, and includes requirements, designs, user manuals, instructions for testers and project plans.
 >
 > __Timothy Lethbridge and Robert Laganiere, 2002__
+
 
 
 
@@ -65,6 +68,7 @@ Because it flows from the top down to completion, this process is called the _**
 In the Waterfall lifecycle, the long life of software is acknowledged by a maintenance phase that repairs errors as they are discovered. New versions of software developed in the Waterfall model go through the same several phases, and take typically between 6 and 18 months.
 
 The Waterfall model can work well with well-specified tasks like NASA space flights, but it runs into trouble when customers change their minds about what they want. A Turing Award winner captures this observation:
+
 
 > Plan to throw one [implementation] away; you will, anyhow.
 >
