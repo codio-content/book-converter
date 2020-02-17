@@ -44,10 +44,8 @@ class Tabular(TextAsParagraph):
             pos = 0
             row = row.replace('\\&', token)
 
-            row = re.sub(r"\\multicolumn{(.*?)}{(.*?)}{(.*?)}", r"|\3|", row,
-                        flags=re.DOTALL + re.VERBOSE)
-            row = re.sub(r"\\multirow{(.*?)}{(.*?)}\s?{(.*?)}", r"|\3|", row,
-                        flags=re.DOTALL + re.VERBOSE)
+            row = re.sub(r"\\multicolumn{(.*?)}{(.*?)}{(.*?)}", r"|\3|", row, flags=re.DOTALL + re.VERBOSE)
+            row = re.sub(r"\\multirow{(.*?)}{(.*?)}\s?{(.*?)}", r"|\3|", row, flags=re.DOTALL + re.VERBOSE)
 
             for ind in range(0, len(table_size)):
                 data = row.split('&')
