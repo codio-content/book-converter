@@ -49,7 +49,6 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\textbar({\})?", r"|", output)
         output = re.sub(r"\\hrule", "<hr>", output)
         output = re.sub(r"\\hfill", "", output)
-        output = re.sub(r"\\newline", "<br>", output)
         output = re.sub(r"\\addtocounter{.*?}{.*?}", r"", output)
         output = re.sub(r"\\small{", r"", output)
         output = re.sub(r"\\cline{.*?}", "", output)
