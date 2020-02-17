@@ -22,12 +22,12 @@ class Tabular(TextAsParagraph):
 
     def _format_table(self, matchobj):
         block_contents = matchobj.group('block_contents')
-
         block_contents = block_contents.strip()
         sub_lines = block_contents.split('\n')
         size = get_text_in_brackets(sub_lines[0])
         block_contents = '\n'.join(sub_lines[1:])
         block_contents = block_contents.replace('\\hline', '')
+        block_contents = block_contents.replace('\\raggedright', '')
 
         token = str(uuid.uuid4())
 
@@ -43,6 +43,12 @@ class Tabular(TextAsParagraph):
                 continue
             pos = 0
             row = row.replace('\\&', token)
+
+            row = re.sub(r"\\multicolumn{(.*?)}{(.*?)}{(.*?)}", r"|\3|", row,
+                        flags=re.DOTALL + re.VERBOSE)
+            row = re.sub(r"\\multirow{(.*?)}{(.*?)}\s?{(.*?)}", r"|\3|", row,
+                        flags=re.DOTALL + re.VERBOSE)
+
             for ind in range(0, len(table_size)):
                 data = row.split('&')
                 col = self.safe_list_get(data, ind, '').strip()

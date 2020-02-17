@@ -49,8 +49,8 @@ def cleanup_latex(lines):
     updated = []
     starts = (
         '%', '\\index{', '\\label{', '\\markboth{', '\\addcontentsline{',
-        '\\vspace', '\\newpage', '\\noindent',
-        '\\ttfamily', '\\chapter', '\\section', '\\newcommand', '\\vfill', '\\pagebreak'
+        '\\vspace', '\\newpage', '\\ttfamily', '\\chapter', '\\section',
+        '\\newcommand', '\\vfill', '\\pagebreak'
     )
     for line in lines:
         if line.startswith(starts):
