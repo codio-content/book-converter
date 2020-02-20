@@ -11,7 +11,8 @@ class Sidebar(TextAsParagraph):
 
         self._pdfs = []
 
-        self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}(\[(?P<props>.*?)])?{(?P<block_graphics>.*?)}
+        self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}(\[(?P<props>.*?)])?
+                                    {(?P<block_graphics>.*?)}(.*?)
                                     {(?P<block_name>.*?)}
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
