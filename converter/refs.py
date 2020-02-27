@@ -90,7 +90,7 @@ def make_refs(toc, chapter_counter_from=1):
                 is_exercise = False
             elif "figure{" in line or "figure[" in line:
                 result = re.search(r'\\(?P<block_name>pic|table|codefile)figure(\[.*\])?{(?P<path>.*?)}'
-                                  r'(%?\s*)?({(?P<ref>.*?)})?', line)
+                                   r'(%?\s*)?({(?P<ref>.*?)})?', line)
                 if result:
                     ref = result.group('ref')
                     if ref:
