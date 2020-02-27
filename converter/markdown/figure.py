@@ -34,7 +34,7 @@ class Figure(TextAsParagraph):
                 if not line.startswith("\\includegraphics"):
                     line = get_text_in_brackets(line)
                 images.append(get_text_in_brackets(line))
-            elif line.startswith("\\caption"):
+            elif "\\caption" in line:
                 if '}' in line:
                     caption += get_text_in_brackets(line)
                 else:
@@ -59,9 +59,16 @@ class Figure(TextAsParagraph):
             markdown_images.append(
                 "![{}]({})".format(caption, image)
             )
-
         caret_token = self._caret_token
-        return f'{self._caret_token.join(markdown_images)}{caret_token}{caret_token}**{caption}**'
+        caption = caption.replace("**", "").strip()
+
+        if markdown_images:
+            return f'{self._caret_token.join(markdown_images)}{caret_token}{caret_token}**{caption}**'
+
+        block_contents = block_contents.replace('\\label{.*?}', '')
+        block_contents = re.sub(r"\\caption{(.*?)}", r"", block_contents, flags=re.DOTALL + re.VERBOSE)
+
+        return f'{block_contents}**<p style="font-size: 10px">{caption}</p>**{caret_token}'
 
     def convert(self):
         output = self.str

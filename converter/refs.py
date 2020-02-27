@@ -64,6 +64,7 @@ def make_refs(toc, chapter_counter_from=1):
     figs_counter = 0
     is_figure = False
     is_exercise = False
+    line_break = False
 
     for item in toc:
         if item.section_type == CHAPTER:
@@ -87,15 +88,30 @@ def make_refs(toc, chapter_counter_from=1):
                 is_exercise = True
             elif line.startswith("\\end{exercise}"):
                 is_exercise = False
-            elif "figure{" in line:
-                result = re.match(r'\\(?P<block_name>pic|table|codefile)figure{(?P<path>.*?)\}{(?P<ref>.*?)\}', line)
+            elif "figure{" in line or "figure[" in line:
+                result = re.search(r'\\(?P<block_name>pic|table|codefile)figure(\[.*\])?{(?P<path>.*?)}'
+                                  r'(%?\s*)?({(?P<ref>.*?)})?', line)
                 if result:
                     ref = result.group('ref')
+                    if ref:
+                        figs_counter += 1
+                        refs[ref] = {
+                            'pageref': item.section_name
+                        }
+                        refs[ref]["ref"] = f'{chapter_counter}.{figs_counter}'
+                    else:
+                        line_break = True
+                        continue
+            elif line_break:
+                res = re.search(r'{(?P<ref>fig:.*?)}', line)
+                if res:
+                    ref = res.group('ref')
                     figs_counter += 1
                     refs[ref] = {
                         'pageref': item.section_name
                     }
                     refs[ref]["ref"] = f'{chapter_counter}.{figs_counter}'
+                    line_break = False
             elif "\\label{" in line:
                 start_pos = line.find("\\label{")
                 end_pos = line.find("}", start_pos)

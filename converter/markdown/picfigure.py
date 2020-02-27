@@ -18,6 +18,7 @@ class PicFigure(TextAsParagraph):
 
     def make_block(self, matchobj):
         content = matchobj.group('content').strip()
+        content = content.replace("**", "")
         label = matchobj.group('refs').strip()
         image = matchobj.group('image').strip()
         if '.' not in image:
