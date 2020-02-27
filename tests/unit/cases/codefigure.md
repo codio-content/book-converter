@@ -1,5 +1,5 @@
 **Figure 1.1**
-**source:ch_javascript/code/json_example.js**
+**source: ch_javascript/code/json_example.js**
 ```code
 file content
 ```
@@ -7,7 +7,7 @@ file content
 
 
 **Figure 1.2**
-**source:ch_ruby_rails/code/class_example.rb**
+**source: ch_ruby_rails/code/class_example.rb**
 ```code
 file content
 ```
@@ -15,7 +15,7 @@ file content
 
 
 **Figure 1.3**
-**source:ch_ruby_rails/code/class_example.rb**
+**source: ch_ruby_rails/code/class_example.rb**
 ```code
 file content
 ```
