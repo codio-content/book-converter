@@ -33,7 +33,7 @@ class Sidebar(TextAsParagraph):
         matches = re.match(r"(\[.*\])?({.*?\})(.*)?", head)
         if matches:
             title = matches.group(2).strip()
-            title = get_text_in_brackets(title)
+            title = get_text_in_brackets(title).strip('*')
             additional = matches.group(3).strip()
 
         if additional:
