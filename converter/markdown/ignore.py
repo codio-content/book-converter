@@ -42,6 +42,12 @@ class Ignore(object):
         output = self.remove_chars(output, "\\vspace{")
         output = self.remove_chars(output, "\\addtocounter{")
         output = re.sub(r"\\noindent", "", output)
+        output = re.sub(r"\\fbox{(.*?\\end{minipage}\n)}\n", r"\1", output, flags=re.DOTALL + re.VERBOSE)
+        output = re.sub(r"\\begin{minipage}{.*?}", "", output)
+        output = re.sub(r"\\end{minipage}", "", output)
+        output = re.sub(r"\\begin{textfigure}", "", output)
+        output = re.sub(r"\\end{textfigure}", "", output)
+        output = re.sub(r"\\n", "", output)
         output = ifhtml_re.sub(self.make_block, output)
         output = ifmobile_re.sub(self.make_block, output)
 

@@ -60,7 +60,10 @@ class Lists(TextAsParagraph):
                     markdown_list_line = markdown_list_line.replace("}", "**", 1)
             elif "\\item" in line:
                 if output_str:
-                    output_str = output_str.strip() + self._caret_token
+                    subline1 = line[:line.index('\\item')]
+                    subline2 = line[line.index('\\item'):]
+                    subline2_md = re.sub(r"\\item(\s+)?", list_heading, subline2)
+                    markdown_list_line = subline1 + self._caret_token + subline2_md
                 if "\\item[" in line:
                     markdown_list_line = markdown_list_line.replace("[", "**", 1)
                     markdown_list_line = markdown_list_line.replace("]", "**", 1)
