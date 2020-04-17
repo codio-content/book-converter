@@ -161,6 +161,7 @@ An unfortunate downside to teaching a Plan-and-Document approach is that student
   <details><summary>Check yourself</summary>Waterfall phases separate planning (requirements and architectural design) from implementation. Testing the product before release is next, followed by a separate operations phase. The Spiral phases are aimed at an iteration: set the goals for an iteration; explore alternatives; develop and verify the prototype for this iteration; and plan the next iteration. RUP phases are tied closer to business objectives: inception makes business case and sets schedule and budget; elaboration works with customers to build an initial prototype; construction builds and test the first version; and transition deploys the product.</details>
 
 |||
+
 ## SEI Capability Maturity Model (CMM)
 The Software Engineering Institute at Carnegie Mellon University proposed the _**Capability Maturity Model**_ (CMM) (Paulk05) to evaluate  organizations' software-development processes based on Plan-and-Document methodologies. The idea is that by modeling the software development process, an organization can improve them. SEI studies observed five levels of software practice:
 
