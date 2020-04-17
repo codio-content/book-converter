@@ -46,14 +46,20 @@ class Lists(TextAsParagraph):
         for line in block_contents.lstrip().rstrip().split("\\item"):
             line = line.lstrip().rstrip()
             line = line.replace("\\\\", "<br/>")
-            line = line.replace("\n", " ")
-            md_string = list_heading + line.strip() + self._caret_token
             if not line:
                 continue
-            if line.startswith('['):
-                md_string = md_string.replace("[", "**", 1)
-                md_string = md_string.replace("]", "**", 1)
-            output_str += md_string
+
+            cline = ""
+            for sub_str in line.split("\n"):
+                if not sub_str:
+                    continue
+                cline += sub_str.strip() + " "
+
+            md_list_line = list_heading + cline.strip() + self._caret_token
+            if cline.startswith('['):
+                md_list_line = md_list_line.replace("[", "**", 1)
+                md_list_line = md_list_line.replace("]", "**", 1)
+            output_str += md_list_line
         return output_str
 
     def _format_block_name(self, block_name, block_title=None):
