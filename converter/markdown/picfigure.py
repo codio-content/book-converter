@@ -13,6 +13,7 @@ class PicFigure(TextAsParagraph):
         self._refs = refs
 
     def make_block(self, image, label, content):
+        content = content.strip()
         if '.' not in image:
             ext = self._detect_asset_ext(image)
             if ext:

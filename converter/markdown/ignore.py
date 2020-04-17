@@ -47,7 +47,6 @@ class Ignore(object):
         output = re.sub(r"\\end{minipage}", "", output)
         output = re.sub(r"\\begin{textfigure}", "", output)
         output = re.sub(r"\\end{textfigure}", "", output)
-        output = re.sub(r"\\n", "", output)
         output = ifhtml_re.sub(self.make_block, output)
         output = ifmobile_re.sub(self.make_block, output)
 

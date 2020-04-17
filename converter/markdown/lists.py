@@ -40,34 +40,20 @@ class Lists(TextAsParagraph):
 
     def _format_list_contents(self, block_name, block_contents):
         block_config = self._block_configuration[block_name]
-
         list_heading = block_config["list_heading"]
 
         output_str = ""
-        for line in block_contents.lstrip().rstrip().split("\n"):
+        for line in block_contents.lstrip().rstrip().split("\\item"):
             line = line.lstrip().rstrip()
             line = line.replace("\\\\", "<br/>")
-
-            markdown_list_line = re.sub(r"\\item(\s+)?", list_heading, line)
+            line = line.replace("\n", " ")
+            md_string = list_heading + line.strip() + self._caret_token
             if not line:
                 continue
-            if "\\term" in line:
-                if output_str:
-                    output_str = output_str.strip() + self._caret_token
-                markdown_list_line = markdown_list_line.replace("\\term", list_heading)
-                if "\\term{" in line:
-                    markdown_list_line = markdown_list_line.replace("{", "**", 1)
-                    markdown_list_line = markdown_list_line.replace("}", "**", 1)
-            elif "\\item" in line:
-                if output_str:
-                    subline1 = line[:line.index('\\item')]
-                    subline2 = line[line.index('\\item'):]
-                    subline2_md = re.sub(r"\\item(\s+)?", list_heading, subline2)
-                    markdown_list_line = subline1 + self._caret_token + subline2_md
-                if "\\item[" in line:
-                    markdown_list_line = markdown_list_line.replace("[", "**", 1)
-                    markdown_list_line = markdown_list_line.replace("]", "**", 1)
-            output_str += markdown_list_line + ' '
+            if line.startswith('['):
+                md_string = md_string.replace("[", "**", 1)
+                md_string = md_string.replace("]", "**", 1)
+            output_str += md_string
         return output_str
 
     def _format_block_name(self, block_name, block_title=None):
@@ -105,7 +91,7 @@ class Lists(TextAsParagraph):
         header = self._format_block_name(block_name, block_title)
         caret_token = self._caret_token
 
-        output_str = f"{header}{caret_token}{caret_token}{formatted_contents}{caret_token}{caret_token}"
+        output_str = f"{header}{caret_token}{caret_token}{formatted_contents}{caret_token}"
         if block_name == "description":
             output_str = f"{header}{formatted_contents}{caret_token}{caret_token}"
         return output_str
