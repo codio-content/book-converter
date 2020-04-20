@@ -38,6 +38,7 @@ def include_file(line):
 
 
 def cleanup_name(name):
+    name = convert_name(name)
     l_pos = name.find('{')
     r_pos = name.find('}')
     cut_pos = l_pos + 1
@@ -55,6 +56,14 @@ def cleanup_name(name):
             cut_pos += 1
         res = name[0:l_pos] + name[cut_pos:r_pos] + name[r_pos+1:]
         return cleanup_name(res)
+    return name
+
+
+def convert_name(name):
+    name = re.sub(r"\\js({\})?", "JavaScript", name)
+    name = re.sub("``", "“", name)
+    name = re.sub("''", "”", name)
+    name = re.sub(r"--", "-", name)
     return name
 
 

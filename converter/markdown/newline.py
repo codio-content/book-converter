@@ -9,6 +9,7 @@ class NewLine(object):
         output = self.str
         output = re.sub(r"^\\\\ ", "<br/>", output, flags=re.MULTILINE)
         output = re.sub(r"\\newline ", "<br/>", output, flags=re.MULTILINE)
+        output = re.sub(r"\\newline<", "<br/>", output, flags=re.MULTILINE)
         output = re.sub(r"\\newline$", "<br/>", output, flags=re.MULTILINE)
 
         return output

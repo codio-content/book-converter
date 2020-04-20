@@ -63,6 +63,7 @@ class TableFigure(TextAsParagraph):
         output = self.str
 
         output = table_re.sub(self.make_block, output)
+        output = re.sub(r"\\protect\\index{.*?}%?", "", output)
 
         for token in self._matches:
             output = self.remove_matched_token(output, token)
