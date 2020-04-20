@@ -1,6 +1,7 @@
 import uuid
 import re
 
+from converter.markdown.del_icons_description import Del_icons_description
 from converter.markdown.inline_code_block import InlineCodeBlock
 from converter.markdown.code_block import CodeBlock
 from converter.markdown.bold import Bold
@@ -75,6 +76,7 @@ class LaTeX2Markdown(object):
     def _latex_to_markdown(self):
         output = self._latex_string
 
+        output = Del_icons_description(output).convert()
         output, figure_counter = TableFigure(
             output, self._caret_token, self._load_workspace_file,
             self._figure_counter_offset, self._chapter_num, self._refs
