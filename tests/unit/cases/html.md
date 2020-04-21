@@ -4,7 +4,7 @@ In contrast to a native app, which is designed to render a particular user inter
 Indeed, modern practice suggests that even when creating a user-facing SaaS app designed to be used via a browser, we should design the app as a collection of resources accessible via RESTful APIs, but then provide a Web browser-based user interface “on top of” those API calls.
 
 
-If the Web browser is the universal client, _**HTML**_, the HyperText Markup Language, is the universal language. A _**markup language**_ combines text with markup (annotations about the text) in a way that makes it easy to syntactically distinguish the two.
+If the Web browser is the universal client, ___HTML___, the HyperText Markup Language, is the universal language. A ___markup language___ combines text with markup (annotations about the text) in a way that makes it easy to syntactically distinguish the two.
 
 HTML consists of a hierarchy of nested elements, each of which consists of an opening tag such as **<p>**, a content part (in some cases), and a closing tag such as **</p>**. Most opening tags can also have attributes, as in **$<$a href="http://..."$>$**. Some tags that don't have a content part are self-closing, such as **<br clear="both"/>** for a line break that clears both left and right margins.
 
@@ -12,13 +12,13 @@ HTML consists of a hierarchy of nested elements, each of which consists of an op
   
 
 |||info
-The use of angle brackets for tags comes from _**SGML**_ (Standard Generalized Markup Language), a codified standardization of IBM's Generalized Markup Language, developed  in the 1960s for encoding computer-readable project documents.
+The use of angle brackets for tags comes from ___SGML___ (Standard Generalized Markup Language), a codified standardization of IBM's Generalized Markup Language, developed  in the 1960s for encoding computer-readable project documents.
 
 |||
 
 
 
-There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1).  HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of _**XML**_, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information *between* two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
+There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1).  HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of ___XML___, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information *between* two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
 
 
 Of particular interest are the HTML tag attributes **id** and **class**, because they figure heavily into connecting the HTML structure of a page with its visual appearance.  The following screencast illustrates the use of Firefox's Web Developer toolbar to quickly identify the ID's and Classes of HTML elements on a page.
@@ -30,7 +30,7 @@ Of particular interest are the HTML tag attributes **id** and **class**, because
 <iframe width="560" height="315" src="//www.youtube.com/embed/X5ArSbUea_o" frameborder="0" allowfullscreen></iframe>
 
 
-CSS uses _**selector notations**_ such as **div#***name* to indicate a **div** element whose **id** is *name* and **div.***name* to indicate a **div** element with class *name*. Only one element in an HTML document can have a given **id**, whereas many elements (even of different tag types) can share the same **class**. All three aspects of an element---its tag type, its **id** (if it has one), and its **class** attributes (if it has any)---can be used to identify an element as a candidate for visual formatting.
+CSS uses ___selector notations___ such as **div#***name* to indicate a **div** element whose **id** is *name* and **div.***name* to indicate a **div** element with class *name*. Only one element in an HTML document can have a given **id**, whereas many elements (even of different tag types) can share the same **class**. All three aspects of an element---its tag type, its **id** (if it has one), and its **class** attributes (if it has any)---can be used to identify an element as a candidate for visual formatting.
 
 <hr>
 
@@ -43,7 +43,7 @@ For an extreme example of how much can be done with CSS, visit the [CSS Zen Gard
 |||
 
 
-As the next screencast shows, the _**CSS**_ (_**Cascading Style Sheets**_) standard allows us to associate visual “styling” instructions with HTML elements by using the elements' classes and IDs. The screencast covers only a few basic CSS constructs, which are summarized in Figure fig:css_cheat.  The Resources section at the end of the chapter lists sites and books that describe CSS in  great detail, including how to use CSS for aligning content on a page, something designers used to do manually with HTML tables.
+As the next screencast shows, the ___CSS___ (___Cascading Style Sheets___) standard allows us to associate visual “styling” instructions with HTML elements by using the elements' classes and IDs. The screencast covers only a few basic CSS constructs, which are summarized in Figure fig:css_cheat.  The Resources section at the end of the chapter lists sites and books that describe CSS in  great detail, including how to use CSS for aligning content on a page, something designers used to do manually with HTML tables.
 
 
 
@@ -92,9 +92,9 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 **Summary**
   
 
-* An _**HTML**_ (HyperText Markup Language) document consists of a hierarchically nested collection of elements. Each element begins with a  _**tag**_ in <angle brackets> that may have optional _**attributes**_.  Some elements enclose content.
-* A _**selector**_ is an expression that identifies one or more HTML elements in a document by using a combination of the element name (such as **body**), element **id** (an element attribute that must be unique on a page), and element **class** (an attribute that need not be unique on a page).
-* _**Cascading Style Sheets**_ (CSS) is a stylesheet language describing visual attributes of elements on a Web page.  A stylesheet associates sets of visual properties with  selectors.  A special **link** element inside the **head** element of an HTML document associates a stylesheet with that document.
+* An ___HTML___ (HyperText Markup Language) document consists of a hierarchically nested collection of elements. Each element begins with a  ___tag___ in <angle brackets> that may have optional ___attributes___.  Some elements enclose content.
+* A ___selector___ is an expression that identifies one or more HTML elements in a document by using a combination of the element name (such as **body**), element **id** (an element attribute that must be unique on a page), and element **class** (an attribute that need not be unique on a page).
+* ___Cascading Style Sheets___ (CSS) is a stylesheet language describing visual attributes of elements on a Web page.  A stylesheet associates sets of visual properties with  selectors.  A special **link** element inside the **head** element of an HTML document associates a stylesheet with that document.
 * The “developer tools” in each browser, such as the Firefox Web Developer toolbar, are invaluable in peeking under the hood to examine both the structure of a page and its stylesheets.
 
 

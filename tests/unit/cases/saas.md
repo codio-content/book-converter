@@ -1,7 +1,7 @@
 ###  Software as a Service
 
 
-The power of SOA combined with the power of the Internet led to a special case of SOA with its own name: _**Software as a Service (SaaS)**_. It delivers software and data as a service over the Internet, usually via a thin program such as a browser that runs on local client devices instead as an application binary that must be installed and runs wholly on that device.  Examples that many use every day include searching, social networking, and watching videos. The advantages for the customer and for the software developer are widely touted:
+The power of SOA combined with the power of the Internet led to a special case of SOA with its own name: ___Software as a Service (SaaS)___. It delivers software and data as a service over the Internet, usually via a thin program such as a browser that runs on local client devices instead as an application binary that must be installed and runs wholly on that device.  Examples that many use every day include searching, social networking, and watching videos. The advantages for the customer and for the software developer are widely touted:
 
 
 
@@ -34,7 +34,7 @@ Unsurprisingly, given the popularity of SaaS, Figure fig:SaaS_frameworks lists t
 Ruby is typical of modern scripting languages in including automatic memory management and dynamic typing. By including important advances in programming languages, Ruby goes beyond languages like Perl in supporting multiple programming paradigms such as object oriented and functional programming.
 
 
-Useful additional features that help productivity via reuse include _**mix-ins**_, which collect related behaviors and make it easy to add them to many different classes, and _**metaprogramming**_, which allows Ruby programs to synthesize code at runtime. Reuse is also enhanced with Ruby's support for _**closures**_ via _**blocks**_ and _**yield**_. Chapter chap:ruby_intro is a short description of Ruby for those who already know Java, and Chapter chap:rails_intro introduces Rails.
+Useful additional features that help productivity via reuse include ___mix-ins___, which collect related behaviors and make it easy to add them to many different classes, and ___metaprogramming___, which allows Ruby programs to synthesize code at runtime. Reuse is also enhanced with Ruby's support for ___closures___ via ___blocks___ and ___yield___. Chapter chap:ruby_intro is a short description of Ruby for those who already know Java, and Chapter chap:rails_intro introduces Rails.
 
 In addition to our view of Rails being technically superior for Agile and SaaS, Ruby and Rails are widely used. For example, Ruby routinely appears among top 10 most popular programming languages. A well-known SaaS app associated with Rails is Twitter, which began as a Rails app in 2006 and grew from 20,000 tweets per day in 2007 to 200,000,000 in 2011, during which time other frameworks replaced various parts of it.
 
@@ -44,7 +44,7 @@ Note that frequent upgrades of SaaS---due to only having a single copy of the so
 
 
 ---
-**Summary:** _**Software as a Service (SaaS)**_ is attractive to both customers and providers because the universal client (the Web browser) makes it easier for customers to use the service and the single version of the software at a centralized site makes it easier for the provider to deliver and improve the service. Given the ability and desire to frequently upgrade SaaS, the Agile software development process is popular for SaaS, and so there are many frameworks to support Agile and SaaS. This book uses Ruby on Rails.
+**Summary:** ___Software as a Service (SaaS)___ is attractive to both customers and providers because the universal client (the Web browser) makes it easier for customers to use the service and the single version of the software at a centralized site makes it easier for the provider to deliver and improve the service. Given the ability and desire to frequently upgrade SaaS, the Agile software development process is popular for SaaS, and so there are many frameworks to support Agile and SaaS. This book uses Ruby on Rails.
 
 ---
 
