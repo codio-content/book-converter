@@ -1,7 +1,7 @@
 import re
 
 
-class Del_icons_description(object):
+class DelIconsDescription(object):
     def __init__(self, latex_str):
         self.str = latex_str
 
