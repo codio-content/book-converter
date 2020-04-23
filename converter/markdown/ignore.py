@@ -42,6 +42,7 @@ class Ignore(object):
         output = self.remove_chars(output, "\\vspace{")
         output = self.remove_chars(output, "\\addtocounter{")
         output = re.sub(r"\\noindent", "", output)
+        output = re.sub(r"\\prereq", "", output)
         output = re.sub(r"\\relax", "", output)
         output = re.sub(r"\s\\n\n", "", output)
         output = re.sub(r"\\fbox{(.*?\\end{minipage}\n)}\n", r"\1", output, flags=re.DOTALL + re.VERBOSE)
