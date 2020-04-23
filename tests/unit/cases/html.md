@@ -6,7 +6,7 @@ Indeed, modern practice suggests that even when creating a user-facing SaaS app 
 
 If the Web browser is the universal client, ___HTML___, the HyperText Markup Language, is the universal language. A ___markup language___ combines text with markup (annotations about the text) in a way that makes it easy to syntactically distinguish the two.
 
-HTML consists of a hierarchy of nested elements, each of which consists of an opening tag such as **<p>**, a content part (in some cases), and a closing tag such as **</p>**. Most opening tags can also have attributes, as in **$<$a href="http://..."$>$**. Some tags that don't have a content part are self-closing, such as **<br clear="both"/>** for a line break that clears both left and right margins.
+HTML consists of a hierarchy of nested elements, each of which consists of an opening tag such as **\<p\>**, a content part (in some cases), and a closing tag such as **\</p\>**. Most opening tags can also have attributes, as in **$<$a href="http://..."$>$**. Some tags that don't have a content part are self-closing, such as **\<br clear="both"/\>** for a line break that clears both left and right margins.
 
 
   
@@ -54,7 +54,7 @@ As the next screencast shows, the ___CSS___ (___Cascading Style Sheets___) stand
 <iframe width="560" height="315" src="//www.youtube.com/embed/E5ZVorHn_fs" frameborder="0" allowfullscreen></iframe>
 
 
-There are four basic mechanisms by which a selector in a CSS file can match an HTML element: by tag name, by class, by ID, and by hierarchy. If multiple selectors match a given element, the rules for which properties to apply are complex, so most designers try to avoid such ambiguities by keeping their CSS simple.  A useful way to see the “bones” of a page is to select \Sf{CSS>-Disable Styles>-All Styles} from the Firefox Web Developer toolbar; most developer-friendly browsers offer a “developer mode” featuring similar behaviors. Disabling styles will display the page with all CSS formatting turned off, showing the extent to which CSS can be used to separate visual appearance from logical structure.
+There are four basic mechanisms by which a selector in a CSS file can match an HTML element: by tag name, by class, by ID, and by hierarchy. If multiple selectors match a given element, the rules for which properties to apply are complex, so most designers try to avoid such ambiguities by keeping their CSS simple.  A useful way to see the “bones” of a page is to select \Sf{CSS\>-Disable Styles\>-All Styles} from the Firefox Web Developer toolbar; most developer-friendly browsers offer a “developer mode” featuring similar behaviors. Disabling styles will display the page with all CSS formatting turned off, showing the extent to which CSS can be used to separate visual appearance from logical structure.
 
 <hr>
 
@@ -92,7 +92,7 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 **Summary**
   
 
-* An ___HTML___ (HyperText Markup Language) document consists of a hierarchically nested collection of elements. Each element begins with a  ___tag___ in <angle brackets> that may have optional ___attributes___.  Some elements enclose content.
+* An ___HTML___ (HyperText Markup Language) document consists of a hierarchically nested collection of elements. Each element begins with a  ___tag___ in \<angle brackets\> that may have optional ___attributes___.  Some elements enclose content.
 * A ___selector___ is an expression that identifies one or more HTML elements in a document by using a combination of the element name (such as **body**), element **id** (an element attribute that must be unique on a page), and element **class** (an attribute that need not be unique on a page).
 * ___Cascading Style Sheets___ (CSS) is a stylesheet language describing visual attributes of elements on a Web page.  A stylesheet associates sets of visual properties with  selectors.  A special **link** element inside the **head** element of an HTML document associates a stylesheet with that document.
 * The “developer tools” in each browser, such as the Firefox Web Developer toolbar, are invaluable in peeking under the hood to examine both the structure of a page and its stylesheets.
