@@ -17,7 +17,7 @@ CSS uses ___selector notations___ such as **div#***name* to indicate a **div** e
 <iframe width="560" height="315" src="//www.youtube.com/embed/yX1tMdBuG3g" frameborder="0" allowfullscreen></iframe>
 
 
-In a Haml template, lines beginning with **%** expand into the corresponding HTML opening tag, with no closing tag needed since Haml uses indentation to determine structure.  Ruby-like hashes following a tag become HTML attributes. Lines \mbox{**--beginning with a dash**} are executed as Ruby code with the result discarded, and lines \mbox{**=beginning with an equals sign**} are executed as Ruby code with the result interpolated into the HTML output.
+In a Haml template, lines beginning with **%** expand into the corresponding HTML opening tag, with no closing tag needed since Haml uses indentation to determine structure.  Ruby-like hashes following a tag become HTML attributes. Lines \mbox{__--beginning with a dash__} are executed as Ruby code with the result discarded, and lines \mbox{__=beginning with an equals sign__} are executed as Ruby code with the result interpolated into the HTML output.
 
 <hr>
 

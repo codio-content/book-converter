@@ -134,7 +134,7 @@ ch_arch/code/htmlexercise.html
 
   Write down a CSS selector that will select *only* the word
   *Mondays* for styling.
-  <details><summary>Check yourself</summary>Three possibilities, from most specific to least specific, are: **#i span**, **p.x span**, and **.x span**. Other selectors are possible but redundant or over-constrained; for example, **p#i span** and **p#i.x span** are redundant with respect to this HTML snippet since at most one element can have the ID **i**.</details>
+  <details><summary>Check yourself</summary>Three possibilities, from most specific to least specific, are: __#i span__, __p.x span__, and __.x span__. Other selectors are possible but redundant or over-constrained; for example, __p#i span__ and __p#i.x span__ are redundant with respect to this HTML snippet since at most one element can have the ID __i__.</details>
 
 |||
 
@@ -142,9 +142,9 @@ ch_arch/code/htmlexercise.html
 
 |||challenge
 
-  In Self-Check ex:css1, why are **span**
-  and  **p span** *not* valid answers?
-  <details><summary>Check yourself</summary>Both of those selector also match *Tuesdays*, which is a **span** inside a **p**.</details>
+  In Self-Check ex:css1, why are __span__
+  and  __p span__ *not* valid answers?
+  <details><summary>Check yourself</summary>Both of those selector also match *Tuesdays*, which is a __span__ inside a __p__.</details>
 
 |||
 
