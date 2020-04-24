@@ -53,6 +53,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\small{", r"", output)
         output = re.sub(r"\\cline{.*?}", "", output)
         output = re.sub(r"vs.\\", "vs.", output)
+        output = re.sub(r"\\\\\*", "", output)
         output = re.sub(r"\\textsection", "$", output)
         output = re.sub(r"\\fillinblank{}", "_________", output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)
