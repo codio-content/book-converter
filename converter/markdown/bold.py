@@ -14,7 +14,7 @@ class Bold(object):
         output = re.sub(r"{\\sf[ ](.*?)}", r"**\1**", output, flags=re.DOTALL + re.VERBOSE)
 
         output = match_block("\\B{", output, lambda match: f"**{match}**")
-        output = match_block("\\C{", output, lambda match: f"**{match}**")
+        output = match_block("\\C{", output, lambda match: f"__{match}__")
         output = match_block("\\T{", output, lambda match: f"**{match}**")
 
         return output

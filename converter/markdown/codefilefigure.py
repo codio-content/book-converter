@@ -51,7 +51,7 @@ class CodeFigure(TextAsParagraph):
                 self._refs.get(label).get('ref')
             )
 
-        return f'{caret_token}{caption}{caret_token}**source:{file_path}**{caret_token}' \
+        return f'{caret_token}{caption}{caret_token}**source: {file_path}**{caret_token}' \
             f'```code{caret_token}{file_content}{caret_token}```{caret_token}{replace_token}'
 
     def remove_matched_token(self, output, chars):

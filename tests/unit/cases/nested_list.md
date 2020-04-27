@@ -10,7 +10,7 @@ ch_bdd/code/vaguefeature.rb
 ch_bdd/code/unmeasurablefeature.rb
 ```
  Only the second case can be tested to see if the system fulfills the requirement.
-* *Achievable.* Ideally, you implement the user story in one Agile iteration. If you are getting less than one story per iteration, then they are too big and you need to subdivide these stories into smaller ones. As mentioned above, the tool _**Pivotal Tracker**_ measures _**Velocity**_, which is the rate of completing stories  of varying difficulty.
+* *Achievable.* Ideally, you implement the user story in one Agile iteration. If you are getting less than one story per iteration, then they are too big and you need to subdivide these stories into smaller ones. As mentioned above, the tool ___Pivotal Tracker___ measures ___Velocity___, which is the rate of completing stories  of varying difficulty.
 * *Relevant.* A user story must have business value to one or more stakeholders. To drill down to the real business value, one technique is to keep asking “Why.” Using as an example a ticket-selling app for a regional theater, suppose the proposal is to add a Facebook linking feature. Here are the “Five Whys” in action with their recursive questions and answers: 
 
 1. Why add the Facebook feature? As box office manager, I think more people will go with friends and enjoy the show more.

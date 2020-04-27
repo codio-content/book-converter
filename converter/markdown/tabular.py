@@ -9,6 +9,9 @@ class Tabular(TextAsParagraph):
     def __init__(self, latex_str, caret_token):
         super().__init__(latex_str, caret_token)
 
+        self._graphics_re = re.compile(r"\\includegraphics(\[.*?]){(.*?)}",
+                                       flags=re.DOTALL + re.VERBOSE)
+
         self._table_re = re.compile(r"""\\begin{(?P<block_name>tabular)}
                                     (?P<block_contents>.*?)
                                     \\end{(?P=block_name)}""",
@@ -28,7 +31,7 @@ class Tabular(TextAsParagraph):
         size = get_text_in_brackets(sub_lines[0])
         block_contents = '\n'.join(sub_lines[1:])
         block_contents = block_contents.replace('\\hline', '')
-
+        block_contents = block_contents.replace('\\raggedright', '')
         token = str(uuid.uuid4())
 
         items = block_contents.split('\\\\')
@@ -43,7 +46,19 @@ class Tabular(TextAsParagraph):
                 continue
             pos = 0
             row = row.replace('\\&', token)
-            for ind in range(0, len(table_size)):
+
+            row = re.sub(r"\\multicolumn{(.*?)}{(.*?)}{(.*?)}", r"\3", row, flags=re.DOTALL + re.VERBOSE)
+            row = re.sub(r"\\multirow{(.*?)}{(.*?)}\s?{(.*?)}", r"\3", row, flags=re.DOTALL + re.VERBOSE)
+
+            t_size = len(table_size)
+
+            match = self._graphics_re.search(row)
+            if match:
+                row = row.replace('\\icondir', 'icons')
+                row = self._graphics_re.sub(r"<img alt='' src='\2' style='width:100px'/>", row)
+                t_size = len(row.split("&"))
+
+            for ind in range(0, t_size):
                 data = row.split('&')
                 col = self.safe_list_get(data, ind, '').strip()
                 col = col.replace('\n', '<br/>')

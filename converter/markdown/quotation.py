@@ -1,5 +1,4 @@
-import re
-
+from converter.markdown.match_elements import match_elements
 from converter.markdown.text_as_paragraph import TextAsParagraph
 
 
@@ -7,20 +6,17 @@ class Quotation(TextAsParagraph):
     def __init__(self, latex_str, caret_token):
         super().__init__(latex_str, caret_token)
 
-        self._makequotation_re = re.compile(r"""\\makequotation{(?P<block_contents>.*?)}([\s]+)?
-                                            {(?P<block_author>.*?)}([ \t]+)?$""",
-                                            flags=re.DOTALL + re.VERBOSE + re.MULTILINE)
-
-    def _makequotation_block(self, matchobj):
-        block_contents = matchobj.group('block_contents')
-        block_author = matchobj.group('block_author')
-        block_contents = self.to_paragraph(block_contents)
-        block_contents = re.sub(r"\\\\", '<br/>', block_contents)
-        caret_token = self._caret_token
-        return f'> {block_contents}{caret_token}>{caret_token}> __{block_author}__{caret_token}{caret_token}'
-
     def convert(self):
-        output = self.str
-        output = self._makequotation_re.sub(self._makequotation_block, output)
-
-        return output
+        out = self.str
+        search_str = "\\makequotation"
+        pos = out.find(search_str)
+        caret_token = self._caret_token
+        while pos != -1:
+            matches, index = match_elements(out[pos + len(search_str):], 2)
+            start = out[0:pos]
+            end_pos = pos + len(search_str) + 1 + index
+            end = out[end_pos:]
+            out = start + f'{caret_token}> {matches[0]}{caret_token}>' \
+                          f'{caret_token}> __{matches[1]}__{caret_token}{caret_token}' + end
+            pos = out.find(search_str, end_pos + 1)
+        return out

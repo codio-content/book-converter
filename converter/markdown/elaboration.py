@@ -16,7 +16,7 @@ class Elaboration(TextAsParagraph):
         title = self.to_paragraph(title)
         block_contents = self.to_paragraph(block_contents)
         caret_token = self._caret_token
-        return f'## {title}{caret_token}{block_contents}'
+        return f'{caret_token}## {title}{caret_token}{block_contents}'
 
     def convert(self):
         return elaboration_re.sub(self.make_block, self.str)
