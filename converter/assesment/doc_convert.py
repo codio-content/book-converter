@@ -8,7 +8,7 @@ from pathlib import Path
 
 from converter.guides.tools import write_file, slugify, write_json
 from converter.guides.item import SectionItem, CHAPTER
-from converter.refs import get_ref_chapter_counter_from
+
 
 
 def generate_assesment_toc(source_path, structure_path, ignore_exists=False):
@@ -131,18 +131,16 @@ def convert_assesment_doc(config, base_path, yes=False):
 
     chapter = None
     children_containers = [book["children"]]
-    chapter_num = get_ref_chapter_counter_from(config) - 1
     logging.debug("convert selected pages")
 
     for item in toc:
         if item.section_type == CHAPTER:
-            chapter_num += 1
             slug_name = slugify(item.section_name)
             chapter = item.section_name
         else:
             slug_name = slugify(item.section_name, chapter=chapter)
 
-        logging.debug("convert page {} - {}".format(slug_name, chapter_num))
+        logging.debug("convert page {}".format(slug_name))
 
         out_md = '\n'.join(item.lines)
 
