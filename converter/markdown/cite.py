@@ -34,7 +34,7 @@ class Cite(object):
 
                         def make_bib_content(line):
                             bib_entry = {}
-                            for item in line.split(',\n'):
+                            for item in re.split(r',\s*\n', line):
                                 item = item.strip()
                                 sub_items = item.split('=', 1)
                                 if len(sub_items) > 1:
