@@ -25,7 +25,6 @@ class Tabular(TextAsParagraph):
 
     def _format_table(self, matchobj):
         block_contents = matchobj.group('block_contents')
-
         block_contents = block_contents.strip()
         sub_lines = block_contents.split('\n')
         size = get_text_in_brackets(sub_lines[0])
@@ -49,6 +48,28 @@ class Tabular(TextAsParagraph):
 
             row = re.sub(r"\\multicolumn{(.*?)}{(.*?)}{(.*?)}", r"\3", row, flags=re.DOTALL + re.VERBOSE)
             row = re.sub(r"\\multirow{(.*?)}{(.*?)}\s?{(.*?)}", r"\3", row, flags=re.DOTALL + re.VERBOSE)
+
+            tabularline_match = re.search(r"\\tabularline", block_contents, flags=re.DOTALL + re.VERBOSE)
+            if tabularline_match:
+                head = True
+                for line in block_contents.split('\n'):
+                    line = line.replace('\\\\', '<br/>')
+                    line = line.strip()
+                    if not line:
+                        continue
+                    if '\\tabularline' in line and head:
+                        out += self._caret_token + "|" + line + '|' + self._caret_token
+                        out += "|-|" + self._caret_token
+                        out += "|"
+                        head = False
+                        continue
+                    if '\\tabularline' in line and not head:
+                        out += "|" + self._caret_token
+                        head = True
+                        continue
+                    out += line + " "
+                out = out.replace('\\tabularline', '')
+                break
 
             t_size = len(table_size)
 
