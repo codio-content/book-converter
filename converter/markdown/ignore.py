@@ -18,6 +18,7 @@ ifhtml_tabular_end_re = re.compile(
     flags=re.DOTALL + re.VERBOSE + re.MULTILINE
 )
 
+
 class Ignore(object):
     def __init__(self, latex_str):
         self.str = latex_str
