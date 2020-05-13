@@ -54,7 +54,7 @@ def cleanup_name(name):
             l_pos = l_pos - 1
         else:
             cut_pos += 1
-        res = name[0:l_pos] + name[cut_pos:r_pos] + name[r_pos+1:]
+        res = name[0:l_pos] + name[cut_pos:r_pos] + name[r_pos + 1:]
         return cleanup_name(res)
     return name
 
@@ -119,14 +119,27 @@ def process_toc_lines(lines, tex_folder, parent_folder):
     toc = []
     line_pos = 1
     item_lines = []
+    chapter_line = ''
+    chapter_line_break = False
     for line in lines:
         line = line.rstrip('\r\n')
+        if chapter_line_break:
+            if line.endswith('}'):
+                line = chapter_line + line
+                chapter_line_break = False
+            else:
+                chapter_line += line
+                continue
         if is_toc(line):
             if toc:
                 if item_lines:
                     toc[len(toc) - 1].lines = item_lines
                 item_lines = []
             section_type = CHAPTER if is_chapter(line) else SECTION
+            if section_type == CHAPTER and not line.endswith('}'):
+                chapter_line = line
+                chapter_line_break = True
+                continue
             section_name, additional_content_in_name = get_name(line)
             toc.append(SectionItem(section_name=section_name, section_type=section_type, line_pos=line_pos))
             if is_section_file(line):
