@@ -24,6 +24,7 @@ class Tabular(TextAsParagraph):
             return default
 
     def _format_table(self, matchobj):
+        caret_token = self._caret_token
         block_contents = matchobj.group('block_contents')
         block_contents = block_contents.strip()
         sub_lines = block_contents.split('\n')
@@ -53,19 +54,19 @@ class Tabular(TextAsParagraph):
             if tabularline_match:
                 head = True
                 for line in block_contents.split('\n'):
-                    line = line.replace('\\\\', '<br/>')
+                    line = line.replace('\\\\', '<br/>').strip()
                     line = line.strip()
                     if not line:
                         continue
                     if '\\tabularline' in line and head:
-                        out += f'{self._caret_token}|line|{self._caret_token}|-|{self._caret_token}|'
+                        out += f'{caret_token}|line|{caret_token}|-|{caret_token}|'
                         head = False
                         continue
                     if '\\tabularline' in line and not head:
-                        out += "|" + self._caret_token
+                        out += f'|{caret_token}'
                         head = True
                         continue
-                    out += line + " "
+                    out += f'{line} '
                 out = out.replace('\\tabularline', '')
                 break
 
