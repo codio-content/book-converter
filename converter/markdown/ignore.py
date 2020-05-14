@@ -8,16 +8,6 @@ ifmobile_re = re.compile(
     r"""\\ifmobioutput(?P<if_block>.*?)\\fi""", flags=re.DOTALL + re.VERBOSE
 )
 
-ifhtml_tabular_begin_re = re.compile(
-    r"""^\\ifhtmloutput.*?(\\begin{tabular}.*?)?\\fi""",
-    flags=re.DOTALL + re.VERBOSE + re.MULTILINE
-)
-
-ifhtml_tabular_end_re = re.compile(
-    r"""^\\ifhtmloutput(.*?(\\end{tabular}).*?)?\\fi""",
-    flags=re.DOTALL + re.VERBOSE + re.MULTILINE
-)
-
 
 class Ignore(object):
     def __init__(self, latex_str):
@@ -61,8 +51,10 @@ class Ignore(object):
         output = re.sub(r"\\begin{textfigure}", "", output)
         output = re.sub(r"\\end{textfigure}", "", output)
         output = re.sub(r"\\newcommand{.*?}{.*?}", "", output)
-        output = ifhtml_tabular_begin_re.sub(r"\1", output)
-        output = ifhtml_tabular_begin_re.sub(r"\1", output)
+        output = re.sub(r"^\\ifhtmloutput.*?(\\begin{tabular}.*?)\\fi", r"\1", output,
+                        flags=re.DOTALL + re.MULTILINE)
+        output = re.sub(r"^\\ifhtmloutput%.*?(\\end{tabular}).*?\\fi", r"\1", output,
+                        flags=re.DOTALL + re.MULTILINE)
         output = ifhtml_re.sub(self.make_block, output)
         output = ifmobile_re.sub(self.make_block, output)
 
