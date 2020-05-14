@@ -23,6 +23,7 @@ class CheckYouself(TextAsParagraph):
     def make_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         block_contents = re.sub(r"\s*\n\s*", " ", block_contents).strip()
+        block_contents = block_contents.replace("\\\\", "<br/>")
         answer_str = answer_re.sub(self.make_answer_block, block_contents)
         caret_token = self._caret_token
         return f'{caret_token}|||challenge{caret_token}{answer_str}{caret_token}|||{caret_token}'
