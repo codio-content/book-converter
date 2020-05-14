@@ -6,9 +6,11 @@
 
 
 
+
 |||info
 **PERT** stands for Program Evaluation and Review Technique, which was invented by the US Navy in the 1950s for its nuclear submarine program.
 |||
+
 
 
 
@@ -18,3 +20,4 @@
 The use of angle brackets for tags comes from ___SGML___ (Standard Generalized Markup Language), a codified standardization of IBM's Generalized Markup Language, developed  in the 1960s for encoding computer-readable project documents.
 
 |||
+

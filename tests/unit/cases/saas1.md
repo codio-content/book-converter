@@ -39,6 +39,7 @@ Governments like that of the US have elaborate regulations to prevent corruption
 
 
 
+
 Of course, like other engineering fields, the government has escape clauses in the contracts that let it still acquire the product even if it is late. Ironically, the contractor makes more money the longer it takes to develop the software. Thus, the art is negotiating the contract and the penalty clauses. As one commentator on ACA noted (Howard13), “The firms that typically get contracts are the firms that are good at getting contracts, not typically good at executing on them.” Another noted that the Plan-and-Document approach is not well suited to modern practices, especially when government contractors focus on maximizing profits (Chung13).
 
 
@@ -62,6 +63,7 @@ Because it flows from the top down to completion, this process is called the ___
 |||info
 **Windows 95** was heralded by a [US<span>\$</span>300 million outdoor party](http://www.youtube.com/watch?v=DeBi2ZxUZiM) for which Microsoft hired comedian Jay Leno, lit up New York's Empire State Building using the Microsoft Windows logo colors, and licensed “Start Me Up” by the Rolling Stones as the celebration's theme song.
 |||
+
 
 
 
@@ -99,6 +101,7 @@ Rather than document all the requirements at the beginning, as in the Waterfall 
 |||info
 **Big Design Up Front** , abbreviated ___BDUF___, is a name some use for software processes like Waterfall, Spiral, and RUP that depend on extensive planning and documentation. They are also known variously as ___heavyweight___, ___plan-driven___, ___disciplined___, or ___structured___ processes.
 |||
+
 
 
 Given the importance of software development, many variations of Plan-and-Document methodologies were proposed beyond these two. A recent one is called the ___Rational Unified Process___ (___RUP___) (Kruchten03), which combines features of both Waterfall and Spiral lifecycles as well standards for diagrams and documentation. We'll use RUP as a representative of the latest thinking in Plan-and-Document lifecycles. Unlike Waterfall and Spiral, it is more closely allied to business issues than to technical issues.

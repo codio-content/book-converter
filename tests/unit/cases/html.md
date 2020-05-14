@@ -18,6 +18,7 @@ The use of angle brackets for tags comes from ___SGML___ (Standard Generalized M
 
 
 
+
 There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1).  HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of ___XML___, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information *between* two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
 
 
@@ -41,6 +42,7 @@ CSS uses ___selector notations___ such as **div#***name* to indicate a **div** e
 For an extreme example of how much can be done with CSS, visit the [CSS Zen Garden](http://csszengarden.com).
 
 |||
+
 
 
 As the next screencast shows, the ___CSS___ (___Cascading Style Sheets___) standard allows us to associate visual “styling” instructions with HTML elements by using the elements' classes and IDs. The screencast covers only a few basic CSS constructs, which are summarized in Figure fig:css_cheat.  The Resources section at the end of the chapter lists sites and books that describe CSS in  great detail, including how to use CSS for aligning content on a page, something designers used to do manually with HTML tables.
@@ -114,6 +116,7 @@ True or false: every HTML element must have an ID.
 |||info
 **GitHub Gists** make it easy to copy-and-paste the code.
 |||
+
 
 
 
