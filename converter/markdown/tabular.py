@@ -59,7 +59,7 @@ class Tabular(TextAsParagraph):
                     if not line:
                         continue
                     if '\\tabularline' in line and head:
-                        out += f'{caret_token}|line|{caret_token}|-|{caret_token}|'
+                        out += f'{caret_token}|{line}|{caret_token}|-|{caret_token}|'
                         head = False
                         continue
                     if '\\tabularline' in line and not head:
