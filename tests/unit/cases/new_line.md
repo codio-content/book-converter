@@ -1,14 +1,11 @@
-> No bottles of beer on the wall,<br/>
-> no bottles of beer,<br/>
-> ya' can't take one down, ya' can't pass it around,<br/>
-> 'cause there are no more bottles of beer on the wall!
-
+> No bottles of beer on the wall,<br/> no bottles of beer,<br/> ya' can't take one down, ya' can't pass it around,<br/> 'cause there are no more bottles of beer on the wall!
 
 
 
 * On Linux, it's likely under: `/usr/lib/jvm/openjdk-.../` <br/> If not, then install the `openjdk-...-source` package.
 * On MacOS, it's likely under: <br/> `/Library/Java/JavaVirtualMachines/jdk.../Contents/Home/`
 * On Windows, it's likely under: `C:\Program Files\Java\jdk...\`
+
 
 
 
@@ -28,6 +25,7 @@
 * Peter Knaggs ported the book to C#. <br/> [http://www.rigwit.co.uk/think/sharp/](http://www.rigwit.co.uk/think/sharp/)
 * Heidi Gentry-Kolen recorded several video lectures that follow the book. <br/> [https://www.youtube.com/user/digipipeline](https://www.youtube.com/user/digipipeline)
 * Waldo Ribeiro submitted a pull request that corrected a dozen typos.
+
 
 
 

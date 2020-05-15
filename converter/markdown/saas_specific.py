@@ -59,6 +59,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\fillinblank{}", "_________", output)
         output = re.sub(r"\\textasciicircum({})?", r"\^", output)
         output = re.sub(r"\\textbackslash{}", r"\\", output)
+        output = re.sub(r"\\end{itemize}", r"\\end{itemize}\n", output)
         output = re.sub(r"\\end{sidebar}", r"\\end{sidebar}\n", output)
         output = re.sub(r"\\end{sidebargraphic}", r"\\end{sidebargraphic}\n", output)
         output = self._saas_icons_re.sub(self._saas_icons_block, output)

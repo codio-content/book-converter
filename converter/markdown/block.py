@@ -69,9 +69,8 @@ class Block(TextAsParagraph):
         for line in block_contents.lstrip().rstrip().split("\n"):
             line = line.lstrip().rstrip()
             line = line.replace("\\\\", "<br/>")
-            indented_line = line_indent_char + line + self._caret_token
-            output_str += indented_line
-        return output_str
+            output_str += f' {line}'
+        return line_indent_char + output_str
 
     def _format_block_name(self, block_name, block_title=None):
         block_config = self._block_configuration[block_name]
