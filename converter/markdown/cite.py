@@ -9,6 +9,14 @@ cite_re = re.compile(r"""~?\\cite{(?P<ref>.*?)}""", flags=re.DOTALL + re.VERBOSE
 bib_re = re.compile(r"""@(?P<type>.*?){(?P<ref>.*?),""", flags=re.DOTALL + re.VERBOSE)
 
 
+def clean_title(title):
+    title = title.replace("{", "").replace("}", "")
+    title = title.replace("\\&", "&")
+    title = title.replace("`", "'")
+    title = title.replace("---", "-")
+    return title
+
+
 class Cite(object):
     _bib_file = None
     _bib_entries = []
@@ -66,10 +74,10 @@ class Cite(object):
         if bib_item:
             if bib_item.get('title') and bib_item.get('author'):
                 author = bib_item.get('author')
-                title = bib_item.get('title')
+                title = clean_title(bib_item.get('title'))
                 return f'<abbr title="{title}">{author}</abbr>'
             elif bib_item.get('title'):
-                return bib_item.get('title')
+                return clean_title(bib_item.get('title'))
             elif bib_item.get('author'):
                 return bib_item.get('author')
         return ref
