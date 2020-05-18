@@ -4,7 +4,7 @@ import logging
 from converter.markdown.block_matcher import match_block
 from converter.guides.tools import get_text_in_brackets
 
-cite_re = re.compile(r"""~?\\cite{(?P<ref>.*?)}""", flags=re.DOTALL + re.VERBOSE)
+cite_re = re.compile(r"""\\cite{(?P<ref>.*?)}""", flags=re.DOTALL + re.VERBOSE)
 
 bib_re = re.compile(r"""@(?P<type>.*?){(?P<ref>.*?),""", flags=re.DOTALL + re.VERBOSE)
 
