@@ -6,11 +6,9 @@
 
 
 
-
 |||info
 **PERT** stands for Program Evaluation and Review Technique, which was invented by the US Navy in the 1950s for its nuclear submarine program.
 |||
-
 
 
 

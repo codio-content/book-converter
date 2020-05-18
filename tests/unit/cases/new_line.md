@@ -10,7 +10,6 @@
 
 
 
-
 * Ellen Hildreth used this book to teach Data Structures at Wellesley College and submitted a whole stack of corrections, along with some great suggestions.
 * Tania Passfield pointed out that some glossaries had leftover terms that no longer appeared in the text.
 * Elizabeth Wiethoff noticed that the series expansion of $\exp(-x^2)$ was wrong. She has also worked on a Ruby version of the book.
@@ -25,7 +24,6 @@
 * Peter Knaggs ported the book to C#. <br/> [http://www.rigwit.co.uk/think/sharp/](http://www.rigwit.co.uk/think/sharp/)
 * Heidi Gentry-Kolen recorded several video lectures that follow the book. <br/> [https://www.youtube.com/user/digipipeline](https://www.youtube.com/user/digipipeline)
 * Waldo Ribeiro submitted a pull request that corrected a dozen typos.
-
 
 
 
