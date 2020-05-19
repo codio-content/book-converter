@@ -1,8 +1,4 @@
-> No bottles of beer on the wall,<br/>
-> no bottles of beer,<br/>
-> ya' can't take one down, ya' can't pass it around,<br/>
-> 'cause there are no more bottles of beer on the wall!
-
+> No bottles of beer on the wall,<br/> no bottles of beer,<br/> ya' can't take one down, ya' can't pass it around,<br/> 'cause there are no more bottles of beer on the wall!
 
 
 

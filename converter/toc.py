@@ -12,7 +12,7 @@ def is_section(line):
 
 
 def is_chapter(line):
-    return line.startswith('\\chapter')
+    return line.startswith('\\chapter[') or line.startswith('\\chapter{')
 
 
 def is_toc(line):
