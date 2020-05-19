@@ -81,7 +81,7 @@ class Tabular(TextAsParagraph):
             for ind in range(0, t_size):
                 data = row.split('&')
                 col = self.safe_list_get(data, ind, '').strip()
-                col = col.replace('\n', '<br/>')
+                col = re.sub(r'\s*\n\s*', ' ', col)
                 col = col.replace('\\\\', '')
                 out += "|" + col.replace('|', '&#124;')
             if heading:
