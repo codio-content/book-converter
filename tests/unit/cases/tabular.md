@@ -9,7 +9,7 @@
 |**div#message**|The **div** whose ID is **message**|
 |**.red**|Any element with class **red**|
 |**div.red, h1**|The **div** with class **red**, or any **h1**|
-|**div#message h1**|An **h1** element that's a child of (inside<br/>of) **div#message**|
+|**div#message h1**|An **h1** element that's a child of (inside of) **div#message**|
 |**a.lnk**|**a** element with class **lnk**|
 |**a.lnk:hover**|**a** element with class **lnk**, when hovered over|
 

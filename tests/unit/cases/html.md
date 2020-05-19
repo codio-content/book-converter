@@ -104,11 +104,8 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 
 |||challenge
-
-  True or false: every HTML element must have an ID.
-
-  <details><summary>Check yourself</summary>False---the ID is optional, though must be unique if provided.</details>
-
+True or false: every HTML element must have an ID. 
+<details><summary>Check yourself</summary>False---the ID is optional, though must be unique if provided.</details>
 |||
 
 
@@ -122,39 +119,25 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 
 |||challenge
-
-  
-  Given the following HTML markup:
-
-  
+Given the following HTML markup: 
 **source:ch_arch/code/htmlexercise.html**
 ```code
 ch_arch/code/htmlexercise.html
 ```
-
-  Write down a CSS selector that will select *only* the word
-  *Mondays* for styling.
-  <details><summary>Check yourself</summary>Three possibilities, from most specific to least specific, are: __#i span__, __p.x span__, and __.x span__. Other selectors are possible but redundant or over-constrained; for example, __p#i span__ and __p#i.x span__ are redundant with respect to this HTML snippet since at most one element can have the ID __i__.</details>
-
+ Write down a CSS selector that will select *only* the word *Mondays* for styling. 
+<details><summary>Check yourself</summary>Three possibilities, from most specific to least specific, are: __#i span__, __p.x span__, and __.x span__. Other selectors are possible but redundant or over-constrained; for example, __p#i span__ and __p#i.x span__ are redundant with respect to this HTML snippet since at most one element can have the ID __i__.</details>
 |||
 
 
 
 |||challenge
-
-  In Self-Check ex:css1, why are __span__
-  and  __p span__ *not* valid answers?
-  <details><summary>Check yourself</summary>Both of those selector also match *Tuesdays*, which is a __span__ inside a __p__.</details>
-
+In Self-Check ex:css1, why are __span__ and  __p span__ *not* valid answers? 
+<details><summary>Check yourself</summary>Both of those selector also match *Tuesdays*, which is a __span__ inside a __p__.</details>
 |||
 
 
 
 |||challenge
-
-  What is the most common way to associate a CSS stylesheet with an HTML
-  or HTML document? (HINT: refer to the earlier screencast example.)
-
-  <details><summary>Check yourself</summary>Within the **HEAD** element of the HTML or HTML document, include a **LINK** element with at least the following three attributes: **REL="STYLESHEET"**, **TYPE="text/css"**, and **HREF="*uri*"**, where ***uri*** is the full or partial URI of  the stylesheet.  That is, the stylesheet must be accessible as a resource named by a URI.</details>
-
+What is the most common way to associate a CSS stylesheet with an HTML or HTML document? (HINT: refer to the earlier screencast example.) 
+<details><summary>Check yourself</summary>Within the **HEAD** element of the HTML or HTML document, include a **LINK** element with at least the following three attributes: **REL="STYLESHEET"**, **TYPE="text/css"**, and **HREF="*uri*"**, where ***uri*** is the full or partial URI of  the stylesheet.  That is, the stylesheet must be accessible as a resource named by a URI.</details>
 |||
