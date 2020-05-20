@@ -12,7 +12,8 @@ class Equation(object):
         block_contents = matchobj.group('block_contents')
         block_contents = block_contents.strip()
         caret_token = self._caret_token
-        return f'{caret_token}$${caret_token}{block_contents}{caret_token}$${caret_token}'
+        return f'{caret_token}<center>{caret_token}$${caret_token}{block_contents}' \
+               f'{caret_token}$${caret_token}</center>{caret_token}'
 
     def convert(self):
         return equation_re.sub(self.make_block, self.str)
