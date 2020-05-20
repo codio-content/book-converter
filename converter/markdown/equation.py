@@ -10,6 +10,7 @@ class Equation(object):
 
     def make_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
+        block_contents = block_contents.strip()
         caret_token = self._caret_token
         return f'{caret_token}$${caret_token}{block_contents}{caret_token}$${caret_token}'
 
