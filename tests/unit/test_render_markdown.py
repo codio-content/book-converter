@@ -303,3 +303,6 @@ class TestSuite(unittest.TestCase):
 
     def test_turingwinner(self):
         self.run_case("turingwinner")
+
+    def test_equation(self):
+        self.run_case("equation")
