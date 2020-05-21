@@ -52,7 +52,9 @@ Note that frequent upgrades of SaaS---due to only having a single copy of the so
 
 |||challenge
 Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar, YouTube, and Documents---is the *best* match to each of the six arguments given in this section for SaaS, reproduced below. 
-<details><summary>Check yourself</summary>While you can argue the mappings, below is our answer. (Note that we cheated and put some apps in multiple categories) 
+<p><details><summary>Check yourself</summary>
+
+While you can argue the mappings, below is our answer. (Note that we cheated and put some apps in multiple categories) 
 
 1. No user installation: Documents
 1. Can't lose data: Gmail, Calendar.
@@ -61,14 +63,16 @@ Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar
 1. Software centralized in single environment: Search.
 1. No field upgrades when improve app: Documents.
 
-</details>
+</details></p>
 |||
 
 
 
 |||challenge
 True or False: If you are using the Agile development process to develop SaaS apps, you could use Python and Django or languages based on the Microsoft's .NET framework and ASP.NET instead of Ruby and Rails. 
-<details><summary>Check yourself</summary>True. Programming frameworks for Agile and SaaS include Django and ASP.NET.</details>
+<p><details><summary>Check yourself</summary>
+
+True. Programming frameworks for Agile and SaaS include Django and ASP.NET.</details></p>
 |||
 
 
