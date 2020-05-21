@@ -49,7 +49,7 @@ def _convert_assets(config, generate_dir, pdfs_for_convert, convert_from_path, b
         dst_folder.mkdir(exist_ok=True, parents=True)
 
         try:
-            pages = convert_from_path(pdf_file, 500)
+            pages = convert_from_path(pdf_file, 400)
             if pages:
                 image = Path(pdf.replace('.pdf', '.jpg'))
                 page = pages[0]
