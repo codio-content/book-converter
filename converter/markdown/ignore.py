@@ -48,6 +48,7 @@ class Ignore(object):
         output = re.sub(r"\\vfill", "", output)
         output = re.sub(r"\\indent", "", output)
         output = re.sub(r"\\fallaciesandpitfalls", "", output)
+        output = re.sub(r"\\newline\\makebox\[.*?\]{}", "<br/>", output)
         output = re.sub(r"\s\\n\n", "", output)
         output = re.sub(r"\\fbox{(.*?\\end{minipage}\n)}\n", r"\1", output, flags=re.DOTALL)
         output = re.sub(r"\\begin{minipage}{.*?}", "", output)
