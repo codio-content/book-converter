@@ -14,6 +14,7 @@
 |**a.lnk:hover**|**a** element with class **lnk**, when hovered over|
 
 
+
 |**Attribute**|**Example values**|**Attribute**|**Example values**|
 |-|-|-|-|
 |font-family|**"Times, serif"**|background-color|**red**, **#c2eed6** (RGB values)|
