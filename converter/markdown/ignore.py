@@ -37,6 +37,7 @@ class Ignore(object):
 
     def convert(self):
         output = self.str
+        output = re.sub(r"\\index\n{(.*?)}", r"\\index{\1}", output, flags=re.DOTALL)
         output = self.remove_chars(output, "\\index{")
         output = self.remove_chars(output, "\\label{")
         output = self.remove_chars(output, "\\vspace{")
@@ -48,7 +49,7 @@ class Ignore(object):
         output = re.sub(r"\\indent", "", output)
         output = re.sub(r"\\fallaciesandpitfalls", "", output)
         output = re.sub(r"\s\\n\n", "", output)
-        output = re.sub(r"\\fbox{(.*?\\end{minipage}\n)}\n", r"\1", output, flags=re.DOTALL + re.VERBOSE)
+        output = re.sub(r"\\fbox{(.*?\\end{minipage}\n)}\n", r"\1", output, flags=re.DOTALL)
         output = re.sub(r"\\begin{minipage}{.*?}", "", output)
         output = re.sub(r"\\end{minipage}", "", output)
         output = re.sub(r"\\begin{textfigure}", "", output)
