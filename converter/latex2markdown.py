@@ -2,6 +2,7 @@ import uuid
 import re
 
 from converter.markdown.del_icons_description import DelIconsDescription
+from converter.markdown.equation import Equation
 from converter.markdown.inline_code_block import InlineCodeBlock
 from converter.markdown.code_block import CodeBlock
 from converter.markdown.bold import Bold
@@ -89,6 +90,7 @@ class LaTeX2Markdown(object):
         output = Ignore(output).convert()
         output = SaasSpecific(output, self._caret_token).convert()
         output = ItalicBold(output).convert()
+        output = Equation(output, self._caret_token).convert()
         output, source_codes = CodeBlock(
             output, self._percent_token, self._caret_token, self._remove_trinket
         ).convert()
