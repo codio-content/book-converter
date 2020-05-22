@@ -39,13 +39,17 @@ class Lists(TextAsParagraph):
             }
         }
 
-    def _format_list_contents(self, block_name, block_contents, start_number=None):
+    def _format_list_contents(self, block_name, block_contents, start_number):
         block_config = self._block_configuration[block_name]
         list_heading = block_config["list_heading"]
-        counter_flag = False
-        if start_number is not None:
-            start_number = int(start_number)
-            counter_flag = True
+        enum = False
+
+        if block_name == 'enumerate':
+            enum = True
+            if start_number is not None:
+                start_number = int(start_number)
+            else:
+                start_number = 0
 
         output_str = ""
         for line in block_contents.lstrip().rstrip().split("\\item"):
@@ -54,7 +58,7 @@ class Lists(TextAsParagraph):
             if not line:
                 continue
 
-            if counter_flag:
+            if enum:
                 start_number += 1
                 list_heading = f'{start_number}. '
 
@@ -95,13 +99,13 @@ class Lists(TextAsParagraph):
     def _replace_block(self, matchobj):
         block_name = matchobj.group('block_name')
         block_contents = matchobj.group('block_contents')
-        start_number = matchobj.group('start_number')
+        start_number_str = matchobj.group('start_number')
         block_title = matchobj.groupdict().get('block_title')
 
         if '\\begin{enumerate' in block_contents or '\\begin{itemize' in block_contents:
             block_contents = self._lists_re.sub(self._replace_block, block_contents)
 
-        formatted_contents = self._format_list_contents(block_name, block_contents, start_number)
+        formatted_contents = self._format_list_contents(block_name, block_contents, start_number_str)
         formatted_contents = self.to_paragraph(formatted_contents)
 
         header = self._format_block_name(block_name, block_title)

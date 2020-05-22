@@ -1,6 +1,6 @@
 1. Type in the hello world program, then compile and run it.
-1. Add a print statement that displays a second message after the “Hello, World!”. Say something witty like, “How are you?” Compile and run the program again.
-1. Add a comment to the program (anywhere), recompile, and run it again. The new comment should not affect the result.
+2. Add a print statement that displays a second message after the “Hello, World!”. Say something witty like, “How are you?” Compile and run the program again.
+3. Add a comment to the program (anywhere), recompile, and run it again. The new comment should not affect the result.
 
 
 
@@ -8,9 +8,9 @@ Recall that the hope for plan-and-document methods is to make software engineeri
 
 
 1. Requirements Elicitation
-1. Requirements Documentation
-1. Cost Estimation
-1. Scheduling and Monitoring Progress
+2. Requirements Documentation
+3. Cost Estimation
+4. Scheduling and Monitoring Progress
 
 
 These are done up front for the Waterfall model and at the beginning of each major iteration for the Spiral and RUP models. As requirements change over time,  these items above imply other tasks:
