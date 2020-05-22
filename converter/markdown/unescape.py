@@ -8,8 +8,6 @@ class UnEscape(object):
     def convert(self):
         output = self.str
 
-        output = re.sub(r"\\{", r"{", output)
-        output = re.sub(r"\\}", r"}", output)
         output = re.sub(r"\\#", "#", output)
         output = re.sub(r"\\_", "_", output)
         output = re.sub(r"\\-", "-", output)
