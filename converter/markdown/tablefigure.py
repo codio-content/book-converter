@@ -51,6 +51,8 @@ class TableFigure(TextAsParagraph):
                     caret_token = self._caret_token
                     content = output[pos + token_len:index - 1]
                     content = content.strip()
+                    content = re.sub(r"\\{", r"{", content)
+                    content = re.sub(r"\\}", r"}", content)
                     output = output[0:pos] + content + "</p>**" + caret_token + output[index + 1:]
                     break
                 else:
