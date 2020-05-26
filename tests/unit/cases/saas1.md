@@ -47,10 +47,10 @@ An early version of this Plan-and-Document software development process was deve
 
 
 1. Requirements analysis and specification
-1. Architectural design
-1. Implementation and Integration
-1. Verification
-1. Operation and Maintenance
+2. Architectural design
+3. Implementation and Integration
+4. Verification
+5. Operation and Maintenance
 
 
 
@@ -82,9 +82,9 @@ This observation led to a software development lifecycle developed in the 1980s 
 
 
 1. Determine objectives and constraints of this iteration
-1. Evaluate alternatives and identify and resolve risks
-1. Develop and verify the prototype for this iteration
-1. Plan the next iteration
+2. Evaluate alternatives and identify and resolve risks
+3. Develop and verify the prototype for this iteration
+4. Plan the next iteration
 
 
 
@@ -108,9 +108,9 @@ Like Waterfall and Spiral, RUP has phases:
 
 
 1. Inception: makes the business case for the software and scopes the project to set the schedule and budget, which is used to judge progress and justify expenditures, and initial assessment of risks to schedule and budget.
-1. Elaboration: works with stakeholders to identify use cases, designs a software architecture, sets the development plan, and builds an initial prototype.
-1. Construction: codes and tests the product, resulting in the first external release.
-1. Transition: moves the product from development to production in the real environment, including customer acceptance testing and user training.
+2. Elaboration: works with stakeholders to identify use cases, designs a software architecture, sets the development plan, and builds an initial prototype.
+3. Construction: codes and tests the product, resulting in the first external release.
+4. Transition: moves the product from development to production in the real environment, including customer acceptance testing and user training.
 
 
 
@@ -121,11 +121,11 @@ In addition to the dynamically changing phases of the project, RUP identifies si
 
 
 1. Business Modeling
-1. Requirements
-1. Analysis and Design
-1. Implementation
-1. Test
-1. Deployment
+2. Requirements
+3. Analysis and Design
+4. Implementation
+5. Test
+6. Deployment
 
 
 
@@ -167,10 +167,10 @@ The Software Engineering Institute at Carnegie Mellon University proposed the __
 
 
 1. Initial or Chaotic---undocumented/*ad hoc*/unstable software development.
-1. Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
-1. Defined---Defined and documented standard processes that improve over time.
-1. Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
-1. Optimizing---Deliberate process optimization improvements as part of management process.
+2. Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
+3. Defined---Defined and documented standard processes that improve over time.
+4. Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
+5. Optimizing---Deliberate process optimization improvements as part of management process.
 
 
 CMM implicitly encourages an organization to move up the CMM levels. While not proposed as a software development methodology, many consider it one. For example,  (Nawrocki02) compares CMM Level 2 to the Agile software methodology (see next section).
