@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 from converter.toc import generate_toc
 from converter.loader import load_config_file
-from converter.convert import convert, convert_bookdown
+from converter.convert import convert, convert_bookdown, convert_rst
 from converter.refs import ref_dict
 
 if __name__ == '__main__':
@@ -34,3 +34,5 @@ if __name__ == '__main__':
                 convert(config, base_path, args.yes)
             elif config.get('workspace', {}).get('bookdown'):
                 convert_bookdown(config, base_path, args.yes)
+            elif config.get('workspace', {}).get('rst'):
+                convert_rst(config, base_path, args.yes)

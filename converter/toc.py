@@ -1,3 +1,4 @@
+import pathlib
 import yaml
 import re
 
@@ -5,6 +6,7 @@ from pathlib import Path
 
 from converter.guides.item import SectionItem, SECTION, CHAPTER
 from converter.guides.tools import write_file, get_text_in_brackets
+from converter.loader import load_json_config_file
 
 
 def is_section(line):
@@ -53,7 +55,7 @@ def cleanup_name(name):
             l_pos = l_pos - 1
         else:
             cut_pos += 1
-        res = name[0:l_pos] + name[cut_pos:r_pos] + name[r_pos+1:]
+        res = name[0:l_pos] + name[cut_pos:r_pos] + name[r_pos + 1:]
         return cleanup_name(res)
     return name
 
@@ -213,21 +215,65 @@ def get_bookdown_toc(folder, name):
         return toc
 
 
-def print_to_yaml(structure, tex, bookdown=False):
-    file_format = "bookdown: {}".format(tex.name) if bookdown else "tex: {}".format(tex.name)
+def get_rst_toc(folder, name):
+    toc = []
+    line_pos = 1
+    rst_path = folder.parent.joinpath("RST/en").resolve()
+    conf_path = folder.joinpath(name).resolve()
+    config, base_path = load_json_config_file(conf_path)
+    chapters = config.get('chapters')
+
+    for chapter in chapters:
+        pages = chapters.get(chapter).keys()
+        toc.append(SectionItem(section_name=chapter, section_type='chapter', line_pos=line_pos))
+        for page in pages:
+            rst_name = f'{page}.rst'
+            path = pathlib.Path(rst_path.joinpath(rst_name).resolve())
+            if not path.exists():
+                print("File %s doesn't exist\n" % rst_name)
+                continue
+            toc += process_rst_file(path)
+        line_pos += 1
+    return toc
+
+
+def process_rst_file(path):
+    with open(path, 'r', errors='replace') as file:
+        lines = file.readlines()
+        return process_rst_lines(lines)
+
+
+def process_rst_lines(lines):
+    toc = []
+    item_lines = []
+    for line in lines:
+        line = line.rstrip('\r\n')
+        top_header_match = re.search(r"""^(?:=)+ *$""", line, flags=re.DOTALL + re.MULTILINE)
+        if top_header_match and item_lines:
+            section_name = item_lines[len(item_lines) - 1]
+            section_name = section_name.replace("\\", "\\\\")
+            if section_name != '':
+                toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
+                toc[len(toc) - 1].lines = item_lines
+        item_lines.append(line)
+    return toc
+
+
+def print_to_yaml(structure, tex, file_format):
+    directory = tex.parent.resolve() if file_format == 'rst' else tex.parent.resolve()
     yaml_structure = """workspace:
   directory: {}
-  {}
+  {}: {}
 assets:
   - code
 sections:
-""".format(tex.parent.resolve(), file_format)
+""".format(directory, file_format, tex.name)
     first_item = True
     for item in structure:
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
         if first_item:
             first_item = False
-            yaml_structure += "    configuration:\n      layout: 2-panels\n"
+            yaml_structure += "    configuration:\n      layout: 1-panels\n"
     return yaml_structure
 
 
@@ -237,12 +283,18 @@ def generate_toc(file_path, structure_path, ignore_exists=False):
         raise Exception("Path exists")
     tex = Path(structure_path)
     bookdown = str(structure_path).endswith('_bookdown.yml')
+    rst = str(structure_path).endswith('.json')
     if bookdown:
         toc = get_bookdown_toc(tex.parent, tex.name)
+        data_format = 'bookdown'
+    elif rst:
+        toc = get_rst_toc(tex.parent, tex.name)
+        data_format = 'rst'
     else:
         toc = get_latex_toc(tex.parent, tex.name)
+        data_format = 'tex'
     path.mkdir(parents=True, exist_ok=ignore_exists)
 
-    content = print_to_yaml(toc, tex, bookdown=bookdown)
+    content = print_to_yaml(toc, tex, data_format)
     a_path = path.joinpath("codio_structure.yml").resolve()
     write_file(a_path, content)

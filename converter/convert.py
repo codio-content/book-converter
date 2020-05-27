@@ -4,7 +4,8 @@ import uuid
 
 from pathlib import Path
 
-from converter.toc import get_latex_toc, get_bookdown_toc
+from converter.rst2markdown import Rst2Markdown
+from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
 from converter.guides.tools import slugify, write_file, write_json
 from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
@@ -478,3 +479,66 @@ def convert_bookdown(config, base_path, yes=False):
     write_metadata(guides_dir, metadata, book)
 
     process_assets(config, generate_dir, pdfs_for_convert, [], bookdown=True)
+
+
+def convert_rst(config, base_path, yes=False):
+    generate_dir = base_path.joinpath("generate")
+    if not prepare_base_directory(generate_dir, yes):
+        return
+
+    logging.debug("start converting %s" % generate_dir)
+    guides_dir, content_dir = prepare_structure(generate_dir)
+    transformation_rules, insert_rules = prepare_codio_rules(config)
+    toc = get_rst_toc(Path(config['workspace']['directory']), Path(config['workspace']['rst']))
+    toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
+    book, metadata = make_metadata_items(config)
+
+    chapter = None
+    chapter_num = get_ref_chapter_counter_from(config) - 1
+    children_containers = [book["children"]]
+    logging.debug("convert selected pages")
+
+    for item in toc:
+        if item.section_type == CHAPTER:
+            chapter_num += 1
+            slug_name = slugify(item.section_name)
+            chapter = item.section_name
+        else:
+            slug_name = slugify(item.section_name, chapter=chapter)
+
+        logging.debug("convert page {} - {}".format(slug_name, chapter_num))
+
+        converted_md = item.markdown
+        if not converted_md:
+            md_converter = Rst2Markdown(
+                item.lines,
+                chapter_num=chapter_num
+            )
+            converted_md = md_converter.to_markdown()
+
+            if slug_name in tokens:
+                for key, value in tokens.get(slug_name).items():
+                    converted_md = converted_md.replace(key, value)
+
+        md_path = content_dir.joinpath(slug_name + ".md")
+        section, book_item = make_section_items(item, slug_name, md_path, transformation_rules, converted_md)
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            book_item["children"] = []
+            if item.section_type == CHAPTER:
+                children_containers = [children_containers[0]]
+        elif item.codio_section == "end" and len(children_containers) > 1:
+            children_containers.pop()
+
+        children_containers[len(children_containers) - 1].append(book_item)
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            children_containers.append(book_item["children"])
+            continue
+
+        if section:
+            metadata["sections"].append(section)
+
+        write_file(md_path, converted_md)
+
+    write_metadata(guides_dir, metadata, book)
