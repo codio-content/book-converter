@@ -217,7 +217,6 @@ def get_bookdown_toc(folder, name):
 
 def get_rst_toc(folder, name):
     toc = []
-    line_pos = 1
     rst_path = folder.parent.joinpath("RST/en").resolve()
     conf_path = folder.joinpath(name).resolve()
     config, base_path = load_json_config_file(conf_path)
@@ -225,7 +224,11 @@ def get_rst_toc(folder, name):
 
     for chapter in chapters:
         pages = chapters.get(chapter).keys()
-        toc.append(SectionItem(section_name=chapter, section_type='chapter', line_pos=line_pos))
+        toc.append(SectionItem(
+            section_name=chapter,
+            section_type='chapter',
+            line_pos=0)
+        )
         for page in pages:
             rst_name = f'{page}.rst'
             path = pathlib.Path(rst_path.joinpath(rst_name).resolve())
@@ -233,7 +236,6 @@ def get_rst_toc(folder, name):
                 print("File %s doesn't exist\n" % rst_name)
                 continue
             toc += process_rst_file(path)
-        line_pos += 1
     return toc
 
 
@@ -246,28 +248,31 @@ def process_rst_file(path):
 def process_rst_lines(lines):
     toc = []
     item_lines = []
-    for line in lines:
+    for ind, line in enumerate(lines):
         line = line.rstrip('\r\n')
-        top_header_match = re.search(r"""^(?:=)+ *$""", line, flags=re.DOTALL + re.MULTILINE)
-        if top_header_match and item_lines:
-            section_name = item_lines[len(item_lines) - 1]
-            section_name = section_name.replace("\\", "\\\\")
-            if section_name != '':
-                toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
-                toc[len(toc) - 1].lines = item_lines
+        next_line = lines[ind+1] if ind+1 < len(lines) else ''
+        next_line = next_line.strip()
+        is_chapter = next_line == "="*len(line)
+        if next_line.startswith("=") and is_chapter:
+            section_name = line.replace("\\", "\\\\")
+            toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
+            item_lines = []
         item_lines.append(line)
+    if toc and item_lines and not toc[len(toc) - 1].lines:
+        item_lines.append('')
+        toc[len(toc) - 1].lines = item_lines
     return toc
 
 
-def print_to_yaml(structure, tex, file_format):
-    directory = tex.parent.resolve() if file_format == 'rst' else tex.parent.resolve()
+def print_to_yaml(structure, tex, format):
+    directory = tex.parent.resolve() if format == 'rst' else tex.parent.resolve()
     yaml_structure = """workspace:
   directory: {}
   {}: {}
 assets:
   - code
 sections:
-""".format(directory, file_format, tex.name)
+""".format(directory, format, tex.name)
     first_item = True
     for item in structure:
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)

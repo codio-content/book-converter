@@ -1,6 +1,8 @@
 import logging
+import re
 import shutil
 import uuid
+from collections import OrderedDict
 
 from pathlib import Path
 
@@ -246,9 +248,9 @@ def make_section_items(item, slug_name, md_path, transformation_rules, converted
         configuration = transformation_rules[slug_name].get('configuration', {})
         if configuration:
             section = {**section, **configuration}
-    if not converted_md:
-        del book_item["pageId"]
-        section = None
+    # if not converted_md:
+    #     del book_item["pageId"]
+    #     section = None
     return section, book_item
 
 
@@ -404,6 +406,29 @@ def cleanup_bookdown(lines):
     return lines
 
 
+def cleanup_rst(lines):
+    updated = []
+    flag = False
+    for line in lines:
+        if line.startswith('.. avmetadata::'):
+            flag = True
+            continue
+        if flag and re.match("^\s+:.+:", line):
+            continue
+        if flag and line == '':
+            flag = False
+        updated.append(line)
+    return updated
+
+
+def get_labels(lines):
+    label = ''
+    for line in lines:
+        if line.startswith('.. _'):
+            label = line.strip()[4:-1]
+    return label
+
+
 def convert_bookdown(config, base_path, yes=False):
     base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
@@ -415,7 +440,6 @@ def convert_bookdown(config, base_path, yes=False):
     transformation_rules, insert_rules = prepare_codio_rules(config)
     toc = get_bookdown_toc(Path(config['workspace']['directory']), Path(config['workspace']['bookdown']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
-
     book, metadata = make_metadata_items(config)
 
     chapter = None
@@ -494,9 +518,12 @@ def convert_rst(config, base_path, yes=False):
     book, metadata = make_metadata_items(config)
 
     chapter = None
-    chapter_num = get_ref_chapter_counter_from(config) - 1
+    chapter_num = 1
     children_containers = [book["children"]]
     logging.debug("convert selected pages")
+
+    refs = OrderedDict()
+    label_counter = 0
 
     for item in toc:
         if item.section_type == CHAPTER:
@@ -510,8 +537,15 @@ def convert_rst(config, base_path, yes=False):
 
         converted_md = item.markdown
         if not converted_md:
+            label = get_labels(item.lines)
+            if label:
+                label_counter += 1
+                refs[label] = {
+                    'pageref': item.section_name
+                }
+            lines = cleanup_rst(item.lines)
             md_converter = Rst2Markdown(
-                item.lines,
+                lines,
                 chapter_num=chapter_num
             )
             converted_md = md_converter.to_markdown()
@@ -534,7 +568,6 @@ def convert_rst(config, base_path, yes=False):
 
         if item.section_type == CHAPTER or item.codio_section == "start":
             children_containers.append(book_item["children"])
-            continue
 
         if section:
             metadata["sections"].append(section)
