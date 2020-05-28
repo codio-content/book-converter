@@ -406,21 +406,6 @@ def cleanup_bookdown(lines):
     return lines
 
 
-def cleanup_rst(lines):
-    updated = []
-    flag = False
-    for line in lines:
-        if line.startswith('.. avmetadata::'):
-            flag = True
-            continue
-        if flag and re.match("^\s+:.+:", line):
-            continue
-        if flag and line == '':
-            flag = False
-        updated.append(line)
-    return updated
-
-
 def get_labels(lines):
     label = ''
     for line in lines:
@@ -543,9 +528,9 @@ def convert_rst(config, base_path, yes=False):
                 refs[label] = {
                     'pageref': item.section_name
                 }
-            lines = cleanup_rst(item.lines)
+
             md_converter = Rst2Markdown(
-                lines,
+                item.lines,
                 chapter_num=chapter_num
             )
             converted_md = md_converter.to_markdown()
