@@ -18,7 +18,6 @@ class Links(object):
         output = re.sub(r"\\weblink{(.*?)}{((.*?\n*.*?)*)}", _clean_block, output)
         output = re.sub(r"\\weblink{(.*?)}", r"[\1](\1)", output)
         output = re.sub(r"\\url{(.*?)}", r"[\1](\1)", output)
-        output = re.sub(r"\\href{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\1](\3)", output)
-        output = re.sub(r"\\href{(.*?)}`(\\[a-z]+)?\s?(.*?)`", r"[\1](\3)", output)
+        output = re.sub(r"\\href{(.*?)}{(\\[a-z]+)?\s?(.*?)}", r"[\3](\1)", output)
 
         return output
