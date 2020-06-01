@@ -1,3 +1,4 @@
 ## ActiveRecord Basics
 https://github.com/saasbook/hw-activerecord-practice
+
 Although ActiveRecord is part of Rails, the ActiveRecord subsystem can be used outside of Rails apps. In this assignment, you will write various ActiveRecord operations to manipulate a database of (fictional) customers for whom we store names, email addresses, and birthdays.  In a typical Rails app, such queries usually appear in the model code, but working on these simple examples will help familiarize you with ActiveRecord's basic features before writing such code yourself
