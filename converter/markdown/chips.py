@@ -17,7 +17,7 @@ class Chips(TextAsParagraph):
         title = self.to_paragraph(title)
         ref = matchobj.group('ref')
         caret_token = self._caret_token
-        return f'## {title}{caret_token}{ref}{caret_token}{block_contents}{caret_token}'
+        return f'## {title}{caret_token}{ref}{caret_token}{caret_token}{block_contents}{caret_token}'
 
     def convert(self):
         return chips_re.sub(self.make_block, self.str)
