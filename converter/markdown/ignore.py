@@ -41,7 +41,6 @@ class Ignore(object):
         output = self.remove_chars(output, "\\index{")
         output = self.remove_chars(output, "\\label{")
         output = self.remove_chars(output, "\\vspace{")
-        output = self.remove_chars(output, "\\addtocounter{")
         output = re.sub(r"\\noindent", "", output)
         output = re.sub(r"\\prereq", "", output)
         output = re.sub(r"\\relax", "", output)
