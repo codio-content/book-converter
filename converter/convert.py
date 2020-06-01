@@ -405,6 +405,16 @@ def cleanup_bookdown(lines):
     lines = lines[1:]
     return lines
 
+def cleanup_rst(lines):
+    updated = []
+    starts = (
+        '.. index::'
+    )
+    for line in lines:
+        if line.startswith(starts):
+            continue
+        updated.append(line)
+    return updated
 
 def get_labels(lines):
     label = ''
@@ -529,8 +539,9 @@ def convert_rst(config, base_path, yes=False):
                     'pageref': item.section_name
                 }
 
+            lines = cleanup_rst(item.lines)
             md_converter = Rst2Markdown(
-                item.lines,
+                lines,
                 chapter_num=chapter_num
             )
             converted_md = md_converter.to_markdown()
