@@ -6,18 +6,18 @@ The power of SOA combined with the power of the Internet led to a special case o
 
 
 1. Since customers do not need to install the application, they don't have to worry whether their hardware is the right brand or fast enough, nor whether they have the correct version of the operating system.
-1. The data associated with the service is generally kept with the service, so customers need not worry about backing it up, losing it due to a local hardware malfunction, or even losing the whole device, such as a phone or tablet.
-1. When a group of users wants to collectively interact with the same data, SaaS is a natural vehicle.
-1. When data is large and/or updated frequently, it may make more sense to centralize data and offer remote access via SaaS.
-1. Only a single copy of the server software runs in a uniform, tightly-controlled hardware and operating system environment selected by the developer, which avoids the compatibility hassles of distributing binaries that must run on wide-ranging computers and operating systems. In addition, developers can test new versions of the application on a small fraction of the real customers temporarily without disturbing most customers. (If the SaaS client runs in a browser, there still are compatibility challenges, which we describe in Chapter chap:arch.) 
+2. The data associated with the service is generally kept with the service, so customers need not worry about backing it up, losing it due to a local hardware malfunction, or even losing the whole device, such as a phone or tablet.
+3. When a group of users wants to collectively interact with the same data, SaaS is a natural vehicle.
+4. When data is large and/or updated frequently, it may make more sense to centralize data and offer remote access via SaaS.
+5. Only a single copy of the server software runs in a uniform, tightly-controlled hardware and operating system environment selected by the developer, which avoids the compatibility hassles of distributing binaries that must run on wide-ranging computers and operating systems. In addition, developers can test new versions of the application on a small fraction of the real customers temporarily without disturbing most customers. (If the SaaS client runs in a browser, there still are compatibility challenges, which we describe in Chapter chap:arch.) 
 
 |||info
 **SaaS: Innovate or Die?** Lest you think the perceived need to improve a successful service is just software engineering paranoia, the most popular search engine used to be AltaVista and the most popular social networking site used to be MySpace.
 |||
 
 
-1. SaaS companies compete regularly on bringing out new features to help ensure that their customers do not abandon them for a competitor who offers a better service.
-1. Since only developers have a copy of the software, they can upgrade the software and underlying hardware frequently as long as they don't violate the external application program interfaces (API). Moreover, developers don't need to annoy users with the seemingly endless requests for permission to upgrade their applications.
+6. SaaS companies compete regularly on bringing out new features to help ensure that their customers do not abandon them for a competitor who offers a better service.
+7. Since only developers have a copy of the software, they can upgrade the software and underlying hardware frequently as long as they don't violate the external application program interfaces (API). Moreover, developers don't need to annoy users with the seemingly endless requests for permission to upgrade their applications.
 
 
 
@@ -52,23 +52,27 @@ Note that frequent upgrades of SaaS---due to only having a single copy of the so
 
 |||challenge
 Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar, YouTube, and Documents---is the *best* match to each of the six arguments given in this section for SaaS, reproduced below. 
-<details><summary>Check yourself</summary>While you can argue the mappings, below is our answer. (Note that we cheated and put some apps in multiple categories) 
+<p><details><summary>Check yourself</summary>
+
+While you can argue the mappings, below is our answer. (Note that we cheated and put some apps in multiple categories) 
 
 1. No user installation: Documents
-1. Can't lose data: Gmail, Calendar.
-1. Users cooperating: Documents.
-1. Large/changing datasets: Search, Maps, News, and YouTube.
-1. Software centralized in single environment: Search.
-1. No field upgrades when improve app: Documents.
+2. Can't lose data: Gmail, Calendar.
+3. Users cooperating: Documents.
+4. Large/changing datasets: Search, Maps, News, and YouTube.
+5. Software centralized in single environment: Search.
+6. No field upgrades when improve app: Documents.
 
-</details>
+</details></p>
 |||
 
 
 
 |||challenge
 True or False: If you are using the Agile development process to develop SaaS apps, you could use Python and Django or languages based on the Microsoft's .NET framework and ASP.NET instead of Ruby and Rails. 
-<details><summary>Check yourself</summary>True. Programming frameworks for Agile and SaaS include Django and ASP.NET.</details>
+<p><details><summary>Check yourself</summary>
+
+True. Programming frameworks for Agile and SaaS include Django and ASP.NET.</details></p>
 |||
 
 

@@ -1,1 +1,1 @@
-If you have additional comments or ideas about the text, please send them to: [mailto:feedback@greenteapress.com](feedback@greenteapress.com).
+Despite design patterns' popularity as a tool, they have been the subject of some critique; for example, Peter Norvig, currently Google's Director of Research, [has argued](http://www.norvig.com/design-patterns) that some design patterns just compensate for deficiencies in statically-typed programming languages such as C++ and Java

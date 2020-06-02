@@ -8,7 +8,6 @@ If the Web browser is the universal client, ___HTML___, the HyperText Markup Lan
 
 HTML consists of a hierarchy of nested elements, each of which consists of an opening tag such as **\<p\>**, a content part (in some cases), and a closing tag such as **\</p\>**. Most opening tags can also have attributes, as in **$<$a href="http://..."$>$**. Some tags that don't have a content part are self-closing, such as **\<br clear="both"/\>** for a line break that clears both left and right margins.
 
-
   
 
 |||info
@@ -18,7 +17,7 @@ The use of angle brackets for tags comes from ___SGML___ (Standard Generalized M
 
 
 
-There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1).  HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of ___XML___, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information *between* two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
+There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1) HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of ___XML___, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information *between* two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
 
 
 Of particular interest are the HTML tag attributes **id** and **class**, because they figure heavily into connecting the HTML structure of a page with its visual appearance.  The following screencast illustrates the use of Firefox's Web Developer toolbar to quickly identify the ID's and Classes of HTML elements on a page.
@@ -105,7 +104,9 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 |||challenge
 True or false: every HTML element must have an ID. 
-<details><summary>Check yourself</summary>False---the ID is optional, though must be unique if provided.</details>
+<p><details><summary>Check yourself</summary>
+
+False---the ID is optional, though must be unique if provided.</details></p>
 |||
 
 
@@ -125,19 +126,25 @@ Given the following HTML markup:
 ch_arch/code/htmlexercise.html
 ```
  Write down a CSS selector that will select *only* the word *Mondays* for styling. 
-<details><summary>Check yourself</summary>Three possibilities, from most specific to least specific, are: __#i span__, __p.x span__, and __.x span__. Other selectors are possible but redundant or over-constrained; for example, __p#i span__ and __p#i.x span__ are redundant with respect to this HTML snippet since at most one element can have the ID __i__.</details>
+<p><details><summary>Check yourself</summary>
+
+Three possibilities, from most specific to least specific, are: __#i span__, __p.x span__, and __.x span__. Other selectors are possible but redundant or over-constrained; for example, __p#i span__ and __p#i.x span__ are redundant with respect to this HTML snippet since at most one element can have the ID __i__.</details></p>
 |||
 
 
 
 |||challenge
 In Self-Check ex:css1, why are __span__ and  __p span__ *not* valid answers? 
-<details><summary>Check yourself</summary>Both of those selector also match *Tuesdays*, which is a __span__ inside a __p__.</details>
+<p><details><summary>Check yourself</summary>
+
+Both of those selector also match *Tuesdays*, which is a __span__ inside a __p__.</details></p>
 |||
 
 
 
 |||challenge
 What is the most common way to associate a CSS stylesheet with an HTML or HTML document? (HINT: refer to the earlier screencast example.) 
-<details><summary>Check yourself</summary>Within the **HEAD** element of the HTML or HTML document, include a **LINK** element with at least the following three attributes: **REL="STYLESHEET"**, **TYPE="text/css"**, and **HREF="*uri*"**, where ***uri*** is the full or partial URI of  the stylesheet.  That is, the stylesheet must be accessible as a resource named by a URI.</details>
+<p><details><summary>Check yourself</summary>
+
+Within the **HEAD** element of the HTML or HTML document, include a **LINK** element with at least the following three attributes: **REL="STYLESHEET"**, **TYPE="text/css"**, and **HREF="*uri*"**, where ***uri*** is the full or partial URI of  the stylesheet.  That is, the stylesheet must be accessible as a resource named by a URI.</details></p>
 |||
