@@ -22,7 +22,7 @@ class Ignore(object):
             ch = output[index]
             if ch == '}':
                 if level == 0:
-                    output = output[0:pos] + output[index + 1:]
+                    output = output[0:pos].strip('\n') + output[index + 1:]
                     break
                 else:
                     level += 1
@@ -37,22 +37,30 @@ class Ignore(object):
 
     def convert(self):
         output = self.str
+        output = re.sub(r"\\index\n{(.*?)}", r"\\index{\1}", output, flags=re.DOTALL)
         output = self.remove_chars(output, "\\index{")
         output = self.remove_chars(output, "\\label{")
         output = self.remove_chars(output, "\\vspace{")
         output = re.sub(r"\\noindent", "", output)
         output = re.sub(r"\\prereq", "", output)
         output = re.sub(r"\\relax", "", output)
+        output = re.sub(r"\\vfill", "", output)
+        output = re.sub(r"\\indent", "", output)
+        output = re.sub(r"\\fallaciesandpitfalls", "", output)
+        output = re.sub(r"\\makebox\[.*?\]{}", "<br/>", output)
+        output = re.sub(r"\\hspace{.*?}", "", output)
         output = re.sub(r"\s\\n\n", "", output)
-        output = re.sub(r"\\fbox{(.*?\\end{minipage}\n)}\n", r"\1", output, flags=re.DOTALL + re.VERBOSE)
+        output = re.sub(r"\\fbox{(.*?\\end{minipage}\n)}\n", r"\1", output, flags=re.DOTALL)
         output = re.sub(r"\\begin{minipage}{.*?}", "", output)
         output = re.sub(r"\\end{minipage}", "", output)
         output = re.sub(r"\\begin{textfigure}", "", output)
         output = re.sub(r"\\end{textfigure}", "", output)
         output = re.sub(r"\\newcommand{.*?}{.*?}", "", output)
-        output = re.sub(r"^\\ifhtmloutput.*?(\\begin{tabular}.*?)\\fi", r"\1", output,
+        output = re.sub(r"^\\ifhtmloutput.*?(\\hfill\\begin{tabular}{\|.*?\|}).*?\\fi", r"\1", output,
                         flags=re.DOTALL + re.MULTILINE)
         output = re.sub(r"^\\ifhtmloutput%.*?(\\end{tabular}).*?\\fi", r"\1", output,
+                        flags=re.DOTALL + re.MULTILINE)
+        output = re.sub(r"^\\ifhtmloutput.*?(\\begin{tabular}.*?)\\else(.*?)\\fi", r"\2", output,
                         flags=re.DOTALL + re.MULTILINE)
         output = ifhtml_re.sub(self.make_block, output)
         output = ifmobile_re.sub(self.make_block, output)
