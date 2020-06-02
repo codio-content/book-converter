@@ -87,6 +87,7 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 
 
+
 ---
 **Summary**
   
