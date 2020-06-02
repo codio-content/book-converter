@@ -58,6 +58,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"vs.\\", "vs.", output)
         output = re.sub(r"\.\\\\\*\}", ".}", output)
         output = re.sub(r"\\/", "", output)
+        output = re.sub(r"\((\w)\)", r"\( \1 \)", output)
         output = re.sub(r"__~to~__", r" __to__ ", output)
         output = re.sub(r"\\textsection", "$", output)
         output = re.sub(r"\\fillinblank{}", "_________", output)
