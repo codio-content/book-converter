@@ -1,1 +1,1 @@
-Beware of overusing *Then I should not see...*.  Because it
+Beware of overusing Then I should not see....  Because it

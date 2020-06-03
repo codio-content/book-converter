@@ -7,7 +7,7 @@ class Italic(object):
 
     def convert(self):
         output = self.str
-        output = re.sub(r"\\emph{(.*?)}", lambda match: f"*{match.group(1).strip()}*", output, flags=re.DOTALL)
+        output = re.sub(r"\\emph{(.*?)}", r"\1", output, flags=re.DOTALL)
         output = re.sub(r"{\\em[ ](.*?)}", r"*\1*", output, flags=re.DOTALL)
         output = re.sub(r"{\\it[ ](.*?)}", r"*\1*", output, flags=re.DOTALL)
 

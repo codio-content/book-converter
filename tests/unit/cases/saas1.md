@@ -4,7 +4,7 @@
 
 > If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.
 >
-> __Gerald Weinberg, *Weinberg's Second Law*__
+> __Gerald Weinberg, Weinberg's Second Law__
 
 
 
@@ -139,7 +139,7 @@ An unfortunate downside to teaching a Plan-and-Document approach is that student
 
 
 ---
-**Summary:** The basic *activities* of software engineering are the same in all the software development process or ___lifecycles___, but their interaction over time relative to product releases differs among the models. The Waterfall lifecycle is characterized by much of the design being done in advance of coding, completing each phase before going on to the next one. The Spiral lifecycle iterates through all the development phases to produce prototypes, but like Waterfall, the customers may only get involved every 6 to 24 months. The more recent Rational Unified Process lifecycle includes phases, iterations, and prototypes, while identifying the people skills needed for the project. All rely on careful planning and thorough documentation, and all measure progress against a plan.
+**Summary:** The basic activities of software engineering are the same in all the software development process or ___lifecycles___, but their interaction over time relative to product releases differs among the models. The Waterfall lifecycle is characterized by much of the design being done in advance of coding, completing each phase before going on to the next one. The Spiral lifecycle iterates through all the development phases to produce prototypes, but like Waterfall, the customers may only get involved every 6 to 24 months. The more recent Rational Unified Process lifecycle includes phases, iterations, and prototypes, while identifying the people skills needed for the project. All rely on careful planning and thorough documentation, and all measure progress against a plan.
 
 ---
 
@@ -165,7 +165,7 @@ Waterfall phases separate planning (requirements and architectural design) from 
 The Software Engineering Institute at Carnegie Mellon University proposed the ___Capability Maturity Model___ (CMM) (Paulk05) to evaluate  organizations' software-development processes based on Plan-and-Document methodologies. The idea is that by modeling the software development process, an organization can improve them. SEI studies observed five levels of software practice:
 
 
-1. Initial or Chaotic---undocumented/*ad hoc*/unstable software development.
+1. Initial or Chaotic---undocumented/ad hoc/unstable software development.
 2. Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
 3. Defined---Defined and documented standard processes that improve over time.
 4. Managed---Management can control software development using process metrics, adapting the process to different projects successfully.

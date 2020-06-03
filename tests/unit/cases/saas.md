@@ -51,7 +51,7 @@ Note that frequent upgrades of SaaS---due to only having a single copy of the so
 
 
 |||challenge
-Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar, YouTube, and Documents---is the *best* match to each of the six arguments given in this section for SaaS, reproduced below. 
+Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar, YouTube, and Documents---is the best match to each of the six arguments given in this section for SaaS, reproduced below. 
 <p><details><summary>Check yourself</summary>
 
 While you can argue the mappings, below is our answer. (Note that we cheated and put some apps in multiple categories) 
