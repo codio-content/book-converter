@@ -19,12 +19,15 @@ class Rst2Markdown(object):
         self._math_block_re = re.compile(r""" {,3}.. math::\n^[\s\S]*?(?P<content>.*?)(?=\n{2,})""",
                                          flags=re.MULTILINE + re.DOTALL)
         self._paragraph_re = re.compile(r"""^(?!\s)[\s\S]*?(?=\n^\s*$)""", flags=re.MULTILINE)
-        self._topic_example_re = re.compile(r"""^(?!\s)\.\. topic:: (?P<type>Example)\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
-                                            flags=re.MULTILINE + re.DOTALL)
+        self._topic_example_re = re.compile(
+            r"""^(?!\s)\.\. topic:: (?P<type>Example)\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
+            flags=re.MULTILINE + re.DOTALL)
         self._epigraph_re = re.compile(r"""^(?!\s)\.\. epigraph::\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
                                        flags=re.MULTILINE + re.DOTALL)
-        self._image_re = re.compile(r"""\.\. odsafig:: (?P<image>.*?)\n*^\s*$\n {6}(?P<caption>.*?\n^$\n(?=\S))""",
-                                       flags=re.MULTILINE + re.DOTALL)
+        self._image_re = re.compile(r"""\.\. odsafig:: (?P<image>.*?)\n*^\s*$\n {6}(?P<caption>.*?\n^$\n(?=\S*))""",
+                                    flags=re.MULTILINE + re.DOTALL)
+        self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
+                                      flags=re.MULTILINE + re.DOTALL)
 
     def _heading1(self, matchobj):
         return ''
@@ -96,7 +99,15 @@ class Rst2Markdown(object):
         image = matchobj.group('image')
         caption = matchobj.group('caption')
         caption = caption.strip()
-        return f"![{caption}]({image}){caret_token}{caption}{caret_token}{caret_token}"
+        return f'![{caption}]({image}){caret_token}{caption}{caret_token}{caret_token}'
+
+    def _sidebar(self, matchobj):
+        caret_token = self._caret_token
+        name = matchobj.group('name')
+        content = matchobj.group('content')
+        content = content.strip()
+        return f'{caret_token}|||xdiscipline{caret_token}{caret_token}**{name}**{caret_token}{caret_token}' \
+               f'{content}{caret_token}{caret_token}|||{caret_token}{caret_token}'
 
     def to_markdown(self):
         output = '\n'.join(self.lines_array)
@@ -113,6 +124,8 @@ class Rst2Markdown(object):
         output = self._math_block_re.sub(self._math_block, output)
         output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
+        output = self._sidebar_re.sub(self._sidebar, output)
+        output = re.sub(self._caret_token, "\n", output)
         output = self._image_re.sub(self._image, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = re.sub(self._caret_token, "\n", output)
