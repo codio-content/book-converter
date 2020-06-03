@@ -112,7 +112,20 @@ def make_refs(toc, chapter_counter_from=1):
                     }
                     refs[ref]["ref"] = f'{chapter_counter}.{figs_counter}'
                     line_break = False
-            elif "\\label{" in line:
+            elif "\\begin{enumerate}" in line:
+                items_counter = 0
+                for ln in item.lines:
+                    if "\\item" in ln:
+                        items_counter += 1
+                        result = re.search(r'\\item\\label{(?P<ref>item:.*?)}', ln)
+                        if result:
+                            ref = result.group('ref')
+                            refs[ref] = {
+                                'item_num': items_counter
+                            }
+                    if "\\end{enumerate}" in ln:
+                        items_counter = 0
+            elif "\\label{" in line and not line.startswith("\\item"):
                 start_pos = line.find("\\label{")
                 end_pos = line.find("}", start_pos)
                 label = line[start_pos + 7:end_pos]
