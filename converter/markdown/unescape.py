@@ -9,7 +9,6 @@ class UnEscape(object):
         output = self.str
 
         output = re.sub(r"\\#", "#", output)
-        output = re.sub(r"\\_", "_", output)
         output = re.sub(r"\\-", "-", output)
         output = re.sub(r"\\\$", r"<span>\$</span>", output)
 
