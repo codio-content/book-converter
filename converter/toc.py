@@ -249,7 +249,8 @@ def get_bookdown_toc(folder, name):
 
 def print_to_yaml(structure, tex, bookdown=False):
     file_format = "bookdown: {}".format(tex.name) if bookdown else "tex: {}".format(tex.name)
-    yaml_structure = """workspace:
+    yaml_structure = """name: "Engineering Software As a Service (2nd edition)"
+workspace:
   directory: {}
   {}
 assets:

@@ -185,7 +185,7 @@ def prepare_structure(generate_dir):
 
 def make_metadata_items(config):
     book = {
-        "name": "TODO: book name",
+        "name": config.get("name"),
         "children": []
     }
     metadata = {
