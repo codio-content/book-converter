@@ -45,7 +45,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\thinspace({\})?", r" ", output)
         output = re.sub(r"\\tl({\})?", r"\<", output)
         output = re.sub(r"\\tg({\})?", r"\>", output)
-        output = re.sub(r"\\ttil({\})?", r"~", output)
+        output = re.sub(r"\\ttil({\})?", r"\\~", output)
         output = re.sub(r"\\textbar({\})?", r"|", output)
         output = re.sub(r"\\hrule", "<hr>", output)
         output = re.sub(r"\\hfill", "", output)
