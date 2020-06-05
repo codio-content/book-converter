@@ -18,7 +18,7 @@ class Cleanup(object):
 
         output = re.sub(r"\\'{(.*?)}", r"\1&#x301;", output)
 
-        output = re.sub(r"(.*?)(~)(.*?)", r"\1 \3", output)
+        output = re.sub(r"(.*?)(?:(?<!\\)(~))(.*?)", r"\1 \3", output)
         output = re.sub(r"(?:(?<!\\)(~))(.*?)", r" \2", output)
         output = re.sub(r"(.*?)(?:(?<!\\)(~))", r"\1 ", output)
 
