@@ -56,12 +56,10 @@ class Ignore(object):
         output = re.sub(r"\\begin{textfigure}", "", output)
         output = re.sub(r"\\end{textfigure}", "", output)
         output = re.sub(r"\\newcommand{.*?}{.*?}", "", output)
-        output = re.sub(r"^\\ifhtmloutput.*?(\\hfill\\begin{tabular}{\|.*?\|}).*?\\fi", r"\1", output,
-                        flags=re.DOTALL + re.MULTILINE)
-        output = re.sub(r"^\\ifhtmloutput%.*?(\\end{tabular}).*?\\fi", r"\1", output,
-                        flags=re.DOTALL + re.MULTILINE)
-        output = re.sub(r"^\\ifhtmloutput.*?(\\begin{tabular}.*?)\\else(.*?)\\fi", r"\2", output,
-                        flags=re.DOTALL + re.MULTILINE)
+        output = re.sub(r"\\ifhtmloutput.*?(\\hfill\\begin{tabular}{\|.*?\|}).*?\\fi", r"\1", output, flags=re.DOTALL)
+        output = re.sub(r"\\ifhtmloutput%.*?(\\end{tabular}).*?\\fi", r"\1", output, flags=re.DOTALL)
+        output = re.sub(r"\\ifhtmloutput.*?(\\begin{tabular}.*?)\\else(.*?)\\fi", r"\2", output, flags=re.DOTALL)
+        output = re.sub(r"\\ifmobioutput.*?(\\begin{tabular}.*?)\\else(.*?)\\fi", r"\2", output, flags=re.DOTALL)
         output = ifhtml_re.sub(self.make_block, output)
         output = ifmobile_re.sub(self.make_block, output)
 
