@@ -9,12 +9,12 @@ class Bold(object):
 
     def convert(self):
         output = self.str
-        output = re.sub(r"\\textbf{(.*?)}", r"**\1**", output, flags=re.DOTALL + re.VERBOSE)
-        output = re.sub(r"{\\bf[ ](.*?)}", r"**\1**", output, flags=re.DOTALL + re.VERBOSE)
-        output = re.sub(r"{\\sf[ ](.*?)}", r"**\1**", output, flags=re.DOTALL + re.VERBOSE)
+        output = re.sub(r"\\textbf{(.*?)}", r"<b>\1</b>", output, flags=re.DOTALL + re.VERBOSE)
+        output = re.sub(r"{\\bf[ ](.*?)}", r"<b>\1</b>", output, flags=re.DOTALL + re.VERBOSE)
+        output = re.sub(r"{\\sf[ ](.*?)}", r"<b>\1</b>", output, flags=re.DOTALL + re.VERBOSE)
 
-        output = match_block("\\B{", output, lambda match: f"**{match}**")
-        output = match_block("\\C{", output, lambda match: f"__{match}__")
-        output = match_block("\\T{", output, lambda match: f"**{match}**")
+        output = match_block("\\B{", output, lambda match: f"<b>{match}</b>")
+        output = match_block("\\C{", output, lambda match: f"<b>{match}</b>")
+        output = match_block("\\T{", output, lambda match: f"<b>{match}</b>")
 
         return output
