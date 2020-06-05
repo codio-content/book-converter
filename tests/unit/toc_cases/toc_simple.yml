@@ -1,4 +1,3 @@
-name: "Engineering Software As a Service (2nd edition)"
 workspace:
   directory: toc_cases
   tex: toc_simple.tex
