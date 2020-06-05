@@ -22,7 +22,7 @@ class Ignore(object):
             ch = output[index]
             if ch == '}':
                 if level == 0:
-                    output = output[0:pos].strip('\n') + output[index + 1:]
+                    output = output[0:pos].lstrip('\n') + output[index + 1:]
                     break
                 else:
                     level += 1
