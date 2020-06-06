@@ -9,7 +9,7 @@ class SaasSpecific(TextAsParagraph):
         self.str = latex_str
 
         self._saas_icons_re = re.compile(r"""\\(dry|reuse|codegen|concise|coc|legacy|beauty|tool|
-                                         learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*\})?""",
+                                         learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*?\})?""",
                                          flags=re.DOTALL + re.VERBOSE)
 
         self._saas_2icons_re = re.compile(
