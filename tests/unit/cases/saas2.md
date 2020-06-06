@@ -3,7 +3,7 @@ Thus, we concentrate on Agile in the six software development chapters in Part I
 While we now see how to build some software successfully, not all projects are small. We next show how to design software to enable composition into services like Amazon.com.
 
 ---
-**Summary:** In contrast to the Plan-and-Document lifecycles, the Agile lifecycle works with customers to continuously add features to working prototypes until the customer is satisfied, allowing customers to change what they want as the project develops. Documentation is primarily through user stories and test cases, and it does not measure progress against a predefined plan. Progress is gauged instead by recording ___velocity___, which essentially is the rate that a project completes features.
+<b>Summary:</b> In contrast to the Plan-and-Document lifecycles, the Agile lifecycle works with customers to continuously add features to working prototypes until the customer is satisfied, allowing customers to change what they want as the project develops. Documentation is primarily through user stories and test cases, and it does not measure progress against a predefined plan. Progress is gauged instead by recording ___velocity___, which essentially is the rate that a project completes features.
 
 ---
 

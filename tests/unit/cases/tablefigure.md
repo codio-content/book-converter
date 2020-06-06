@@ -1,15 +1,15 @@
-We can therefore say that the expression __3+2__ results in calling __Fixnum#+__ on the receiver __3__.
+We can therefore say that the expression <b>3+2</b> results in calling <b>Fixnum#+</b> on the receiver <b>3</b>.
 
 file content content
 
-**<p style="font-size: 10px">Figure 1.1:  The first column is Ruby's syntactic sugar for common operations, the second column shows the explicit method call, and the third column shows how to perform the same method call using Ruby's __send__, which accepts either a string or (more idiomatically) a symbol for the method name.</p>**
-
-
-file content content
-
-**<p style="font-size: 10px">Figure 1.2:  Comparing Amazon.com and Healthcare.gov during its first three months. (Thorp13) After its stumbling start, the deadline was extended from December 15, 2013 to March 31, 2014, which explains the lower goal in customers per day in December. Note that availability for ACA does *not* include time for “scheduled maintenance,” which Amazon does include (Zients13). The error rate was for significant errors on the forms sent to insurance companies (Horsley13). The site was widely labeled by security experts as insecure, as the developers were under tremendous pressure to get proper functionality, and little attention was paid to security (Harrington13)</p>**
+**<p style="font-size: 10px">Figure 1.1:  The first column is Ruby's syntactic sugar for common operations, the second column shows the explicit method call, and the third column shows how to perform the same method call using Ruby's <b>send</b>, which accepts either a string or (more idiomatically) a symbol for the method name.</p>**
 
 
 file content content
 
-**<p style="font-size: 10px">Figure 1.3:  Some common Ruby methods on collections.  For those that expect a block, the “Block” column shows the number of arguments expected by the block; if blank, the method doesn't expect a block.  For example, a call to __sort__, whose block expects 2 arguments, might look like: __c.sort { |a,b| a $<=>$ b }__. These methods all return a new object rather than modifying the receiver, but some methods also have a *destructive* variant ending in __!__, for example __sort!__, that modify their argument in place  (and also return the new value). Use destructive methods with extreme care, if at all.</p>**
+**<p style="font-size: 10px">Figure 1.2:  Comparing Amazon.com and Healthcare.gov during its first three months. (Thorp13) After its stumbling start, the deadline was extended from December 15, 2013 to March 31, 2014, which explains the lower goal in customers per day in December. Note that availability for ACA does <i>not</i> include time for “scheduled maintenance,” which Amazon does include (Zients13). The error rate was for significant errors on the forms sent to insurance companies (Horsley13). The site was widely labeled by security experts as insecure, as the developers were under tremendous pressure to get proper functionality, and little attention was paid to security (Harrington13)</p>**
+
+
+file content content
+
+**<p style="font-size: 10px">Figure 1.3:  Some common Ruby methods on collections.  For those that expect a block, the “Block” column shows the number of arguments expected by the block; if blank, the method doesn't expect a block.  For example, a call to <b>sort</b>, whose block expects 2 arguments, might look like: <b>c.sort { |a,b| a $<=>$ b }</b>. These methods all return a new object rather than modifying the receiver, but some methods also have a <i>destructive</i> variant ending in <b>!</b>, for example <b>sort!</b>, that modify their argument in place  (and also return the new value). Use destructive methods with extreme care, if at all.</p>**

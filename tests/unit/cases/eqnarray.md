@@ -9,12 +9,12 @@ $$
 
 Write a recursive method called `ack` that takes two `int`s as parameters and that computes and returns the value of the Ackermann function.
 
-For example, the **factorial** of an integer $n$, which is written $n!$, is defined like this:
+For example, the <b>factorial</b> of an integer $n$, which is written $n!$, is defined like this:
 $$
 0! = 1 \\
 n! = n \cdot(n-1)!
 $$
-Don't confuse the mathematical symbol $!$, which means *factorial*, with the Java operator `!`, which means *not*.
+Don't confuse the mathematical symbol $!$, which means <i>factorial</i>, with the Java operator `!`, which means <i>not</i>.
 
 $$
 \sin \frac{\pi}{4} + \frac{\cos \frac{\pi}{4}}{2} \\

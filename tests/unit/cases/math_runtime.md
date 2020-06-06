@@ -6,4 +6,4 @@ On the other hand, if `add` is linear, the total time for $n$ adds would be quad
 
 $ runtime = a + b n + c n^2 $
 
-With perfect data, we might be able to tell the difference between a straight line and a parabola, but if the measurements are noisy, it can be hard to tell. A better way to interpret noisy measurements is to plot runtime and problem size on a **log-log** scale.
+With perfect data, we might be able to tell the difference between a straight line and a parabola, but if the measurements are noisy, it can be hard to tell. A better way to interpret noisy measurements is to plot runtime and problem size on a <b>log-log</b> scale.
