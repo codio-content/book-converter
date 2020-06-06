@@ -1,4 +1,4 @@
-Many people (and textbooks) incorrectly refer to `%` as the “modulus operator”. In mathematics, however, **modulus** is the number you're dividing by. In the previous example, the modulus is 12. The Java language specification refers to  `%` as the “remainder operator”.
+Many people (and textbooks) incorrectly refer to `%` as the “modulus operator”. In mathematics, however, <b>modulus</b> is the number you're dividing by. In the previous example, the modulus is 12. The Java language specification refers to  `%` as the “remainder operator”.
 
 The remainder operator looks like a percent sign, but you might find it helpful to think of it as a division sign ($\div$) rotated to the left.
 

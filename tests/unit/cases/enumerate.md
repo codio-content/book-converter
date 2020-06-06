@@ -4,7 +4,7 @@
 
 
 
-Recall that the hope for plan-and-document methods is to make software engineering as predictable in budget and schedule as civil engineering. Remarkably, user stories, points, and velocity correspond to *seven* major tasks of the plan-and-document methodologies. They include:
+Recall that the hope for plan-and-document methods is to make software engineering as predictable in budget and schedule as civil engineering. Remarkably, user stories, points, and velocity correspond to <i>seven</i> major tasks of the plan-and-document methodologies. They include:
 
 
 1. Requirements Elicitation
