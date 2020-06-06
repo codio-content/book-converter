@@ -44,14 +44,14 @@ Note that frequent upgrades of SaaS---due to only having a single copy of the so
 
 
 ---
-**Summary:** ___Software as a Service (SaaS)___ is attractive to both customers and providers because the universal client (the Web browser) makes it easier for customers to use the service and the single version of the software at a centralized site makes it easier for the provider to deliver and improve the service. Given the ability and desire to frequently upgrade SaaS, the Agile software development process is popular for SaaS, and so there are many frameworks to support Agile and SaaS. This book uses Ruby on Rails.
+<b>Summary:</b> ___Software as a Service (SaaS)___ is attractive to both customers and providers because the universal client (the Web browser) makes it easier for customers to use the service and the single version of the software at a centralized site makes it easier for the provider to deliver and improve the service. Given the ability and desire to frequently upgrade SaaS, the Agile software development process is popular for SaaS, and so there are many frameworks to support Agile and SaaS. This book uses Ruby on Rails.
 
 ---
 
 
 
 |||challenge
-Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar, YouTube, and Documents---is the *best* match to each of the six arguments given in this section for SaaS, reproduced below. 
+Which of the  examples of Google SaaS apps---Search, Maps, News, Gmail, Calendar, YouTube, and Documents---is the <i>best</i> match to each of the six arguments given in this section for SaaS, reproduced below. 
 <p><details><summary>Check yourself</summary>
 
 While you can argue the mappings, below is our answer. (Note that we cheated and put some apps in multiple categories) 
