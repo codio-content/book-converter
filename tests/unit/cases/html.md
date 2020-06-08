@@ -8,6 +8,7 @@ If the Web browser is the universal client, ___HTML___, the HyperText Markup Lan
 
 HTML consists of a hierarchy of nested elements, each of which consists of an opening tag such as <b>&lt;p&gt;</b>, a content part (in some cases), and a closing tag such as <b>&lt;/p&gt;</b>. Most opening tags can also have attributes, as in <b>$<$a href="http://..."$>$</b>. Some tags that don't have a content part are self-closing, such as <b>&lt;br clear="both"/&gt;</b> for a line break that clears both left and right margins.
 
+
   
 
 |||info
@@ -17,7 +18,9 @@ The use of angle brackets for tags comes from ___SGML___ (Standard Generalized M
 
 
 
-There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1) HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of ___XML___, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information <i>between</i> two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
+There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1)
+
+HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of ___XML___, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information <i>between</i> two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
 
 
 Of particular interest are the HTML tag attributes <b>id</b> and <b>class</b>, because they figure heavily into connecting the HTML structure of a page with its visual appearance.  The following screencast illustrates the use of Firefox's Web Developer toolbar to quickly identify the ID's and Classes of HTML elements on a page.
@@ -84,6 +87,7 @@ Rather than delving deeply into the aesthetics of graphic design, our goal for y
 There are 2 principles to using front-end frameworks successfully in this way: semantic styling and grid layout. Semantic styling means First, think of your page's visual elements not in terms of their visual characteristics ("This message should appear in a red box with bold text") but in terms of their function ("This message signals an error", "This text is the page title", "This list of items is a menu of navigation options"). A good front-end framework names its styles according to the function they enable an element to fulfill, rather than according to their visual appearance.
 ## SPA or MPA?
 SPA vs MPA: Are you building something that's more like a website (transactional? lots of different possible screens? user navigates large amounts of data in a typical session? multi-screen workflows?) or more like a desktop app (few screens? continuous interaction vs transactional, eg something like Pivotal Tracker? user navigates modest amounts of data in a typical session? short workflows or interactions typically limited to 1 screen?)  If it's primarily a website, use HTML5 + jQuery where needed. If primarily an app, may be better off using a framework. [Need a checklist like "when to use agile" for "when to build a SPA vs MPA"].  Examples of popular SPAs: Gmail, Google Docs, Pivotal Tracker.  Popular MPAs: IMDb, Amazon.com, Google Search.  *MPA vs SPA is primarily a user experience question, not a technical one!*
+
 
 
 

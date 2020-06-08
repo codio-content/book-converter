@@ -55,6 +55,7 @@ class Sidebar(TextAsParagraph):
         block_contents = matchobj.group('block_contents')
         image = matchobj.group('block_graphics')
         block_name = matchobj.group('block_name')
+        block_name = block_name.replace('\n', ' ')
 
         if '.' not in image:
             ext = self._detect_asset_ext(image)

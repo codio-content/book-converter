@@ -9,7 +9,7 @@ class SaasSpecific(TextAsParagraph):
         self.str = latex_str
 
         self._saas_icons_re = re.compile(r"""\\(dry|reuse|codegen|concise|coc|legacy|beauty|tool|
-                                         learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*\})?""",
+                                         learnbydoing|automation|curric|idio|lookout)(\s+)?(\[.*?\])?({.*?\})?""",
                                          flags=re.DOTALL + re.VERBOSE)
 
         self._saas_2icons_re = re.compile(
@@ -45,20 +45,19 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\thinspace({\})?", r" ", output)
         output = re.sub(r"\\tl({\})?", r"&lt;", output)
         output = re.sub(r"\\tg({\})?", r"&gt;", output)
-        output = re.sub(r"\\ttil({\})?", r"~", output)
+        output = re.sub(r"\\ttil({\})?", r"\\~", output)
         output = re.sub(r"\\textbar({\})?", r"|", output)
         output = re.sub(r"\\hrule", "<hr>", output)
         output = re.sub(r"\\hfill", "", output)
-        output = re.sub(r"\\small{(.*?(?=^\}$))}", r"\1", output,
-                        flags=re.DOTALL + re.MULTILINE)
-        output = re.sub(r"\\raggedright{(.*?(?=^\}$))}", r"\1", output,
-                        flags=re.DOTALL + re.MULTILINE)
+        output = re.sub(r"\\small{(?:(.*?)^\s*}(?=\s*\n))", r"\1", output, flags=re.DOTALL + re.MULTILINE)
+        output = re.sub(r"\\raggedright{(.*?(?=^\}$))}", r"\1", output, flags=re.DOTALL + re.MULTILINE)
         output = re.sub(r"\\cline{.*?}", "", output)
         output = re.sub(r"\\c{(.*?)}", r"\1", output)
         output = re.sub(r"vs.\\", "vs.", output)
         output = re.sub(r"\.\\\\\*\}", ".}", output)
         output = re.sub(r"\\/", "", output)
-        output = re.sub(r"\(([a-z])\)", r"( \1 )", output)
+        output = re.sub(r"\\_\\-", r"_", output)
+        output = re.sub(r"\((?:(?![s])([a-z]))\)", r"( \1 )", output)
         output = re.sub(r"__~to~__", r" __to__ ", output)
         output = re.sub(r"-{}-", r"- - ", output)
         output = re.sub(r"\\textsection", "$", output)
