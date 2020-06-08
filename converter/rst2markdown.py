@@ -12,6 +12,7 @@ class Rst2Markdown(object):
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
         self._num_list_re = re.compile(r"""^#\.(?P<content>.*?)\s*?$""", flags=re.MULTILINE)
+        self._list_re = re.compile(r"""^(?P<content>\* *[\s\S]+?)\n$""", flags=re.MULTILINE)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
         self._ref_re = re.compile(r""":ref:`(?P<name>.*?)(?P<label_name><.*?>)?`""")
         self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""")
@@ -48,6 +49,18 @@ class Rst2Markdown(object):
         content = matchobj.group('content')
         content = content.strip()
         return f'1. {content}'
+
+    def _list(self, matchobj):
+        content = matchobj.group('content')
+        content = content.strip()
+        lines = content.split('*')
+        out = ''
+        for line in lines:
+            if not line:
+                continue
+            line = line.replace('\n', '')
+            out += f'* {line}{self._caret_token}'
+        return out
 
     def _ext_links(self, matchobj):
         name = matchobj.group('name')
@@ -127,6 +140,7 @@ class Rst2Markdown(object):
         output = self._sidebar_re.sub(self._sidebar, output)
         output = re.sub(self._caret_token, "\n", output)
         output = self._image_re.sub(self._image, output)
+        output = self._list_re.sub(self._list, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = re.sub(self._caret_token, "\n", output)
         return output
