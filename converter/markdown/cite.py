@@ -9,12 +9,14 @@ cite_re = re.compile(r"""\\cite{(?P<ref>.*?)}""", flags=re.DOTALL + re.VERBOSE)
 bib_re = re.compile(r"""@(?P<type>.*?){(?P<ref>.*?),""", flags=re.DOTALL + re.VERBOSE)
 
 
-def clean_title(title):
-    title = title.replace("{", "").replace("}", "")
-    title = title.replace("\\&", "&")
-    title = title.replace("`", "'")
-    title = title.replace("---", "-")
-    return title
+def clean_text(string):
+    string = string.replace("{", "").replace("}", "")
+    string = string.replace("\\&", "&")
+    string = string.replace("`", "'")
+    string = string.replace("---", "-")
+    string = string.replace("\\", "")
+    string = string.replace("o{}", "o")
+    return string
 
 
 class Cite(object):
@@ -73,13 +75,13 @@ class Cite(object):
         bib_item = Cite._bib_file.get(ref.lower(), {})
         if bib_item:
             if bib_item.get('title') and bib_item.get('author'):
-                author = bib_item.get('author')
-                title = clean_title(bib_item.get('title'))
+                author = clean_text(bib_item.get('author'))
+                title = clean_text(bib_item.get('title'))
                 return f'<abbr title="{title}">{author}</abbr>'
             elif bib_item.get('title'):
-                return clean_title(bib_item.get('title'))
+                return clean_text(bib_item.get('title'))
             elif bib_item.get('author'):
-                return bib_item.get('author')
+                return clean_text(bib_item.get('author'))
         return ref
 
     def make_block(self, matchobj):
