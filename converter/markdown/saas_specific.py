@@ -54,6 +54,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\cline{.*?}", "", output)
         output = re.sub(r"\\bs{}", r"\\", output)
         output = re.sub(r"==", r"\\=\\=", output)
+        output = re.sub(r"\\o{}", r"o", output)
         output = re.sub(r"\\c{(.*?)}", r"\1", output)
         output = re.sub(r"vs.\\", "vs.", output)
         output = re.sub(r"\.\\\\\*\}", ".}", output)
