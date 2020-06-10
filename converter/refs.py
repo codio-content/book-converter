@@ -78,6 +78,14 @@ def make_refs(toc, chapter_counter_from=1):
         else:
             section_counter += 1
         for line in item.lines:
+            if line.startswith("\\sectionfile"):
+                result = re.search(r"\\sectionfile{(?P<block_name>.*?)}{(?P<block_path>.*?)}", line)
+                label = result.group("block_path")
+                if label:
+                    refs[label] = {
+                        'pageref': item.section_name
+                    }
+                    refs[label]["ref"] = f'{chapter_counter}.{section_counter}'
             if line.startswith("\\begin{figure}"):
                 figs_counter += 1
                 is_figure = True
