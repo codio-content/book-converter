@@ -44,6 +44,7 @@ from converter.markdown.remove_comments import RemoveComments
 from converter.markdown.screencast import Screencast
 from converter.markdown.tabularx import Tabularx
 from converter.markdown.tabular import Tabular
+from converter.markdown.tags import Tags
 from converter.markdown.unescape import UnEscape
 from converter.markdown.turingwinner import TuringWinner
 
@@ -172,6 +173,7 @@ class LaTeX2Markdown(object):
         output = Center(output, self._caret_token).convert()
 
         output = UnEscape(output).convert()
+        output = Tags(output).convert()
         output = NewLine(output).convert()
 
         # convert all matched % back
