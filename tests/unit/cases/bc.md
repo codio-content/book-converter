@@ -6,6 +6,6 @@ jQuery defines a global function <b>jQuery()</b> (aliased as <b><span>\$</span>(
 
 
 |||info
-The call <b>jQuery.noConflict()</b> “undefines” the <b><span>\$</span></b> alias, in case your app uses the browser's built-in <b><span>\$</span></b> (usually an alias for <b>document.-getElementById</b>) or loads another JavaScript library such as [Prototype](http://prototypejs.org) that also tries to define <b><span>\$</span></b>.
+The call <b>jQuery.noConflict()</b> “undefines” the <b><span>\$</span></b> alias, in case your app uses the browser's built-in <b><span>\$</span></b> (usually an alias for <b>document.getElementById</b>) or loads another JavaScript library such as [Prototype](http://prototypejs.org) that also tries to define <b><span>\$</span></b>.
 
 |||
