@@ -8,7 +8,7 @@ class Tags(object):
     def convert(self):
         output = self.str
 
-        output = re.sub(r"\\tl({\})?", r"&lt;", output)
-        output = re.sub(r"\\tg({\})?", r"&gt;", output)
+        output = re.sub(r"\\tl", r"&lt;", output)
+        output = re.sub(r"\\tg", r"&gt;", output)
 
         return output

@@ -36,6 +36,8 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\putbib", "", output)
         output = re.sub(r"\\ig({\})?", "Instructors' Manual", output)
         output = re.sub(r"\\js({\})?", "JavaScript", output)
+        output = re.sub(r"\\tl({\})?", r"\\tl", output)
+        output = re.sub(r"\\tg({\})?", r"\\tg", output)
         output = re.sub(r"\\slash({\})?", "/", output)
         output = re.sub(r"\\ldots({\})?", r"...", output)
         output = re.sub(r"\\LaTeX({\})?", r"LaTeX", output)
