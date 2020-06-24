@@ -29,6 +29,9 @@ class Rst2Markdown(object):
                                     flags=re.MULTILINE + re.DOTALL)
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
                                       flags=re.MULTILINE + re.DOTALL)
+        self._inlineav_re = re.compile(
+            r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options>^ {3}:.*?: \S*\n$)""",
+            flags=re.MULTILINE + re.DOTALL)
 
     def _heading1(self, matchobj):
         return ''
@@ -120,9 +123,38 @@ class Rst2Markdown(object):
         return f'{caret_token}|||xdiscipline{caret_token}{caret_token}**{name}**{caret_token}{caret_token}' \
                f'{content}{caret_token}{caret_token}|||{caret_token}{caret_token}'
 
+    def _inlineav(self, matchobj):
+        images = {}
+        caret_token = self._caret_token
+        option_re = re.compile('[\t ]+:([^:]+): (.+)')
+        name = matchobj.group('name')
+        av_type = matchobj.group('type')
+        options = matchobj.group('options')
+        options = options.split('\n')
+        for opt in options:
+            match = option_re.match(opt)
+            if match:
+                images[match[1]] = match[2]
+        script = images.get('scripts')
+        if script:
+            if av_type == 'dgm':
+                return f'{caret_token}<div id="{name}"></div>{caret_token}' \
+                       f'<script type="text/javascript" src="/OpenDSA/{script}"></script>{caret_token}'
+            if av_type == 'ss':
+                return f'{caret_token}<div id="{name}">' \
+                       f'<span class="jsavcounter"></span>' \
+                       f'<a class="jsavsettings" href="#">Settings</a>' \
+                       f'<div class="jsavcontrols"></div>' \
+                       f'<p class="jsavoutput jsavline"></p>' \
+                       f'<div class="jsavcanvas"></div>' \
+                       f'</div>{caret_token}' \
+                       f'<script type="text/javascript" src="/OpenDSA/{script}"></script>{caret_token}'
+
     def to_markdown(self):
         output = '\n'.join(self.lines_array)
         output = re.sub(r"\|---\|", "--", output)
+        output = re.sub(r"\+", "\\+", output)
+        output = self._inlineav_re.sub(self._inlineav, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
