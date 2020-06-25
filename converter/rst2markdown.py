@@ -139,7 +139,7 @@ class Rst2Markdown(object):
         if script:
             if av_type == 'dgm':
                 return f'{caret_token}<div id="{name}" class="ssAV"></div>{caret_token}' \
-                       f'<script type="text/javascript" src="/.guides/{script}"></script>{caret_token}'
+                       f'<script type="text/javascript" src=".guides/{script}"></script>{caret_token}'
             if av_type == 'ss':
                 return f'{caret_token}<div id="{name}" class="ssAV">{caret_token}' \
                        f'<span class="jsavcounter"></span>{caret_token}' \
@@ -148,7 +148,7 @@ class Rst2Markdown(object):
                        f'<p class="jsavoutput jsavline"></p>{caret_token}' \
                        f'<div class="jsavcanvas"></div>{caret_token}' \
                        f'</div>{caret_token}' \
-                       f'<script type="text/javascript" src="/.guides/{script}"></script>{caret_token}'
+                       f'<script type="text/javascript" src=".guides/{script}"></script>{caret_token}'
 
     def to_markdown(self):
         output = '\n'.join(self.lines_array)
