@@ -138,17 +138,17 @@ class Rst2Markdown(object):
         script = images.get('scripts')
         if script:
             if av_type == 'dgm':
-                return f'{caret_token}<div id="{name}"></div>{caret_token}' \
-                       f'<script type="text/javascript" src="/OpenDSA/{script}"></script>{caret_token}'
+                return f'{caret_token}<div id="{name}" class="ssAV"></div>{caret_token}' \
+                       f'<script type="text/javascript" src="/.guides/{script}"></script>{caret_token}'
             if av_type == 'ss':
-                return f'{caret_token}<div id="{name}">' \
-                       f'<span class="jsavcounter"></span>' \
-                       f'<a class="jsavsettings" href="#">Settings</a>' \
-                       f'<div class="jsavcontrols"></div>' \
-                       f'<p class="jsavoutput jsavline"></p>' \
-                       f'<div class="jsavcanvas"></div>' \
+                return f'{caret_token}<div id="{name}" class="ssAV">{caret_token}' \
+                       f'<span class="jsavcounter"></span>{caret_token}' \
+                       f'<a class="jsavsettings" href="#">Settings</a>{caret_token}' \
+                       f'<div class="jsavcontrols"></div>{caret_token}' \
+                       f'<p class="jsavoutput jsavline"></p>{caret_token}' \
+                       f'<div class="jsavcanvas"></div>{caret_token}' \
                        f'</div>{caret_token}' \
-                       f'<script type="text/javascript" src="/OpenDSA/{script}"></script>{caret_token}'
+                       f'<script type="text/javascript" src="/.guides/{script}"></script>{caret_token}'
 
     def to_markdown(self):
         output = '\n'.join(self.lines_array)
