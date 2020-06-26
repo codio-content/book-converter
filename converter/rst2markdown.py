@@ -1,3 +1,4 @@
+import pathlib
 import re
 import uuid
 
@@ -31,6 +32,9 @@ class Rst2Markdown(object):
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
             r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options>^ {3}:.*?: \S*\n$)""",
+            flags=re.MULTILINE + re.DOTALL)
+        self._code_include_re = re.compile(
+            r"""\.\. codeinclude:: (?P<path>.*?$)\n(?P<options>^ +:.*?: \S*\n$)?""",
             flags=re.MULTILINE + re.DOTALL)
 
     def _heading1(self, matchobj):
@@ -150,10 +154,55 @@ class Rst2Markdown(object):
                        f'</div>{caret_token}' \
                        f'<script type="text/javascript" src=".guides/{script}"></script>{caret_token}'
 
+    def _code_include(self, matchobj):
+        options = {}
+        lines = []
+        content = ''
+        tag = None
+        caret_token = self._caret_token
+        code_dir = pathlib.Path('OpenDSA/SourceCode').resolve()
+        option_re = re.compile('[\t ]+:([^:]+): (.+)')
+        path = matchobj.group('path').strip()
+        path = pathlib.Path(path)
+        opt = matchobj.group('options')
+        if opt:
+            opt = opt.split('\n')
+            for item in opt:
+                match = option_re.match(item)
+                if match:
+                    options[match[1]] = match[2]
+                    tag = options.get('tag')
+        file_path = pathlib.Path(path)
+        if not str(file_path).endswith(".java"):
+            file_path = "{}.java".format(file_path)
+        if not str(file_path).startswith('Java'):
+            java_dir = pathlib.Path('Java')
+            file_path = java_dir.joinpath(file_path)
+        file = code_dir.joinpath(file_path)
+        if file.exists():
+            lines = self.load_file(file)
+        if lines:
+            for line in lines:
+                if tag:
+                    start_tag_string = f'/* *** ODSATag: {tag} *** */'
+                    end_tag_string = f'/* *** ODSAendTag: {tag} *** */'
+                    if line.startswith(start_tag_string):
+                        content = ''
+                        continue
+                    if line.startswith(end_tag_string):
+                        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
+                content += line
+        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
+
+    def load_file(self, path):
+        with open(path, 'r') as file:
+            return file.readlines()
+
     def to_markdown(self):
         output = '\n'.join(self.lines_array)
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+", "\\+", output)
+        output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
@@ -166,10 +215,11 @@ class Rst2Markdown(object):
         output = self._math_re.sub(self._math, output)
         output = self._math_block_re.sub(self._math_block, output)
         output = self._topic_example_re.sub(self._topic_example, output)
+        # output = self._code_re.sub(self._code, output)
+        output = self._code_include_re.sub(self._code_include, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
         output = re.sub(self._caret_token, "\n", output)
         output = self._image_re.sub(self._image, output)
-        output = self._code_re.sub(self._code, output)
         output = re.sub(self._caret_token, "\n", output)
         return output
