@@ -398,12 +398,14 @@ def assets_extension(base_src_dir):
             file = base_src_dir.joinpath('{}.{}'.format(asset_path, ext))
             if file.exists():
                 return ext
+
     return detect_asset_ext
 
 
 def cleanup_bookdown(lines):
     lines = lines[1:]
     return lines
+
 
 def cleanup_rst(lines):
     updated = []
@@ -415,6 +417,7 @@ def cleanup_rst(lines):
             continue
         updated.append(line)
     return updated
+
 
 def get_labels(lines):
     label = ''
