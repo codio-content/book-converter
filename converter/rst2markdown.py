@@ -20,6 +20,8 @@ class Rst2Markdown(object):
         self._math_re = re.compile(r""":math:`(?P<content>.*?)`""")
         self._math_block_re = re.compile(r""" {,3}.. math::\n^[\s\S]*?(?P<content>.*?)(?=\n{2,})""",
                                          flags=re.MULTILINE + re.DOTALL)
+        self._todo_block_re = re.compile(r"""\.\. TODO::\n(?P<options>^ +:.*?: \S*\n$)(?P<text>.*?\n^$\n(?=\S*)|.*)""",
+                                         flags=re.MULTILINE + re.DOTALL)
         self._paragraph_re = re.compile(r"""^(?!\s|\d|#\.|\*|\..).*?(?=\n^\s*$)""", flags=re.MULTILINE + re.DOTALL)
         self._topic_example_re = re.compile(
             r"""^(?!\s)\.\. topic:: (?P<type>Example)\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
@@ -82,10 +84,12 @@ class Rst2Markdown(object):
 
     def _math(self, matchobj):
         content = matchobj.group('content')
+        content = content.replace("\\+", "+")
         return f'$${content}$$'
 
     def _math_block(self, matchobj):
         content = matchobj.group('content')
+        content = content.replace("\\+", "+")
         return f'  <center>$${content}$$</center>'
 
     def _paragraph(self, matchobj):
@@ -106,6 +110,9 @@ class Rst2Markdown(object):
         caret_token = self._caret_token
         content = matchobj.group('content')
         return f'<div style="padding: 30px;">{content}{caret_token}</div>{caret_token}{caret_token}'
+
+    def _todo_block(self, matchobj):
+        return ''
 
     def _code(self, matchobj):
         caret_token = self._caret_token
@@ -160,7 +167,8 @@ class Rst2Markdown(object):
         content = ''
         tag = None
         caret_token = self._caret_token
-        code_dir = pathlib.Path('OpenDSA/SourceCode').resolve()
+        curr_dir = pathlib.Path.cwd().parent
+        code_dir = curr_dir.joinpath('OpenDSA/SourceCode')
         option_re = re.compile('[\t ]+:([^:]+): (.+)')
         path = matchobj.group('path').strip()
         path = pathlib.Path(path)
@@ -178,11 +186,13 @@ class Rst2Markdown(object):
         if not str(file_path).startswith('Java'):
             java_dir = pathlib.Path('Java')
             file_path = java_dir.joinpath(file_path)
-        file = code_dir.joinpath(file_path)
+        file = code_dir.joinpath(file_path).resolve()
         if file.exists():
             lines = self.load_file(file)
         if lines:
             for line in lines:
+                if not line:
+                    continue
                 if tag:
                     start_tag_string = f'/* *** ODSATag: {tag} *** */'
                     end_tag_string = f'/* *** ODSAendTag: {tag} *** */'
@@ -191,6 +201,7 @@ class Rst2Markdown(object):
                         continue
                     if line.startswith(end_tag_string):
                         return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
+                line = re.sub(r"\/\* \*\*\* .*? \*\*\* \*\/", "", line)
                 content += line
         return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
 
@@ -203,6 +214,7 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+", "\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
+        output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
@@ -214,6 +226,7 @@ class Rst2Markdown(object):
         output = self._term_re.sub(self._term, output)
         output = self._math_re.sub(self._math, output)
         output = self._math_block_re.sub(self._math_block, output)
+        output = self._paragraph_re.sub(self._paragraph, output)
         output = self._topic_example_re.sub(self._topic_example, output)
         # output = self._code_re.sub(self._code, output)
         output = self._code_include_re.sub(self._code_include, output)
