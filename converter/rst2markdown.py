@@ -14,7 +14,8 @@ class Rst2Markdown(object):
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
-        self._num_list_re = re.compile(r"""^[#|\d]\. (?P<content>.*?)\s*?^$""", flags=re.MULTILINE + re.DOTALL)
+        self._list_re = re.compile(r"""^(?P<type>[#|\d]\.|[*]) (?P<content>.*?)\s*?^$""",
+                                       flags=re.MULTILINE + re.DOTALL)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
         self._ref_re = re.compile(r""":ref:`(?P<name>.*?)(?P<label_name><.*?>)?`""")
         self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""")
@@ -55,7 +56,8 @@ class Rst2Markdown(object):
         content = matchobj.group('content')
         return f'{self._caret_token}#### {content}'
 
-    def _num_list(self, matchobj):
+    def _list(self, matchobj):
+        list_type = matchobj.group('type')
         content = matchobj.group('content')
         content = content.strip()
         out = []
@@ -63,6 +65,8 @@ class Rst2Markdown(object):
             line = line.strip()
             out.append(line)
         list_item = ' '.join(out)
+        if list_type == '*':
+            return f'* {list_item}'
         return f'1. {list_item}'
 
     def _ext_links(self, matchobj):
@@ -221,7 +225,7 @@ class Rst2Markdown(object):
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
         output = self._heading4_re.sub(self._heading4, output)
-        output = self._num_list_re.sub(self._num_list, output)
+        output = self._list_re.sub(self._list, output)
         output = self._ext_links_re.sub(self._ext_links, output)
         output = self._ref_re.sub(self._ref, output)
         output = self._term_re.sub(self._term, output)
