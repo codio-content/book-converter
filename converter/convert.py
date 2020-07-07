@@ -1,5 +1,4 @@
 import logging
-import re
 import shutil
 import uuid
 from collections import OrderedDict
@@ -516,7 +515,8 @@ def convert_rst(config, base_path, yes=False):
     book, metadata = make_metadata_items(config)
 
     chapter = None
-    chapter_num = 1
+    chapter_num = 0
+    subsection_num = 0
     children_containers = [book["children"]]
     logging.debug("convert selected pages")
 
@@ -525,10 +525,12 @@ def convert_rst(config, base_path, yes=False):
 
     for item in toc:
         if item.section_type == CHAPTER:
+            subsection_num = 0
             chapter_num += 1
             slug_name = slugify(item.section_name)
             chapter = item.section_name
         else:
+            subsection_num += 1
             slug_name = slugify(item.section_name, chapter=chapter)
 
         logging.debug("convert page {} - {}".format(slug_name, chapter_num))
@@ -545,7 +547,8 @@ def convert_rst(config, base_path, yes=False):
             lines = cleanup_rst(item.lines)
             md_converter = Rst2Markdown(
                 lines,
-                chapter_num=chapter_num
+                chapter_num=chapter_num,
+                subsection_num=subsection_num
             )
             converted_md = md_converter.to_markdown()
 

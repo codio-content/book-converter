@@ -4,16 +4,17 @@ import uuid
 
 
 class Rst2Markdown(object):
-    def __init__(self, lines_array, chapter_num=1):
+    def __init__(self, lines_array, chapter_num=0, subsection_num=0):
         self._caret_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
+        self._subsection_num = subsection_num
+        self._figure_counter = 0
         self.lines_array = lines_array
         self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
         self._num_list_re = re.compile(r"""^[#|\d]\. (?P<content>.*?)\s*?^$""", flags=re.MULTILINE + re.DOTALL)
-        self._code_re = re.compile(r"""^(?P<content>(?: {3}(?!:)| {2}if).*?)\n^$""", flags=re.MULTILINE + re.DOTALL)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
         self._ref_re = re.compile(r""":ref:`(?P<name>.*?)(?P<label_name><.*?>)?`""")
         self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""")
@@ -24,7 +25,7 @@ class Rst2Markdown(object):
                                          flags=re.MULTILINE + re.DOTALL)
         self._paragraph_re = re.compile(r"""^(?!\s|\d|#\.|\*|\..).*?(?=\n^\s*$)""", flags=re.MULTILINE + re.DOTALL)
         self._topic_example_re = re.compile(
-            r"""^(?!\s)\.\. topic:: (?P<type>Example)\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
+            r"""^(?!\s)\.\. topic:: (?P<type>Example)\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S)|.*)""",
             flags=re.MULTILINE + re.DOTALL)
         self._epigraph_re = re.compile(r"""^(?!\s)\.\. epigraph::\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
                                        flags=re.MULTILINE + re.DOTALL)
@@ -44,15 +45,15 @@ class Rst2Markdown(object):
 
     def _heading2(self, matchobj):
         content = matchobj.group('content')
-        return f'## {content}'
+        return f'{self._caret_token}## {content}'
 
     def _heading3(self, matchobj):
         content = matchobj.group('content')
-        return f'### {content}'
+        return f'{self._caret_token}### {content}'
 
     def _heading4(self, matchobj):
         content = matchobj.group('content')
-        return f'#### {content}'
+        return f'{self._caret_token}#### {content}'
 
     def _num_list(self, matchobj):
         content = matchobj.group('content')
@@ -102,8 +103,10 @@ class Rst2Markdown(object):
         topic_type = matchobj.group('type')
         content = matchobj.group('content')
         content = content.strip()
+        self._figure_counter += 1
         return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
-               f'{caret_token}{caret_token}**{topic_type}**<br/><br/>' \
+               f'{caret_token}{caret_token}**{topic_type} {self._chapter_num}.{self._subsection_num}.' \
+               f'{self._figure_counter}**<br/><br/>' \
                f'{caret_token}{caret_token}{content}</div><br/>{caret_token}{caret_token}'
 
     def _epigraph(self, matchobj):
@@ -113,11 +116,6 @@ class Rst2Markdown(object):
 
     def _todo_block(self, matchobj):
         return ''
-
-    def _code(self, matchobj):
-        caret_token = self._caret_token
-        content = matchobj.group('content')
-        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
 
     def _image(self, matchobj):
         caret_token = self._caret_token
@@ -200,10 +198,13 @@ class Rst2Markdown(object):
                         content = ''
                         continue
                     if line.startswith(end_tag_string):
-                        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
-                line = re.sub(r"\/\* \*\*\* .*? \*\*\* \*\/", "", line)
+                        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
+                line = re.sub(r"/\* \*\*\* .*? \*\*\* \*/", "", line)
                 content += line
-        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
+        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
+
+    def get_figure_counter(self):
+        return self._figure_counter
 
     def load_file(self, path):
         with open(path, 'r') as file:
@@ -228,7 +229,6 @@ class Rst2Markdown(object):
         output = self._math_block_re.sub(self._math_block, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = self._topic_example_re.sub(self._topic_example, output)
-        # output = self._code_re.sub(self._code, output)
         output = self._code_include_re.sub(self._code_include, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
