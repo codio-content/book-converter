@@ -14,7 +14,7 @@ class Rst2Markdown(object):
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
-        self._list_re = re.compile(r"""^(?P<type>[#|\d]\.|[*]) (?P<content>.*?)\s*?^$""",
+        self._list_re = re.compile(r"""^(?P<type>[#|\d]\.|[*]) (?P<content>.*?\n(?: .*?\n.*?)*)""",
                                        flags=re.MULTILINE + re.DOTALL)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
         self._ref_re = re.compile(r""":ref:`(?P<name>.*?)(?P<label_name><.*?>)?`""")
@@ -66,7 +66,7 @@ class Rst2Markdown(object):
             out.append(line)
         list_item = ' '.join(out)
         if list_type == '*':
-            return f'* {list_item}'
+            return f'* {list_item}{self._caret_token}'
         return f'1. {list_item}'
 
     def _ext_links(self, matchobj):
