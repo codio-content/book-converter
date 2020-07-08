@@ -15,7 +15,7 @@ class Rst2Markdown(object):
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
         self._list_re = re.compile(r"""^(?P<type>[#|\d]\.|[*]) (?P<content>.*?\n(?: .*?\n.*?)*)""",
-                                       flags=re.MULTILINE + re.DOTALL)
+                                   flags=re.MULTILINE + re.DOTALL)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
         self._ref_re = re.compile(r""":ref:`(?P<name>.*?)(?P<label_name><.*?>)?`""")
         self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""")
@@ -37,9 +37,10 @@ class Rst2Markdown(object):
         self._inlineav_re = re.compile(
             r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options>^ {3}:.*?: \S*\n$)""",
             flags=re.MULTILINE + re.DOTALL)
+        self._code_lines_re = re.compile(
+            r"""^$\n(?P<content> +.*?\n)^$""", flags=re.MULTILINE + re.DOTALL)
         self._code_include_re = re.compile(
-            r"""\.\. codeinclude:: (?P<path>.*?$)\n(?P<options>^ +:.*?: \S*\n$)?""",
-            flags=re.MULTILINE + re.DOTALL)
+            r"""\.\. codeinclude:: (?P<path>.*?$)\n(?P<options>^ +:.*?: \S*\n$)?""", flags=re.MULTILINE + re.DOTALL)
 
     def _heading1(self, matchobj):
         return ''
@@ -135,6 +136,11 @@ class Rst2Markdown(object):
         content = content.strip()
         return f'{caret_token}|||xdiscipline{caret_token}{caret_token}**{name}**{caret_token}{caret_token}' \
                f'{content}{caret_token}{caret_token}|||{caret_token}{caret_token}'
+
+    def _code_lines(self, matchobj):
+        caret_token = self._caret_token
+        content = matchobj.group('content')
+        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
 
     def _inlineav(self, matchobj):
         images = {}
@@ -233,6 +239,7 @@ class Rst2Markdown(object):
         output = self._math_block_re.sub(self._math_block, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = self._topic_example_re.sub(self._topic_example, output)
+        output = self._code_lines_re.sub(self._code_lines, output)
         output = self._code_include_re.sub(self._code_include, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
