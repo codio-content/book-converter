@@ -19,6 +19,7 @@ class Quotation(TextAsParagraph):
             end_pos = pos + len(search_str) + 1 + index
             end = out[end_pos:]
             matches[0] = re.sub(r"\\\\", "<br/>", matches[0])
+            matches[1] = matches[1].strip('~')
             out = start + f'{caret_token}> {matches[0]}{caret_token}>' \
                           f'{caret_token}> __{matches[1]}__{caret_token}{caret_token}' + end
             pos = out.find(search_str, end_pos + 1)
