@@ -140,7 +140,7 @@ class Rst2Markdown(object):
     def _code_lines(self, matchobj):
         caret_token = self._caret_token
         content = matchobj.group('content')
-        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}'
+        return f'{caret_token}```{caret_token}{content}```{caret_token}'
 
     def _inlineav(self, matchobj):
         images = {}
