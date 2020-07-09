@@ -38,7 +38,7 @@ class Rst2Markdown(object):
             r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options>^ {3}:.*?: \S*\n$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._code_lines_re = re.compile(
-            r"""^$\n(?P<content> +.*?\n)^$""", flags=re.MULTILINE + re.DOTALL)
+            r"""^$\n(?P<content> {2}.*?\n)^$""", flags=re.MULTILINE + re.DOTALL)
         self._code_include_re = re.compile(
             r"""\.\. codeinclude:: (?P<path>.*?$)\n(?P<options>^ +:.*?: \S*\n$)?""", flags=re.MULTILINE + re.DOTALL)
 
@@ -107,7 +107,7 @@ class Rst2Markdown(object):
         caret_token = self._caret_token
         topic_type = matchobj.group('type')
         content = matchobj.group('content')
-        content = content.strip()
+        content = re.sub(r"\n +", "\n ", content)
         self._figure_counter += 1
         return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
                f'{caret_token}{caret_token}**{topic_type} {self._chapter_num}.{self._subsection_num}.' \
@@ -117,7 +117,13 @@ class Rst2Markdown(object):
     def _epigraph(self, matchobj):
         caret_token = self._caret_token
         content = matchobj.group('content')
-        return f'<div style="padding: 30px;">{content}{caret_token}</div>{caret_token}{caret_token}'
+        content = content.strip()
+        out = []
+        for line in content.split('\n'):
+            line = line.strip()
+            out.append(line)
+        content = '\n'.join(out)
+        return f'<div style="padding: 50px;">{caret_token}{content}{caret_token}</div>{caret_token}{caret_token}'
 
     def _todo_block(self, matchobj):
         return ''
@@ -224,7 +230,6 @@ class Rst2Markdown(object):
     def to_markdown(self):
         output = '\n'.join(self.lines_array)
         output = re.sub(r"\|---\|", "--", output)
-        output = re.sub(r"\+", "\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
@@ -240,10 +245,10 @@ class Rst2Markdown(object):
         output = self._math_block_re.sub(self._math_block, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = self._topic_example_re.sub(self._topic_example, output)
-        output = self._code_lines_re.sub(self._code_lines, output)
-        output = self._code_include_re.sub(self._code_include, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
+        output = self._code_lines_re.sub(self._code_lines, output)
+        output = self._code_include_re.sub(self._code_include, output)
         output = re.sub(self._caret_token, "\n", output)
         output = self._image_re.sub(self._image, output)
         output = re.sub(self._caret_token, "\n", output)
