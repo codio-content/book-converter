@@ -167,7 +167,8 @@ class Rst2Markdown(object):
                        f'<p class="jsavoutput jsavline"></p>{caret_token}' \
                        f'<div class="jsavcanvas"></div>{caret_token}' \
                        f'</div>{caret_token}' \
-                       f'<script type="text/javascript" src=".guides/{script}"></script>{caret_token}'
+                       f'<script type="text/javascript" src=".guides/{script}">' \
+                       f'</script>{caret_token}{caret_token}'
 
     def _code_include(self, matchobj):
         options = {}
