@@ -35,7 +35,7 @@ class Rst2Markdown(object):
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
-            r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options>^ {3}:.*?: \S*\n$)""",
+            r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options> {3}.*?)(?=^\s*$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._code_lines_re = re.compile(
             r"""^$\n(?P<content> {2}.*?\n)^$""", flags=re.MULTILINE + re.DOTALL)
@@ -58,6 +58,7 @@ class Rst2Markdown(object):
         return f'{self._caret_token}#### {content}'
 
     def _list(self, matchobj):
+        caret_token = self._caret_token
         list_type = matchobj.group('type')
         content = matchobj.group('content')
         content = content.strip()
@@ -67,8 +68,8 @@ class Rst2Markdown(object):
             out.append(line)
         list_item = ' '.join(out)
         if list_type == '*':
-            return f'* {list_item}{self._caret_token}'
-        return f'1. {list_item}'
+            return f'* {list_item}{caret_token}{caret_token}'
+        return f'1. {list_item}{caret_token}{caret_token}'
 
     def _ext_links(self, matchobj):
         name = matchobj.group('name')
@@ -231,6 +232,7 @@ class Rst2Markdown(object):
         output = '\n'.join(self.lines_array)
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
+        output = re.sub(r"\+\+", "\\+\\+", output)
         output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._heading1_re.sub(self._heading1, output)
