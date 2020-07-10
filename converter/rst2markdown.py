@@ -38,7 +38,7 @@ class Rst2Markdown(object):
             r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options> {3}.*?)(?=^\s*$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._code_lines_re = re.compile(
-            r"""^$\n(?P<content> {2}.*?\n)^$""", flags=re.MULTILINE + re.DOTALL)
+            r"""^$\n(?P<content> {2}[\S ]*)\n^$""", flags=re.MULTILINE + re.DOTALL)
         self._code_include_re = re.compile(
             r"""\.\. codeinclude:: (?P<path>.*?$)\n(?P<options>^ +:.*?: \S*\n$)?""", flags=re.MULTILINE + re.DOTALL)
 
@@ -51,7 +51,7 @@ class Rst2Markdown(object):
 
     def _heading3(self, matchobj):
         content = matchobj.group('content')
-        return f'{self._caret_token}### {content}'
+        return f'{self._caret_token}{self._caret_token}### {content}'
 
     def _heading4(self, matchobj):
         content = matchobj.group('content')
@@ -96,8 +96,9 @@ class Rst2Markdown(object):
 
     def _math_block(self, matchobj):
         content = matchobj.group('content')
+        content = content.strip()
         content = content.replace("\\+", "+")
-        return f'  <center>$${content}$$</center>'
+        return f'<center>$${content}$$</center>'
 
     def _paragraph(self, matchobj):
         content = matchobj.group(0)
@@ -161,11 +162,13 @@ class Rst2Markdown(object):
             match = option_re.match(opt)
             if match:
                 images[match[1]] = match[2]
-        script = images.get('scripts')
-        if script:
+        script_opt = images.get('scripts')
+        script_opt = script_opt.split()
+        if len(script_opt) > 0:
+            scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/{x}">'
+                                                 f'</script>{caret_token}', script_opt)))
             if av_type == 'dgm':
-                return f'{caret_token}<div id="{name}" class="ssAV"></div>{caret_token}' \
-                       f'<script type="text/javascript" src=".guides/{script}"></script>{caret_token}'
+                return f'{caret_token}<div id="{name}" class="ssAV"></div>{caret_token}{scripts}{caret_token}'
             if av_type == 'ss':
                 return f'{caret_token}<div id="{name}" class="ssAV">{caret_token}' \
                        f'<span class="jsavcounter"></span>{caret_token}' \
@@ -173,9 +176,7 @@ class Rst2Markdown(object):
                        f'<div class="jsavcontrols"></div>{caret_token}' \
                        f'<p class="jsavoutput jsavline"></p>{caret_token}' \
                        f'<div class="jsavcanvas"></div>{caret_token}' \
-                       f'</div>{caret_token}' \
-                       f'<script type="text/javascript" src=".guides/{script}">' \
-                       f'</script>{caret_token}{caret_token}'
+                       f'</div>{caret_token}{scripts}{caret_token}'
 
     def _code_include(self, matchobj):
         options = {}
