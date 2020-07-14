@@ -68,8 +68,8 @@ class Rst2Markdown(object):
             out.append(line)
         list_item = ' '.join(out)
         if list_type == '*':
-            return f'* {list_item}{caret_token}{caret_token}'
-        return f'1. {list_item}{caret_token}{caret_token}'
+            return f'* {list_item}{caret_token}'
+        return f'{list_item}{caret_token}'
 
     def _ext_links(self, matchobj):
         name = matchobj.group('name')
@@ -222,6 +222,20 @@ class Rst2Markdown(object):
                 content += line
         return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
 
+    def _enum_lists_parse(self, lines):
+        counter = 0
+        list_flag = False
+        for ind, line in enumerate(lines):
+            next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
+            if line.startswith('#. '):
+                list_flag = True
+                counter += 1
+                lines[ind] = line.replace("#", str(counter), 1)
+            if not next_line[:1] and next_line != '' and not next_line.startswith('#. ') and list_flag:
+                list_flag = False
+                counter = 0
+        return lines
+
     def get_figure_counter(self):
         return self._figure_counter
 
@@ -230,6 +244,7 @@ class Rst2Markdown(object):
             return file.readlines()
 
     def to_markdown(self):
+        self.lines_array = self._enum_lists_parse(self.lines_array)
         output = '\n'.join(self.lines_array)
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
