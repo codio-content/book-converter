@@ -99,7 +99,7 @@ def is_section_file(line):
 
 
 def get_section_lines(line, tex_folder):
-    section_line_re = re.compile(r"""\\sectionfile{(?P<block_name>.*?)}{(?P<block_path>.*?)}""")
+    section_line_re = re.compile(r"""\\sectionfile(\[.*?\])?{(?P<block_name>.*?)}{(?P<block_path>.*?)}""")
     result = section_line_re.search(line)
     if result:
         file = result.group("block_path")

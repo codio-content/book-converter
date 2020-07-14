@@ -79,7 +79,7 @@ def make_refs(toc, chapter_counter_from=1):
             section_counter += 1
         for line in item.lines:
             if line.startswith("\\sectionfile"):
-                result = re.search(r"\\sectionfile{(?P<block_name>.*?)}{(?P<block_path>.*?)}", line)
+                result = re.search(r"\\sectionfile(\[.*?\])?{(?P<block_name>.*?)}{(?P<block_path>.*?)}", line)
                 label = result.group("block_path")
                 if label:
                     refs[label] = {
