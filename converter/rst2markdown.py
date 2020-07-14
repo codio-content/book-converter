@@ -227,11 +227,12 @@ class Rst2Markdown(object):
         list_flag = False
         for ind, line in enumerate(lines):
             next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
-            if line.startswith('#. '):
+            if line.startswith('#. ') or line.startswith('   #. '):
                 list_flag = True
                 counter += 1
                 lines[ind] = line.replace("#", str(counter), 1)
-            if not next_line[:1] and next_line != '' and not next_line.startswith('#. ') and list_flag:
+            if next_line[:1].strip() and not next_line.startswith('#. ') \
+                    and not next_line.startswith('   #. ') and list_flag:
                 list_flag = False
                 counter = 0
         return lines
