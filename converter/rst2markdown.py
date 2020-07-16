@@ -69,7 +69,7 @@ class Rst2Markdown(object):
         list_item = ' '.join(out)
         if list_type == '*':
             return f'* {list_item}{caret_token}'
-        return f'{list_item}{caret_token}'
+        return f'{list_type} {list_item}{caret_token}'
 
     def _ext_links(self, matchobj):
         name = matchobj.group('name')
@@ -145,10 +145,20 @@ class Rst2Markdown(object):
         return f'{caret_token}|||xdiscipline{caret_token}{caret_token}**{name}**{caret_token}{caret_token}' \
                f'{content}{caret_token}{caret_token}|||{caret_token}{caret_token}'
 
-    def _code_lines(self, matchobj):
-        caret_token = self._caret_token
-        content = matchobj.group('content')
-        return f'{caret_token}```{caret_token}{content}```{caret_token}'
+    def _code_lines(self, data):
+        flag = False
+        lines = data.split("\n")
+        for ind, line in enumerate(lines):
+            prev_line = lines[ind - 1]
+            next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
+            indent_size = len(line) - len(line.lstrip())
+            if prev_line == '' and indent_size == 2 or indent_size == 3:
+                flag = True
+            if flag:
+                lines[ind] = line.replace(line, f"```{line}```")
+            if next_line == '' or indent_size < 2:
+                flag = False
+        return "\n".join(lines)
 
     def _inlineav(self, matchobj):
         images = {}
@@ -164,19 +174,25 @@ class Rst2Markdown(object):
                 images[match[1]] = match[2]
         script_opt = images.get('scripts')
         script_opt = script_opt.split()
-        if len(script_opt) > 0:
-            scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/{x}">'
-                                                 f'</script>{caret_token}', script_opt)))
-            if av_type == 'dgm':
-                return f'{caret_token}<div id="{name}" class="ssAV"></div>{caret_token}{scripts}{caret_token}'
-            if av_type == 'ss':
-                return f'{caret_token}<div id="{name}" class="ssAV">{caret_token}' \
-                       f'<span class="jsavcounter"></span>{caret_token}' \
-                       f'<a class="jsavsettings" href="#">Settings</a>{caret_token}' \
-                       f'<div class="jsavcontrols"></div>{caret_token}' \
-                       f'<p class="jsavoutput jsavline"></p>{caret_token}' \
-                       f'<div class="jsavcanvas"></div>{caret_token}' \
-                       f'</div>{caret_token}{scripts}{caret_token}'
+        css_opt = images.get('links', '')
+        css_opt = css_opt.split()
+        scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/{x}">'
+                                             f'</script>{caret_token}', script_opt)))
+        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href=".guides/{x}"/>'
+                                               f'{caret_token}', css_opt)))
+        if av_type == 'dgm':
+            return f'{caret_token}{css_links}{caret_token}' \
+                   f'<div id="{name}" class="ssAV"></div>' \
+                   f'{caret_token}{scripts}{caret_token}'
+        if av_type == 'ss':
+            return f'{caret_token}{css_links}{caret_token}' \
+                   f'<div id="{name}" class="ssAV">{caret_token}' \
+                   f'<span class="jsavcounter"></span>{caret_token}' \
+                   f'<a class="jsavsettings" href="#">Settings</a>{caret_token}' \
+                   f'<div class="jsavcontrols"></div>{caret_token}' \
+                   f'<p class="jsavoutput jsavline"></p>{caret_token}' \
+                   f'<div class="jsavcanvas"></div>{caret_token}' \
+                   f'</div>{caret_token}{scripts}{caret_token}<br/>'
 
     def _code_include(self, matchobj):
         options = {}
@@ -247,9 +263,16 @@ class Rst2Markdown(object):
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
         output = '\n'.join(self.lines_array)
+
+        match = re.search(r"Here is a more detailed", output)
+        if match:
+            test = 1
+
+
         output = re.sub(r"\|---\|", "--", output)
-        output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = re.sub(r"\+\+", "\\+\\+", output)
+        output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
+        output = re.sub(r"^.. _.*?:$", "", output, flags=re.MULTILINE)
         output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._heading1_re.sub(self._heading1, output)
@@ -266,7 +289,7 @@ class Rst2Markdown(object):
         output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
-        output = self._code_lines_re.sub(self._code_lines, output)
+        output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
         output = re.sub(self._caret_token, "\n", output)
         output = self._image_re.sub(self._image, output)
