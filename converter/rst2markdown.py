@@ -37,10 +37,7 @@ class Rst2Markdown(object):
         self._inlineav_re = re.compile(
             r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options> {3}.*?)(?=^\s*$)""",
             flags=re.MULTILINE + re.DOTALL)
-        self._code_lines_re = re.compile(
-            r"""^$\n(?P<content> {2}[\S ]*)\n^$""", flags=re.MULTILINE + re.DOTALL)
-        self._code_include_re = re.compile(
-            r"""\.\. codeinclude:: (?P<path>.*?$)\n(?P<options>^ +:.*?: \S*\n$)?""", flags=re.MULTILINE + re.DOTALL)
+        self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
 
     def _heading1(self, matchobj):
         return ''
@@ -154,7 +151,7 @@ class Rst2Markdown(object):
             indent_size = len(line) - len(line.lstrip())
             if prev_line == '' and indent_size == 2 or indent_size == 3:
                 flag = True
-            if flag:
+            if flag and not line.strip().startswith(":"):
                 lines[ind] = line.replace(line, f"```{line}```")
             if next_line == '' or indent_size < 2:
                 flag = False
@@ -229,10 +226,10 @@ class Rst2Markdown(object):
                 if tag:
                     start_tag_string = f'/* *** ODSATag: {tag} *** */'
                     end_tag_string = f'/* *** ODSAendTag: {tag} *** */'
-                    if line.startswith(start_tag_string):
+                    if line.strip().startswith(start_tag_string):
                         content = ''
                         continue
-                    if line.startswith(end_tag_string):
+                    if line.strip().startswith(end_tag_string):
                         return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
                 line = re.sub(r"/\* \*\*\* .*? \*\*\* \*/", "", line)
                 content += line
