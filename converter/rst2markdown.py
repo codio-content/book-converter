@@ -149,12 +149,14 @@ class Rst2Markdown(object):
             prev_line = lines[ind - 1]
             next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
             indent_size = len(line) - len(line.lstrip())
-            if prev_line == '' and indent_size == 2 or indent_size == 3:
-                flag = True
+            if not prev_line.strip() and line.strip():
+                if indent_size == 2 or indent_size == 3:
+                    flag = True
             if flag and not line.strip().startswith(":"):
                 lines[ind] = line.replace(line, f"```{line}```")
-            if next_line == '' or indent_size < 2:
-                flag = False
+            if flag:
+                if not next_line.strip() or indent_size < 2:
+                    flag = False
         return "\n".join(lines)
 
     def _inlineav(self, matchobj):
@@ -280,6 +282,11 @@ class Rst2Markdown(object):
         output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
+
+        match = re.search(r"they tend to be easier", output)
+        if match:
+            test = 1
+
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
         output = re.sub(self._caret_token, "\n", output)
