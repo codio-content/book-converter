@@ -35,7 +35,7 @@ class Rst2Markdown(object):
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
-            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options> {3}.*?\n^$)(?=^\s*$)""",
+            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options> +.*?\n)(?=^\S)""",
             flags=re.MULTILINE + re.DOTALL)
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
 
