@@ -35,7 +35,7 @@ class Rst2Markdown(object):
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
-            r"""\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options> {3}.*?)(?=^\s*$)""",
+            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options> {3}.*?\n^$)(?=^\s*$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
 
@@ -161,37 +161,45 @@ class Rst2Markdown(object):
 
     def _inlineav(self, matchobj):
         images = {}
+        caption = ""
         caret_token = self._caret_token
         option_re = re.compile('[\t ]+:([^:]+): (.+)')
         name = matchobj.group('name')
         av_type = matchobj.group('type')
         options = matchobj.group('options')
         options = options.split('\n')
-        for opt in options:
-            match = option_re.match(opt)
-            if match:
-                images[match[1]] = match[2]
+        for line in options:
+            opt_match = option_re.match(line)
+            if opt_match:
+                images[opt_match[1]] = opt_match[2]
+            elif line.strip():
+                caption += f'{line} '
         script_opt = images.get('scripts')
         script_opt = script_opt.split()
         css_opt = images.get('links', '')
         css_opt = css_opt.split()
+        self._figure_counter += 1
+        counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter }'
+        if caption:
+            caption = caption.strip()
+            caption = f'<center>{counter} {caption}</center><br/>{caret_token}{caret_token}'
         scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/{x}">'
                                              f'</script>{caret_token}', script_opt)))
         css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href=".guides/{x}"/>'
                                                f'{caret_token}', css_opt)))
         if av_type == 'dgm':
-            return f'{caret_token}{css_links}{caret_token}' \
+            return f'{css_links}{caret_token}' \
                    f'<div id="{name}" class="ssAV"></div>' \
-                   f'{caret_token}{scripts}{caret_token}'
+                   f'{caret_token}{scripts}<br/>{caption}'
         if av_type == 'ss':
-            return f'{caret_token}{css_links}{caret_token}' \
+            return f'{css_links}{caret_token}' \
                    f'<div id="{name}" class="ssAV">{caret_token}' \
                    f'<span class="jsavcounter"></span>{caret_token}' \
                    f'<a class="jsavsettings" href="#">Settings</a>{caret_token}' \
                    f'<div class="jsavcontrols"></div>{caret_token}' \
                    f'<p class="jsavoutput jsavline"></p>{caret_token}' \
                    f'<div class="jsavcanvas"></div>{caret_token}' \
-                   f'</div>{caret_token}{scripts}{caret_token}<br/>'
+                   f'</div>{caret_token}{scripts}<br/>{caption}'
 
     def _code_include(self, matchobj):
         options = {}
@@ -265,7 +273,6 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
-        output = re.sub(r"^.. _.*?:$", "", output, flags=re.MULTILINE)
         output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._heading1_re.sub(self._heading1, output)
@@ -282,11 +289,6 @@ class Rst2Markdown(object):
         output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
-
-        match = re.search(r"they tend to be easier", output)
-        if match:
-            test = 1
-
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
         output = re.sub(self._caret_token, "\n", output)
