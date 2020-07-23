@@ -17,27 +17,15 @@ class Sidebar(TextAsParagraph):
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
 
-        self._sidebar_re = re.compile(r"""\\begin{sidebar}
-                                    (?P<block_contents>.*?)
-                                    \\end{sidebar}""", flags=re.DOTALL + re.VERBOSE)
+        self._sidebar_re = re.compile(r"""\\begin{sidebar}(\[.*?\])?{(?P<title>.*?)}
+                                        (?P<block_contents>.*?)\\end{sidebar}""", flags=re.DOTALL + re.VERBOSE)
 
     def _sidebar_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         lines = block_contents.split('\n')
-        head = lines[0]
-        title = ''
-        additional = ''
-
-        lines = lines[1:]
-
-        matches = re.match(r"(\[.*\])?({.*?\})(.*)?", head)
-        if matches:
-            title = matches.group(2).strip()
-            title = get_text_in_brackets(title).strip('*')
-            additional = matches.group(3).strip()
-
-        if additional:
-            lines.insert(0, additional)
+        title = matchobj.group('title')
+        title = title.replace("\n", " ").strip()
+        title = get_text_in_brackets(title)
 
         lines = map(lambda line: line.strip(), lines)
         block_contents = '\n'.join(lines)
