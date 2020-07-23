@@ -45,6 +45,7 @@ from converter.markdown.screencast import Screencast
 from converter.markdown.tabularx import Tabularx
 from converter.markdown.tabular import Tabular
 from converter.markdown.tags import Tags
+from converter.markdown.textfigure import Textfigure
 from converter.markdown.unescape import UnEscape
 from converter.markdown.turingwinner import TuringWinner
 
@@ -112,6 +113,7 @@ class LaTeX2Markdown(object):
             self._source_codes.extend(source_codes)
         output = re.sub(r"\\%", self._percent_token, output)
         output = InlineCodeBlock(output, self._percent_token).convert()
+        output = Textfigure(output, self._caret_token).convert()
 
         # remove comments
         output = RemoveComments(output).convert()

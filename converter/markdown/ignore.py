@@ -54,8 +54,6 @@ class Ignore(object):
         output = re.sub(r"\\fbox{(.*?\\end{minipage}\n)}\n", r"\1", output, flags=re.DOTALL)
         output = re.sub(r"\\begin{minipage}{.*?}", "", output)
         output = re.sub(r"\\end{minipage}", "", output)
-        output = re.sub(r"\\begin{textfigure}", "", output)
-        output = re.sub(r"\\end{textfigure}", "", output)
         output = re.sub(r"\\newcommand{.*?}{.*?}", "", output)
         output = re.sub(r"\\ifhtmloutput.*?(\\hfill\\begin{tabular}{\|.*?\|}).*?\\fi", r"\1", output, flags=re.DOTALL)
         output = re.sub(r"\\ifhtmloutput%.*?(\\end{tabular}).*?\\fi", r"\1", output, flags=re.DOTALL)
