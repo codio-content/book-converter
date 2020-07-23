@@ -13,7 +13,7 @@ class Sidebar(TextAsParagraph):
 
         self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}(\[(?P<props>.*?)])?
                                     {(?P<block_graphics>.*?)}(.*?)
-                                    {(?P<block_name>.*?)}
+                                    (?:{(?P<block_name>.*?)})?
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
 
@@ -45,7 +45,8 @@ class Sidebar(TextAsParagraph):
         block_contents = matchobj.group('block_contents')
         image = matchobj.group('block_graphics')
         block_name = matchobj.group('block_name')
-        block_name = block_name.replace('\n', ' ')
+        if block_name:
+            block_name = block_name.replace('\n', ' ')
 
         if '.' not in image:
             ext = self._detect_asset_ext(image)
