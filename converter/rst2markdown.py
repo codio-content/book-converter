@@ -35,7 +35,7 @@ class Rst2Markdown(object):
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
-            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?$)\n(?P<options> +.*?\n)(?=^\S)""",
+            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>\:.*?\: .*?\n)+(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
 
@@ -163,12 +163,14 @@ class Rst2Markdown(object):
         images = {}
         caption = ""
         caret_token = self._caret_token
-        option_re = re.compile('[\t ]+:([^:]+): (.+)')
+        option_re = re.compile(':([^:]+): (.+)')
         name = matchobj.group('name')
         av_type = matchobj.group('type')
+        av_type = av_type.strip()
         options = matchobj.group('options')
         options = options.split('\n')
         for line in options:
+            line = line.strip()
             opt_match = option_re.match(line)
             if opt_match:
                 images[opt_match[1]] = opt_match[2]
@@ -190,7 +192,8 @@ class Rst2Markdown(object):
         if av_type == 'dgm':
             return f'{css_links}{caret_token}' \
                    f'<div id="{name}" class="ssAV"></div>' \
-                   f'{caret_token}{scripts}<br/>{caption}'
+                   f'{caret_token}{scripts}<br/>{caption}' \
+                   f'{caret_token}{caret_token}'
         if av_type == 'ss':
             return f'{css_links}{caret_token}' \
                    f'<div id="{name}" class="ssAV">{caret_token}' \
@@ -199,7 +202,8 @@ class Rst2Markdown(object):
                    f'<div class="jsavcontrols"></div>{caret_token}' \
                    f'<p class="jsavoutput jsavline"></p>{caret_token}' \
                    f'<div class="jsavcanvas"></div>{caret_token}' \
-                   f'</div>{caret_token}{scripts}<br/>{caption}'
+                   f'</div>{caret_token}{scripts}<br/>{caption}' \
+                   f'{caret_token}{caret_token}'
 
     def _code_include(self, matchobj):
         options = {}
