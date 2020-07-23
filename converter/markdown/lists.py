@@ -55,6 +55,7 @@ class Lists(TextAsParagraph):
         for line in block_contents.lstrip().rstrip().split("\\item"):
             line = line.lstrip().rstrip()
             line = line.replace("\\\\", "<br/>")
+            line = re.sub(r" {4,}", " ", line)
             if not line:
                 continue
 
