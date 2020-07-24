@@ -22,7 +22,7 @@ class Ignore(object):
             ch = output[index]
             if ch == '}':
                 if level == 0:
-                    output = output[0:pos].lstrip('\n') + output[index + 1:]
+                    output = output[0:pos] + output[index + 1:]
                     break
                 else:
                     level += 1
@@ -37,10 +37,10 @@ class Ignore(object):
 
     def convert(self):
         output = self.str
-        output = re.sub(r"\\index\n{(.*?)}", r"\\index{\1}", output, flags=re.DOTALL)
-        output = self.remove_chars(output, "\\index{")
         output = self.remove_chars(output, "\\label{")
         output = self.remove_chars(output, "\\vspace{")
+        output = re.sub(r"\\index\n{(.*?)}", r"\\index{\1}", output, flags=re.DOTALL)
+        output = re.sub(r"\n?\\index{.*?\n?.*?}%?", "", output)
         output = re.sub(r"\\noindent", "", output)
         output = re.sub(r"\\bigconcepts", "", output)
         output = re.sub(r"\\prereqs?", "", output)
