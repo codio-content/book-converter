@@ -39,6 +39,7 @@ class Ignore(object):
         output = self.str
         output = self.remove_chars(output, "\\label{")
         output = self.remove_chars(output, "\\vspace{")
+        output = re.sub(r"\\textit{.*?}", "", output)
         output = re.sub(r"\\index\n{(.*?)}", r"\\index{\1}", output, flags=re.DOTALL)
         output = re.sub(r"\n? *\\index{.*?\n?.*?}%", "", output)
         output = re.sub(r"(?![ ])\n? *\\index{.*?\n?.*?}", "", output)
