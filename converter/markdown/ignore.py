@@ -41,7 +41,7 @@ class Ignore(object):
         output = self.remove_chars(output, "\\vspace{")
         output = re.sub(r"\\index\n{(.*?)}", r"\\index{\1}", output, flags=re.DOTALL)
         output = re.sub(r"\n? *\\index{.*?\n?.*?}%", "", output)
-        output = re.sub(r"\n? *\\index{.*?\n?.*?}", "", output)
+        output = re.sub(r"(?![ ])\n? *\\index{.*?\n?.*?}", "", output)
         output = re.sub(r"\\noindent", "", output)
         output = re.sub(r"\\bigconcepts", "", output)
         output = re.sub(r"\\prereqs?", "", output)
