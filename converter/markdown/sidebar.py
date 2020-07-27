@@ -32,6 +32,7 @@ class Sidebar(TextAsParagraph):
         lines = map(lambda line: line.strip(), lines)
         block_contents = '\n'.join(lines)
         block_contents = self.to_paragraph(block_contents)
+        block_contents = block_contents.replace("\n", " ")
 
         caret_token = self._caret_token
         if title:

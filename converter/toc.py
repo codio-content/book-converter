@@ -64,6 +64,7 @@ def convert_name(name):
     name = re.sub("``", "“", name)
     name = re.sub("''", "”", name)
     name = re.sub(r"--", "-", name)
+    name = re.sub(r" vs.\\", " vs.", name)
     return name
 
 
