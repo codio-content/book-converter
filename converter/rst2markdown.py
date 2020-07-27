@@ -38,6 +38,7 @@ class Rst2Markdown(object):
             r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>\:.*?\: .*?\n)+(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
+        self._extrtoolembed_re = re.compile(r"""\.\. extrtoolembed:: '(?P<name>.*?)'""")
 
     def _heading1(self, matchobj):
         return ''
@@ -159,6 +160,10 @@ class Rst2Markdown(object):
                     flag = False
         return "\n".join(lines)
 
+    def _extrtoolembed(self, matchobj):
+        ex_name = matchobj.group('name')
+        return ''
+
     def _inlineav(self, matchobj):
         images = {}
         caption = ""
@@ -176,7 +181,7 @@ class Rst2Markdown(object):
                 images[opt_match[1]] = opt_match[2]
             elif line.strip():
                 caption += f'{line} '
-        script_opt = images.get('scripts')
+        script_opt = images.get('scripts', '')
         script_opt = script_opt.split()
         css_opt = images.get('links', '')
         css_opt = css_opt.split()
@@ -279,6 +284,7 @@ class Rst2Markdown(object):
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
+        output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
