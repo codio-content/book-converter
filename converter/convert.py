@@ -577,3 +577,4 @@ def convert_rst(config, base_path, yes=False):
         write_file(md_path, converted_md)
 
     write_metadata(guides_dir, metadata, book)
+    process_assets(config, generate_dir, [], [])

@@ -37,6 +37,9 @@ class Rst2Markdown(object):
         self._inlineav_re = re.compile(
             r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>\:.*?\: .*?\n)+(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL)
+        self._avembed_re = re.compile(
+            r"""\s*\.\. avembed:: (?P<name>.*?) (?P<type>[a-z]{2})\n(?P<options>(\s+:.*?:\s+.*\n)+)?"""
+        )
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
 
     def _heading1(self, matchobj):
@@ -159,6 +162,23 @@ class Rst2Markdown(object):
                     flag = False
         return "\n".join(lines)
 
+    def _avembed(self, matchobj):
+        caret_token = self._caret_token
+        file_name = matchobj.group('name')
+        # todo: check different type
+        av_type = matchobj.group('type')
+        # todo: verify options
+        # options = matchobj.group('options')
+        name = pathlib.Path(file_name).stem
+
+        # todo: future todos: upload and use cdn path
+
+        return f'{caret_token}<iframe id="{name}_iframe" src=".guides/opendsa_v1/{file_name}' \
+               f'?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java' \
+               f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
+               f'class="embeddedExercise" width="660" height="600" data-showhide="show" scrolling="yes" ' \
+               f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>{caret_token}'
+
     def _inlineav(self, matchobj):
         images = {}
         caption = ""
@@ -176,7 +196,7 @@ class Rst2Markdown(object):
                 images[opt_match[1]] = opt_match[2]
             elif line.strip():
                 caption += f'{line} '
-        script_opt = images.get('scripts')
+        script_opt = images.get('scripts', '')
         script_opt = script_opt.split()
         css_opt = images.get('links', '')
         css_opt = css_opt.split()
@@ -185,9 +205,9 @@ class Rst2Markdown(object):
         if caption:
             caption = caption.strip()
             caption = f'<center>{counter} {caption}</center><br/>{caret_token}{caret_token}'
-        scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/{x}">'
+        scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/opendsa_v1/{x}">'
                                              f'</script>{caret_token}', script_opt)))
-        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href=".guides/{x}"/>'
+        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href=".guides/opendsa_v1/{x}"/>'
                                                f'{caret_token}', css_opt)))
         if av_type == 'dgm':
             return f'{css_links}{caret_token}' \
@@ -279,6 +299,7 @@ class Rst2Markdown(object):
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
+        output = self._avembed_re.sub(self._avembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
