@@ -42,5 +42,4 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(load_md(path), converter.to_markdown().rstrip('\n'))
 
     def test_markdown_chapter_render(self):
-        self.write_md("avembed")
         self.run_case("avembed")

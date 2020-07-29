@@ -2,6 +2,10 @@ import pathlib
 import re
 import uuid
 
+from collections import namedtuple
+
+AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'points'])
+
 
 class Rst2Markdown(object):
     def __init__(self, lines_array, chapter_num=0, subsection_num=0):
@@ -9,6 +13,7 @@ class Rst2Markdown(object):
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
         self._figure_counter = 0
+        self._assessments = list()
         self.lines_array = lines_array
         self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
@@ -173,11 +178,17 @@ class Rst2Markdown(object):
 
         # todo: future todos: upload and use cdn path
 
+        assessment_id = f'custom-{name.lower()}'
+        assessment = AssessmentData(assessment_id, name, 1)
+        self._assessments.append(assessment)
+
         return f'{caret_token}<iframe id="{name}_iframe" src=".guides/opendsa_v1/{file_name}' \
                f'?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java' \
                f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
-               f'class="embeddedExercise" width="660" height="600" data-showhide="show" scrolling="yes" ' \
-               f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>{caret_token}'
+               f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
+               f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>' \
+               f'{caret_token}<div style="display: none">{{Check It!|assessment}}({assessment_id})</div>' \
+               f'{caret_token}'
 
     def _inlineav(self, matchobj):
         images = {}
@@ -290,6 +301,9 @@ class Rst2Markdown(object):
     def load_file(self, path):
         with open(path, 'r') as file:
             return file.readlines()
+
+    def get_assessments(self):
+        return self._assessments
 
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)

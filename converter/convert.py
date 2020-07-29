@@ -283,6 +283,31 @@ def write_metadata(guides_dir, metadata, book):
     write_json(book_path, book)
 
 
+def convert_custom_assessment(assessment):
+    return {
+        'type':  'custom',
+        'taskId': assessment.id,
+        'source': {
+            'name': assessment.name,
+            'arePartialPointsAllowed': False,
+            'oneTimeTest': False,
+            'points': assessment.points
+        }
+    }
+
+
+def write_assessments(guides_dir, assessments):
+    if not assessments:
+        return
+    logging.debug("write assessments")
+    assessments_path = guides_dir.joinpath("assessments.json")
+
+    unique_assessments = list({object_.id: object_ for object_ in assessments}.values())
+
+    converted_assessments = list(map(convert_custom_assessment, unique_assessments))
+    write_json(assessments_path, converted_assessments)
+
+
 def convert(config, base_path, yes=False):
     base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
@@ -522,6 +547,7 @@ def convert_rst(config, base_path, yes=False):
 
     refs = OrderedDict()
     label_counter = 0
+    all_assessments = list()
 
     for item in toc:
         if item.section_type == CHAPTER:
@@ -545,12 +571,13 @@ def convert_rst(config, base_path, yes=False):
                 }
 
             lines = cleanup_rst(item.lines)
-            md_converter = Rst2Markdown(
+            rst_converter = Rst2Markdown(
                 lines,
                 chapter_num=chapter_num,
                 subsection_num=subsection_num
             )
-            converted_md = md_converter.to_markdown()
+            converted_md = rst_converter.to_markdown()
+            all_assessments += rst_converter.get_assessments()
 
             if slug_name in tokens:
                 for key, value in tokens.get(slug_name).items():
@@ -577,4 +604,5 @@ def convert_rst(config, base_path, yes=False):
         write_file(md_path, converted_md)
 
     write_metadata(guides_dir, metadata, book)
+    write_assessments(guides_dir, all_assessments)
     process_assets(config, generate_dir, [], [])
