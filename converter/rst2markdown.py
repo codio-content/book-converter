@@ -165,6 +165,7 @@ class Rst2Markdown(object):
 
     def _extrtoolembed(self, matchobj):
         ex_name = matchobj.group('name')
+        exercise = self.exercises.get(ex_name, '')
         return ''
 
     def _inlineav(self, matchobj):

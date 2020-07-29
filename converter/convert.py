@@ -505,7 +505,7 @@ def convert_bookdown(config, base_path, yes=False):
 
 
 def get_code_exercises():
-    ex_list = []
+    exercises = OrderedDict()
     curr_dir = pathlib.Path.cwd()
     code_dir = curr_dir.joinpath('ODSAprivate-master')
     code_dir = pathlib.Path(code_dir)
@@ -515,22 +515,23 @@ def get_code_exercises():
         for file in yaml_files:
             with open(file, 'r') as stream:
                 try:
-                    options = OrderedDict()
                     data = yaml.load(stream)
                     if type(data) is list:
                         data = data[0]
                     curr_ver = data.get('current_version', '')
                     prompts = curr_ver.get('prompts', '')[0]['coding_prompt']
-                    options['name'] = data.get('name', '')
-                    options['question'] = prompts.get('question', '')
-                    options['starter_code'] = prompts.get('starter_code', '')
-                    options['wrapper_code'] = prompts.get('wrapper_code', '')
-                    options['tests'] = prompts.get('tests', '')
-                    ex_list.append(options)
+                    name = data.get('name', '')
+                    exercises[name] = {
+                        'name': name,
+                        'question': prompts.get('question', ''),
+                        'starter_code': prompts.get('starter_code', ''),
+                        'wrapper_code': prompts.get('wrapper_code', ''),
+                        'tests': prompts.get('tests', '')
+                    }
                 except yaml.YAMLError as exc:
                     logging.error("load file exception", exc)
                     raise BaseException("load file exception")
-    return ex_list
+    return exercises
 
 
 def convert_rst(config, base_path, yes=False):
