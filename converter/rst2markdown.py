@@ -4,12 +4,13 @@ import uuid
 
 
 class Rst2Markdown(object):
-    def __init__(self, lines_array, chapter_num=0, subsection_num=0):
+    def __init__(self, lines_array, exercises, chapter_num=0, subsection_num=0):
         self._caret_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
         self._figure_counter = 0
         self.lines_array = lines_array
+        self.exercises = exercises
         self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
@@ -35,10 +36,12 @@ class Rst2Markdown(object):
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
-            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>\:.*?\: .*?\n)+(?=\S|$)""",
+            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>:.*?: .*?\n)+(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
-        self._extrtoolembed_re = re.compile(r"""\.\. extrtoolembed:: '(?P<name>.*?)'""")
+        self._extrtoolembed_re = re.compile(
+            r"""\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""",
+            flags=re.MULTILINE + re.DOTALL)
 
     def _heading1(self, matchobj):
         return ''
@@ -186,7 +189,7 @@ class Rst2Markdown(object):
         css_opt = images.get('links', '')
         css_opt = css_opt.split()
         self._figure_counter += 1
-        counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter }'
+        counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter}'
         if caption:
             caption = caption.strip()
             caption = f'<center>{counter} {caption}</center><br/>{caret_token}{caret_token}'
@@ -228,7 +231,7 @@ class Rst2Markdown(object):
                 match = option_re.match(item)
                 if match:
                     options[match[1]] = match[2]
-                    tag = options.get('tag')
+                    tag = options.get('tag', '')
         file_path = pathlib.Path(path)
         if not str(file_path).endswith(".java"):
             file_path = "{}.java".format(file_path)

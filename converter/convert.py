@@ -1,8 +1,10 @@
 import logging
+import pathlib
 import shutil
 import uuid
-from collections import OrderedDict
+import yaml
 
+from collections import OrderedDict
 from pathlib import Path
 
 from converter.rst2markdown import Rst2Markdown
@@ -502,6 +504,35 @@ def convert_bookdown(config, base_path, yes=False):
     process_assets(config, generate_dir, pdfs_for_convert, [], bookdown=True)
 
 
+def get_code_exercises():
+    ex_list = []
+    curr_dir = pathlib.Path.cwd()
+    code_dir = curr_dir.joinpath('ODSAprivate-master')
+    code_dir = pathlib.Path(code_dir)
+    ex_dirs = [p for p in code_dir.iterdir() if not p.is_file()]
+    for directory in ex_dirs:
+        yaml_files = directory.glob("*.yaml")
+        for file in yaml_files:
+            with open(file, 'r') as stream:
+                try:
+                    options = OrderedDict()
+                    data = yaml.load(stream)
+                    if type(data) is list:
+                        data = data[0]
+                    curr_ver = data.get('current_version', '')
+                    prompts = curr_ver.get('prompts', '')[0]['coding_prompt']
+                    options['name'] = data.get('name', '')
+                    options['question'] = prompts.get('question', '')
+                    options['starter_code'] = prompts.get('starter_code', '')
+                    options['wrapper_code'] = prompts.get('wrapper_code', '')
+                    options['tests'] = prompts.get('tests', '')
+                    ex_list.append(options)
+                except yaml.YAMLError as exc:
+                    logging.error("load file exception", exc)
+                    raise BaseException("load file exception")
+    return ex_list
+
+
 def convert_rst(config, base_path, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
@@ -513,6 +544,7 @@ def convert_rst(config, base_path, yes=False):
     toc = get_rst_toc(Path(config['workspace']['directory']), Path(config['workspace']['rst']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
+    exercises = get_code_exercises()
 
     chapter = None
     chapter_num = 0
@@ -547,6 +579,7 @@ def convert_rst(config, base_path, yes=False):
             lines = cleanup_rst(item.lines)
             md_converter = Rst2Markdown(
                 lines,
+                exercises,
                 chapter_num=chapter_num,
                 subsection_num=subsection_num
             )
