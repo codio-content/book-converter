@@ -1,10 +1,11 @@
+import logging
 import pathlib
 import re
 import uuid
 
 from collections import namedtuple
 
-AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'points'])
+AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'instructions', 'points'])
 
 
 class Rst2Markdown(object):
@@ -175,11 +176,12 @@ class Rst2Markdown(object):
         caret_token = self._caret_token
         name = matchobj.group('name')
         ex_data = self.exercises.get(name, {})
-        assessment_id = f'custom-{name.lower()}'
-        assessment = AssessmentData(assessment_id, name, 1)
+        assessment_id = f'test-{name.lower()}'
+        instructions = ex_data.get('question', '')
+        assessment = AssessmentData(assessment_id, name, instructions, 1)
         self._assessments.append(assessment)
 
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token})'
+        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
 
     def _avembed(self, matchobj):
         caret_token = self._caret_token
@@ -193,7 +195,7 @@ class Rst2Markdown(object):
         # todo: future todos: upload and use cdn path
 
         assessment_id = f'custom-{name.lower()}'
-        assessment = AssessmentData(assessment_id, name, 1)
+        assessment = AssessmentData(assessment_id, name, '', 1)
         self._assessments.append(assessment)
 
         return f'{caret_token}<iframe id="{name}_iframe" src=".guides/opendsa_v1/{file_name}' \
@@ -202,7 +204,7 @@ class Rst2Markdown(object):
                f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
                f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>' \
                f'{caret_token}<div style="display: none">{{Check It!|assessment}}({assessment_id})</div>' \
-               f'{caret_token}'
+               f'{caret_token}\n'
 
     def _inlineav(self, matchobj):
         images = {}
@@ -276,8 +278,10 @@ class Rst2Markdown(object):
             java_dir = pathlib.Path('Java')
             file_path = java_dir.joinpath(file_path)
         file = code_dir.joinpath(file_path).resolve()
-        if file.exists():
+        try:
             lines = self.load_file(file)
+        except BaseException as e:
+            logging.error(e)
         if lines:
             for line in lines:
                 if not line:
@@ -325,7 +329,6 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
-        output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
@@ -344,6 +347,7 @@ class Rst2Markdown(object):
         output = self._sidebar_re.sub(self._sidebar, output)
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
+        output = self._todo_block_re.sub(self._todo_block, output)
         output = re.sub(self._caret_token, "\n", output)
         output = self._image_re.sub(self._image, output)
         output = re.sub(self._caret_token, "\n", output)
