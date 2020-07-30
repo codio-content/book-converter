@@ -174,10 +174,12 @@ class Rst2Markdown(object):
     def _extrtoolembed(self, matchobj):
         caret_token = self._caret_token
         name = matchobj.group('name')
-        assessment_meta = '{Check It!|assessment}'
-        assessment_id = f'custom-{name.lower()}'
         ex_data = self.exercises.get(name, {})
-        return f'{caret_token}{assessment_meta}{assessment_id}{caret_token})'
+        assessment_id = f'custom-{name.lower()}'
+        assessment = AssessmentData(assessment_id, name, 1)
+        self._assessments.append(assessment)
+
+        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token})'
 
     def _avembed(self, matchobj):
         caret_token = self._caret_token
@@ -314,6 +316,9 @@ class Rst2Markdown(object):
         with open(path, 'r') as file:
             return file.readlines()
 
+    def get_assessments(self):
+        return self._assessments
+
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
         output = '\n'.join(self.lines_array)
@@ -322,6 +327,7 @@ class Rst2Markdown(object):
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
+        output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
