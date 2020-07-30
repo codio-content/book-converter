@@ -2,6 +2,10 @@ import pathlib
 import re
 import uuid
 
+from collections import namedtuple
+
+AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'points'])
+
 
 class Rst2Markdown(object):
     def __init__(self, lines_array, exercises, chapter_num=0, subsection_num=0):
@@ -9,6 +13,7 @@ class Rst2Markdown(object):
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
         self._figure_counter = 0
+        self._assessments = list()
         self.lines_array = lines_array
         self.exercises = exercises
         self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
@@ -38,6 +43,9 @@ class Rst2Markdown(object):
         self._inlineav_re = re.compile(
             r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>:.*?: .*?\n)+(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL)
+        self._avembed_re = re.compile(
+            r"""\s*\.\. avembed:: (?P<name>.*?) (?P<type>[a-z]{2})\n(?P<options>(\s+:.*?:\s+.*\n)+)?"""
+        )
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
         self._extrtoolembed_re = re.compile(
             r"""\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""",
@@ -171,6 +179,29 @@ class Rst2Markdown(object):
         ex_data = self.exercises.get(name, {})
         return f'{caret_token}{assessment_meta}{assessment_id}{caret_token})'
 
+    def _avembed(self, matchobj):
+        caret_token = self._caret_token
+        file_name = matchobj.group('name')
+        # todo: check different type
+        av_type = matchobj.group('type')
+        # todo: verify options
+        # options = matchobj.group('options')
+        name = pathlib.Path(file_name).stem
+
+        # todo: future todos: upload and use cdn path
+
+        assessment_id = f'custom-{name.lower()}'
+        assessment = AssessmentData(assessment_id, name, 1)
+        self._assessments.append(assessment)
+
+        return f'{caret_token}<iframe id="{name}_iframe" src=".guides/opendsa_v1/{file_name}' \
+               f'?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java' \
+               f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
+               f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
+               f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>' \
+               f'{caret_token}<div style="display: none">{{Check It!|assessment}}({assessment_id})</div>' \
+               f'{caret_token}'
+
     def _inlineav(self, matchobj):
         images = {}
         caption = ""
@@ -197,9 +228,9 @@ class Rst2Markdown(object):
         if caption:
             caption = caption.strip()
             caption = f'<center>{counter} {caption}</center><br/>{caret_token}{caret_token}'
-        scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/{x}">'
+        scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/opendsa_v1/{x}">'
                                              f'</script>{caret_token}', script_opt)))
-        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href=".guides/{x}"/>'
+        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href=".guides/opendsa_v1/{x}"/>'
                                                f'{caret_token}', css_opt)))
         if av_type == 'dgm':
             return f'{css_links}{caret_token}' \
@@ -291,7 +322,6 @@ class Rst2Markdown(object):
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
-        output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
