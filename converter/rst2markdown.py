@@ -164,9 +164,12 @@ class Rst2Markdown(object):
         return "\n".join(lines)
 
     def _extrtoolembed(self, matchobj):
-        ex_name = matchobj.group('name')
-        exercise = self.exercises.get(ex_name, '')
-        return ''
+        caret_token = self._caret_token
+        name = matchobj.group('name')
+        assessment_meta = '{Check It!|assessment}'
+        assessment_id = f'custom-{name.lower()}'
+        ex_data = self.exercises.get(name, {})
+        return f'{caret_token}{assessment_meta}{assessment_id}{caret_token})'
 
     def _inlineav(self, matchobj):
         images = {}

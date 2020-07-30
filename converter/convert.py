@@ -516,7 +516,7 @@ def get_code_exercises():
             with open(file, 'r') as stream:
                 try:
                     data = yaml.load(stream)
-                    if type(data) is list:
+                    if isinstance(data, list):
                         data = data[0]
                     curr_ver = data.get('current_version', '')
                     prompts = curr_ver.get('prompts', '')[0]['coding_prompt']
