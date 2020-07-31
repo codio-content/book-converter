@@ -10,7 +10,7 @@ OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
 
 class Rst2Markdown(object):
-    def __init__(self, lines_array, exercises, chapter_num=0, subsection_num=0):
+    def __init__(self, lines_array, exercises, workspace_dir=pathlib.Path('.'), chapter_num=0, subsection_num=0):
         self._caret_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
@@ -18,6 +18,7 @@ class Rst2Markdown(object):
         self._assessments = list()
         self.lines_array = lines_array
         self.exercises = exercises
+        self.workspace_dir = workspace_dir
         self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
@@ -259,8 +260,8 @@ class Rst2Markdown(object):
         content = ''
         tag = None
         caret_token = self._caret_token
-        curr_dir = pathlib.Path.cwd().parent
-        code_dir = curr_dir.joinpath('OpenDSA/SourceCode')
+        curr_dir = self.workspace_dir
+        code_dir = curr_dir.joinpath('SourceCode')
         option_re = re.compile('[\t ]+:([^:]+): (.+)')
         path = matchobj.group('path').strip()
         path = pathlib.Path(path)
@@ -331,6 +332,7 @@ class Rst2Markdown(object):
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = self._inlineav_re.sub(self._inlineav, output)
+        output = self._avembed_re.sub(self._avembed, output)
         output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)

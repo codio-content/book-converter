@@ -531,11 +531,12 @@ def convert_bookdown(config, base_path, yes=False):
     process_assets(config, generate_dir, pdfs_for_convert, [], bookdown=True)
 
 
-def get_code_exercises():
+def get_code_exercises(workspace_dir):
     exercises = OrderedDict()
-    curr_dir = pathlib.Path.cwd()
-    code_dir = curr_dir.joinpath('ODSAprivate-master')
+    code_dir = workspace_dir.joinpath('ODSAprivate-master')
     code_dir = pathlib.Path(code_dir)
+    if not code_dir.exists():
+        return OrderedDict()
     ex_dirs = [p for p in code_dir.iterdir() if not p.is_file()]
     for directory in ex_dirs:
         yaml_files = directory.glob("*.yaml")
@@ -569,10 +570,11 @@ def convert_rst(config, base_path, yes=False):
     logging.debug("start converting %s" % generate_dir)
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
-    toc = get_rst_toc(Path(config['workspace']['directory']), Path(config['workspace']['rst']))
+    workspace_dir = Path(config['workspace']['directory'])
+    toc = get_rst_toc(workspace_dir, Path(config['workspace']['rst']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
-    exercises = get_code_exercises()
+    exercises = get_code_exercises(workspace_dir)
 
     chapter = None
     chapter_num = 0
@@ -609,6 +611,7 @@ def convert_rst(config, base_path, yes=False):
             rst_converter = Rst2Markdown(
                 lines,
                 exercises,
+                workspace_dir=workspace_dir,
                 chapter_num=chapter_num,
                 subsection_num=subsection_num
             )
