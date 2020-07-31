@@ -5,7 +5,7 @@ import uuid
 
 from collections import namedtuple
 
-AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'instructions', 'points'])
+AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
 
@@ -17,7 +17,7 @@ class Rst2Markdown(object):
         self._figure_counter = 0
         self._assessments = list()
         self.lines_array = lines_array
-        self.exercises = exercises
+        self._exercises = exercises
         self.workspace_dir = workspace_dir
         self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
@@ -177,10 +177,13 @@ class Rst2Markdown(object):
     def _extrtoolembed(self, matchobj):
         caret_token = self._caret_token
         name = matchobj.group('name')
-        ex_data = self.exercises.get(name, {})
+        ex_data = self._exercises.get(name, {})
         assessment_id = f'test-{name.lower()}'
         instructions = ex_data.get('question', '')
-        assessment = AssessmentData(assessment_id, name, instructions, 1)
+        starter_code = ex_data.get('starter_code', '')
+        wrapper_code = ex_data.get('wrapper_code', '')
+        tests = ex_data.get('tests', '')
+        assessment = AssessmentData(assessment_id, name, 'test', 1, ex_data)
         self._assessments.append(assessment)
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
@@ -197,7 +200,7 @@ class Rst2Markdown(object):
         # todo: future todos: upload and use cdn path
 
         assessment_id = f'custom-{name.lower()}'
-        assessment = AssessmentData(assessment_id, name, '', 1)
+        assessment = AssessmentData(assessment_id, name, 'custom', 1, {})
         self._assessments.append(assessment)
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \

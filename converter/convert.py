@@ -285,13 +285,33 @@ def write_metadata(guides_dir, metadata, book):
     write_json(book_path, book)
 
 
+def convert_assessment(assessment):
+    if assessment.type == 'custom':
+        return convert_custom_assessment(assessment)
+    elif assessment.type == 'test':
+        return convert_test_assessment(assessment)
+
+
 def convert_custom_assessment(assessment):
     return {
-        'type':  'custom',
+        'type': 'custom',
         'taskId': assessment.id,
         'source': {
             'name': assessment.name,
-            'instructions': assessment.instructions,
+            'arePartialPointsAllowed': False,
+            'oneTimeTest': False,
+            'points': assessment.points
+        }
+    }
+
+
+def convert_test_assessment(assessment):
+    return {
+        'type': 'test',
+        'taskId': assessment.id,
+        'source': {
+            'name': assessment.name,
+            'instructions': assessment.ex_data.get('question', ''),
             'command': '',
             'arePartialPointsAllowed': False,
             'oneTimeTest': False,
@@ -308,7 +328,7 @@ def write_assessments(guides_dir, assessments):
 
     unique_assessments = list({object_.id: object_ for object_ in assessments}.values())
 
-    converted_assessments = list(map(convert_custom_assessment, unique_assessments))
+    converted_assessments = list(map(convert_assessment, unique_assessments))
     write_json(assessments_path, converted_assessments)
 
 
