@@ -1,20 +1,23 @@
+import logging
 import pathlib
 import re
 import uuid
 
 from collections import namedtuple
 
-AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'points'])
+AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'instructions', 'points'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
+
 class Rst2Markdown(object):
-    def __init__(self, lines_array, chapter_num=0, subsection_num=0):
+    def __init__(self, lines_array, exercises, chapter_num=0, subsection_num=0):
         self._caret_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
         self._figure_counter = 0
         self._assessments = list()
         self.lines_array = lines_array
+        self.exercises = exercises
         self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
@@ -40,12 +43,15 @@ class Rst2Markdown(object):
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
-            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>\:.*?\: .*?\n)+(?=\S|$)""",
+            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>:.*?: .*?\n)+(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._avembed_re = re.compile(
             r"""\s*\.\. avembed:: (?P<name>.*?) (?P<type>[a-z]{2})\n(?P<options>(\s+:.*?:\s+.*\n)+)?"""
         )
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
+        self._extrtoolembed_re = re.compile(
+            r"""\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""",
+            flags=re.MULTILINE + re.DOTALL)
 
     def _heading1(self, matchobj):
         return ''
@@ -167,6 +173,17 @@ class Rst2Markdown(object):
                     flag = False
         return "\n".join(lines)
 
+    def _extrtoolembed(self, matchobj):
+        caret_token = self._caret_token
+        name = matchobj.group('name')
+        ex_data = self.exercises.get(name, {})
+        assessment_id = f'test-{name.lower()}'
+        instructions = ex_data.get('question', '')
+        assessment = AssessmentData(assessment_id, name, instructions, 1)
+        self._assessments.append(assessment)
+
+        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
+
     def _avembed(self, matchobj):
         caret_token = self._caret_token
         file_name = matchobj.group('name')
@@ -179,7 +196,7 @@ class Rst2Markdown(object):
         # todo: future todos: upload and use cdn path
 
         assessment_id = f'custom-{name.lower()}'
-        assessment = AssessmentData(assessment_id, name, 1)
+        assessment = AssessmentData(assessment_id, name, '', 1)
         self._assessments.append(assessment)
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \
@@ -188,7 +205,7 @@ class Rst2Markdown(object):
                f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
                f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>' \
                f'{caret_token}<div style="display: none">{{Check It!|assessment}}({assessment_id})</div>' \
-               f'{caret_token}'
+               f'{caret_token}\n'
 
     def _inlineav(self, matchobj):
         images = {}
@@ -212,7 +229,7 @@ class Rst2Markdown(object):
         css_opt = images.get('links', '')
         css_opt = css_opt.split()
         self._figure_counter += 1
-        counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter }'
+        counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter}'
         if caption:
             caption = caption.strip()
             caption = f'<center>{counter} {caption}</center><br/>{caret_token}{caret_token}'
@@ -254,7 +271,7 @@ class Rst2Markdown(object):
                 match = option_re.match(item)
                 if match:
                     options[match[1]] = match[2]
-                    tag = options.get('tag')
+                    tag = options.get('tag', '')
         file_path = pathlib.Path(path)
         if not str(file_path).endswith(".java"):
             file_path = "{}.java".format(file_path)
@@ -262,8 +279,10 @@ class Rst2Markdown(object):
             java_dir = pathlib.Path('Java')
             file_path = java_dir.joinpath(file_path)
         file = code_dir.joinpath(file_path).resolve()
-        if file.exists():
+        try:
             lines = self.load_file(file)
+        except BaseException as e:
+            logging.error(e)
         if lines:
             for line in lines:
                 if not line:
@@ -311,9 +330,8 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
-        output = self._todo_block_re.sub(self._todo_block, output)
         output = self._inlineav_re.sub(self._inlineav, output)
-        output = self._avembed_re.sub(self._avembed, output)
+        output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
@@ -330,6 +348,7 @@ class Rst2Markdown(object):
         output = self._sidebar_re.sub(self._sidebar, output)
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
+        output = self._todo_block_re.sub(self._todo_block, output)
         output = re.sub(self._caret_token, "\n", output)
         output = self._image_re.sub(self._image, output)
         output = re.sub(self._caret_token, "\n", output)
