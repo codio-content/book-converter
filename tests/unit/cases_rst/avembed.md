@@ -16,7 +16,8 @@ Each '0' bit indicates a left branch while each '1' bit indicates a right branch
 
 
 <iframe id="HuffmanDecodePRO_iframe" src="https://global.codio.com/opendsa/v3/Exercises/Binary/HuffmanDecodePRO.html?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>
-<div style="display: none">{Check It!|assessment}(custom-huffmandecodepro)</div>
+
+{Check It!|assessment}(custom-huffmandecodepro)
 
 
 
@@ -35,9 +36,11 @@ In theory, Huffman coding is an optimal coding method whenever the true frequenc
       :figwidth: 90%
       :alt: Mid-square method example
 <iframe id="MidSquare_iframe" src="https://global.codio.com/opendsa/v3/AV/Hashing/MidSquare.html?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>
-<div style="display: none">{Check It!|assessment}(custom-midsquare)</div>
 
-```
+{Check It!|assessment}(custom-midsquare)
+
+
 <iframe id="MidSquare1_iframe" src="https://global.codio.com/opendsa/v3/AV/Hashing/MidSquare1.html?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>
-<div style="display: none">{Check It!|assessment}(custom-midsquare1)</div>
-```
+
+{Check It!|assessment}(custom-midsquare1)
+

@@ -200,7 +200,7 @@ class Rst2Markdown(object):
         # todo: future todos: upload and use cdn path
 
         assessment_id = f'custom-{name.lower()}'
-        assessment = AssessmentData(assessment_id, name, 'custom', 1, {})
+        assessment = AssessmentData(assessment_id, name, 'Resolve the challenge above', 1, {})
         self._assessments.append(assessment)
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \
@@ -208,8 +208,7 @@ class Rst2Markdown(object):
                f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
                f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
                f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>' \
-               f'{caret_token}<div style="display: none">{{Check It!|assessment}}({assessment_id})</div>' \
-               f'{caret_token}\n'
+               f'{caret_token}{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}{caret_token}'
 
     def _inlineav(self, matchobj):
         images = {}
