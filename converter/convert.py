@@ -605,4 +605,4 @@ def convert_rst(config, base_path, yes=False):
 
     write_metadata(guides_dir, metadata, book)
     write_assessments(guides_dir, all_assessments)
-    process_assets(config, generate_dir, [], [])
+    # process_assets(config, generate_dir, [], []) # todo: uncomment
