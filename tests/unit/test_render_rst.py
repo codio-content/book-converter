@@ -1,6 +1,8 @@
 import unittest
 import os
 
+from collections import OrderedDict
+
 from converter.rst2markdown import Rst2Markdown
 from converter.guides.tools import write_file
 
@@ -27,7 +29,7 @@ def load_md(path):
 
 
 def make_converter(path):
-    return Rst2Markdown(load_rst(path).split('\n'))
+    return Rst2Markdown(load_rst(path).split('\n'), OrderedDict())
 
 
 class TestSuite(unittest.TestCase):

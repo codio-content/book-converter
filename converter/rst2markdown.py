@@ -6,10 +6,11 @@ import uuid
 from collections import namedtuple
 
 AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'instructions', 'points'])
+OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
 
 class Rst2Markdown(object):
-    def __init__(self, lines_array, exercises, chapter_num=0, subsection_num=0):
+    def __init__(self, lines_array, exercises, workspace_dir=pathlib.Path('.'), chapter_num=0, subsection_num=0):
         self._caret_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
@@ -17,6 +18,7 @@ class Rst2Markdown(object):
         self._assessments = list()
         self.lines_array = lines_array
         self.exercises = exercises
+        self.workspace_dir = workspace_dir
         self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
@@ -198,7 +200,7 @@ class Rst2Markdown(object):
         assessment = AssessmentData(assessment_id, name, '', 1)
         self._assessments.append(assessment)
 
-        return f'{caret_token}<iframe id="{name}_iframe" src=".guides/opendsa_v1/{file_name}' \
+        return f'{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \
                f'?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java' \
                f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
                f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
@@ -232,9 +234,9 @@ class Rst2Markdown(object):
         if caption:
             caption = caption.strip()
             caption = f'<center>{counter} {caption}</center><br/>{caret_token}{caret_token}'
-        scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src=".guides/opendsa_v1/{x}">'
+        scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src="{OPEN_DSA_CDN}/{x}">'
                                              f'</script>{caret_token}', script_opt)))
-        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href=".guides/opendsa_v1/{x}"/>'
+        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href="{OPEN_DSA_CDN}/{x}"/>'
                                                f'{caret_token}', css_opt)))
         if av_type == 'dgm':
             return f'{css_links}{caret_token}' \
@@ -258,8 +260,8 @@ class Rst2Markdown(object):
         content = ''
         tag = None
         caret_token = self._caret_token
-        curr_dir = pathlib.Path.cwd().parent
-        code_dir = curr_dir.joinpath('OpenDSA/SourceCode')
+        curr_dir = self.workspace_dir
+        code_dir = curr_dir.joinpath('SourceCode')
         option_re = re.compile('[\t ]+:([^:]+): (.+)')
         path = matchobj.group('path').strip()
         path = pathlib.Path(path)
@@ -330,6 +332,7 @@ class Rst2Markdown(object):
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = self._inlineav_re.sub(self._inlineav, output)
+        output = self._avembed_re.sub(self._avembed, output)
         output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
