@@ -59,73 +59,73 @@ metadata:
 
 ```yml
 assets:
-  - "../DataStructures":
+  - "DataStructures":
       pattern: "*.js"
       dst: ".guides/opendsa_v1/DataStructures"
-  - "../DataStructures":
+  - "DataStructures":
       pattern: "*.css"
       dst: ".guides/opendsa_v1/DataStructures"
-  - "../Exercises":
+  - "Exercises":
       pattern: "*.js"
       dst: ".guides/opendsa_v1/Exercises"
-  - "../Exercises":
+  - "Exercises":
       pattern: "*.html"
       dst: ".guides/opendsa_v1/Exercises"
-  - "../Exercises":
+  - "Exercises":
       pattern: "*.json"
       dst: ".guides/opendsa_v1/Exercises"
-  - "../AV":
+  - "AV":
       pattern: "*.js"
       dst: ".guides/opendsa_v1/AV"
-  - "../AV":
+  - "AV":
       pattern: "*.html"
       dst: ".guides/opendsa_v1/AV"
-  - "../AV":
+  - "AV":
       pattern: "*.json"
       dst: ".guides/opendsa_v1/AV"
-  - "../AV":
+  - "AV":
       pattern: "*.css"
       dst: ".guides/opendsa_v1/AV"
-  - "../lib":
+  - "lib":
       pattern: "*.js"
       dst: ".guides/opendsa_v1/lib"
-  - "../lib":
+  - "lib":
       pattern: "*.html"
       dst: ".guides/opendsa_v1/lib"
-  - "../lib":
+  - "lib":
       pattern: "*.json"
       dst: ".guides/opendsa_v1/lib"
-  - "../lib":
+  - "lib":
       pattern: "*.png"
       dst: ".guides/opendsa_v1/lib"
-  - "../lib":
+  - "lib":
       pattern: "*.css"
       dst: ".guides/opendsa_v1/lib"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.js"
       dst: ".guides/opendsa_v1/khan-exercises"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.css"
       dst: ".guides/opendsa_v1/khan-exercises"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.html"
       dst: ".guides/opendsa_v1/khan-exercises"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.png"
       dst: ".guides/opendsa_v1/khan-exercises"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.gif"
       dst: ".guides/opendsa_v1/khan-exercises"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.eot"
       dst: ".guides/opendsa_v1/khan-exercises"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.otf"
       dst: ".guides/opendsa_v1/khan-exercises"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.svg"
       dst: ".guides/opendsa_v1/khan-exercises"
-  - "../khan-exercises":
+  - "khan-exercises":
       pattern: "*.woff"
       dst: ".guides/opendsa_v1/khan-exercises"
 optimization:
