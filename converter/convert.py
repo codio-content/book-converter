@@ -300,7 +300,8 @@ def convert_custom_assessment(assessment):
             'name': assessment.name,
             'arePartialPointsAllowed': False,
             'oneTimeTest': False,
-            'points': assessment.points
+            'points': assessment.points,
+            'instructions': assessment.ex_data.get('question', '')
         }
     }
 

@@ -200,7 +200,7 @@ class Rst2Markdown(object):
         # todo: future todos: upload and use cdn path
 
         assessment_id = f'custom-{name.lower()}'
-        assessment = AssessmentData(assessment_id, name, 'Resolve the challenge above', 1, {})
+        assessment = AssessmentData(assessment_id, name, 'custom', 1, {'question': 'Resolve the challenge above'})
         self._assessments.append(assessment)
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \
