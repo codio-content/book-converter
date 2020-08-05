@@ -315,7 +315,7 @@ def convert_test_assessment(assessment):
         'source': {
             'name': assessment.name,
             'instructions': instructions,
-            'command': f'{assessment.name}.sh {class_name}',
+            'command': f'run.py {class_name}',
             'arePartialPointsAllowed': False,
             'oneTimeTest': False,
             'points': assessment.points
