@@ -179,10 +179,6 @@ class Rst2Markdown(object):
         name = matchobj.group('name')
         ex_data = self._exercises.get(name, {})
         assessment_id = f'test-{name.lower()}'
-        instructions = ex_data.get('question', '')
-        starter_code = ex_data.get('starter_code', '')
-        wrapper_code = ex_data.get('wrapper_code', '')
-        tests = ex_data.get('tests', '')
         assessment = AssessmentData(assessment_id, name, 'test', 1, ex_data)
         self._assessments.append(assessment)
 

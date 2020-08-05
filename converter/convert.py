@@ -307,13 +307,15 @@ def convert_custom_assessment(assessment):
 
 
 def convert_test_assessment(assessment):
+    class_name = assessment.ex_data.get('class_name', '')
+    instructions = assessment.ex_data.get('question', '')
     return {
         'type': 'test',
         'taskId': assessment.id,
         'source': {
             'name': assessment.name,
-            'instructions': assessment.ex_data.get('question', ''),
-            'command': '',
+            'instructions': instructions,
+            'command': f'{assessment.name}.sh {class_name}',
             'arePartialPointsAllowed': False,
             'oneTimeTest': False,
             'points': assessment.points
@@ -331,6 +333,36 @@ def write_assessments(guides_dir, assessments):
 
     converted_assessments = list(map(convert_assessment, unique_assessments))
     write_json(assessments_path, converted_assessments)
+
+
+def create_odsa_assessments(guides_dir, exercises):
+    if not exercises:
+        return
+    logging.debug("process create odsa assessments content")
+    odsa_private_data_dir = guides_dir.joinpath("assessments")
+    odsa_private_data_dir.mkdir(exist_ok=True, parents=True)
+    for exercise in exercises:
+        exercise_data = exercises[exercise]
+        group_dir = odsa_private_data_dir.joinpath(exercise_data['dir_name'])
+        if not group_dir:
+            group_dir.mkdir(exist_ok=True, parents=True)
+        data_dir = group_dir.joinpath(exercise_data['file_name'])
+        data_dir.mkdir(exist_ok=True, parents=True)
+        run_file_path = data_dir.joinpath('run.sh')
+        wrapper_code_path = data_dir.joinpath('wrapper_code')
+        starter_code_path = data_dir.joinpath('starter_code')
+        wrapper_code = exercise_data['wrapper_code']
+        starter_code = exercise_data['starter_code']
+        starter_code = starter_code.replace("___", "// Write your code below")
+        run_file = get_run_file_data()
+
+        write_file(run_file_path, run_file)
+        write_file(wrapper_code_path, wrapper_code)
+        write_file(starter_code_path, starter_code)
+
+
+def get_run_file_data():
+    return ''
 
 
 def convert(config, base_path, yes=False):
@@ -572,6 +604,9 @@ def get_code_exercises(workspace_dir):
                     name = data.get('name', '')
                     exercises[name] = {
                         'name': name,
+                        'dir_name': directory.name,
+                        'file_name': file.stem,
+                        'class_name': prompts.get('class_name', ''),
                         'question': prompts.get('question', ''),
                         'starter_code': prompts.get('starter_code', ''),
                         'wrapper_code': prompts.get('wrapper_code', ''),
@@ -665,4 +700,5 @@ def convert_rst(config, base_path, yes=False):
 
     write_metadata(guides_dir, metadata, book)
     write_assessments(guides_dir, all_assessments)
+    create_odsa_assessments(guides_dir, exercises)
     process_assets(config, generate_dir, [], [])
