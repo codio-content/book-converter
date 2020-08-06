@@ -257,10 +257,18 @@ def process_rst_lines(lines):
             section_name = line.replace("\\", "\\\\")
             toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
             item_lines = []
+        if line.startswith(".. extrtoolembed::"):
+            result = re.match(r'\.\. extrtoolembed:: \'(?P<name>.*?)\'', line)
+            if result:
+                ex_name = result.group('name')
+                section_name = f'Exercise: {ex_name}'
+                toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
+                content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
+                toc[len(toc) - 1].lines.append(content)
         item_lines.append(line)
-    if toc and item_lines and not toc[len(toc) - 1].lines:
+    if toc and item_lines and not toc[0].lines:
         item_lines.append('')
-        toc[len(toc) - 1].lines = item_lines
+        toc[0].lines = item_lines
     return toc
 
 

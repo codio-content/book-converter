@@ -181,8 +181,7 @@ class Rst2Markdown(object):
         assessment_id = f'test-{name.lower()}'
         assessment = AssessmentData(assessment_id, name, 'test', 1, ex_data)
         self._assessments.append(assessment)
-
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
+        return f'{caret_token}***Exercise:*** {name}{caret_token}'
 
     def _avembed(self, matchobj):
         caret_token = self._caret_token
