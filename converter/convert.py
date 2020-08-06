@@ -310,13 +310,14 @@ def convert_custom_assessment(assessment):
 def convert_test_assessment(assessment):
     class_name = assessment.ex_data.get('class_name', '')
     instructions = assessment.ex_data.get('question', '')
+    ex_path = assessment.ex_data.get('ex_path', '')
     return {
         'type': 'test',
         'taskId': assessment.id,
         'source': {
             'name': assessment.name,
             'instructions': instructions,
-            'command': f'.guides/assessments/run.py {class_name}',
+            'command': f'.guides/assessments/run.py {class_name} {ex_path}',
             'arePartialPointsAllowed': False,
             'oneTimeTest': False,
             'points': assessment.points
@@ -366,7 +367,8 @@ def create_odsa_assessments(guides_dir, exercises):
 
 
 def get_run_file_data():
-    return ''
+    with open('converter/rst/run.py', 'r') as file:
+        return file.read()
 
 
 def convert(config, base_path, yes=False):
@@ -597,10 +599,13 @@ def get_code_exercises(workspace_dir):
     ex_dirs = [p for p in code_dir.iterdir() if not p.is_file()]
     for directory in ex_dirs:
         yaml_files = directory.glob("*.yaml")
+        ex_group_dir = pathlib.Path(directory).name
+        ex_group_dir = Path(ex_group_dir)
         for file in yaml_files:
             with open(file, 'r') as stream:
                 try:
                     data = yaml.load(stream)
+                    ex_path = ex_group_dir.joinpath(file.stem)
                     if isinstance(data, list):
                         data = data[0]
                     curr_ver = data.get('current_version', '')
@@ -608,8 +613,9 @@ def get_code_exercises(workspace_dir):
                     name = data.get('name', '')
                     exercises[name] = {
                         'name': name,
-                        'dir_name': directory.name,
+                        'ex_path': str(ex_path),
                         'file_name': file.stem,
+                        'dir_name': directory.name,
                         'class_name': prompts.get('class_name', ''),
                         'question': prompts.get('question', ''),
                         'starter_code': prompts.get('starter_code', ''),
