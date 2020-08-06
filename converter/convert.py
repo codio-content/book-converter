@@ -1,6 +1,7 @@
 import logging
 import pathlib
 import shutil
+import subprocess
 import uuid
 import yaml
 
@@ -343,8 +344,9 @@ def create_odsa_assessments(guides_dir, exercises):
     odsa_private_data_dir.mkdir(exist_ok=True, parents=True)
 
     run_file_path = odsa_private_data_dir.joinpath('run.py')
-    run_file = get_run_file_data()
-    write_file(run_file_path, run_file)
+    run_file_data = get_run_file_data()
+    write_file(run_file_path, run_file_data)
+    subprocess.call(f'chmod +x {run_file_path}', shell=True)
 
     for exercise in exercises:
         exercise_data = exercises[exercise]
@@ -587,11 +589,11 @@ def convert_bookdown(config, base_path, yes=False):
 
 
 def get_code_exercises(workspace_dir):
-    exercises = OrderedDict()
+    exercises = {}
     code_dir = workspace_dir.joinpath('ODSAprivate-master')
     code_dir = pathlib.Path(code_dir)
     if not code_dir.exists():
-        return OrderedDict()
+        return {}
     ex_dirs = [p for p in code_dir.iterdir() if not p.is_file()]
     for directory in ex_dirs:
         yaml_files = directory.glob("*.yaml")
