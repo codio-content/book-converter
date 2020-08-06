@@ -315,7 +315,7 @@ def convert_test_assessment(assessment):
         'source': {
             'name': assessment.name,
             'instructions': instructions,
-            'command': f'run.py {class_name}',
+            'command': f'.guides/assessments/run.py {class_name}',
             'arePartialPointsAllowed': False,
             'oneTimeTest': False,
             'points': assessment.points
@@ -341,6 +341,11 @@ def create_odsa_assessments(guides_dir, exercises):
     logging.debug("process create odsa assessments content")
     odsa_private_data_dir = guides_dir.joinpath("assessments")
     odsa_private_data_dir.mkdir(exist_ok=True, parents=True)
+
+    run_file_path = odsa_private_data_dir.joinpath('run.py')
+    run_file = get_run_file_data()
+    write_file(run_file_path, run_file)
+
     for exercise in exercises:
         exercise_data = exercises[exercise]
         group_dir = odsa_private_data_dir.joinpath(exercise_data['dir_name'])
@@ -348,15 +353,12 @@ def create_odsa_assessments(guides_dir, exercises):
             group_dir.mkdir(exist_ok=True, parents=True)
         data_dir = group_dir.joinpath(exercise_data['file_name'])
         data_dir.mkdir(exist_ok=True, parents=True)
-        run_file_path = data_dir.joinpath('run.sh')
         wrapper_code_path = data_dir.joinpath('wrapper_code')
         starter_code_path = data_dir.joinpath('starter_code')
         wrapper_code = exercise_data['wrapper_code']
         starter_code = exercise_data['starter_code']
         starter_code = starter_code.replace("___", "// Write your code below")
-        run_file = get_run_file_data()
 
-        write_file(run_file_path, run_file)
         write_file(wrapper_code_path, wrapper_code)
         write_file(starter_code_path, starter_code)
 
