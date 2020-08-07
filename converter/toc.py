@@ -294,14 +294,13 @@ def generate_toc(file_path, structure_path, ignore_exists=False):
     if path.exists() and not ignore_exists:
         raise Exception("Path exists")
     tex = Path(structure_path)
-    base_path = Path(tex.parts[0])
     bookdown = str(structure_path).endswith('_bookdown.yml')
     rst = str(structure_path).endswith('.json')
     if bookdown:
         toc = get_bookdown_toc(tex, tex.name)
         data_format = 'bookdown'
     elif rst:
-        toc = get_rst_toc(base_path, tex.name)
+        toc = get_rst_toc(tex.parent.parent, tex.name)
         data_format = 'rst'
     else:
         toc = get_latex_toc(tex.parent, tex.name)
