@@ -23,12 +23,11 @@ def load_config_file(base_path):
 
 
 def load_json_config_file(file_path):
-    file_path = Path(file_path)
     if not file_path.is_file():
         raise BaseException("Structure not found")
     with open(file_path, 'r') as stream:
         try:
-            return json.load(stream), file_path.parent
+            return json.load(stream)
         except json.JSONDecodeError as exc:
             logging.error("load config file exception", exc)
             raise BaseException("load config file exception")

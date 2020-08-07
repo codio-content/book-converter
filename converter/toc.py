@@ -217,9 +217,9 @@ def get_bookdown_toc(folder, name):
 
 def get_rst_toc(folder, name):
     toc = []
-    rst_path = folder.joinpath("RST/en").resolve()
-    conf_path = folder.joinpath(name).resolve()
-    config, base_path = load_json_config_file(conf_path)
+    rst_path = folder.joinpath('RST/en').resolve()
+    conf_path = folder.joinpath(f'config\\{name}').resolve()
+    config = load_json_config_file(conf_path)
     chapters = config.get('chapters')
 
     for chapter in chapters:
@@ -272,15 +272,14 @@ def process_rst_lines(lines):
     return toc
 
 
-def print_to_yaml(structure, tex, format):
-    directory = tex.parent.resolve() if format == 'rst' else tex.parent.resolve()
+def print_to_yaml(structure, tex, data_format):
+    directory = tex.parent.parent.resolve() if data_format == 'rst' else tex.parent.resolve()
     yaml_structure = """workspace:
   directory: {}
   {}: {}
 assets:
-  - code
 sections:
-""".format(directory, format, tex.name)
+""".format(directory, data_format, tex.name)
     first_item = True
     for item in structure:
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
@@ -295,13 +294,14 @@ def generate_toc(file_path, structure_path, ignore_exists=False):
     if path.exists() and not ignore_exists:
         raise Exception("Path exists")
     tex = Path(structure_path)
+    base_path = Path(tex.parts[0])
     bookdown = str(structure_path).endswith('_bookdown.yml')
     rst = str(structure_path).endswith('.json')
     if bookdown:
-        toc = get_bookdown_toc(tex.parent, tex.name)
+        toc = get_bookdown_toc(tex, tex.name)
         data_format = 'bookdown'
     elif rst:
-        toc = get_rst_toc(tex.parent, tex.name)
+        toc = get_rst_toc(base_path, tex.name)
         data_format = 'rst'
     else:
         toc = get_latex_toc(tex.parent, tex.name)
