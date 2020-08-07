@@ -218,7 +218,8 @@ def get_bookdown_toc(folder, name):
 def get_rst_toc(folder, name):
     toc = []
     rst_path = folder.joinpath('RST/en').resolve()
-    conf_path = folder.joinpath(f'config\\{name}').resolve()
+    conf_dir = folder.joinpath('config')
+    conf_path = conf_dir.joinpath(name).resolve()
     config = load_json_config_file(conf_path)
     chapters = config.get('chapters')
 

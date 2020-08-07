@@ -2,7 +2,6 @@ workspace:
   directory: toc_cases
   tex: toc_simple.tex
 assets:
-  - code
 sections:
   - name: "Computer programming"
     type: chapter
