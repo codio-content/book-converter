@@ -12,6 +12,7 @@ IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
+JSAV_IFRAME_SUBPATH = 'jsav/iframe/v6/'
 JSAV_IMAGE_IFRAME = f"""
 <html>
 <head>
@@ -28,7 +29,7 @@ JSAV_IMAGE_IFRAME = f"""
 <script type="text/javascript" src="{GUIDES_CDN}/jquery-ui.min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/jquery.transit.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/raphael.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/v1/JSAV-min.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/JSAV-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/odsaUtils-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/odsaMOD-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/d3.min.js"></script>
@@ -292,8 +293,8 @@ class Rst2Markdown(object):
         reason for subpath - some dynamic images have relative imports like ../../../SourceCode/target_file
         and it allow load it in correct way from cdn root
         """
-        iframe_sub_path = 'jsav/iframe/v5/'
-        iframe_src = f'{OPEN_DSA_CDN}/{iframe_sub_path}{iframe_name}.html'
+
+        iframe_src = f'{OPEN_DSA_CDN}/{JSAV_IFRAME_SUBPATH}{iframe_name}.html'
         iframe_content = ''
 
         if av_type == 'dgm':
@@ -313,7 +314,7 @@ class Rst2Markdown(object):
         iframe_content = re.sub(caret_token, '\n', iframe_content)
         iframe_body = Template(JSAV_IMAGE_IFRAME).substitute(title=name, content=iframe_content, name=name)
 
-        self._iframe_images.append(IframeImage(iframe_src, f'{iframe_sub_path}{iframe_name}.html', iframe_body))
+        self._iframe_images.append(IframeImage(iframe_src, f'{JSAV_IFRAME_SUBPATH}{iframe_name}.html', iframe_body))
         iframe_height = self.detect_height_from_css(css_opt, name)
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{iframe_src}" ' \
