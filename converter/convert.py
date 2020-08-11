@@ -604,7 +604,7 @@ def get_code_exercises(workspace_dir):
         for file in yaml_files:
             with open(file, 'r') as stream:
                 try:
-                    data = yaml.load(stream)
+                    data = yaml.load(stream, Loader=yaml.FullLoader)
                     ex_path = ex_group_dir.joinpath(file.stem)
                     if isinstance(data, list):
                         data = data[0]
