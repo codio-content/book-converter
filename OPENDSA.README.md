@@ -52,13 +52,14 @@ Do not forget add codio client script file
 metadata:
   scripts:
     - https://codio.com/codio-client.js
-    - https://global.codio.com/opendsa/passtocodio.js
+    - https://global.codio.com/opendsa/passtocodio_v2.js
 ```
 
 ### Copy assets instructions
 
 ```yml
 assets:
+  - SourceCode
   - "DataStructures":
       pattern: "*.js"
       dst: ".guides/opendsa_v1/DataStructures"
@@ -131,3 +132,14 @@ assets:
 optimization:
   optimizeImages: true
 ```
+
+
+### JSAV images
+
+To make assets add to config lines 
+```
+opendsa:
+  writeIframe: true
+```
+
+In generate folder will appear subfolder with name `jsav` - upload it to base CDN path 

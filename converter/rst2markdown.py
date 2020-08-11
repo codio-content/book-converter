@@ -3,10 +3,56 @@ import pathlib
 import re
 import uuid
 
+from converter.guides.tools import slugify
+from string import Template
 from collections import namedtuple
 
 AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
+IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
+JSAV_IMAGE_IFRAME = """
+<html>
+<head>
+<title>$title</title>
+<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/haiku.css" type="text/css" />
+<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/normalize.css" type="text/css" />
+<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/JSAV.css" type="text/css" />
+<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/odsaMOD-min.css" type="text/css" />
+<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/jquery-ui.css" type="text/css" />
+<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/odsaStyle-min.css" type="text/css" />
+
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/jquery-ui.min.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/jquery.transit.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/raphael.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/JSAV-min.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/odsaUtils-min.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/odsaMOD-min.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/d3.min.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/d3-selection-multi.v1.min.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/dataStructures.js"></script>
+<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/conceptMap.js"></script>
+</head>
+<body>
+$content
+<script>
+window.addEventListener("load", sendPostMessage);
+document.getElementById('$name').addEventListener("resize", sendPostMessage);
+document.getElementById('$name').addEventListener("click", sendPostMessage);
+var height;
+function sendPostMessage() {
+    if (height !== document.getElementById('$name').offsetHeight) {
+        height = document.getElementById('$name').offsetHeight;
+        window.parent.postMessage(
+            JSON.stringify({frameHeight: height, frameId: "$name", status: 'iframe', av: "$name"}), '*'
+        );
+    }
+}
+</script>
+</body>
+</html>
+"""
 
 
 class Rst2Markdown(object):
@@ -16,6 +62,7 @@ class Rst2Markdown(object):
         self._subsection_num = subsection_num
         self._figure_counter = 0
         self._assessments = list()
+        self._iframe_images = list()
         self.lines_array = lines_array
         self._exercises = exercises
         self.workspace_dir = workspace_dir
@@ -235,21 +282,55 @@ class Rst2Markdown(object):
                                              f'</script>{caret_token}', script_opt)))
         css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href="{OPEN_DSA_CDN}/{x}"/>'
                                                f'{caret_token}', css_opt)))
+        iframe_name = slugify(name)
+        """
+        reason for subpath - some dynamic images have relative imports like ../../../SourceCode/target_file
+        and it allow load it in correct way from cdn root
+        """
+        iframe_sub_path = 'jsav/iframe/v4/'
+        iframe_src = f'{OPEN_DSA_CDN}/{iframe_sub_path}{iframe_name}.html'
+        iframe_content = ''
+
         if av_type == 'dgm':
-            return f'{css_links}{caret_token}' \
-                   f'<div id="{name}" class="ssAV"></div>' \
-                   f'{caret_token}{scripts}<br/>{caption}' \
-                   f'{caret_token}{caret_token}'
+            iframe_content = f'{css_links}\n' \
+                   f'<div style="margin: 0" id="{name}"></div>\n' \
+                   f'{scripts}\n'
         if av_type == 'ss':
-            return f'{css_links}{caret_token}' \
-                   f'<div id="{name}" class="ssAV">{caret_token}' \
-                   f'<span class="jsavcounter"></span>{caret_token}' \
-                   f'<a class="jsavsettings" href="#">Settings</a>{caret_token}' \
-                   f'<div class="jsavcontrols"></div>{caret_token}' \
-                   f'<p class="jsavoutput jsavline"></p>{caret_token}' \
-                   f'<div class="jsavcanvas"></div>{caret_token}' \
-                   f'</div>{caret_token}{scripts}<br/>{caption}' \
-                   f'{caret_token}{caret_token}'
+            iframe_content = f'{css_links}\n' \
+                   f'<div style="margin: 0" id="{name}" class="ssAV">\n' \
+                   f'<span class="jsavcounter"></span>\n' \
+                   f'<a class="jsavsettings" href="#">Settings</a>\n' \
+                   f'<div class="jsavcontrols"></div>\n' \
+                   f'<p class="jsavoutput jsavline"></p>\n' \
+                   f'<div class="jsavcanvas"></div>\n' \
+                   f'</div>\n{scripts}\n'
+
+        iframe_content = re.sub(caret_token, '\n', iframe_content)
+        iframe_body = Template(JSAV_IMAGE_IFRAME).substitute(title=name, content=iframe_content, name=name)
+
+        self._iframe_images.append(IframeImage(iframe_src, f'{iframe_sub_path}/{iframe_name}.html', iframe_body))
+        iframe_height = self.detect_height_from_css(css_opt, name)
+
+        return f'{caret_token}<iframe id="{name}_iframe" src="{iframe_src}" ' \
+               f'width="900" height="{iframe_height}" scrolling="no" ' \
+               f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>{caret_token}' \
+               f'<br/>{caret_token}{caption}{caret_token}'
+
+    def detect_height_from_css(self, css_names, image_id):
+        for css_name in css_names:
+            css_path = self.workspace_dir.joinpath(css_name)
+            if not css_path.exists():
+                continue
+            with open(css_path, 'r') as file:
+                css_content = file.read().replace('\n', '')
+                result = re.match(rf"""#{image_id}(?P<content>.*?)}}""", css_content)
+                if result:
+                    css_height_opt = result.group('content')
+                    result_height = re.match(r""".*{.*height(\s)*:(\s)*(?P<height>\d+)px""", css_height_opt)
+                    if result_height:
+                        iframe_height = int(result_height.group('height'))
+                        return iframe_height + 30
+        return 250
 
     def _code_include(self, matchobj):
         options = {}
@@ -321,6 +402,9 @@ class Rst2Markdown(object):
 
     def get_assessments(self):
         return self._assessments
+
+    def get_iframe_images(self):
+        return self._iframe_images
 
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)

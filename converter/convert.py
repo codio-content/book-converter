@@ -628,6 +628,15 @@ def get_code_exercises(workspace_dir):
     return exercises
 
 
+def process_iframe_images(config, generate_dir, iframe_images):
+    write_iframe = bool(config.get('opendsa', {}).get('writeIframe', False))
+    if write_iframe and iframe_images:
+        for image in iframe_images:
+            write_path = generate_dir.joinpath(image.path)
+            write_path.parent.mkdir(exist_ok=True, parents=True)
+            write_file(write_path, image.content)
+
+
 def convert_rst(config, base_path, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
@@ -651,6 +660,7 @@ def convert_rst(config, base_path, yes=False):
     refs = OrderedDict()
     label_counter = 0
     all_assessments = list()
+    iframe_images = list()
 
     for item in toc:
         if item.section_type == CHAPTER:
@@ -683,6 +693,7 @@ def convert_rst(config, base_path, yes=False):
             )
             converted_md = rst_converter.to_markdown()
             all_assessments += rst_converter.get_assessments()
+            iframe_images += rst_converter.get_iframe_images()
 
             if slug_name in tokens:
                 for key, value in tokens.get(slug_name).items():
@@ -712,3 +723,4 @@ def convert_rst(config, base_path, yes=False):
     write_assessments(guides_dir, all_assessments)
     create_odsa_assessments(guides_dir, exercises)
     process_assets(config, generate_dir, [], [])
+    process_iframe_images(config, generate_dir, iframe_images)
