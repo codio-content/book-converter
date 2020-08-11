@@ -10,45 +10,50 @@ from collections import namedtuple
 AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
-JSAV_IMAGE_IFRAME = """
+GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
+MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
+JSAV_IMAGE_IFRAME = f"""
 <html>
 <head>
 <title>$title</title>
-<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/haiku.css" type="text/css" />
-<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/normalize.css" type="text/css" />
-<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/JSAV.css" type="text/css" />
-<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/odsaMOD-min.css" type="text/css" />
-<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/jquery-ui.css" type="text/css" />
-<link rel="stylesheet" href="//static-assets.codio.com/guides/opendsa/v1/odsaStyle-min.css" type="text/css" />
+<link rel="stylesheet" href="{GUIDES_CDN}/haiku.css" type="text/css" />
+<link rel="stylesheet" href="{GUIDES_CDN}/normalize.css" type="text/css" />
+<link rel="stylesheet" href="{GUIDES_CDN}/JSAV.css" type="text/css" />
+<link rel="stylesheet" href="{GUIDES_CDN}/odsaMOD-min.css" type="text/css" />
+<link rel="stylesheet" href="{GUIDES_CDN}/jquery-ui.css" type="text/css" />
+<link rel="stylesheet" href="{GUIDES_CDN}/odsaStyle-min.css" type="text/css" />
 
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/jquery-2.1.4.min.js"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/jquery-ui.min.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/jquery.transit.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/raphael.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/JSAV-min.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/odsaUtils-min.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/odsaMOD-min.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/d3.min.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/d3-selection-multi.v1.min.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/dataStructures.js"></script>
-<script type="text/javascript" src="//static-assets.codio.com/guides/opendsa/v1/conceptMap.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="{MATHJAX_CDN}/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/jquery.transit.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/raphael.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/v1/JSAV-min.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/odsaUtils-min.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/odsaMOD-min.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/d3.min.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/d3-selection-multi.v1.min.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/dataStructures.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/conceptMap.js"></script>
 </head>
 <body>
 $content
 <script>
 window.addEventListener("load", sendPostMessage);
-document.getElementById('$name').addEventListener("resize", sendPostMessage);
-document.getElementById('$name').addEventListener("click", sendPostMessage);
+var element = document.getElementById('$name');
+if (element) {{
+    element.addEventListener("resize", sendPostMessage);
+    element.addEventListener("click", sendPostMessage);
+}}
 var height;
-function sendPostMessage() {
-    if (height !== document.getElementById('$name').offsetHeight) {
-        height = document.getElementById('$name').offsetHeight;
+function sendPostMessage() {{
+    if (height !== element.offsetHeight && element) {{
+        height = element.offsetHeight;
         window.parent.postMessage(
-            JSON.stringify({frameHeight: height, frameId: "$name", status: 'iframe', av: "$name"}), '*'
+            JSON.stringify({{frameHeight: height, frameId: "$name", status: 'iframe', av: "$name"}}), '*'
         );
-    }
-}
+    }}
+}}
 </script>
 </body>
 </html>
@@ -287,7 +292,7 @@ class Rst2Markdown(object):
         reason for subpath - some dynamic images have relative imports like ../../../SourceCode/target_file
         and it allow load it in correct way from cdn root
         """
-        iframe_sub_path = 'jsav/iframe/v4/'
+        iframe_sub_path = 'jsav/iframe/v5/'
         iframe_src = f'{OPEN_DSA_CDN}/{iframe_sub_path}{iframe_name}.html'
         iframe_content = ''
 
@@ -308,7 +313,7 @@ class Rst2Markdown(object):
         iframe_content = re.sub(caret_token, '\n', iframe_content)
         iframe_body = Template(JSAV_IMAGE_IFRAME).substitute(title=name, content=iframe_content, name=name)
 
-        self._iframe_images.append(IframeImage(iframe_src, f'{iframe_sub_path}/{iframe_name}.html', iframe_body))
+        self._iframe_images.append(IframeImage(iframe_src, f'{iframe_sub_path}{iframe_name}.html', iframe_body))
         iframe_height = self.detect_height_from_css(css_opt, name)
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{iframe_src}" ' \
