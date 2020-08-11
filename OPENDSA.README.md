@@ -136,10 +136,11 @@ optimization:
 
 ### JSAV images
 
-To make assets add to config lines 
+To make jsav iframe assets need to add to `codio_structure.yaml` options 
+
 ```
 opendsa:
   writeIframe: true
 ```
 
-In generate folder will appear subfolder with name `jsav` - upload it to base CDN path 
+In generate folder will appear subfolder with name `jsav` - need to upload it to base CDN path 
