@@ -319,7 +319,8 @@ class Rst2Markdown(object):
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{iframe_src}" ' \
                f'width="900" height="{iframe_height}" scrolling="no" ' \
-               f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>{caret_token}' \
+               f'style="position: relative; top: 0px; border: 0; margin: 0; overflow: hidden;">' \
+               f'Your browser does not support iframes.</iframe>{caret_token}' \
                f'<br/>{caret_token}{caption}{caret_token}'
 
     def detect_height_from_css(self, css_names, image_id):

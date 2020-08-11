@@ -1,7 +1,7 @@
 Each '0' bit indicates a left branch while each '1' bit indicates a right branch. The following slideshow shows an example for how to decode a message by traversing the tree appropriately.
 
 
-<iframe id="huffmanDecodeCON_iframe" src="https://global.codio.com/opendsa/v3/jsav/iframe/v6/huffmandecodecon.html" width="900" height="250" scrolling="no" style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>
+<iframe id="huffmanDecodeCON_iframe" src="https://global.codio.com/opendsa/v3/jsav/iframe/v6/huffmandecodecon.html" width="900" height="250" scrolling="no" style="position: relative; top: 0px; border: 0; margin: 0; overflow: hidden;">Your browser does not support iframes.</iframe>
 <br/>
 
 
