@@ -5,30 +5,30 @@ import subprocess
 import re
 
 ex_dir = ''
-file_name = ''
+file_path = ''
 class_name = ''
 
 if len(sys.argv) > 1:
     class_name = sys.argv[1]
     ex_dir = f'.guides/assessments/{sys.argv[2]}'
-    file_name = f'{ex_dir}/{class_name}.java'
+    file_path = f'{ex_dir}/{class_name}.java'
 
-with open(f'{ex_dir}/wrapper_code') as f:
+with open(f'{ex_dir}/wrapper_code.java') as f:
     wrapper_data = f.read()
 
-with open(f'{ex_dir}/starter_code') as f:
+with open(f'{ex_dir}/starter_code.java') as f:
     student_data = f.read()
 
 data = re.sub(r"___", student_data, wrapper_data)
 
-with open(file_name, 'w', encoding="utf-8") as f:
+with open(file_path, 'w', encoding="utf-8") as f:
     f.write(data)
 
-retcode = subprocess.call(f'javac {file_name}', shell=True)
-if retcode != 0:
+ret_code = subprocess.call(f'javac -d /tmp/ {file_path} ex_dir/Tester.java', shell=True)
+if ret_code != 0:
     sys.exit(1)
 
-p = subprocess.Popen(f'java -classpath {ex_dir} {class_name}', shell=True, stdout=subprocess.PIPE,
+p = subprocess.Popen(f'java -cp /tmp/ Tester', shell=True, stdout=subprocess.PIPE,
                      universal_newlines=True)
 output, error = p.communicate()
 output = output.strip()

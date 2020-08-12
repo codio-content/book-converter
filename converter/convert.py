@@ -1,5 +1,6 @@
 import logging
 import pathlib
+import re
 import shutil
 import subprocess
 import uuid
@@ -356,14 +357,86 @@ def create_odsa_assessments(guides_dir, exercises):
             group_dir.mkdir(exist_ok=True, parents=True)
         data_dir = group_dir.joinpath(exercise_data['file_name'])
         data_dir.mkdir(exist_ok=True, parents=True)
-        wrapper_code_path = data_dir.joinpath('wrapper_code')
-        starter_code_path = data_dir.joinpath('starter_code')
+        wrapper_code_path = data_dir.joinpath('wrapper_code.java')
+        starter_code_path = data_dir.joinpath('starter_code.java')
+        test_code_path = data_dir.joinpath('Tester.java')
         wrapper_code = exercise_data['wrapper_code']
         starter_code = exercise_data['starter_code']
         starter_code = starter_code.replace("___", "// Write your code below")
+        test_code = get_odsa_code_test_file(exercise_data)
 
+        write_file(test_code_path, test_code)
         write_file(wrapper_code_path, wrapper_code)
         write_file(starter_code_path, starter_code)
+
+
+def get_odsa_code_test_file(exercise_data):
+    class_name = exercise_data.get('class_name', '')
+    method_name = exercise_data.get('method_name', '')
+    tests = exercise_data.get('tests', '')
+    tests = re.sub('"",', '""\\,', tests)
+
+    tests_re = re.compile(r"""(?P<actual>\".*?\"),(?:(?P<expected>\".*?)\"|.*?,)(?P<message>\".*?\")?""")
+    matches = list(re.finditer(tests_re, tests))
+    if not matches:
+        return ''
+    size = len(matches)
+    run_tests = get_run_tests(size)
+    unit_tests = get_odsa_unit_tests(matches, class_name, method_name)
+    return f'import java.util.Objects;\n' \
+           f'import java.util.concurrent.Callable;\n' \
+           f'\n' \
+           f'public class Tester {{\n' \
+           f'   public static void main(String[] args) {{\n' \
+           f'{run_tests}' \
+           f'   }}\n' \
+           f'\n' \
+           f'   private static boolean runTest(Callable<Boolean> func) {{\n' \
+           f'       try {{\n' \
+           f'           return func.call();\n' \
+           f'       }} catch (Exception | Error e) {{\n' \
+           f'           return false;\n' \
+           f'       }}\n' \
+           f'   }}\n\n' \
+           f'{unit_tests}' \
+           f'}}\n'
+
+
+def get_odsa_unit_tests(matches, class_name, method_name):
+    num = 0
+    unit_tests = []
+    for m in matches:
+        num += 1
+        actual = m.group('actual')
+        actual = actual.strip('"') if actual is not None else actual
+        expected = m.group('expected')
+        expected = expected.strip('"') if expected is not None else expected
+        message = m.group('message')
+        message = f'{message}, ' if message else ''
+        test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
+                    f'       public Test{num}() {{\n' \
+                    f'       }}\n' \
+                    f'       public Boolean call() {{\n' \
+                    f'           Link test_val = {class_name}.{method_name}({actual});\n' \
+                    f'           return Objects.equals({message}{expected}, test_val);\n' \
+                    f'       }}\n' \
+                    f'   }}\n' \
+                    f'\n'
+        unit_tests.append(test_code)
+    return ''.join(unit_tests)
+
+
+def get_run_tests(size):
+    run_scripts = []
+    for num in range(size):
+        num += 1
+        code = f'       if (runTest(new Test{num}())) {{\n' \
+               f'           System.out.println("Test{num} passed");\n' \
+               f'       }} else {{\n' \
+               f'           System.out.println("Test{num} failed");\n' \
+               f'       }}\n'
+        run_scripts.append(code)
+    return ''.join(run_scripts)
 
 
 def get_run_file_data():
@@ -617,6 +690,7 @@ def get_code_exercises(workspace_dir):
                         'file_name': file.stem,
                         'dir_name': directory.name,
                         'class_name': prompts.get('class_name', ''),
+                        'method_name': prompts.get('method_name', ''),
                         'question': prompts.get('question', ''),
                         'starter_code': prompts.get('starter_code', ''),
                         'wrapper_code': prompts.get('wrapper_code', ''),
