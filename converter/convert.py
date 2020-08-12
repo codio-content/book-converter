@@ -376,7 +376,7 @@ def get_odsa_code_test_file(exercise_data):
     tests = exercise_data.get('tests', '')
     tests = re.sub('"",', '""\\,', tests)
 
-    tests_re = re.compile(r"""(?P<actual>\".*?\"),(?:(?P<expected>\".*?)\"|.*?,)(?P<message>\".*?\")?""")
+    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> \d,|\".*?\")(?:\"(?P<message>.*?)\")?""")
     matches = list(re.finditer(tests_re, tests))
     if not matches:
         return ''
@@ -408,17 +408,16 @@ def get_odsa_unit_tests(matches, class_name, method_name):
     for m in matches:
         num += 1
         actual = m.group('actual')
-        actual = actual.strip('"') if actual is not None else actual
         expected = m.group('expected')
-        expected = expected.strip('"') if expected is not None else expected
+        expected = expected.strip('"').strip(',').strip() if expected is not None else expected
         message = m.group('message')
-        message = f'{message}, ' if message else ''
         test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
                     f'       public Test{num}() {{\n' \
                     f'       }}\n' \
                     f'       public Boolean call() {{\n' \
-                    f'           Link test_val = {class_name}.{method_name}({actual});\n' \
-                    f'           return Objects.equals({message}{expected}, test_val);\n' \
+                    f'          Link test_val = {class_name}.{method_name}({actual});\n' \
+                    f'          Link expected_val = {expected};\n' \
+                    f'           return Objects.equals(expected_val, test_val);\n' \
                     f'       }}\n' \
                     f'   }}\n' \
                     f'\n'
