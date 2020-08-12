@@ -381,7 +381,7 @@ def get_odsa_code_test_file(exercise_data):
     if not matches:
         return ''
     size = len(matches)
-    run_tests = get_run_tests(size)
+    run_tests = get_odsa_run_tests_code(size)
     unit_tests = get_odsa_unit_tests(matches, class_name, method_name)
     return f'import java.util.Objects;\n' \
            f'import java.util.concurrent.Callable;\n' \
@@ -426,7 +426,7 @@ def get_odsa_unit_tests(matches, class_name, method_name):
     return ''.join(unit_tests)
 
 
-def get_run_tests(size):
+def get_odsa_run_tests_code(size):
     run_scripts = []
     for num in range(size):
         num += 1
