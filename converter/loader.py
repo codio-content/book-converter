@@ -16,7 +16,7 @@ def load_config_file(base_path):
             raise BaseException("Structure not found")
     with open(file_path, 'r') as stream:
         try:
-            return yaml.load(stream), file_path.parent
+            return yaml.load(stream, Loader=yaml.FullLoader), file_path.parent
         except yaml.YAMLError as exc:
             logging.error("load config file exception", exc)
             raise BaseException("load config file exception")

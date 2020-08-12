@@ -43,5 +43,15 @@ class TestSuite(unittest.TestCase):
         converter = make_converter(path)
         self.assertEqual(load_md(path), converter.to_markdown().rstrip('\n'))
 
-    def test_markdown_chapter_render(self):
+    def test_avembed_render(self):
         self.run_case("avembed")
+
+    def test_inlineav_render(self):
+        self.run_case("inlineav")
+        converter = make_converter("cases_rst/{}".format("inlineav"))
+        converter.to_markdown()
+        js_av_images = converter.get_iframe_images()
+        self.assertEqual(len(js_av_images), 1)
+        self.assertTrue('chomskycon' in js_av_images[0].src.lower())
+        self.assertTrue('chomskycon' in js_av_images[0].path.lower())
+        self.assertTrue('chomskycon' in js_av_images[0].content.lower())

@@ -206,7 +206,7 @@ def process_bookdown_file(folder, name, name_without_ext):
 def get_bookdown_toc(folder, name):
     a_path = folder.joinpath(name).resolve()
     with open(a_path, 'r', errors='replace') as stream:
-        content = yaml.load(stream)
+        content = yaml.load(stream, Loader=yaml.FullLoader)
         rmd_files = content.get('rmd_files')
         toc = []
         for file in rmd_files:
