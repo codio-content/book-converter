@@ -415,9 +415,7 @@ def get_odsa_unit_tests(matches, class_name, method_name):
                     f'       public Test{num}() {{\n' \
                     f'       }}\n' \
                     f'       public Boolean call() {{\n' \
-                    f'          Link test_val = {class_name}.{method_name}({actual});\n' \
-                    f'          Link expected_val = {expected};\n' \
-                    f'           return Objects.equals(expected_val, test_val);\n' \
+                    f'          return Objects.equals({expected}, {class_name}.{method_name}({actual}));\n' \
                     f'       }}\n' \
                     f'   }}\n' \
                     f'\n'
