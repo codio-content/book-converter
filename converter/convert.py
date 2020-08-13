@@ -376,7 +376,7 @@ def get_odsa_code_test_file(exercise_data):
     tests = exercise_data.get('tests', '')
     tests = re.sub('"",', '""\\,', tests)
 
-    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> \d,|\".*?\")(?:\"(?P<message>.*?)\")?""")
+    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> \d|\".*?\")(?:,\"(?P<message>.*?)\")?""")
     matches = list(re.finditer(tests_re, tests))
     if not matches:
         return ''
@@ -409,7 +409,7 @@ def get_odsa_unit_tests(matches, class_name, method_name):
         num += 1
         actual = m.group('actual')
         expected = m.group('expected')
-        expected = expected.strip('"').strip(',').strip() if expected is not None else expected
+        expected = expected.strip('"').strip() if expected is not None else expected
         message = m.group('message')
         test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
                     f'       public Test{num}() {{\n' \
