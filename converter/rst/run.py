@@ -5,19 +5,22 @@ import subprocess
 import re
 
 ex_path = ''
+ex_private_path = ''
 file_path = ''
 class_name = ''
 
 if len(sys.argv) > 1:
     class_name = sys.argv[1]
     ex_path = f'{sys.argv[2]}'
-    file_path = f'{ex_path}/{class_name}.java'
+    ex_private_path = f'.guides/secure/assessments/{ex_path}'
+    file_path = f'{ex_private_path}/{class_name}.java'
 
-with open(f'{ex_path}/wrapper_code.java') as f:
+with open(f'{ex_private_path}/wrapper_code.java') as f:
     wrapper_data = f.read()
 
 with open(f'exercises/{ex_path}/starter_code.java') as f:
     student_data = f.read()
+
 
 data = re.sub(r"___", student_data, wrapper_data)
 
