@@ -318,7 +318,7 @@ def convert_test_assessment(assessment):
         'source': {
             'name': assessment.name,
             'instructions': instructions,
-            'command': f'.guides/assessments/run.py {class_name} {ex_path}',
+            'command': f'.guides/secure/assessments/run.py {class_name} {ex_path}',
             'arePartialPointsAllowed': False,
             'oneTimeTest': False,
             'points': assessment.points
