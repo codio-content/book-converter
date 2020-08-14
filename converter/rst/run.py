@@ -16,7 +16,7 @@ if len(sys.argv) > 1:
 with open(f'{ex_path}/wrapper_code.java') as f:
     wrapper_data = f.read()
 
-with open(f'../../../exercises/{ex_path}/starter_code.java') as f:
+with open(f'exercises/{ex_path}/starter_code.java') as f:
     student_data = f.read()
 
 data = re.sub(r"___", student_data, wrapper_data)
