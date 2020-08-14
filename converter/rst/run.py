@@ -27,7 +27,7 @@ data = re.sub(r"___", student_data, wrapper_data)
 with open(file_path, 'w', encoding="utf-8") as f:
     f.write(data)
 
-ret_code = subprocess.call(f'javac -d /tmp/ {file_path} {ex_dir}/Tester.java', shell=True)
+ret_code = subprocess.call(f'javac -d /tmp/ {file_path} {ex_private_path}/Tester.java', shell=True)
 if ret_code != 0:
     sys.exit(1)
 
