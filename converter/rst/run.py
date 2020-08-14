@@ -10,7 +10,7 @@ class_name = ''
 
 if len(sys.argv) > 1:
     class_name = sys.argv[1]
-    ex_dir = f'.guides/assessments/{sys.argv[2]}'
+    ex_dir = f'.guides/secure/assessments/{sys.argv[2]}'
     file_path = f'{ex_dir}/{class_name}.java'
 
 with open(f'{ex_dir}/wrapper_code.java') as f:

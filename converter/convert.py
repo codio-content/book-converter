@@ -338,27 +338,33 @@ def write_assessments(guides_dir, assessments):
     write_json(assessments_path, converted_assessments)
 
 
-def create_odsa_assessments(guides_dir, exercises):
+def create_odsa_assessments(guides_dir, generate_dir, exercises):
     if not exercises:
         return
     logging.debug("process create odsa assessments content")
-    odsa_private_data_dir = guides_dir.joinpath("assessments")
-    odsa_private_data_dir.mkdir(exist_ok=True, parents=True)
+    odsa_private_ex_dir = guides_dir.joinpath("secure/assessments")
+    odsa_private_ex_dir.mkdir(exist_ok=True, parents=True)
 
-    run_file_path = odsa_private_data_dir.joinpath('run.py')
+    run_file_path = odsa_private_ex_dir.joinpath('run.py')
     run_file_data = get_run_file_data()
     write_file(run_file_path, run_file_data)
     subprocess.call(f'chmod +x {run_file_path}', shell=True)
 
     for exercise in exercises:
         exercise_data = exercises[exercise]
-        group_dir = odsa_private_data_dir.joinpath(exercise_data['dir_name'])
-        if not group_dir:
-            group_dir.mkdir(exist_ok=True, parents=True)
-        data_dir = group_dir.joinpath(exercise_data['file_name'])
+        group_name = exercise_data['dir_name']
+        file_name = exercise_data['file_name']
+
+        private_group_dir_path = odsa_private_ex_dir.joinpath(group_name)
+        private_group_dir_path.mkdir(exist_ok=True, parents=True)
+        data_dir = private_group_dir_path.joinpath(file_name)
         data_dir.mkdir(exist_ok=True, parents=True)
+
+        starter_code_dir = generate_dir.joinpath(f'exercises/{group_name}/{file_name}')
+        starter_code_dir.mkdir(exist_ok=True, parents=True)
+
         wrapper_code_path = data_dir.joinpath('wrapper_code.java')
-        starter_code_path = data_dir.joinpath('starter_code.java')
+        starter_code_path = starter_code_dir.joinpath('starter_code.java')
         test_code_path = data_dir.joinpath('Tester.java')
         wrapper_code = exercise_data['wrapper_code']
         starter_code = exercise_data['starter_code']
@@ -792,6 +798,6 @@ def convert_rst(config, base_path, yes=False):
 
     write_metadata(guides_dir, metadata, book)
     write_assessments(guides_dir, all_assessments)
-    create_odsa_assessments(guides_dir, exercises)
+    create_odsa_assessments(guides_dir, generate_dir, exercises)
     process_assets(config, generate_dir, [], [])
     process_iframe_images(config, generate_dir, iframe_images)
