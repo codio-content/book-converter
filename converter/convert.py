@@ -257,6 +257,18 @@ def make_section_items(item, slug_name, md_path, transformation_rules, converted
     return section, book_item
 
 
+def make_odsa_ex_files(path):
+    path = path.replace("\\", "/")
+    return {
+               "path": "#tabs",
+               "action": "close"
+           }, {
+               "path": f"exercises/{path}/starter_code.java",
+               "panel": 0,
+               "action": "open"
+           }
+
+
 def process_assets(config, generate_dir, pdfs_for_convert, source_codes, bookdown=False):
     logging.debug("copy assets")
     copy_assets(config, generate_dir)
@@ -686,7 +698,7 @@ def get_code_exercises(workspace_dir):
                         data = data[0]
                     curr_ver = data.get('current_version', '')
                     prompts = curr_ver.get('prompts', '')[0]['coding_prompt']
-                    name = data.get('name', '')
+                    name = data.get('name', '').lower()
                     exercises[name] = {
                         'name': name,
                         'ex_path': str(ex_path),
@@ -723,10 +735,10 @@ def convert_rst(config, base_path, yes=False):
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
-    toc = get_rst_toc(workspace_dir, Path(config['workspace']['rst']))
+    exercises = get_code_exercises(workspace_dir)
+    toc = get_rst_toc(workspace_dir, exercises, Path(config['workspace']['rst']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
-    exercises = get_code_exercises(workspace_dir)
 
     chapter = None
     chapter_num = 0
@@ -790,6 +802,9 @@ def convert_rst(config, base_path, yes=False):
 
         if item.section_type == CHAPTER or item.codio_section == "start":
             children_containers.append(book_item["children"])
+
+        if item.exercise:
+            section["files"] = make_odsa_ex_files(item.exercise_path)
 
         if section:
             metadata["sections"].append(section)

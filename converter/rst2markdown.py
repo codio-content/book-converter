@@ -229,12 +229,14 @@ class Rst2Markdown(object):
 
     def _extrtoolembed(self, matchobj):
         caret_token = self._caret_token
-        name = matchobj.group('name')
-        ex_data = self._exercises.get(name, {})
+        name = matchobj.group('name').lower()
+        ex_data = self._exercises.get(name.lower(), {})
         assessment_id = f'test-{name.lower()}'
+        if not ex_data:
+            return f'{caret_token}***Exercise:*** "{name}" **not found**{caret_token}{caret_token}'
         assessment = AssessmentData(assessment_id, name, 'test', 1, ex_data)
         self._assessments.append(assessment)
-        return f'{caret_token}***Exercise:*** {name}{caret_token}'
+        return f'{caret_token}***Exercise:*** "{name}"{caret_token}{caret_token}'
 
     def _avembed(self, matchobj):
         caret_token = self._caret_token
@@ -416,6 +418,12 @@ class Rst2Markdown(object):
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
         output = '\n'.join(self.lines_array)
+
+        match = re.search(r"Decimal to Binary", output)
+        if match:
+            test = 1
+
+
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)

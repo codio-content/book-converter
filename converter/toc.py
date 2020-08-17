@@ -215,7 +215,7 @@ def get_bookdown_toc(folder, name):
         return toc
 
 
-def get_rst_toc(folder, name):
+def get_rst_toc(folder, exercises, name):
     toc = []
     rst_path = folder.joinpath('RST/en').resolve()
     conf_dir = folder.joinpath('config')
@@ -236,24 +236,24 @@ def get_rst_toc(folder, name):
             if not path.exists():
                 print("File %s doesn't exist\n" % rst_name)
                 continue
-            toc += process_rst_file(path)
+            toc += process_rst_file(path, exercises)
     return toc
 
 
-def process_rst_file(path):
+def process_rst_file(path, exercises):
     with open(path, 'r', errors='replace') as file:
         lines = file.readlines()
-        return process_rst_lines(lines)
+        return process_rst_lines(lines, exercises)
 
 
-def process_rst_lines(lines):
+def process_rst_lines(lines, exercises):
     toc = []
     item_lines = []
     for ind, line in enumerate(lines):
         line = line.rstrip('\r\n')
-        next_line = lines[ind+1] if ind+1 < len(lines) else ''
+        next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
         next_line = next_line.strip()
-        is_chapter = next_line == "="*len(line)
+        is_chapter = next_line == "=" * len(line)
         if next_line.startswith("=") and is_chapter:
             section_name = line.replace("\\", "\\\\")
             toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
@@ -263,9 +263,13 @@ def process_rst_lines(lines):
             if result:
                 ex_name = result.group('name')
                 section_name = f'Exercise: {ex_name}'
-                toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
-                content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
-                toc[len(toc) - 1].lines.append(content)
+                exercise = exercises.get(ex_name.lower())
+                if exercise:
+                    exercise_path = exercise['ex_path']
+                    toc.append(SectionItem(section_name=section_name, section_type="section", exercise=True,
+                                           exercise_path=exercise_path, line_pos=0))
+                    content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
+                    toc[len(toc) - 1].lines.append(content)
         item_lines.append(line)
     if toc and item_lines and not toc[0].lines:
         item_lines.append('')
