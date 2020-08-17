@@ -418,12 +418,6 @@ class Rst2Markdown(object):
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
         output = '\n'.join(self.lines_array)
-
-        match = re.search(r"Decimal to Binary", output)
-        if match:
-            test = 1
-
-
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
