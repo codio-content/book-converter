@@ -215,7 +215,7 @@ def get_bookdown_toc(folder, name):
         return toc
 
 
-def get_rst_toc(folder, exercises, name):
+def get_rst_toc(folder, name, exercises={}):
     toc = []
     rst_path = folder.joinpath('RST/en').resolve()
     conf_dir = folder.joinpath('config')
@@ -253,7 +253,7 @@ def process_rst_lines(lines, exercises):
         line = line.rstrip('\r\n')
         next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
         next_line = next_line.strip()
-        is_chapter = next_line == "=" * len(line)
+        is_chapter = next_line.startswith("===")
         if next_line.startswith("=") and is_chapter:
             section_name = line.replace("\\", "\\\\")
             toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))

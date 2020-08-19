@@ -98,14 +98,16 @@ class Rst2Markdown(object):
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
             r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>:.*?: .*?\n)+(?=\S|$)""",
-            flags=re.MULTILINE + re.DOTALL)
+            flags=re.MULTILINE + re.DOTALL
+        )
         self._avembed_re = re.compile(
             r"""\s*\.\. avembed:: (?P<name>.*?) (?P<type>[a-z]{2})\n(?P<options>(\s+:.*?:\s+.*\n)+)?"""
         )
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
         self._extrtoolembed_re = re.compile(
             r"""\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""",
-            flags=re.MULTILINE + re.DOTALL)
+            flags=re.MULTILINE + re.DOTALL
+        )
 
     def _heading1(self, matchobj):
         return ''

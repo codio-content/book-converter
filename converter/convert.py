@@ -350,10 +350,10 @@ def write_assessments(guides_dir, assessments):
     write_json(assessments_path, converted_assessments)
 
 
-def create_odsa_assessments(guides_dir, generate_dir, exercises):
+def create_odsa_test_assessments(guides_dir, generate_dir, exercises):
     if not exercises:
         return
-    logging.debug("process create odsa assessments content")
+    logging.debug("process create odsa test assessments content")
     odsa_private_ex_dir = guides_dir.joinpath("secure/assessments")
     odsa_private_ex_dir.mkdir(exist_ok=True, parents=True)
 
@@ -749,7 +749,7 @@ def convert_rst(config, base_path, yes=False):
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
     exercises = get_code_exercises(workspace_dir)
-    toc = get_rst_toc(workspace_dir, exercises, Path(config['workspace']['rst']))
+    toc = get_rst_toc(workspace_dir, Path(config['workspace']['rst']), exercises)
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
 
@@ -826,6 +826,6 @@ def convert_rst(config, base_path, yes=False):
 
     write_metadata(guides_dir, metadata, book)
     write_assessments(guides_dir, all_assessments)
-    create_odsa_assessments(guides_dir, generate_dir, exercises)
+    create_odsa_test_assessments(guides_dir, generate_dir, exercises)
     process_assets(config, generate_dir, [], [])
     process_iframe_images(config, generate_dir, iframe_images)
