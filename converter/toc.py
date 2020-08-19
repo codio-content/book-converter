@@ -253,8 +253,8 @@ def process_rst_lines(lines, exercises):
         line = line.rstrip('\r\n')
         next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
         next_line = next_line.strip()
-        is_chapter = next_line.startswith("===")
-        if next_line.startswith("=") and is_chapter:
+        is_chapter = next_line == "=" * len(line)
+        if next_line.startswith("===") and is_chapter:
             section_name = line.replace("\\", "\\\\")
             toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
             item_lines = []
@@ -264,6 +264,7 @@ def process_rst_lines(lines, exercises):
                 ex_name = result.group('name')
                 section_name = f'Exercise: {ex_name}'
                 exercise = exercises.get(ex_name.lower())
+
                 if exercise:
                     exercise_path = exercise['ex_path']
                     toc.append(SectionItem(section_name=section_name, section_type="section", exercise=True,
