@@ -331,7 +331,7 @@ def convert_test_assessment(assessment):
             'name': assessment.name,
             'instructions': instructions,
             'command': f'.guides/secure/assessments/run.py {class_name} {ex_path}',
-            'arePartialPointsAllowed': False,
+            'arePartialPointsAllowed': True,
             'oneTimeTest': False,
             'points': assessment.points
         }
@@ -408,7 +408,7 @@ def get_odsa_code_test_file(exercise_data):
            f'   public static void main(String[] args) {{\n' \
            f'       int total_tests = {size};\n' \
            f'       int passed_tests = 0;\n' \
-           f'       int test_counter = 1;\n' \
+           f'       int test_counter = 0;\n' \
            f'       String feedback = "";\n' \
            f'\n' \
            f'{run_tests}' \
@@ -458,10 +458,9 @@ def get_odsa_run_tests_code(size):
                f'           passed_tests++;\n' \
                f'           test_counter++;\n' \
                f'           feedback += "Test" + test_counter + " passed\\n";\n' \
-               f'           System.out.println("Test{num} passed");\n' \
                f'       }} else {{\n' \
+               f'           test_counter++;\n' \
                f'           feedback += "Test" + test_counter + " failed\\n";\n' \
-               f'           System.out.println("Test{num} failed");\n' \
                f'       }}\n' \
                f'\n'
         run_scripts.append(code)
