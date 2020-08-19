@@ -4,6 +4,9 @@ import sys
 import subprocess
 import re
 
+sys.path.append('/usr/share/codio/assessments')
+from lib.grade import send_partial
+
 ex_path = ''
 ex_private_path = ''
 file_path = ''
@@ -20,7 +23,6 @@ with open(f'{ex_private_path}/wrapper_code.java') as f:
 
 with open(f'exercises/{ex_path}/starter_code.java') as f:
     student_data = f.read()
-
 
 data = re.sub(r"___", student_data, wrapper_data)
 
@@ -43,10 +45,13 @@ if error:
     print(error)
     sys.exit(1)
 
-print(output)
-print('<br/><hr/><h3>Challenge Feedback</h3>')
+output = output.split('\n')
+total_tests = output.pop(0)
+passed_tests = output.pop(0)
+feedback = '\n'.join(output)
 
-if output != '323':
-    print('Your code is not outputing the correct value')
-else:
-    print('Well done you passed the challenge!')
+grade = int(passed_tests) / int(total_tests) * 100
+print(feedback)
+print("<br><h1>Total Grade: %d </h1>" % grade)
+res = send_partial(grade)
+exit(0 if res else 1)

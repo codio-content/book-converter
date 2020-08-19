@@ -234,7 +234,7 @@ class Rst2Markdown(object):
         assessment_id = f'test-{name.lower()}'
         if not ex_data:
             return f'{caret_token}***Exercise:*** "{name}" **not found**{caret_token}{caret_token}'
-        assessment = AssessmentData(assessment_id, name, 'test', 1, ex_data)
+        assessment = AssessmentData(assessment_id, name, 'test', 20, ex_data)
         self._assessments.append(assessment)
         return f'{caret_token}***Exercise:*** "{name}"{caret_token}{caret_token}'
 

@@ -445,9 +445,17 @@ def get_odsa_run_tests_code(size):
     run_scripts = []
     for num in range(size):
         num += 1
-        code = f'       if (runTest(new Test{num}())) {{\n' \
+        code = f'       int total_tests = {size};\n' \
+               f'       int passed_tests = 0;\n' \
+               f'       int test_counter = 1;\n' \
+               f'       String feedback = "";\n' \
+               f'       if (runTest(new Test{num}())) {{\n' \
+               f'           passed_tests++;\n' \
+               f'           test_counter++;\n' \
+               f'           feedback += "Test" + test_counter + " passed\\n";\n' \
                f'           System.out.println("Test{num} passed");\n' \
                f'       }} else {{\n' \
+               f'           feedback += "Test" + test_counter + " failed\\n";\n' \
                f'           System.out.println("Test{num} failed");\n' \
                f'       }}\n'
         run_scripts.append(code)
