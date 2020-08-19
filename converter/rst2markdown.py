@@ -92,8 +92,8 @@ class Rst2Markdown(object):
             flags=re.MULTILINE + re.DOTALL)
         self._epigraph_re = re.compile(r"""^(?!\s)\.\. epigraph::\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
                                        flags=re.MULTILINE + re.DOTALL)
-        self._image_re = re.compile(r"""\.\. odsafig:: (?P<image>.*?)\n*^\s*$\n {6}(?P<caption>.*?\n^$\n(?=\S*))""",
-                                    flags=re.MULTILINE + re.DOTALL)
+        self._image_re = re.compile(r"""\.\. odsafig:: (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)""")
+        self._image_capt_re = re.compile(r"""\.\. odsafig:: (?P<path>.*?)\n(?:.*?\n +(?P<caption>.*\n\n))""")
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
                                       flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
@@ -198,8 +198,23 @@ class Rst2Markdown(object):
         return ''
 
     def _image(self, matchobj):
+        alt = ''
+        options_dict = {}
         caret_token = self._caret_token
-        image = matchobj.group('image')
+        image = matchobj.group('path')
+        options = matchobj.group('options')
+        option_re = re.compile('[\t ]+:([^:]+): (.+)')
+        options = options.split('\n')
+        for opt in options:
+            match = option_re.match(opt)
+            if match:
+                options_dict[match[1]] = match[2]
+                alt = options_dict.get('alt', '')
+        return f'![{alt}]({image}){caret_token}{caret_token}'
+
+    def _image_capt(self, matchobj):
+        caret_token = self._caret_token
+        image = matchobj.group('path')
         caption = matchobj.group('caption')
         caption = caption.strip()
         return f'![{caption}]({image}){caret_token}{caption}{caret_token}{caret_token}'
@@ -303,17 +318,17 @@ class Rst2Markdown(object):
 
         if av_type == 'dgm':
             iframe_content = f'{css_links}\n' \
-                   f'<div style="margin: 0" id="{name}"></div>\n' \
-                   f'{scripts}\n'
+                             f'<div style="margin: 0" id="{name}"></div>\n' \
+                             f'{scripts}\n'
         if av_type == 'ss':
             iframe_content = f'{css_links}\n' \
-                   f'<div style="margin: 0" id="{name}" class="ssAV">\n' \
-                   f'<span class="jsavcounter"></span>\n' \
-                   f'<a class="jsavsettings" href="#">Settings</a>\n' \
-                   f'<div class="jsavcontrols"></div>\n' \
-                   f'<p class="jsavoutput jsavline"></p>\n' \
-                   f'<div class="jsavcanvas"></div>\n' \
-                   f'</div>\n{scripts}\n'
+                             f'<div style="margin: 0" id="{name}" class="ssAV">\n' \
+                             f'<span class="jsavcounter"></span>\n' \
+                             f'<a class="jsavsettings" href="#">Settings</a>\n' \
+                             f'<div class="jsavcontrols"></div>\n' \
+                             f'<p class="jsavoutput jsavline"></p>\n' \
+                             f'<div class="jsavcanvas"></div>\n' \
+                             f'</div>\n{scripts}\n'
 
         iframe_content = re.sub(caret_token, '\n', iframe_content)
         iframe_body = Template(JSAV_IMAGE_IFRAME).substitute(title=name, content=iframe_content, name=name)
@@ -420,6 +435,7 @@ class Rst2Markdown(object):
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
         output = '\n'.join(self.lines_array)
+        output = re.sub(r".. _[\S ]+:", "", output)
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
@@ -430,6 +446,8 @@ class Rst2Markdown(object):
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
         output = self._heading4_re.sub(self._heading4, output)
+        output = self._image_re.sub(self._image, output)
+        output = self._image_capt_re.sub(self._image_capt, output)
         output = self._list_re.sub(self._list, output)
         output = self._ext_links_re.sub(self._ext_links, output)
         output = self._ref_re.sub(self._ref, output)
@@ -443,7 +461,5 @@ class Rst2Markdown(object):
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
         output = self._todo_block_re.sub(self._todo_block, output)
-        output = re.sub(self._caret_token, "\n", output)
-        output = self._image_re.sub(self._image, output)
         output = re.sub(self._caret_token, "\n", output)
         return output
