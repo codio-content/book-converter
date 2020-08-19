@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+from lib.grade import send_partial
+
 import sys
 import subprocess
 import re
 
 sys.path.append('/usr/share/codio/assessments')
-from lib.grade import send_partial
 
 ex_path = ''
 ex_private_path = ''
