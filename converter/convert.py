@@ -406,7 +406,16 @@ def get_odsa_code_test_file(exercise_data):
            f'\n' \
            f'public class Tester {{\n' \
            f'   public static void main(String[] args) {{\n' \
+           f'       int total_tests = {size};\n' \
+           f'       int passed_tests = 0;\n' \
+           f'       int test_counter = 1;\n' \
+           f'       String feedback = "";\n' \
+           f'\n' \
            f'{run_tests}' \
+           f'       String total = "" + total_tests;\n' \
+           f'       String passed = "" + passed_tests;\n' \
+           f'       String output = total + "\\n" + passed +"\\n" + feedback;\n' \
+           f'       System.out.println(output);\n'\
            f'   }}\n' \
            f'\n' \
            f'   private static boolean runTest(Callable<Boolean> func) {{\n' \
@@ -445,11 +454,7 @@ def get_odsa_run_tests_code(size):
     run_scripts = []
     for num in range(size):
         num += 1
-        code = f'       int total_tests = {size};\n' \
-               f'       int passed_tests = 0;\n' \
-               f'       int test_counter = 1;\n' \
-               f'       String feedback = "";\n' \
-               f'       if (runTest(new Test{num}())) {{\n' \
+        code = f'       if (runTest(new Test{num}())) {{\n' \
                f'           passed_tests++;\n' \
                f'           test_counter++;\n' \
                f'           feedback += "Test" + test_counter + " passed\\n";\n' \
@@ -457,7 +462,8 @@ def get_odsa_run_tests_code(size):
                f'       }} else {{\n' \
                f'           feedback += "Test" + test_counter + " failed\\n";\n' \
                f'           System.out.println("Test{num} failed");\n' \
-               f'       }}\n'
+               f'       }}\n' \
+               f'\n'
         run_scripts.append(code)
     return ''.join(run_scripts)
 
