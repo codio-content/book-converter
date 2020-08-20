@@ -263,13 +263,12 @@ def process_rst_lines(lines, exercises):
             if result:
                 ex_name = result.group('name')
                 section_name = f'Exercise: {ex_name}'
-                exercise = exercises.get(ex_name.lower())
-                if exercise:
-                    exercise_path = exercise['ex_path']
-                    toc.append(SectionItem(section_name=section_name, section_type="section", exercise=True,
-                                           exercise_path=exercise_path, line_pos=0))
-                    content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
-                    toc[len(toc) - 1].lines.append(content)
+                exercise = exercises.get(ex_name.lower(), {})
+                exercise_path = exercise.get('ex_path', '')
+                toc.append(SectionItem(section_name=section_name, section_type="section", exercise=True,
+                                       exercise_path=exercise_path, line_pos=0))
+                content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
+                toc[len(toc) - 1].lines.append(content)
         item_lines.append(line)
     if toc and item_lines and not toc[0].lines:
         item_lines.append('')
