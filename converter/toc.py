@@ -289,7 +289,7 @@ sections:
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
         if first_item:
             first_item = False
-            yaml_structure += "    configuration:\n      layout: 1-panels\n"
+            yaml_structure += "    configuration:\n      layout: 1-panel\n"
     return yaml_structure
 
 
