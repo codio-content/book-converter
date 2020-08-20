@@ -816,6 +816,11 @@ def convert_rst(config, base_path, yes=False):
         if item.section_type == CHAPTER or item.codio_section == "start":
             children_containers.append(book_item["children"])
 
+        section["files"].append({
+            "path": "#tabs",
+            "action": "close"
+        })
+
         if item.exercise:
             section["files"] = make_odsa_ex_files(item.exercise_path)
 

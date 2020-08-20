@@ -264,7 +264,6 @@ def process_rst_lines(lines, exercises):
                 ex_name = result.group('name')
                 section_name = f'Exercise: {ex_name}'
                 exercise = exercises.get(ex_name.lower())
-
                 if exercise:
                     exercise_path = exercise['ex_path']
                     toc.append(SectionItem(section_name=section_name, section_type="section", exercise=True,
