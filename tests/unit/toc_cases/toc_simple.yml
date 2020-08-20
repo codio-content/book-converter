@@ -6,7 +6,7 @@ sections:
   - name: "Computer programming"
     type: chapter
     configuration:
-      layout: 1-panels
+      layout: 1-panel
   - name: "What is a computer?"
     type: section
   - name: "What is programming?"
