@@ -454,7 +454,10 @@ def get_odsa_run_tests_code(matches, method_name):
     num = 0
     for match in matches:
         actual = match.group('actual')
+        actual = actual.strip('"')
         expected = match.group('expected')
+        expected = expected.strip('"')
+        message = match.group('message')
         num += 1
         code = f'       if (runTest(new Test{num}())) {{\n' \
                f'           passed_tests++;\n' \
