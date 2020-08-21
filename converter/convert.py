@@ -468,7 +468,7 @@ def get_odsa_run_tests_code(size):
 
 
 def get_run_file_data():
-    with open('converter/rst/run.py', 'r') as file:
+    with open('converter/opendsa_ex_script/run.script', 'r') as file:
         return file.read()
 
 
