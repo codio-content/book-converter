@@ -8,7 +8,10 @@ def normalize_output(output, media_directory):
     topic_name = None
 
     for line in lines:
-        if 'WeTeach_AP' in line:
+        lower_line = line.lower()
+        if 'WeTeach_AP'.lower() in lower_line:
+            continue
+        if 'All Rights Reserved'.lower() in lower_line:
             continue
         topic_or_unit_found = False
         if not unit_name and 'Unit' in line:
