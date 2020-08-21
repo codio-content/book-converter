@@ -4,6 +4,7 @@ CHAPTER = "chapter"
 
 class SectionItem(object):
     def __init__(self, section_name, section_type=SECTION, exercise=False, exercise_path='', line_pos=0):
+        self.contains_exercises = None
         self.section_type = section_type
         self.section_name = section_name
         self.exercise = exercise
@@ -22,5 +23,6 @@ class SectionItem(object):
             'section_type': self.section_type,
             'exercise': self.exercise,
             'exercise_path': self.exercise_path,
+            'contains_exercises': self.contains_exercises,
             'line_pos': self.line_pos
         })
