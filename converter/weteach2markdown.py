@@ -23,7 +23,15 @@ def normalize_output(output, media_directory):
         # {width="2.8952384076990376in" height="0.7772451881014873in"}
         line = re.sub(r'{width="(\d)+\.(\d)+in" height="(\d)+\.(\d)+in"\}', '', line)
         line = line.replace(f'{media_directory}/', '')
+        line = line.strip('> ')
+        if line.startswith('!['):
+            close_image_tag = line.find(')')
+            if close_image_tag > -1 and len(line) > close_image_tag + 1 and line[close_image_tag + 1].isalpha():
+                line = line[close_image_tag + 1:] + '\n' + line[0:close_image_tag + 1]
 
         normalized_lines.append(line.strip())
+
+    if normalized_lines and normalized_lines[0].startswith('============'):
+        normalized_lines.pop(0)
 
     return unit_name, topic_name, '\n'.join(normalized_lines).strip()

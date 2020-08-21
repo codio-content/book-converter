@@ -40,3 +40,6 @@ class TestSuite(unittest.TestCase):
 
     def test_render1(self):
         self.run_case("render1")
+
+    def test_render2(self):
+        self.run_case("render2")
