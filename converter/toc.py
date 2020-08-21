@@ -249,6 +249,7 @@ def process_rst_file(path, exercises):
 def process_rst_lines(lines, exercises):
     toc = []
     item_lines = []
+    contains_exercises = False
     for ind, line in enumerate(lines):
         line = line.rstrip('\r\n')
         next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
@@ -256,23 +257,34 @@ def process_rst_lines(lines, exercises):
         is_chapter = next_line == "=" * len(line)
         if next_line.startswith("===") and is_chapter:
             section_name = line.replace("\\", "\\\\")
-            toc.append(SectionItem(section_name=section_name, section_type="section", line_pos=0))
+            toc.append(SectionItem(
+                section_name=section_name,
+                section_type="section",
+                line_pos=0)
+            )
             item_lines = []
         if line.startswith(".. extrtoolembed::"):
             result = re.match(r'\.\. extrtoolembed:: \'(?P<name>.*?)\'', line)
             if result:
+                contains_exercises = True
                 ex_name = result.group('name')
                 section_name = f'Exercise: {ex_name}'
                 exercise = exercises.get(ex_name.lower(), {})
                 exercise_path = exercise.get('ex_path', '')
-                toc.append(SectionItem(section_name=section_name, section_type="section", exercise=True,
-                                       exercise_path=exercise_path, line_pos=0))
+                toc.append(SectionItem(
+                    section_name=section_name,
+                    section_type="section",
+                    exercise=True,
+                    exercise_path=exercise_path,
+                    line_pos=0)
+                )
                 content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
                 toc[len(toc) - 1].lines.append(content)
         item_lines.append(line)
     if toc and item_lines and not toc[0].lines:
         item_lines.append('')
         toc[0].lines = item_lines
+        toc[0].contains_exercises = contains_exercises
     return toc
 
 
@@ -285,8 +297,18 @@ assets:
 sections:
 """.format(directory, data_format, tex.name)
     first_item = True
-    for item in structure:
+    section_flag = False
+    for ind, item in enumerate(structure):
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
+
+        next_item = structure[ind + 1] if ind + 1 < len(structure) else {}
+        if item.contains_exercises:
+            yaml_structure += "    codio_section: start\n"
+            section_flag = True
+        elif section_flag and not next_item.exercise:
+            yaml_structure += "    codio_section: end\n"
+            section_flag = False
+
         if first_item:
             first_item = False
             yaml_structure += "    configuration:\n      layout: 1-panel\n"

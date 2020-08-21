@@ -808,10 +808,11 @@ def convert_rst(config, base_path, yes=False):
             book_item["children"] = []
             if item.section_type == CHAPTER:
                 children_containers = [children_containers[0]]
-        elif item.codio_section == "end" and len(children_containers) > 1:
-            children_containers.pop()
 
         children_containers[len(children_containers) - 1].append(book_item)
+
+        if item.codio_section == "end" and len(children_containers) > 1:
+            children_containers.pop()
 
         if item.section_type == CHAPTER or item.codio_section == "start":
             children_containers.append(book_item["children"])
