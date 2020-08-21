@@ -55,8 +55,12 @@ def convert(base_directory, output):
         convert_docx(element, output)
 
 
+def slugify(in_str):
+    return re.sub('[^a-zA-Z]+', '', in_str).lower()
+
+
 def convert_docx(element, output_dir):
-    media_dir = output_dir.joinpath('.guides').absolute()
+    media_dir = output_dir.joinpath('.guides').joinpath(slugify(str(Path(element.doc).stem))).absolute()
     command = ['pandoc', '--extract-media', str(media_dir), '--wrap=none', '-t', 'markdown', element.doc]
     result = subprocess.run(command, capture_output=True)
     utf8_output = result.stdout.decode('utf-8')
@@ -73,7 +77,18 @@ def convert_docx(element, output_dir):
     if not tname:
         uname = unit_name.strip('*')
 
-    print(uname, tname)
+    for line in normalized_output.split('\n'):
+        result = re.match(r"(.*)(\d)+\.(\d)+\.(\d)+\s[\-]+", line)
+        if result:
+            line_strip = line.lstrip('*').strip()
+            result_sp = re.match(r"(Lab )?(\d\.)?(\d)+\.(\d)+\.(\d)+\s[\-]+\s?([a-zA-Z\s\-]+)(\*\*)?.*", line_strip)
+            if result_sp:
+                prefix = result_sp.group(2) if result_sp.group(2) else ''
+                ex_name = result_sp.group(6).rstrip('--').strip()
+                title = prefix + result_sp.group(3) + '.' + result_sp.group(4) + '.' + \
+                    result_sp.group(5) + ' ' + ex_name
+                print('title', title)
+                print('ex_name', ex_name)
 
 
 def main():

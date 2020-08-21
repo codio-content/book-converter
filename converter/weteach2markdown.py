@@ -27,10 +27,12 @@ def normalize_output(output, media_directory):
         line = re.sub(r'{width="(\d)+\.(\d)+in" height="(\d)+\.(\d)+in"\}', '', line)
         line = line.replace(f'{media_directory}/', '')
         line = line.strip('> ')
+        line = line.replace('** **', ' ')
         if line.startswith('!['):
             close_image_tag = line.find(')')
-            if close_image_tag > -1 and len(line) > close_image_tag + 1 and line[close_image_tag + 1].isalpha():
-                line = line[close_image_tag + 1:] + '\n' + line[0:close_image_tag + 1]
+            if close_image_tag > -1 and len(line) > close_image_tag + 1:
+                if line[close_image_tag + 1].isalpha() or line[close_image_tag + 1] == '*':
+                    line = line[close_image_tag + 1:] + '\n' + line[0:close_image_tag + 1]
 
         normalized_lines.append(line.strip())
 
