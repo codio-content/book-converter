@@ -63,7 +63,7 @@ class TestSuite(unittest.TestCase):
     def test_toc_print_yaml(self):
         path = Path(get_file_path('toc_simple'))
         toc = get_latex_toc(path.parent, path.name)
-        yaml = print_to_yaml(toc, path)
+        yaml = print_to_yaml(toc, path, 'tex')
 
         yaml = re.sub(r"directory:(.*)$", r"directory: toc_cases", yaml, flags=re.MULTILINE)
         yaml = yaml.strip()

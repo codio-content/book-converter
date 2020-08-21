@@ -1,8 +1,12 @@
 import logging
 
 from subprocess import Popen, PIPE
-from PIL import Image
 from pathlib import Path
+
+try:
+    from PIL import Image
+except ImportError:
+    logging.warn('from PIL import Image', ImportWarning)
 
 
 def run_command(command):

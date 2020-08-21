@@ -1,3 +1,4 @@
+import json
 import yaml
 import logging
 
@@ -15,7 +16,18 @@ def load_config_file(base_path):
             raise BaseException("Structure not found")
     with open(file_path, 'r') as stream:
         try:
-            return yaml.load(stream), file_path.parent
+            return yaml.load(stream, Loader=yaml.FullLoader), file_path.parent
         except yaml.YAMLError as exc:
+            logging.error("load config file exception", exc)
+            raise BaseException("load config file exception")
+
+
+def load_json_config_file(file_path):
+    if not file_path.is_file():
+        raise BaseException("Structure not found")
+    with open(file_path, 'r') as stream:
+        try:
+            return json.load(stream)
+        except json.JSONDecodeError as exc:
             logging.error("load config file exception", exc)
             raise BaseException("load config file exception")
