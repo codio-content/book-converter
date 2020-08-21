@@ -393,14 +393,13 @@ def get_odsa_code_test_file(exercise_data):
     method_name = exercise_data.get('method_name', '')
     tests = exercise_data.get('tests', '')
     tests = re.sub('"",', '""\\,', tests)
-
     tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> ?\d+ ?|\".*?\")(?:,(?P<message>.*?)$)?""",
                           flags=re.MULTILINE)
     matches = list(re.finditer(tests_re, tests))
     if not matches:
         return ''
     size = len(matches)
-    run_tests = get_odsa_run_tests_code(size)
+    run_tests = get_odsa_run_tests_code(matches, method_name)
     unit_tests = get_odsa_unit_tests(matches, class_name, method_name)
     return f'import java.util.Objects;\n' \
            f'import java.util.concurrent.Callable;\n' \
@@ -433,12 +432,11 @@ def get_odsa_code_test_file(exercise_data):
 def get_odsa_unit_tests(matches, class_name, method_name):
     num = 0
     unit_tests = []
-    for m in matches:
+    for match in matches:
         num += 1
-        actual = m.group('actual')
-        expected = m.group('expected')
+        actual = match.group('actual')
+        expected = match.group('expected')
         expected = expected.strip('"').strip() if expected is not None else expected
-        message = m.group('message')
         test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
                     f'       public Test{num}() {{\n' \
                     f'       }}\n' \
@@ -451,17 +449,20 @@ def get_odsa_unit_tests(matches, class_name, method_name):
     return ''.join(unit_tests)
 
 
-def get_odsa_run_tests_code(size):
+def get_odsa_run_tests_code(matches, method_name):
     run_scripts = []
-    for num in range(size):
+    num = 0
+    for match in matches:
+        actual = match.group('actual')
+        expected = match.group('expected')
         num += 1
         code = f'       if (runTest(new Test{num}())) {{\n' \
                f'           passed_tests++;\n' \
                f'           test_counter++;\n' \
-               f'           feedback += "Test" + test_counter + " passed\\n";\n' \
+               f'           feedback += "Test"+test_counter+" PASSED: {method_name}({actual}) -> {expected}\\n";\n' \
                f'       }} else {{\n' \
                f'           test_counter++;\n' \
-               f'           feedback += "Test" + test_counter + " failed\\n";\n' \
+               f'           feedback += "Test"+test_counter+" FAILED: {method_name}({actual})\\n";\n' \
                f'       }}\n' \
                f'\n'
         run_scripts.append(code)
