@@ -1,5 +1,6 @@
 import logging
 import subprocess
+import re
 
 from argparse import ArgumentParser
 from os import listdir
@@ -49,7 +50,9 @@ def convert(base_directory, output):
                     to_process.append(DocumentsToProcess(sub_content, f_item, file))
 
     sorted_items = sort_processing_items(to_process)
-    convert_docx(sorted_items[4], output)
+
+    for element in sorted_items:
+        convert_docx(element, output)
 
 
 def convert_docx(element, output_dir):
@@ -57,8 +60,20 @@ def convert_docx(element, output_dir):
     command = ['pandoc', '--extract-media', str(media_dir), '--wrap=none', '-t', 'markdown', element.doc]
     result = subprocess.run(command, capture_output=True)
     utf8_output = result.stdout.decode('utf-8')
-    normalized_output = normalize_output(utf8_output, str(output_dir))
-    print('normalized_output', normalized_output)
+    unit_name, topic_name, normalized_output = normalize_output(utf8_output, str(output_dir))
+
+    result = re.match(r"(.*)Unit\s(\d)+\s(Lab\s|Labs\s)?[\-]+(?P<uname>[a-zA-Z\s]+)", unit_name)
+    uname = 'Unit ' + result.group(2) + ' -- ' + result.group('uname').strip()
+    tname = ''
+
+    if topic_name:
+        result = re.match(r"(.*)(Topic|Topics)\s(\d)(?P<tname>.*)", topic_name)
+        tname = (result.group(2) + ' ' + result.group(3) + result.group(4)).rstrip('*')
+
+    if not tname:
+        uname = unit_name.strip('*')
+
+    print(uname, tname)
 
 
 def main():
