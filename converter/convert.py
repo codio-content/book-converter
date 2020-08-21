@@ -394,7 +394,8 @@ def get_odsa_code_test_file(exercise_data):
     tests = exercise_data.get('tests', '')
     tests = re.sub('"",', '""\\,', tests)
 
-    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> \d|\".*?\")(?:,\"(?P<message>.*?)\")?""")
+    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> ?\d+ ?|\".*?\")(?:,(?P<message>.*?)$)?""",
+                          flags=re.MULTILINE)
     matches = list(re.finditer(tests_re, tests))
     if not matches:
         return ''
