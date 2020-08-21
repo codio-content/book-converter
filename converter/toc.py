@@ -299,17 +299,16 @@ sections:
     first_item = True
     section_flag = False
     for ind, item in enumerate(structure):
+        yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
+
         next_item = structure[ind + 1] if ind + 1 < len(structure) else {}
-        codio_section_params = ""
         if item.contains_exercises:
-            codio_section_params = "    codio_section: start\n"
+            yaml_structure += "    codio_section: start\n"
             section_flag = True
         elif section_flag and not next_item.exercise:
-            codio_section_params = "    codio_section: end\n"
+            yaml_structure += "    codio_section: end\n"
             section_flag = False
 
-        yaml_structure += "  - name: \"{}\"\n    type: {}\n{}\n".format(item.section_name, item.section_type,
-                                                                        codio_section_params)
         if first_item:
             first_item = False
             yaml_structure += "    configuration:\n      layout: 1-panel\n"
