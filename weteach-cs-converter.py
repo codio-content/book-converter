@@ -59,6 +59,12 @@ def slugify(in_str):
     return re.sub('[^a-zA-Z]+', '', in_str).lower()
 
 
+def prepare_page_name(name):
+    separated = re.sub('([A-Z])', ' \\1', name).strip()
+    slugified = re.sub('[^a-zA-Z]+', '', name).replace('PartA', '').replace('PartB', '')
+    return separated, slugified
+
+
 def convert_docx(element, output_dir):
     media_dir = output_dir.joinpath('.guides').joinpath(slugify(str(Path(element.doc).stem))).absolute()
     command = ['pandoc', '--extract-media', str(media_dir), '--wrap=none', '-t', 'markdown', element.doc]
@@ -87,8 +93,9 @@ def convert_docx(element, output_dir):
                 ex_name = result_sp.group(6).rstrip('--').strip()
                 title = prefix + result_sp.group(3) + '.' + result_sp.group(4) + '.' + \
                     result_sp.group(5) + ' ' + ex_name
-                print('title', title)
-                print('ex_name', ex_name)
+
+                label, file = prepare_page_name(ex_name)
+                print('label, file', label, file)
 
 
 def main():
