@@ -2,6 +2,7 @@ import logging
 import subprocess
 import re
 import uuid
+import shutil
 
 from argparse import ArgumentParser
 from os import listdir
@@ -42,6 +43,7 @@ def sort_processing_items(items):
 
 
 def convert(base_directory, output):
+    shutil.rmtree(output, ignore_errors=True)
     print('output', output)
     to_process = []
     for f_item in listdir(base_directory):
@@ -103,11 +105,11 @@ def full_metadata(structure):
 
 
 def slugify(in_str):
-    return re.sub('[^a-zA-Z]+', '', in_str).lower()
+    return re.sub('[^a-zA-Z0-9]+', '', in_str).lower()
 
 
 def prepare_page_name(name):
-    separated = re.sub('([A-Z])', ' \\1', name).strip()
+    separated = re.sub('([A-Z])', ' \\1', name).strip().replace('--', '')
     slugified = re.sub('[^a-zA-Z]+', '', name).replace('PartA', '').replace('PartB', '')
     return separated, slugified
 
@@ -184,13 +186,15 @@ def convert_docx(element, output_dir, structure, sections):
     current_item = None
 
     for line in normalized_output.split('\n'):
-        result = re.match(r"(.*)(\d)+\.(\d)+\.(\d)+\s[\-]+", line)
+        result = re.match(r"(.*)(\d)+\.(\d)+\.(\d|[ABCD])+\s[\-]+", line)
         if not result:
             current_content.append(line)
             continue
 
         line_strip = line.lstrip('*').strip()
-        result_sp = re.match(r"(Lab )?(\d\.)?(\d)+\.(\d)+\.(\d)+\s[\-]+\s?([a-zA-Z\s\-]+)(\*\*)?.*", line_strip)
+        result_sp = re.match(
+            r"(Lab )?(\d\.)?(\d)+\.(\d|[ABCD])+\.(\d)+\s[\-]+\s?([a-zA-Z\s\-0-9]+)(\*\*)?.*", line_strip
+        )
         if not result_sp:
             current_content.append(line)
             continue
