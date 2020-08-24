@@ -152,8 +152,20 @@ def convert_docx(element, output_dir, structure, sections):
     uname = 'Unit ' + result.group(2) + ' -- ' + result.group('uname').strip()
     tname = ''
 
+    if topic_name:
+        result = re.match(r"(.*)(Topic|Topics)\s(\d)(?P<tname>.*)", topic_name)
+        tname = (result.group(2) + ' ' + result.group(3) + result.group(4)).rstrip('*').replace('--', '-')
+
     if not tname:
         uname = unit_name.strip('*')
+
+    if unit_name == topic_name:
+        uname = uname.replace(tname, '')
+
+    uname = uname.lstrip('>').lstrip('#').strip().rstrip('-').strip()\
+        .replace(' Lab', '').replace(' Classes Topics', ' Classes').replace('--', '-')
+
+    print('uname', uname)
 
     book_item_unit = book_item(uname, "chapter", True)
 
@@ -161,10 +173,6 @@ def convert_docx(element, output_dir, structure, sections):
     if not top_item:
         top_item = book_item_unit
         structure.append(book_item_unit)
-
-    if topic_name:
-        result = re.match(r"(.*)(Topic|Topics)\s(\d)(?P<tname>.*)", topic_name)
-        tname = (result.group(2) + ' ' + result.group(3) + result.group(4)).rstrip('*')
 
     book_item_topic = book_item(tname, "section", True)
 
@@ -198,7 +206,7 @@ def convert_docx(element, output_dir, structure, sections):
             result_sp.group(5) + ' ' + ex_name
 
         label, file = prepare_page_name(ex_name)
-        print('label, file', label, file)
+        # print('label, file', label, file)
 
         book_item_lab = book_item(label, "page", False)
 
