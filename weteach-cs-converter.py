@@ -110,7 +110,7 @@ def slugify(in_str):
 
 def prepare_page_name(name):
     separated = re.sub('([A-Z])', ' \\1', name).strip().replace('--', '')
-    slugified = re.sub('[^a-zA-Z]+', '', name).replace('PartA', '').replace('PartB', '')
+    slugified = re.sub('[^a-zA-Z0-9]+', '', name).replace('PartA', '').replace('PartB', '')
     return separated, slugified
 
 
@@ -212,10 +212,6 @@ def convert_docx(element, output_dir, structure, sections):
         label, file = prepare_page_name(ex_name)
         # print('label, file', label, file)
 
-        book_item_lab = book_item(label, "page", False)
-
-        top_item['children'].append(book_item_lab)
-
         file_to_open = str(process_starter_files(f'{file}.java', output_dir, tname or uname, element.base_dir))
         file_to_open = file_to_open.replace(str(output_dir), '').lstrip('/')
         base_ex_dir = Path(file_to_open).parent
@@ -246,6 +242,22 @@ def convert_docx(element, output_dir, structure, sections):
             }
         ]
 
+        book_item_lab = book_item(title, "page", False)
+
+        # print('line', line)
+        # print('file', file)
+
+        if ex_name in line:
+            sub_position_file = line.index(ex_name)
+            if '-' in line[sub_position_file:]:
+                sub_position_delimetr = line.index('-', sub_position_file)
+                if sub_position_delimetr > -1:
+                    sub_content = line[sub_position_delimetr + 1:]
+                    sub_content = sub_content.strip().strip('-').strip('*').strip('-').strip()
+                    if sub_content:
+                        current_content.append(sub_content)
+
+        top_item['children'].append(book_item_lab)
         current_item = section_item(title, files)
         current_item['content-file-additional'] = f'{run_content}\n{solution_content}'
 
