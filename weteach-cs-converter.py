@@ -186,14 +186,14 @@ def convert_docx(element, output_dir, structure, sections):
     current_item = None
 
     for line in normalized_output.split('\n'):
-        result = re.match(r"(.*)(\d)+\.(\d)+\.(\d|[ABCD])+\s[\-]+", line)
+        result = re.match(r"(.*)(\d)+\.(\d|[ABCDS])+\.(\d|[ABCDS])+\s[\-]+", line)
         if not result:
             current_content.append(line)
             continue
 
         line_strip = line.lstrip('*').strip()
         result_sp = re.match(
-            r"(Lab )?(\d\.)?(\d)+\.(\d|[ABCD])+\.(\d)+\s[\-]+\s?([a-zA-Z\s\-0-9]+)(\*\*)?.*", line_strip
+            r"(Lab )?(\d\.)?(\d)+\.(\d|[ABCDS])+\.(\d|[ABCDS])+\s[\-]+\s?([a-zA-Z\s\-0-9]+)(\*\*)?.*", line_strip
         )
         if not result_sp:
             current_content.append(line)
@@ -210,7 +210,6 @@ def convert_docx(element, output_dir, structure, sections):
             result_sp.group(5) + ' ' + ex_name
 
         label, file = prepare_page_name(ex_name)
-        # print('label, file', label, file)
 
         file_to_open = str(process_starter_files(f'{file}.java', output_dir, tname or uname, element.base_dir))
         file_to_open = file_to_open.replace(str(output_dir), '').lstrip('/')
@@ -231,6 +230,10 @@ def convert_docx(element, output_dir, structure, sections):
 
         files = [
             {
+                "path": "#tabs",
+                "action": "close"
+            },
+            {
                 "path": file_to_open,
                 "panel": 0,
                 "action": "open"
@@ -243,9 +246,6 @@ def convert_docx(element, output_dir, structure, sections):
         ]
 
         book_item_lab = book_item(title, "page", False)
-
-        # print('line', line)
-        # print('file', file)
 
         if ex_name in line:
             sub_position_file = line.index(ex_name)
@@ -266,7 +266,20 @@ def convert_docx(element, output_dir, structure, sections):
         sections.append(current_item)
     elif not tname:
         top_item['pageId'] = slugify(uname)
-        current_item = section_item(uname, [])
+        files = [
+            {
+                "path": "#tabs",
+                "action": "close"
+            },
+            {
+                "path": "#terminal: clear;",
+                "panel": 1,
+                "action": "open"
+            }
+        ]
+        book_item_unit['type'] = 'page'
+        del book_item_unit['children']
+        current_item = section_item(uname, files)
         current_item['content-file'] = '\n'.join(current_content)
         sections.append(current_item)
 
