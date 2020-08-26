@@ -11,7 +11,7 @@ from pathlib import Path
 
 from converter.rst2markdown import Rst2Markdown
 from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
-from converter.guides.tools import slugify, write_file, write_json
+from converter.guides.tools import slugify, write_file, write_json, read_file
 from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
 from converter.bookdown2markdown import BookDown2Markdown
@@ -358,7 +358,7 @@ def create_odsa_test_assessments(guides_dir, generate_dir, exercises):
     odsa_private_ex_dir.mkdir(exist_ok=True, parents=True)
 
     run_file_path = odsa_private_ex_dir.joinpath('run.py')
-    run_file_data = get_run_file_data()
+    run_file_data = read_file('converter/opendsa_ex_script/run.script')
     write_file(run_file_path, run_file_data)
     subprocess.call(f'chmod +x {run_file_path}', shell=True)
 
@@ -415,7 +415,7 @@ def get_odsa_code_test_file(exercise_data):
            f'       String total = "" + total_tests;\n' \
            f'       String passed = "" + passed_tests;\n' \
            f'       String output = total + "\\n" + passed +"\\n" + feedback;\n' \
-           f'       System.out.println(output);\n'\
+           f'       System.out.println(output);\n' \
            f'   }}\n' \
            f'\n' \
            f'   private static boolean runTest(Callable<Boolean> func) {{\n' \
@@ -470,11 +470,6 @@ def get_odsa_run_tests_code(matches, method_name):
                f'\n'
         run_scripts.append(code)
     return ''.join(run_scripts)
-
-
-def get_run_file_data():
-    with open('converter/opendsa_ex_script/run.script', 'r') as file:
-        return file.read()
 
 
 def convert(config, base_path, yes=False):

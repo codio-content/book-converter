@@ -16,9 +16,14 @@ def write_json(file_path, json_data):
     write_file(file_path, json.dumps(json_data, sort_keys=True, indent=2, separators=(',', ': ')))
 
 
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
+
 def get_text_in_brackets(line, start=0):
     start = line.find('{', start)
     end = line.rfind('}')
     if start == end or start == -1 or end == -1:
         return line
-    return line[start+1:end]
+    return line[start + 1:end]
