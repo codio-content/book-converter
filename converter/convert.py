@@ -438,11 +438,13 @@ def get_odsa_unit_tests(matches, class_name, method_name):
         expected = match.group('expected')
         expected = expected.strip('"').strip() if expected is not None else expected
         test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
+                    f'       private static final {class_name} instance = new {class_name}();\n' \
+                    f'\n' \
                     f'       public Test{num}() {{\n' \
                     f'       }}\n' \
                     f'       public Boolean call() {{\n' \
                     f'          {class_name} instance{num} = new {class_name}();\n' \
-                    f'          return Objects.equals({expected}, instance{num} .{method_name}({actual}));\n' \
+                    f'          return Objects.equals({expected}, instance.{method_name}({actual}));\n' \
                     f'       }}\n' \
                     f'   }}\n' \
                     f'\n'
@@ -463,10 +465,10 @@ def get_odsa_run_tests_code(matches, method_name):
         code = f'       if (runTest(new Test{num}())) {{\n' \
                f'           passed_tests++;\n' \
                f'           test_counter++;\n' \
-               f'           feedback += "Test"+test_counter+" PASSED: {method_name}({actual}) -> {expected}\\n";\n' \
+               f'           feedback += "Test"+test_counter+" PASSED: {method_name}({actual}) -> {expected}\\n\\n";\n' \
                f'       }} else {{\n' \
                f'           test_counter++;\n' \
-               f'           feedback += "Test"+test_counter+" FAILED: {method_name}({actual})\\n";\n' \
+               f'           feedback += "Test"+test_counter+" FAILED: {method_name}({actual})\\n\\n";\n' \
                f'       }}\n' \
                f'\n'
         run_scripts.append(code)
