@@ -46,8 +46,7 @@ if error:
         pre_lines = match.group(1)
         pre_lines_count = pre_lines.count("\n")
         answer_lines_count = wrapper_code.count("\n") if answer_code else 0
-
-        line_no = 7 - pre_lines_count
+        line_no = int(err_match.group(1)) - pre_lines_count
         if line_no > answer_lines_count:
             line_no = answer_lines_count
         if err_type:
