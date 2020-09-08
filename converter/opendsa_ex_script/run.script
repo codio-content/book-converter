@@ -59,6 +59,7 @@ if error:
         print("ERROR: no answer insertion marker in wrapper code")
     exit(1)
 #############################
+
 p = subprocess.Popen(f'java -cp /tmp/ Tester', shell=True, stdout=subprocess.PIPE,
                      universal_newlines=True)
 output, error = p.communicate()
