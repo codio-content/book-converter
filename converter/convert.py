@@ -408,7 +408,6 @@ def get_odsa_code_test_file(exercise_data):
            f'   public static void main(String[] args) {{\n' \
            f'       int total_tests = {size};\n' \
            f'       int passed_tests = 0;\n' \
-           f'       int test_counter = 0;\n' \
            f'       String feedback = "";\n' \
            f'\n' \
            f'{run_tests}' \
@@ -442,9 +441,17 @@ def get_odsa_unit_tests(matches, class_name, method_name):
                     f'\n' \
                     f'       public Test{num}() {{\n' \
                     f'       }}\n' \
+                    f'\n' \
+                    f'       public static Object getExpectedVal() {{\n' \
+                    f'          return {expected};\n' \
+                    f'       }}\n' \
+                    f'\n' \
+                    f'       public static Object getActualVal() {{\n' \
+                    f'          return instance.{method_name}({actual});\n' \
+                    f'       }}\n' \
+                    f'\n' \
                     f'       public Boolean call() {{\n' \
-                    f'          {class_name} instance{num} = new {class_name}();\n' \
-                    f'          return Objects.equals({expected}, instance.{method_name}({actual}));\n' \
+                    f'          return Objects.equals(getExpectedVal(), getActualVal());\n' \
                     f'       }}\n' \
                     f'   }}\n' \
                     f'\n'
@@ -464,11 +471,17 @@ def get_odsa_run_tests_code(matches, method_name):
         num += 1
         code = f'       if (runTest(new Test{num}())) {{\n' \
                f'           passed_tests++;\n' \
-               f'           test_counter++;\n' \
-               f'           feedback += "Test"+test_counter+" PASSED: {method_name}({actual}) -> {expected}\\n\\n";\n' \
+               f'           feedback += "Test PASSED: {method_name}({actual}) -> {expected}' \
+               f'\\n\\n";\n' \
                f'       }} else {{\n' \
-               f'           test_counter++;\n' \
-               f'           feedback += "Test"+test_counter+" FAILED: {method_name}({actual})\\n\\n";\n' \
+               f'           feedback += "Test FAILED: {method_name}({actual})\\n";\n' \
+               f'           try {{\n' \
+               f'               Object exp = Test{num}.getExpectedVal();\n' \
+               f'               Object act = Test{num}.getActualVal();\n' \
+               f'               feedback += "Expected: " + exp + "\\n" + "but was: " + act + "\\n\\n";\n' \
+               f'           }} catch (Exception | Error e) {{\n' \
+               f'               feedback += e + "\\n\\n";\n' \
+               f'           }}\n' \
                f'       }}\n' \
                f'\n'
         run_scripts.append(code)
