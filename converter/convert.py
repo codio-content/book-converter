@@ -321,9 +321,26 @@ def convert_custom_assessment(assessment):
 
 
 def convert_test_assessment(assessment):
+    examples_list = []
+    examples = ''
     class_name = assessment.ex_data.get('class_name', '')
+    method_name = assessment.ex_data.get('method_name', '')
     instructions = assessment.ex_data.get('question', '')
     ex_path = assessment.ex_data.get('ex_path', '')
+    tests = assessment.ex_data.get('tests', '')
+    test_matches = get_odsa_workout_unit_tests(tests)
+    for match in test_matches:
+        message = match.group('message')
+        if message == 'example':
+            actual = match.group('actual')
+            actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
+            expected = match.group('expected')
+            example = f'{method_name}({actual}) -> {expected}'
+            examples_list.append(example)
+    if examples_list:
+        examples = '\n'.join(examples_list)
+        examples = f'\nExample:\n\n```{examples}```'
+    instructions = f'{instructions}{examples}'
     return {
         'type': 'test',
         'taskId': assessment.id,
@@ -336,6 +353,13 @@ def convert_test_assessment(assessment):
             'points': assessment.points
         }
     }
+
+
+def get_odsa_workout_unit_tests(tests):
+    tests = re.sub('"",', '""\\,', tests)
+    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> ?\d+ ?|\".*?\")(?:,(?P<message>.*?)$)?""",
+                          flags=re.MULTILINE)
+    return list(re.finditer(tests_re, tests))
 
 
 def write_assessments(guides_dir, assessments):
@@ -392,15 +416,12 @@ def get_odsa_code_test_file(exercise_data):
     class_name = exercise_data.get('class_name', '')
     method_name = exercise_data.get('method_name', '')
     tests = exercise_data.get('tests', '')
-    tests = re.sub('"",', '""\\,', tests)
-    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> ?\d+ ?|\".*?\")(?:,(?P<message>.*?)$)?""",
-                          flags=re.MULTILINE)
-    matches = list(re.finditer(tests_re, tests))
-    if not matches:
+    test_matches = get_odsa_workout_unit_tests(tests)
+    if not test_matches:
         return ''
-    size = len(matches)
-    run_tests = get_odsa_run_tests_code(matches, method_name)
-    unit_tests = get_odsa_unit_tests(matches, class_name, method_name)
+    size = len(test_matches)
+    run_tests = get_odsa_run_tests_code(test_matches, method_name)
+    unit_tests = get_odsa_unit_tests(test_matches, class_name, method_name)
     return f'import java.util.Objects;\n' \
            f'import java.util.concurrent.Callable;\n' \
            f'\n' \
@@ -463,18 +484,33 @@ def get_odsa_run_tests_code(matches, method_name):
     run_scripts = []
     num = 0
     for match in matches:
+        msg = ''
         actual = match.group('actual')
+        actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
         actual = actual.strip('"')
         expected = match.group('expected')
         expected = expected.strip('"')
         message = match.group('message')
+        passed_data = f': {method_name}({actual}) -> {expected}'
+        failed_data = f': {method_name}({actual})\\n'
+        if message:
+            if message == 'example':
+                msg = ''
+            elif message == 'hidden':
+                passed_data = ': hidden'
+                failed_data = ': hidden'
+            else:
+                message = message.strip('"')
+                msg = f'{message}\\n\\n'
+                passed_data = ''
+                failed_data = ''
         num += 1
         code = f'       if (runTest(new Test{num}())) {{\n' \
                f'           passed_tests++;\n' \
-               f'           feedback += "Test PASSED: {method_name}({actual}) -> {expected}' \
+               f'           feedback += "{msg}Test <b>PASSED</b>{passed_data}' \
                f'\\n\\n";\n' \
                f'       }} else {{\n' \
-               f'           feedback += "Test FAILED: {method_name}({actual})\\n";\n' \
+               f'           feedback += "{msg}Test <b>FAILED</b>{failed_data}";\n' \
                f'           try {{\n' \
                f'               Object exp = Test{num}.getExpectedVal();\n' \
                f'               Object act = Test{num}.getActualVal();\n' \
