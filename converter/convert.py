@@ -502,8 +502,8 @@ def get_odsa_run_tests_code(matches, method_name):
             else:
                 message = message.strip('"')
                 msg = f'{message}\\n\\n'
-                passed_data = ''
-                failed_data = ''
+                passed_data = '\\n'
+                failed_data = '\\n'
         num += 1
         code = f'       if (runTest(new Test{num}())) {{\n' \
                f'           passed_tests++;\n' \
