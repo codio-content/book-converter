@@ -7,6 +7,7 @@ import re
 sys.path.append('/usr/share/codio/assessments')
 from lib.grade import send_partial
 
+error_msg = ''
 ex_path = ''
 ex_private_path = ''
 file_path = ''
@@ -19,19 +20,44 @@ if len(sys.argv) > 1:
     file_path = f'{ex_private_path}/{class_name}.java'
 
 with open(f'{ex_private_path}/wrapper_code.java') as f:
-    wrapper_data = f.read()
+    wrapper_code = f.read()
 
 with open(f'exercises/{ex_path}/starter_code.java') as f:
-    student_data = f.read()
+    answer_code = f.read()
 
-data = re.sub(r"___", student_data, wrapper_data)
-
+code = re.sub(r"\b___\b", answer_code, wrapper_code)
 with open(file_path, 'w', encoding="utf-8") as f:
-    f.write(data)
+    f.write(code)
 
-ret_code = subprocess.call(f'javac -d /tmp/ {file_path} {ex_private_path}/Tester.java', shell=True)
-if ret_code != 0:
-    sys.exit(1)
+#############################
+p = subprocess.Popen(f'javac -d /tmp/ {file_path} {ex_private_path}/Tester.java', shell=True,
+                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+output, error = p.communicate()
+output = output.strip()
+error = error.strip()
+
+if error:
+    err_match = re.search('^\S+\.java:\s*([0-9]+)\s*:\s*(?:warning:\s*)?(.*)', error)
+    err_type = re.search('^\s*(found|expected|required|symbol)\s*:\s*(.*)', error, flags=re.MULTILINE)
+
+    insert_marker_re = re.compile(r"(.*?)[ ]*\b___\b", flags=re.DOTALL)
+    match = insert_marker_re.search(wrapper_code)
+    if match:
+        pre_lines = match.group(1)
+        pre_lines_count = pre_lines.count("\n")
+        answer_lines_count = wrapper_code.count("\n") if answer_code else 0
+        line_no = int(err_match.group(1)) - pre_lines_count
+        if line_no > answer_lines_count:
+            line_no = answer_lines_count
+        if err_type:
+            error_msg = f'line {line_no}: {err_match.group(2)}: {err_type.group(2)}'
+        else:
+            error_msg = f'line {line_no}: {err_match.group(2)}'
+        print(error_msg)
+    else:
+        print("ERROR: no answer insertion marker in wrapper code")
+    exit(1)
+#############################
 
 p = subprocess.Popen(f'java -cp /tmp/ Tester', shell=True, stdout=subprocess.PIPE,
                      universal_newlines=True)
@@ -40,7 +66,6 @@ output = output.strip()
 
 if p.returncode != 0:
     sys.exit(1)
-
 if error:
     print(error)
     sys.exit(1)
