@@ -49,7 +49,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\textbar({\})?", r"|", output)
         output = re.sub(r"\\hrule", "<hr>", output)
         output = re.sub(r"\\hfill", "", output)
-        output = re.sub(r"\\small{(?:(.*?)^\s*}(?=\s*\n))", r"\1", output, flags=re.DOTALL + re.MULTILINE)
+        output = re.sub(r"(?:{\\small|\\small{)(?:(.*?)^\s*}(?=\s*\n))", r"\1", output, flags=re.DOTALL + re.MULTILINE)
         output = re.sub(r"\\raggedright{(.*?(?=^\}$))}", r"\1", output, flags=re.DOTALL + re.MULTILINE)
         output = re.sub(r"\\cline{.*?}", "", output)
         output = re.sub(r"\\bs{}", r"\\", output)
