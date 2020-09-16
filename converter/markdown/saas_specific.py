@@ -67,6 +67,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\((?:(?![s])([a-z]))\)", r"( \1 )", output)
         output = re.sub(r"__~to~__", r" __to__ ", output)
         output = re.sub(r"-{}-", r"- - ", output)
+        output = re.sub(r"\[\]\((.*?)\)", r"[\\](\1)", output)
         output = re.sub(r"{(name_with_rating)}", r"<b>\1</b>", output)
         output = re.sub(r"\\textsection", "$", output)
         output = re.sub(r"\\fillinblank{}", "_________", output)
