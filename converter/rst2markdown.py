@@ -176,7 +176,6 @@ class Rst2Markdown(object):
         topic_type = matchobj.group('type')
         content = matchobj.group('content')
         content = re.sub(r"\n +", "\n ", content)
-        content = content.replace('\n', ' ')
         self._figure_counter += 1
         return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
                f'{caret_token}{caret_token}**{topic_type} {self._chapter_num}.{self._subsection_num}.' \
@@ -453,9 +452,9 @@ class Rst2Markdown(object):
         output = self._term_re.sub(self._term, output)
         output = self._math_re.sub(self._math, output)
         output = self._math_block_re.sub(self._math_block, output)
-        output = self._paragraph_re.sub(self._paragraph, output)
         output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
+        output = self._paragraph_re.sub(self._paragraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
