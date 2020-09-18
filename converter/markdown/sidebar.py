@@ -12,7 +12,7 @@ class Sidebar(TextAsParagraph):
         self._pdfs = []
 
         self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}(\[(?P<props>.*?)])?
-                                    {(?P<block_graphics>.*?)}(.*?)
+                                    {(?P<block_graphics>.*?)}(?:%?[]*\n[ ]*)?
                                     (?:{(?P<block_name>.*?)})?
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
@@ -32,6 +32,7 @@ class Sidebar(TextAsParagraph):
         lines = map(lambda line: line.strip(), lines)
         block_contents = '\n'.join(lines)
         block_contents = self.to_paragraph(block_contents)
+        block_contents = block_contents.replace("\n", " ")
 
         caret_token = self._caret_token
         if title:
