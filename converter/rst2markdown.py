@@ -105,8 +105,7 @@ class Rst2Markdown(object):
         )
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
         self._extrtoolembed_re = re.compile(
-            r"""\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""",
-            flags=re.MULTILINE + re.DOTALL
+            r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE
         )
 
     def _heading1(self, matchobj):
@@ -245,15 +244,14 @@ class Rst2Markdown(object):
         return "\n".join(lines)
 
     def _extrtoolembed(self, matchobj):
-        caret_token = self._caret_token
         name = matchobj.group('name').lower()
         ex_data = self._exercises.get(name.lower(), {})
         assessment_id = f'test-{name.lower()}'
         if not ex_data:
-            return f'{caret_token}***Exercise:*** "{name}" **not found**{caret_token}{caret_token}'
+            return ''
         assessment = AssessmentData(assessment_id, name, 'test', 20, ex_data)
         self._assessments.append(assessment)
-        return f'{caret_token}***Exercise:*** "{name}"{caret_token}{caret_token}'
+        return ''
 
     def _avembed(self, matchobj):
         caret_token = self._caret_token
@@ -439,6 +437,7 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
+        output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
@@ -447,16 +446,15 @@ class Rst2Markdown(object):
         output = self._image_capt_re.sub(self._image_capt, output)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._avembed_re.sub(self._avembed, output)
-        output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._list_re.sub(self._list, output)
         output = self._ext_links_re.sub(self._ext_links, output)
         output = self._ref_re.sub(self._ref, output)
         output = self._term_re.sub(self._term, output)
         output = self._math_re.sub(self._math, output)
         output = self._math_block_re.sub(self._math_block, output)
-        output = self._paragraph_re.sub(self._paragraph, output)
         output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
+        output = self._paragraph_re.sub(self._paragraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
