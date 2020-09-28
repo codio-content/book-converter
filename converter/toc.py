@@ -6,7 +6,7 @@ from pathlib import Path
 
 from converter.guides.item import SectionItem, SECTION, CHAPTER
 from converter.guides.tools import write_file, get_text_in_brackets
-from converter.loader import load_json_config_file
+from converter.loader import load_json_file
 
 
 def is_section(line):
@@ -218,9 +218,9 @@ def get_bookdown_toc(folder, name):
 def get_rst_toc(folder, name, exercises={}):
     toc = []
     rst_path = folder.joinpath('RST/en').resolve()
-    conf_dir = folder.joinpath('config')
-    conf_path = conf_dir.joinpath(name).resolve()
-    config = load_json_config_file(conf_path)
+    structure_dir = folder.joinpath('config')
+    structure_path = structure_dir.joinpath(name).resolve()
+    config = load_json_file(structure_path)
     chapters = config.get('chapters')
 
     for chapter in chapters:
@@ -297,17 +297,26 @@ assets:
 sections:
 """.format(directory, data_format, tex.name)
     first_item = True
-    section_flag = False
+    exercises_flag = False
     for ind, item in enumerate(structure):
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
 
         next_item = structure[ind + 1] if ind + 1 < len(structure) else {}
+        prev_item = structure[ind - 1]
+
+        if exercises_flag and not prev_item.exercise:
+            yaml_structure += "    configuration:\n" \
+                              "      layout: 2-panels\n"
+        elif prev_item.exercise and not item.exercise:
+            yaml_structure += "    configuration:\n" \
+                              "      layout: 1-panel\n"
+
         if item.contains_exercises:
             yaml_structure += "    codio_section: start\n"
-            section_flag = True
-        elif section_flag and not next_item.exercise:
+            exercises_flag = True
+        elif exercises_flag and not next_item.exercise:
             yaml_structure += "    codio_section: end\n"
-            section_flag = False
+            exercises_flag = False
 
         if first_item:
             first_item = False
