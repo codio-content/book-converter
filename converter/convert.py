@@ -335,11 +335,11 @@ def convert_test_assessment(assessment):
             actual = match.group('actual')
             actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
             expected = match.group('expected')
-            example = f'{method_name}({actual}) -> {expected}'
+            example = f'`{method_name}({actual}) -> {expected}`\n\n'
             examples_list.append(example)
     if examples_list:
         examples = '\n'.join(examples_list)
-        examples = f'\nExample:\n\n```{examples}```'
+        examples = f'\nExamples:\n\n{examples}'
     instructions = f'{instructions}{examples}'
     return {
         'type': 'test',
