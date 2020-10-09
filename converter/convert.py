@@ -356,8 +356,7 @@ def convert_test_assessment(assessment):
 
 
 def get_odsa_workout_unit_tests(tests):
-    tests = re.sub('"",', '""\\,', tests)
-    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> ?\d+ ?|\".*?\")(?:,(?P<message>.*?)$)?""",
+    tests_re = re.compile(r"""(?P<actual>\d+|\"?.*?\"),(?P<expected>\d+|\".*?\"|.*?$)(?:,(?P<message>.*?$))?""",
                           flags=re.MULTILINE)
     return list(re.finditer(tests_re, tests))
 
