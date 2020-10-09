@@ -454,7 +454,9 @@ def get_odsa_unit_tests(matches, class_name, method_name):
     for match in matches:
         num += 1
         actual = match.group('actual')
+        actual = actual.strip('"')
         expected = match.group('expected')
+        expected = expected.strip('"')
         expected = expected.strip('"').strip() if expected is not None else expected
         test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
                     f'       private static final {class_name} instance = new {class_name}();\n' \
