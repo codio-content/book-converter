@@ -116,6 +116,25 @@ def get_section_lines(line, tex_folder):
     return []
 
 
+def cleanup_ifoddpage(lines):
+    updated = []
+    ifoddpage = False
+    for line in lines:
+        if "\\checkoddpage" in line:
+            continue
+        if ifoddpage and "\\fi" in line:
+            ifoddpage = False
+            continue
+        if ifoddpage:
+            continue
+        if "\\ifoddpage{" in line:
+            line = re.sub(r"\\ifoddpage{\\small(\\input{.*?})}", r"\1", line, flags=re.DOTALL)
+            line = line.strip()
+            ifoddpage = True
+        updated.append(line)
+    return updated
+
+
 def process_toc_lines(lines, tex_folder, parent_folder):
     toc = []
     line_pos = 1
@@ -145,6 +164,7 @@ def process_toc_lines(lines, tex_folder, parent_folder):
             toc.append(SectionItem(section_name=section_name, section_type=section_type, line_pos=line_pos))
             if is_section_file(line):
                 section_lines = get_section_lines(line, parent_folder)
+                section_lines = cleanup_ifoddpage(section_lines)
                 for sub_line in section_lines:
                     if is_input(sub_line):
                         sub_content = get_include_lines(tex_folder, input_file(sub_line))

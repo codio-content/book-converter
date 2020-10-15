@@ -68,7 +68,7 @@ class Figure(TextAsParagraph):
         block_contents = block_contents.replace('\\label{.*?}', '')
         block_contents = re.sub(r"\\caption{(.*?)}", r"", block_contents, flags=re.DOTALL + re.VERBOSE)
 
-        return f'{block_contents}**<p style="font-size: 10px">{caption}</p>**{caret_token}'
+        return f'{block_contents}{caret_token}**<p style="font-size: 10px">{caption}</p>**{caret_token}'
 
     def convert(self):
         output = self.str
