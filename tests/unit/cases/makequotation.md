@@ -1,6 +1,6 @@
 > It is a pleasure to see a student text that emphasizes the production of real useful software. I also applaud the emphasis on getting results early in the process. Nothing stimulates student morale and activity more.
 >
-> __Prof. Frederick P. Brooks, Jr., Turing Award winner and author of *The Mythical Man-Month*__
+> __Prof. Frederick P. Brooks, Jr., Turing Award winner and author of <i>The Mythical Man-Month</i>__
 
 
 

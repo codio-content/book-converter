@@ -1,4 +1,4 @@
-In contrast to a native app, which is designed to render a particular user interface associated with only one SaaS service, we can think of a desktop or mobile browser as a *universal client*, because any site the browser visits can deliver all the information necessary to render that site's user interface. Both browsers and native apps are used by millions of people, so we call them *production clients*.
+In contrast to a native app, which is designed to render a particular user interface associated with only one SaaS service, we can think of a desktop or mobile browser as a <i>universal client</i>, because any site the browser visits can deliver all the information necessary to render that site's user interface. Both browsers and native apps are used by millions of people, so we call them <i>production clients</i>.
 
 
 Indeed, modern practice suggests that even when creating a user-facing SaaS app designed to be used via a browser, we should design the app as a collection of resources accessible via RESTful APIs, but then provide a Web browser-based user interface “on top of” those API calls.
@@ -6,8 +6,7 @@ Indeed, modern practice suggests that even when creating a user-facing SaaS app 
 
 If the Web browser is the universal client, ___HTML___, the HyperText Markup Language, is the universal language. A ___markup language___ combines text with markup (annotations about the text) in a way that makes it easy to syntactically distinguish the two.
 
-HTML consists of a hierarchy of nested elements, each of which consists of an opening tag such as **\<p\>**, a content part (in some cases), and a closing tag such as **\</p\>**. Most opening tags can also have attributes, as in **$<$a href="http://..."$>$**. Some tags that don't have a content part are self-closing, such as **\<br clear="both"/\>** for a line break that clears both left and right margins.
-
+HTML consists of a hierarchy of nested elements, each of which consists of an opening tag such as <b>&lt;p&gt;</b>, a content part (in some cases), and a closing tag such as <b>&lt;/p&gt;</b>. Most opening tags can also have attributes, as in <b>$<$a href="http://..."$>$</b>. Some tags that don't have a content part are self-closing, such as <b>&lt;br clear="both"/&gt;</b> for a line break that clears both left and right margins.
 
   
 
@@ -18,10 +17,10 @@ The use of angle brackets for tags comes from ___SGML___ (Standard Generalized M
 
 
 
-There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1).  HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of ___XML___, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information *between* two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
+There is an unfortunate and confusing mess of terminology surrounding the [lineage of HTML](http://www.w3.org/TR/html5/introduction.html#history-1) HTML 5 includes features of both its predecessors (HTML versions 1 through 4) and XHTML (eXtended HyperText Markup Language), which is a subset of ___XML___, an eXtensible Markup Language that can be used both to represent data and to describe other markup languages.  Indeed, XML is a common data representation for exchanging information <i>between</i> two services in a Service-Oriented Architecture, as we'll see in Chapter chap:tdd when we extend RottenPotatoes to retrieve movie information from a separate movie database service.  The differences among the variants of XHTML and HTML are difficult to keep straight, and not all browsers support all versions.  Unless otherwise noted, from now on when we say HTML we mean HTML 5, and we will try to avoid using features that aren't widely supported.
 
 
-Of particular interest are the HTML tag attributes **id** and **class**, because they figure heavily into connecting the HTML structure of a page with its visual appearance.  The following screencast illustrates the use of Firefox's Web Developer toolbar to quickly identify the ID's and Classes of HTML elements on a page.
+Of particular interest are the HTML tag attributes <b>id</b> and <b>class</b>, because they figure heavily into connecting the HTML structure of a page with its visual appearance.  The following screencast illustrates the use of Firefox's Web Developer toolbar to quickly identify the ID's and Classes of HTML elements on a page.
 
 <hr>
 
@@ -30,7 +29,7 @@ Of particular interest are the HTML tag attributes **id** and **class**, because
 <iframe width="560" height="315" src="//www.youtube.com/embed/X5ArSbUea_o" frameborder="0" allowfullscreen></iframe>
 
 
-CSS uses ___selector notations___ such as **div#***name* to indicate a **div** element whose **id** is *name* and **div.***name* to indicate a **div** element with class *name*. Only one element in an HTML document can have a given **id**, whereas many elements (even of different tag types) can share the same **class**. All three aspects of an element---its tag type, its **id** (if it has one), and its **class** attributes (if it has any)---can be used to identify an element as a candidate for visual formatting.
+CSS uses ___selector notations___ such as <b>div#</b><i>name</i> to indicate a <b>div</b> element whose <b>id</b> is <i>name</i> and <b>div.</b><i>name</i> to indicate a <b>div</b> element with class <i>name</i>. Only one element in an HTML document can have a given <b>id</b>, whereas many elements (even of different tag types) can share the same <b>class</b>. All three aspects of an element---its tag type, its <b>id</b> (if it has one), and its <b>class</b> attributes (if it has any)---can be used to identify an element as a candidate for visual formatting.
 
 <hr>
 
@@ -54,7 +53,7 @@ As the next screencast shows, the ___CSS___ (___Cascading Style Sheets___) stand
 <iframe width="560" height="315" src="//www.youtube.com/embed/E5ZVorHn_fs" frameborder="0" allowfullscreen></iframe>
 
 
-There are four basic mechanisms by which a selector in a CSS file can match an HTML element: by tag name, by class, by ID, and by hierarchy. If multiple selectors match a given element, the rules for which properties to apply are complex, so most designers try to avoid such ambiguities by keeping their CSS simple.  A useful way to see the “bones” of a page is to select \Sf{CSS\>-Disable Styles\>-All Styles} from the Firefox Web Developer toolbar; most developer-friendly browsers offer a “developer mode” featuring similar behaviors. Disabling styles will display the page with all CSS formatting turned off, showing the extent to which CSS can be used to separate visual appearance from logical structure.
+There are four basic mechanisms by which a selector in a CSS file can match an HTML element: by tag name, by class, by ID, and by hierarchy. If multiple selectors match a given element, the rules for which properties to apply are complex, so most designers try to avoid such ambiguities by keeping their CSS simple.  A useful way to see the “bones” of a page is to select \Sf{CSS&gt;-Disable Styles&gt;-All Styles} from the Firefox Web Developer toolbar; most developer-friendly browsers offer a “developer mode” featuring similar behaviors. Disabling styles will display the page with all CSS formatting turned off, showing the extent to which CSS can be used to separate visual appearance from logical structure.
 
 <hr>
 
@@ -62,7 +61,7 @@ There are four basic mechanisms by which a selector in a CSS file can match an H
 
 ch_arch/tables/css_cheat
 
-**<p style="font-size: 10px">Figure 1.1:  A few CSS constructs, including those explained in Screencast css-intro.  The top table shows some CSS *selectors*, which identify the elements to be styled; the bottom table shows a few of the many attributes, whose names are usually self-explanatory, and example values they can be assigned.  Not all attributes are valid on all elements.</p>**
+**<p style="font-size: 10px">Figure 1.1:  A few CSS constructs, including those explained in Screencast css-intro.  The top table shows some CSS <i>selectors</i>, which identify the elements to be styled; the bottom table shows a few of the many attributes, whose names are usually self-explanatory, and example values they can be assigned.  Not all attributes are valid on all elements.</p>**
 
 
 
@@ -88,13 +87,14 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 
 
+
 ---
-**Summary**
+<b>Summary</b>
   
 
-* An ___HTML___ (HyperText Markup Language) document consists of a hierarchically nested collection of elements. Each element begins with a  ___tag___ in \<angle brackets\> that may have optional ___attributes___.  Some elements enclose content.
-* A ___selector___ is an expression that identifies one or more HTML elements in a document by using a combination of the element name (such as **body**), element **id** (an element attribute that must be unique on a page), and element **class** (an attribute that need not be unique on a page).
-* ___Cascading Style Sheets___ (CSS) is a stylesheet language describing visual attributes of elements on a Web page.  A stylesheet associates sets of visual properties with  selectors.  A special **link** element inside the **head** element of an HTML document associates a stylesheet with that document.
+* An ___HTML___ (HyperText Markup Language) document consists of a hierarchically nested collection of elements. Each element begins with a  ___tag___ in &lt;angle brackets&gt; that may have optional ___attributes___.  Some elements enclose content.
+* A ___selector___ is an expression that identifies one or more HTML elements in a document by using a combination of the element name (such as <b>body</b>), element <b>id</b> (an element attribute that must be unique on a page), and element <b>class</b> (an attribute that need not be unique on a page).
+* ___Cascading Style Sheets___ (CSS) is a stylesheet language describing visual attributes of elements on a Web page.  A stylesheet associates sets of visual properties with  selectors.  A special <b>link</b> element inside the <b>head</b> element of an HTML document associates a stylesheet with that document.
 * The “developer tools” in each browser, such as the Firefox Web Developer toolbar, are invaluable in peeking under the hood to examine both the structure of a page and its stylesheets.
 
 
@@ -104,11 +104,10 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 
 |||challenge
+True or false: every HTML element must have an ID. 
+<p><details><summary>Check yourself</summary>
 
-  True or false: every HTML element must have an ID.
-
-  <details><summary>Check yourself</summary>False---the ID is optional, though must be unique if provided.</details>
-
+False---the ID is optional, though must be unique if provided.</details></p>
 |||
 
 
@@ -122,39 +121,31 @@ SPA vs MPA: Are you building something that's more like a website (transactional
 
 
 |||challenge
-
-  
-  Given the following HTML markup:
-
-  
+Given the following HTML markup: 
 **source:ch_arch/code/htmlexercise.html**
 ```code
 ch_arch/code/htmlexercise.html
 ```
+ Write down a CSS selector that will select <i>only</i> the word <i>Mondays</i> for styling. 
+<p><details><summary>Check yourself</summary>
 
-  Write down a CSS selector that will select *only* the word
-  *Mondays* for styling.
-  <details><summary>Check yourself</summary>Three possibilities, from most specific to least specific, are: __#i span__, __p.x span__, and __.x span__. Other selectors are possible but redundant or over-constrained; for example, __p#i span__ and __p#i.x span__ are redundant with respect to this HTML snippet since at most one element can have the ID __i__.</details>
-
+Three possibilities, from most specific to least specific, are: <b>#i span</b>, <b>p.x span</b>, and <b>.x span</b>. Other selectors are possible but redundant or over-constrained; for example, <b>p#i span</b> and <b>p#i.x span</b> are redundant with respect to this HTML snippet since at most one element can have the ID <b>i</b>.</details></p>
 |||
 
 
 
 |||challenge
+In Self-Check ex:css1, why are <b>span</b> and  <b>p span</b> <i>not</i> valid answers? 
+<p><details><summary>Check yourself</summary>
 
-  In Self-Check ex:css1, why are __span__
-  and  __p span__ *not* valid answers?
-  <details><summary>Check yourself</summary>Both of those selector also match *Tuesdays*, which is a __span__ inside a __p__.</details>
-
+Both of those selector also match <i>Tuesdays</i>, which is a <b>span</b> inside a <b>p</b>.</details></p>
 |||
 
 
 
 |||challenge
+What is the most common way to associate a CSS stylesheet with an HTML or HTML document? (HINT: refer to the earlier screencast example.) 
+<p><details><summary>Check yourself</summary>
 
-  What is the most common way to associate a CSS stylesheet with an HTML
-  or HTML document? (HINT: refer to the earlier screencast example.)
-
-  <details><summary>Check yourself</summary>Within the **HEAD** element of the HTML or HTML document, include a **LINK** element with at least the following three attributes: **REL="STYLESHEET"**, **TYPE="text/css"**, and **HREF="*uri*"**, where ***uri*** is the full or partial URI of  the stylesheet.  That is, the stylesheet must be accessible as a resource named by a URI.</details>
-
+Within the <b>HEAD</b> element of the HTML or HTML document, include a <b>LINK</b> element with at least the following three attributes: <b>REL="STYLESHEET"</b>, <b>TYPE="text/css"</b>, and <b>HREF="<i>uri</i>"</b>, where <b><i>uri</i></b> is the full or partial URI of  the stylesheet.  That is, the stylesheet must be accessible as a resource named by a URI.</details></p>
 |||

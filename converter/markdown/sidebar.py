@@ -12,36 +12,27 @@ class Sidebar(TextAsParagraph):
         self._pdfs = []
 
         self._sidebargraphic_re = re.compile(r"""\\begin{sidebargraphic}(\[(?P<props>.*?)])?
-                                    {(?P<block_graphics>.*?)}(.*?)
-                                    {(?P<block_name>.*?)}
+                                    {(?P<block_graphics>.*?)}(?:%?[]*\n[ ]*)?
+                                    (?:{(?P<block_name>.*?)})?
                                     (?P<block_contents>.*?)
                                     \\end{sidebargraphic}""", flags=re.DOTALL + re.VERBOSE)
 
-        self._sidebar_re = re.compile(r"""\\begin{sidebar}
-                                    (?P<block_contents>.*?)
-                                    \\end{sidebar}""", flags=re.DOTALL + re.VERBOSE)
+        self._sidebar_re = re.compile(r"""\\begin{sidebar}(\[.*?\])?(?:{(?P<title>.*?)})?
+                                      (?P<block_contents>.*?)\\end{sidebar}""",
+                                      flags=re.DOTALL + re.VERBOSE)
 
     def _sidebar_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         lines = block_contents.split('\n')
-        head = lines[0]
-        title = ''
-        additional = ''
-
-        lines = lines[1:]
-
-        matches = re.match(r"(\[.*\])?({.*?\})(.*)?", head)
-        if matches:
-            title = matches.group(2).strip()
-            title = get_text_in_brackets(title).strip('*')
-            additional = matches.group(3).strip()
-
-        if additional:
-            lines.insert(0, additional)
+        title = matchobj.group('title')
+        if title:
+            title = title.replace("\n", " ").strip()
+            title = get_text_in_brackets(title)
 
         lines = map(lambda line: line.strip(), lines)
         block_contents = '\n'.join(lines)
         block_contents = self.to_paragraph(block_contents)
+        block_contents = block_contents.replace("\n", " ")
 
         caret_token = self._caret_token
         if title:
@@ -55,6 +46,8 @@ class Sidebar(TextAsParagraph):
         block_contents = matchobj.group('block_contents')
         image = matchobj.group('block_graphics')
         block_name = matchobj.group('block_name')
+        if block_name:
+            block_name = block_name.replace('\n', ' ')
 
         if '.' not in image:
             ext = self._detect_asset_ext(image)

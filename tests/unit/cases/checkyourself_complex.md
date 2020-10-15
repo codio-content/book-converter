@@ -1,8 +1,6 @@
 |||challenge
+Suppose you mix <b>Enumerable</b> into a class <b>Foo</b> that does not provide the <b>each</b> method.  What error will be raised when you call <b>Foo.new.map { |elt| puts elt }</b>? 
+<p><details><summary>Check yourself</summary>
 
-  Suppose you mix __Enumerable__ into a class __Foo__ that does not
-  provide the __each__ method.  What error will be raised when you
-  call __Foo.new.map { |elt| puts elt }__?
-  <details><summary>Check yourself</summary>The __map__ method in __Enumerable__ will attempt to call __each__ on its receiver, but since the new __Foo__ object doesn't define __each__, Ruby will raise an Undefined Method error.</details>
-
+The <b>map</b> method in <b>Enumerable</b> will attempt to call <b>each</b> on its receiver, but since the new <b>Foo</b> object doesn't define <b>each</b>, Ruby will raise an Undefined Method error.</details></p>
 |||

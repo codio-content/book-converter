@@ -12,7 +12,7 @@ def is_section(line):
 
 
 def is_chapter(line):
-    return line.startswith('\\chapter')
+    return line.startswith('\\chapter[') or line.startswith('\\chapter{')
 
 
 def is_toc(line):
@@ -54,7 +54,7 @@ def cleanup_name(name):
             l_pos = l_pos - 1
         else:
             cut_pos += 1
-        res = name[0:l_pos] + name[cut_pos:r_pos] + name[r_pos+1:]
+        res = name[0:l_pos] + name[cut_pos:r_pos] + name[r_pos + 1:]
         return cleanup_name(res)
     return name
 
@@ -64,6 +64,7 @@ def convert_name(name):
     name = re.sub("``", "“", name)
     name = re.sub("''", "”", name)
     name = re.sub(r"--", "-", name)
+    name = re.sub(r" vs.\\", " vs.", name)
     return name
 
 
@@ -99,7 +100,7 @@ def is_section_file(line):
 
 
 def get_section_lines(line, tex_folder):
-    section_line_re = re.compile(r"""\\sectionfile{(?P<block_name>.*?)}{(?P<block_path>.*?)}""")
+    section_line_re = re.compile(r"""\\sectionfile(\[.*?\])?{(?P<block_name>.*?)}{(?P<block_path>.*?)}""")
     result = section_line_re.search(line)
     if result:
         file = result.group("block_path")
@@ -119,14 +120,27 @@ def process_toc_lines(lines, tex_folder, parent_folder):
     toc = []
     line_pos = 1
     item_lines = []
+    chapter_line = ''
+    chapter_line_break = False
     for line in lines:
         line = line.rstrip('\r\n')
+        if chapter_line_break:
+            if line.endswith('}'):
+                line = chapter_line + line
+                chapter_line_break = False
+            else:
+                chapter_line += line
+                continue
         if is_toc(line):
             if toc:
                 if item_lines:
                     toc[len(toc) - 1].lines = item_lines
                 item_lines = []
             section_type = CHAPTER if is_chapter(line) else SECTION
+            if section_type == CHAPTER and not line.endswith('}'):
+                chapter_line = line
+                chapter_line_break = True
+                continue
             section_name, additional_content_in_name = get_name(line)
             toc.append(SectionItem(section_name=section_name, section_type=section_type, line_pos=line_pos))
             if is_section_file(line):
@@ -236,7 +250,8 @@ def get_bookdown_toc(folder, name):
 
 def print_to_yaml(structure, tex, bookdown=False):
     file_format = "bookdown: {}".format(tex.name) if bookdown else "tex: {}".format(tex.name)
-    yaml_structure = """workspace:
+    yaml_structure = """name: "TODO: book name"
+workspace:
   directory: {}
   {}
 assets:
@@ -248,7 +263,7 @@ sections:
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
         if first_item:
             first_item = False
-            yaml_structure += "    configuration:\n      layout: 2-panels\n"
+            yaml_structure += "    configuration:\n      layout: 1-panels\n"
     return yaml_structure
 
 

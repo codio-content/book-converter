@@ -10,6 +10,7 @@ class Lists(TextAsParagraph):
 
         self._block_counter = defaultdict(lambda: 1)
         self._lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize|description)} # list name
+                                    (\s\\addtocounter{.*?}{(?P<start_number>\d)})? # list start number
                                     (\[.*?\])? # Optional enumerate settings i.e. (a)
                                     (?P<block_contents>.*?) # Non-greedy list contents
                                     \\end{(?P=block_name)}""",  # closing list
@@ -38,16 +39,29 @@ class Lists(TextAsParagraph):
             }
         }
 
-    def _format_list_contents(self, block_name, block_contents):
+    def _format_list_contents(self, block_name, block_contents, start_number):
         block_config = self._block_configuration[block_name]
         list_heading = block_config["list_heading"]
+        enum = False
+
+        if block_name == 'enumerate':
+            enum = True
+            if start_number is not None:
+                start_number = int(start_number)
+            else:
+                start_number = 0
 
         output_str = ""
         for line in block_contents.lstrip().rstrip().split("\\item"):
             line = line.lstrip().rstrip()
             line = line.replace("\\\\", "<br/>")
+            line = re.sub(r" {4,}", " ", line)
             if not line:
                 continue
+
+            if enum:
+                start_number += 1
+                list_heading = f'{start_number}. '
 
             cline = ""
             for sub_str in line.split("\n"):
@@ -86,12 +100,13 @@ class Lists(TextAsParagraph):
     def _replace_block(self, matchobj):
         block_name = matchobj.group('block_name')
         block_contents = matchobj.group('block_contents')
+        start_number_str = matchobj.group('start_number')
         block_title = matchobj.groupdict().get('block_title')
 
         if '\\begin{enumerate' in block_contents or '\\begin{itemize' in block_contents:
             block_contents = self._lists_re.sub(self._replace_block, block_contents)
 
-        formatted_contents = self._format_list_contents(block_name, block_contents)
+        formatted_contents = self._format_list_contents(block_name, block_contents, start_number_str)
         formatted_contents = self.to_paragraph(formatted_contents)
 
         header = self._format_block_name(block_name, block_title)

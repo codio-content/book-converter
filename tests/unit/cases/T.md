@@ -1,1 +1,1 @@
-HTTP methods---**GET**, **POST**, **PUT** and **DELETE**---and even use
+HTTP methods---<b>GET</b>, <b>POST</b>, <b>PUT</b> and <b>DELETE</b>---and even use

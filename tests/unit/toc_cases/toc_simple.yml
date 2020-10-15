@@ -1,3 +1,4 @@
+name: "TODO: book name"
 workspace:
   directory: toc_cases
   tex: toc_simple.tex
@@ -7,7 +8,7 @@ sections:
   - name: "Computer programming"
     type: chapter
     configuration:
-      layout: 2-panels
+      layout: 1-panels
   - name: "What is a computer?"
     type: section
   - name: "What is programming?"

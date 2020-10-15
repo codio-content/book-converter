@@ -5,7 +5,7 @@
 
 > If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.
 >
-> __Gerald Weinberg, *Weinberg's Second Law*__
+> __Gerald Weinberg, <i>Weinberg's Second Law</i>__
 
 
 
@@ -47,10 +47,10 @@ An early version of this Plan-and-Document software development process was deve
 
 
 1. Requirements analysis and specification
-1. Architectural design
-1. Implementation and Integration
-1. Verification
-1. Operation and Maintenance
+2. Architectural design
+3. Implementation and Integration
+4. Verification
+5. Operation and Maintenance
 
 
 
@@ -82,9 +82,9 @@ This observation led to a software development lifecycle developed in the 1980s 
 
 
 1. Determine objectives and constraints of this iteration
-1. Evaluate alternatives and identify and resolve risks
-1. Develop and verify the prototype for this iteration
-1. Plan the next iteration
+2. Evaluate alternatives and identify and resolve risks
+3. Develop and verify the prototype for this iteration
+4. Plan the next iteration
 
 
 
@@ -108,9 +108,9 @@ Like Waterfall and Spiral, RUP has phases:
 
 
 1. Inception: makes the business case for the software and scopes the project to set the schedule and budget, which is used to judge progress and justify expenditures, and initial assessment of risks to schedule and budget.
-1. Elaboration: works with stakeholders to identify use cases, designs a software architecture, sets the development plan, and builds an initial prototype.
-1. Construction: codes and tests the product, resulting in the first external release.
-1. Transition: moves the product from development to production in the real environment, including customer acceptance testing and user training.
+2. Elaboration: works with stakeholders to identify use cases, designs a software architecture, sets the development plan, and builds an initial prototype.
+3. Construction: codes and tests the product, resulting in the first external release.
+4. Transition: moves the product from development to production in the real environment, including customer acceptance testing and user training.
 
 
 
@@ -121,11 +121,11 @@ In addition to the dynamically changing phases of the project, RUP identifies si
 
 
 1. Business Modeling
-1. Requirements
-1. Analysis and Design
-1. Implementation
-1. Test
-1. Deployment
+2. Requirements
+3. Analysis and Design
+4. Implementation
+5. Test
+6. Deployment
 
 
 
@@ -140,37 +140,37 @@ An unfortunate downside to teaching a Plan-and-Document approach is that student
 
 
 ---
-**Summary:** The basic *activities* of software engineering are the same in all the software development process or ___lifecycles___, but their interaction over time relative to product releases differs among the models. The Waterfall lifecycle is characterized by much of the design being done in advance of coding, completing each phase before going on to the next one. The Spiral lifecycle iterates through all the development phases to produce prototypes, but like Waterfall, the customers may only get involved every 6 to 24 months. The more recent Rational Unified Process lifecycle includes phases, iterations, and prototypes, while identifying the people skills needed for the project. All rely on careful planning and thorough documentation, and all measure progress against a plan.
+<b>Summary:</b> The basic <i>activities</i> of software engineering are the same in all the software development process or ___lifecycles___, but their interaction over time relative to product releases differs among the models. The Waterfall lifecycle is characterized by much of the design being done in advance of coding, completing each phase before going on to the next one. The Spiral lifecycle iterates through all the development phases to produce prototypes, but like Waterfall, the customers may only get involved every 6 to 24 months. The more recent Rational Unified Process lifecycle includes phases, iterations, and prototypes, while identifying the people skills needed for the project. All rely on careful planning and thorough documentation, and all measure progress against a plan.
 
 ---
 
 
 
 |||challenge
+What are a major similarity and a major difference between processes like Spiral and RUP versus Waterfall? 
+<p><details><summary>Check yourself</summary>
 
-  What are a major similarity and a major difference between processes like Spiral and RUP versus Waterfall?
-  <details><summary>Check yourself</summary>All rely on planning and documentation, but Spiral and RUP use iteration and prototypes to improve them over time versus a single long path to the product.</details>
-
+All rely on planning and documentation, but Spiral and RUP use iteration and prototypes to improve them over time versus a single long path to the product.</details></p>
 |||
 
 
 
 |||challenge
+What are the differences between the phases of these Plan-and-Document processes? 
+<p><details><summary>Check yourself</summary>
 
-  What are the differences between the phases of these Plan-and-Document processes?
-  <details><summary>Check yourself</summary>Waterfall phases separate planning (requirements and architectural design) from implementation. Testing the product before release is next, followed by a separate operations phase. The Spiral phases are aimed at an iteration: set the goals for an iteration; explore alternatives; develop and verify the prototype for this iteration; and plan the next iteration. RUP phases are tied closer to business objectives: inception makes business case and sets schedule and budget; elaboration works with customers to build an initial prototype; construction builds and test the first version; and transition deploys the product.</details>
-
+Waterfall phases separate planning (requirements and architectural design) from implementation. Testing the product before release is next, followed by a separate operations phase. The Spiral phases are aimed at an iteration: set the goals for an iteration; explore alternatives; develop and verify the prototype for this iteration; and plan the next iteration. RUP phases are tied closer to business objectives: inception makes business case and sets schedule and budget; elaboration works with customers to build an initial prototype; construction builds and test the first version; and transition deploys the product.</details></p>
 |||
 
 ## SEI Capability Maturity Model (CMM)
 The Software Engineering Institute at Carnegie Mellon University proposed the ___Capability Maturity Model___ (CMM) (Paulk05) to evaluate  organizations' software-development processes based on Plan-and-Document methodologies. The idea is that by modeling the software development process, an organization can improve them. SEI studies observed five levels of software practice:
 
 
-1. Initial or Chaotic---undocumented/*ad hoc*/unstable software development.
-1. Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
-1. Defined---Defined and documented standard processes that improve over time.
-1. Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
-1. Optimizing---Deliberate process optimization improvements as part of management process.
+1. Initial or Chaotic---undocumented/<i>ad hoc</i>/unstable software development.
+2. Repeatable---not following rigorous discipline, but some processes repeatable with consistent results.
+3. Defined---Defined and documented standard processes that improve over time.
+4. Managed---Management can control software development using process metrics, adapting the process to different projects successfully.
+5. Optimizing---Deliberate process optimization improvements as part of management process.
 
 
 CMM implicitly encourages an organization to move up the CMM levels. While not proposed as a software development methodology, many consider it one. For example,  (Nawrocki02) compares CMM Level 2 to the Agile software methodology (see next section).

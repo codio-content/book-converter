@@ -28,6 +28,7 @@ class TuringWinner(TextAsParagraph):
                   f'{block_contents}{caret_token}{image_src}{caret_token}|||{caret_token}{caret_token}'
 
         quote = ''
+        q_name = q_name.strip()
         if q_name and q_content:
             quote = f'{caret_token}> {q_content}{caret_token}>' \
                     f'{caret_token}> __{q_name}__{caret_token}{caret_token}'
