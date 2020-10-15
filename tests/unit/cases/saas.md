@@ -64,6 +64,7 @@ While you can argue the mappings, below is our answer. (Note that we cheated and
 6. No field upgrades when improve app: Documents.
 
 </details></p>
+
 |||
 
 
@@ -73,6 +74,7 @@ True or False: If you are using the Agile development process to develop SaaS ap
 <p><details><summary>Check yourself</summary>
 
 True. Programming frameworks for Agile and SaaS include Django and ASP.NET.</details></p>
+
 |||
 
 
