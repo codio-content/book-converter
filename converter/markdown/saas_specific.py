@@ -51,6 +51,8 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\hfill", "", output)
         output = re.sub(r"(?:{\\small|\\small{)(?:(.*?)^\s*}(?=\s*\n))", r"\1", output, flags=re.DOTALL + re.MULTILINE)
         output = re.sub(r"\\raggedright{(.*?(?=^\}$))}", r"\1", output, flags=re.DOTALL + re.MULTILINE)
+        output = re.sub(r"\\Beta{.*?}", "", output, flags=re.DOTALL)
+        output = re.sub(r"\\times{}", r"\\times", output)
         output = re.sub(r"\\cline{.*?}", "", output)
         output = re.sub(r"\\bs{}", r"\\", output)
         output = re.sub(r"==", r"\\=\\=", output)

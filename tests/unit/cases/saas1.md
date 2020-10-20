@@ -151,6 +151,7 @@ What are a major similarity and a major difference between processes like Spiral
 <p><details><summary>Check yourself</summary>
 
 All rely on planning and documentation, but Spiral and RUP use iteration and prototypes to improve them over time versus a single long path to the product.</details></p>
+
 |||
 
 
@@ -160,6 +161,7 @@ What are the differences between the phases of these Plan-and-Document processes
 <p><details><summary>Check yourself</summary>
 
 Waterfall phases separate planning (requirements and architectural design) from implementation. Testing the product before release is next, followed by a separate operations phase. The Spiral phases are aimed at an iteration: set the goals for an iteration; explore alternatives; develop and verify the prototype for this iteration; and plan the next iteration. RUP phases are tied closer to business objectives: inception makes business case and sets schedule and budget; elaboration works with customers to build an initial prototype; construction builds and test the first version; and transition deploys the product.</details></p>
+
 |||
 
 ## SEI Capability Maturity Model (CMM)

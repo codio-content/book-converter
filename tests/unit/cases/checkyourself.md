@@ -3,4 +3,5 @@ True or False: User stories on 3x5 cards in BDD play the same role as design req
 <p><details><summary>Check yourself</summary>
 
 True.</details></p>
+
 |||

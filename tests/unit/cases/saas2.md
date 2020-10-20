@@ -14,6 +14,7 @@ True or False: A big difference between Spiral and Agile development is building
 <p><details><summary>Check yourself</summary>
 
 False: Both build working but incomplete prototypes that the customer helps evaluate. The difference is that customers are involved every two weeks in Agile versus up to two years in with Spiral.</details></p>
+
 |||
 
 ## Versions of Agile

@@ -108,6 +108,7 @@ True or false: every HTML element must have an ID.
 <p><details><summary>Check yourself</summary>
 
 False---the ID is optional, though must be unique if provided.</details></p>
+
 |||
 
 
@@ -130,6 +131,7 @@ ch_arch/code/htmlexercise.html
 <p><details><summary>Check yourself</summary>
 
 Three possibilities, from most specific to least specific, are: <b>#i span</b>, <b>p.x span</b>, and <b>.x span</b>. Other selectors are possible but redundant or over-constrained; for example, <b>p#i span</b> and <b>p#i.x span</b> are redundant with respect to this HTML snippet since at most one element can have the ID <b>i</b>.</details></p>
+
 |||
 
 
@@ -139,6 +141,7 @@ In Self-Check ex:css1, why are <b>span</b> and  <b>p span</b> <i>not</i> valid a
 <p><details><summary>Check yourself</summary>
 
 Both of those selector also match <i>Tuesdays</i>, which is a <b>span</b> inside a <b>p</b>.</details></p>
+
 |||
 
 
@@ -148,4 +151,5 @@ What is the most common way to associate a CSS stylesheet with an HTML or HTML d
 <p><details><summary>Check yourself</summary>
 
 Within the <b>HEAD</b> element of the HTML or HTML document, include a <b>LINK</b> element with at least the following three attributes: <b>REL="STYLESHEET"</b>, <b>TYPE="text/css"</b>, and <b>HREF="<i>uri</i>"</b>, where <b><i>uri</i></b> is the full or partial URI of  the stylesheet.  That is, the stylesheet must be accessible as a resource named by a URI.</details></p>
+
 |||
