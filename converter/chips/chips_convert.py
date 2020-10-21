@@ -146,6 +146,10 @@ def convert_chips_doc(config, base_path, yes=False):
 
         out_md = '\n'.join(item.lines)
 
+        if slug_name in tokens:
+            for key, value in tokens.get(slug_name).items():
+                out_md = out_md.replace(key, value)
+
         md_path = content_dir.joinpath(slug_name + ".md")
         section, book_item = make_section_items(item, slug_name, md_path, transformation_rules, out_md)
 
