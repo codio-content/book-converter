@@ -9,13 +9,13 @@ from converter.guides.tools import write_file, slugify, write_json
 from converter.guides.item import SectionItem, CHAPTER
 
 
-def generate_chips_toc(converted_path, source_path, ignore_exists=True):
+def generate_chips_toc(converted_path, source_path, ignore_exists=False):
     converted_path = Path(converted_path)
     if converted_path.exists() and not ignore_exists:
         raise Exception("Path exists")
     source_path = Path(source_path)
     converted_path.mkdir(parents=True, exist_ok=ignore_exists)
-    docs_path = Path(source_path.joinpath('docs'))
+    docs_path = Path(source_path.joinpath('docs')).resolve()
     if docs_path.exists():
         source_type = 'docs'
         doc_files = get_doc_files(docs_path)
