@@ -2,7 +2,6 @@ import re
 import shutil
 import uuid
 
-import yaml
 import logging
 from pathlib import Path
 
@@ -10,68 +9,80 @@ from converter.guides.tools import write_file, slugify, write_json
 from converter.guides.item import SectionItem, CHAPTER
 
 
-
-def generate_assesment_toc(source_path, structure_path, ignore_exists=False):
-    path = Path(source_path)
-    if path.exists() and not ignore_exists:
+def generate_chips_toc(converted_path, source_path, ignore_exists=True):
+    converted_path = Path(converted_path)
+    if converted_path.exists() and not ignore_exists:
         raise Exception("Path exists")
-    structure = Path(structure_path)
-    path.mkdir(parents=True, exist_ok=ignore_exists)
-    toc = get_assesment_toc(structure.parent, structure.name)
-    content = to_yaml(toc, structure)
-    a_path = path.joinpath("codio_structure.yml").resolve()
+    source_path = Path(source_path)
+    converted_path.mkdir(parents=True, exist_ok=ignore_exists)
+    docs_path = Path(source_path.joinpath('docs'))
+    if docs_path.exists():
+        source_type = 'docs'
+        doc_files = get_doc_files(docs_path)
+        toc = get_chips_toc(source_path.parent, doc_files)
+    else:
+        source_type = 'readme'
+        readme_file = Path(source_path.joinpath('README.md'))
+        toc = get_chips_toc(source_path.parent, [readme_file])
+    content = to_yaml(toc, source_path, source_type)
+    a_path = converted_path.joinpath("codio_structure.yml").resolve()
     write_file(a_path, content)
 
 
-def get_assesment_toc(tex_folder, tex_name):
-    lines = get_assesment_lines(tex_folder, tex_name)
-    if not lines:
-        return None
-    return process_assesment_lines(lines)
+def get_doc_files(docs_path):
+    files = []
+    for file in docs_path.glob('*.md'):
+        files.append(file)
+    return files
 
 
-def get_assesment_lines(folder, name):
-    a_path = folder.joinpath(name).resolve()
+def get_chips_toc(path, files):
+    toc = []
+    for file in files:
+        lines = get_chips_lines(path, file)
+        if not lines:
+            return None
+        toc.append(process_chips_lines(lines)[0])
+    return toc
+
+
+def get_chips_lines(folder, file_path):
+    a_path = folder.joinpath(file_path).resolve()
     with open(a_path, 'r', errors='replace') as file:
         return file.readlines()
 
 
-def process_assesment_lines(lines):
+def process_chips_lines(lines):
     toc = []
     item_lines = []
     header = False
-    for line in lines:
+    for ind, line in enumerate(lines):
         line = line.rstrip('\r\n')
 
-        if match_alt_header(line):
-            section_name = item_lines[len(item_lines) - 1]
-            item_lines.pop()
-            item_lines.append(line)
-            item_lines = []
-            header = True
-            continue
+        if not header:
+            next_line = lines[ind + 1]
+            if match_alt_header(next_line):
+                section_name = line.strip()
+                lines[ind + 1] = ''
+                header = True
+            elif match_header(line):
+                section_name = line.strip('#').strip()
+                header = True
+            else:
+                continue
 
-        if match_part_header(line):
-            item_lines = []
-            section_name = match_part_header(line).string.strip('**')
-            header = True
-
-        if match_header(line):
-            item_lines = []
-            section_name = match_header(line).string.strip('#').strip()
-            header = True
-
-        if header:
-            toc.append(SectionItem(
-                section_name=section_name,
-                section_type='section',
-                line_pos=0)
-            )
-            toc[len(toc) - 1].lines = item_lines
-            header = False
+            if header:
+                item_lines.clear()
+                toc.append(SectionItem(
+                    section_name=section_name,
+                    section_type='section',
+                    line_pos=0)
+                )
+                continue
 
         item_lines.append(line)
 
+    toc[len(toc) - 1].lines = item_lines if toc else []
     return toc
 
 
@@ -80,44 +91,27 @@ def match_header(line):
 
 
 def match_alt_header(line):
-    return re.search(r""" {0,3}(?:=|-)+ *$""", line)
+    return re.search(r""" {0,3}(?:=)+ *$""", line)
 
 
 def match_part_header(line):
     return re.search(r"""^\*\*Part \d+:.*?\*\*""", line)
 
 
-def to_yaml(structure, source_path):
-    source = "source: {}".format(source_path.name)
+def to_yaml(structure, source_path, source_type):
+    source = "source: {}".format(source_type)
     yaml_structure = """workspace:
   directory: {}
   {}
 sections:
-""".format(source_path.parent.resolve(), source)
+""".format(source_path.resolve(), source)
     for item in structure:
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
     return yaml_structure
 
 
-def load_assesment_docs_config(target_path):
-    global config_path
-    target_path = Path(target_path)
-    config_path = target_path
-    if target_path.is_dir():
-        config_path = target_path.joinpath("content_structure.yml")
-        if not config_path.is_file():
-            config_path = target_path.joinpath("content_structure.yaml")
-        if not config_path.is_file():
-            raise BaseException("Structure not found")
-    with open(config_path, 'r') as stream:
-        try:
-            return yaml.load(stream), config_path.parent
-        except yaml.YAMLError as exc:
-            logging.error("load config file exception", exc)
-            raise BaseException("load config file exception")
-
-
-def convert_assesment_doc(config, base_path, yes=False):
+def convert_chips_doc(config, base_path, yes=False):
+    toc = []
     base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
@@ -125,7 +119,15 @@ def convert_assesment_doc(config, base_path, yes=False):
     logging.debug("start converting %s" % generate_dir)
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
-    toc = get_assesment_toc(Path(config['workspace']['directory']), Path(config['workspace']['source']))
+    chips_path = Path(config['workspace']['directory'])
+    source_type = config['workspace']['source']
+    if source_type == 'docs':
+        docs_path = Path(chips_path.joinpath('docs'))
+        doc_files = get_doc_files(docs_path)
+        toc = get_chips_toc(chips_path.parent, doc_files)
+    elif source_type == 'readme':
+        readme_file = Path(chips_path.joinpath('README.md'))
+        toc = get_chips_toc(chips_path.parent, [readme_file])
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
 

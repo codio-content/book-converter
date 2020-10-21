@@ -1,7 +1,7 @@
 import logging
 from argparse import ArgumentParser
 
-from converter.assesment.doc_convert import convert_assesment_doc, generate_assesment_toc
+from converter.chips.chips_convert import convert_chips_doc, generate_chips_toc
 from converter.loader import load_config_file
 
 if __name__ == '__main__':
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     logging.getLogger('PIL').setLevel(logging.WARN)
 
     if args.generate:
-        generate_assesment_toc(args.paths[0], args.generate)
+        generate_chips_toc(args.paths[0], args.generate)
     else:
         config, base_path = load_config_file(args.paths[0])
-        convert_assesment_doc(config, base_path, False)
+        convert_chips_doc(config, base_path, False)
