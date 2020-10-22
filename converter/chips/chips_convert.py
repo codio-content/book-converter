@@ -29,11 +29,16 @@ def generate_chips_toc(converted_path, source_path, ignore_exists=False):
     write_file(a_path, content)
 
 
+def sort_natural(val):
+    return tuple(int(part) if re.match(r'[0-9]+$', part) else part
+                 for part in re.split(r'([0-9]+)', val.name))
+
+
 def get_doc_files(docs_path):
     files = []
     for file in docs_path.glob('*.md'):
         files.append(file)
-    return files
+    return sorted(files, key=sort_natural)
 
 
 def get_chips_toc(path, files):
