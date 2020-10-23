@@ -18,12 +18,11 @@ def generate_chips_toc(converted_path, source_path, ignore_exists=False):
     docs_path = Path(source_path.joinpath('docs')).resolve()
     if docs_path.exists():
         source_type = 'docs'
-        doc_files = get_doc_files(docs_path)
-        toc = get_chips_toc(source_path.parent, doc_files)
+        f_list = get_doc_files(docs_path)
     else:
         source_type = 'readme'
-        readme_file = Path(source_path.joinpath('README.md'))
-        toc = get_chips_toc(source_path.parent, [readme_file])
+        f_list = [Path(source_path.joinpath('README.md'))]
+    toc = get_chips_toc(source_path.parent, f_list, source_type)
     content = to_yaml(toc, source_path, source_type)
     a_path = converted_path.joinpath("codio_structure.yml").resolve()
     write_file(a_path, content)
@@ -41,13 +40,19 @@ def get_doc_files(docs_path):
     return sorted(files, key=sort_natural)
 
 
-def get_chips_toc(path, files):
+def get_chips_toc(path, files, source_type):
     toc = []
-    for file in files:
-        lines = get_chips_lines(path, file)
+    if source_type == 'docs':
+        for file in files:
+            lines = get_chips_lines(path, file)
+            if not lines:
+                return None
+            toc.append(process_docs_lines(lines)[0])
+    elif source_type == 'readme':
+        lines = get_chips_lines(path, files[0])
         if not lines:
             return None
-        toc.append(process_chips_lines(lines)[0])
+        toc = process_readme_lines(lines)
     return toc
 
 
@@ -57,7 +62,7 @@ def get_chips_lines(folder, file_path):
         return file.readlines()
 
 
-def process_chips_lines(lines):
+def process_docs_lines(lines):
     toc = []
     item_lines = []
     header = False
@@ -77,7 +82,7 @@ def process_chips_lines(lines):
                 continue
 
             if header:
-                item_lines.clear()
+                item_lines = []
                 toc.append(SectionItem(
                     section_name=section_name,
                     section_type='section',
@@ -91,6 +96,52 @@ def process_chips_lines(lines):
     return toc
 
 
+def process_readme_lines(lines):
+    toc = []
+    item_lines = []
+    section_name = ''
+    header = False
+    for line in lines:
+        line = line.rstrip('\r\n')
+
+        if match_alt_header(line):
+            section_name = item_lines[len(item_lines) - 1]
+            item_lines.pop()
+            item_lines.append(line)
+            item_lines = []
+            header = True
+            continue
+
+        if match_part_header(line):
+            item_lines = []
+            section_name = match_part_header(line).string.strip('**')
+            header = True
+
+        if match_header(line):
+            item_lines = []
+            section_name = match_header(line).string.strip('#').strip()
+            header = True
+
+        if match_submission(line):
+            item_lines = []
+            section_name = match_submission(line).string.strip('**')
+            header = True
+
+        if header:
+            toc.append(SectionItem(
+                section_name=section_name,
+                section_type='section',
+                line_pos=0)
+            )
+            toc[len(toc) - 1].lines = item_lines
+            header = False
+            continue
+
+        item_lines.append(line)
+
+    return toc
+
+
 def match_header(line):
     return re.search(r""" {0,3}#{1,6}(?:\n|\s+?(.*?))""", line)
 
@@ -100,7 +151,11 @@ def match_alt_header(line):
 
 
 def match_part_header(line):
-    return re.search(r"""^\*\*Part \d+:.*?\*\*""", line)
+    return re.search(r"""^\*\*Part \d+:.*?\*\*""", line, flags=re.M)
+
+
+def match_submission(line):
+    return re.search(r"""^\*\*submission:?\*\*$""", line, flags=re.M | re.I)
 
 
 def to_yaml(structure, source_path, source_type):
@@ -128,11 +183,13 @@ def convert_chips_doc(config, base_path, yes=False):
     source_type = config['workspace']['source']
     if source_type == 'docs':
         docs_path = Path(chips_path.joinpath('docs'))
-        doc_files = get_doc_files(docs_path)
-        toc = get_chips_toc(chips_path.parent, doc_files)
+        f_list = get_doc_files(docs_path)
+        toc = get_chips_toc(chips_path.parent, f_list, source_type)
     elif source_type == 'readme':
-        readme_file = Path(chips_path.joinpath('README.md'))
-        toc = get_chips_toc(chips_path.parent, [readme_file])
+        f_list = [Path(chips_path.joinpath('README.md'))]
+        toc = get_chips_toc(chips_path.parent, f_list, source_type)
+    else:
+        raise Exception("Invalid source type")
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
 

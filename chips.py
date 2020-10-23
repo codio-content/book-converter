@@ -22,4 +22,4 @@ if __name__ == '__main__':
         generate_chips_toc(args.paths[0], args.generate)
     else:
         config, base_path = load_config_file(args.paths[0])
-        convert_chips_doc(config, base_path, False)
+        convert_chips_doc(config, base_path, args.yes)
