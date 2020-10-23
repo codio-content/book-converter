@@ -171,7 +171,6 @@ sections:
 
 
 def convert_chips_doc(config, base_path, yes=False):
-    toc = []
     base_dir = base_path
     generate_dir = base_dir.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
