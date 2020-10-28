@@ -1,7 +1,7 @@
 import re
 
 
-def normalize_output(output, media_directory):
+def normalize_output(output, media_directory, skip_names=True):
     lines = output.replace('\r', '').split('\n')
     normalized_lines = []
     unit_name = None
@@ -20,7 +20,7 @@ def normalize_output(output, media_directory):
         if not topic_name and 'Topic' in line:
             topic_name = line
             topic_or_unit_found = True
-        if topic_or_unit_found:
+        if topic_or_unit_found and skip_names:
             continue
 
         # {width="2.8952384076990376in" height="0.7772451881014873in"}

@@ -43,13 +43,12 @@ def sort_processing_items(items):
 
 
 def convert(base_directory, output):
-    shutil.rmtree(output, ignore_errors=True)
     print('output', output)
     to_process = []
     for f_item in listdir(base_directory):
         sub_content = base_directory.joinpath(f_item)
         if sub_content.is_dir():
-            for file in Path(sub_content).rglob('*.docx'):
+            for file in Path(sub_content).rglob('*.md'):
                 if not file.name.startswith('~'):
                     to_process.append(DocumentsToProcess(sub_content, f_item, file))
 
@@ -59,7 +58,7 @@ def convert(base_directory, output):
     sections = []
 
     for element in sorted_items:
-        convert_docx(element, output, structure, sections)
+        convert_md(element, output, structure, sections)
 
     guides_dir = output.joinpath('.guides')
     book_file = guides_dir.joinpath('book.json')
@@ -143,14 +142,18 @@ def section_item(name, files):
     }
 
 
-def convert_docx(element, output_dir, structure, sections):
-    media_dir = output_dir.joinpath('.guides').joinpath('media').joinpath(str(uuid.uuid4())).absolute()
-    command = ['pandoc', '--extract-media', str(media_dir), '--wrap=none', '-t', 'markdown', element.doc]
-    result = subprocess.run(command, capture_output=True)
-    utf8_output = result.stdout.decode('utf-8')
+def read_md(file):
+    with open(file, 'r', errors='replace') as file:
+        content = file.readlines()
+        return '\n'.join(content)
+
+
+def convert_md(element, output_dir, structure, sections):
+    utf8_output = read_md(element.doc)
+
     unit_name, topic_name, normalized_output = normalize_output(utf8_output, str(output_dir))
 
-    result = re.match(r"(.*)Unit\s(\d)+\s(Lab\s|Labs\s)?[\-]+(?P<uname>[a-zA-Z\s]+)", unit_name)
+    result = re.match(r"(.*)Unit\s(\d+)\s(Lab\s|Labs\s)?[\-]+(?P<uname>[a-zA-Z0-9\s]+)", unit_name)
     uname = 'Unit ' + result.group(2) + ' -- ' + result.group('uname').strip()
     tname = ''
 
@@ -305,20 +308,50 @@ def process_starter_files(file_name, output_dir, topic_name, base_dir):
     return dst_file
 
 
+def prepare(base_directory, output):
+    shutil.rmtree(output, ignore_errors=True)
+    to_process = []
+    for f_item in listdir(base_directory):
+        sub_content = base_directory.joinpath(f_item)
+        if sub_content.is_dir():
+            for file in Path(sub_content).rglob('*.docx'):
+                if not file.name.startswith('~'):
+                    to_process.append(DocumentsToProcess(sub_content, f_item, file))
+
+    for element in to_process:
+        docx_to_markdown(element, output)
+
+
+def docx_to_markdown(element, output_dir):
+    media_dir = output_dir.joinpath('.guides').joinpath('media').joinpath(str(uuid.uuid4())).absolute()
+    command = ['pandoc', '--extract-media', str(media_dir), '--wrap=none', '-t', 'markdown', element.doc]
+    result = subprocess.run(command, capture_output=True)
+    utf8_output = result.stdout.decode('utf-8')
+    unit_name, topic_name, normalized_output = normalize_output(utf8_output, str(output_dir), skip_names=False)
+
+    md_file = str(element.doc).replace('.docx', '.md')
+
+    write_file(md_file, normalized_output)
+
+
 def main():
     parser = ArgumentParser(description='Process weteach-cs docs to codio guides.')
     parser.add_argument('paths', metavar='PATH', type=str, nargs='+', help='path to a sources directory')
     parser.add_argument('-l', '--log', action='store', default=None)
     parser.add_argument('--output', type=str, help='path to output folder')
+    parser.add_argument('--prepare', help='prepare markdown structure', default=False, action='store_true')
 
     args = parser.parse_args()
 
     logging.basicConfig(filename=args.log, level=logging.DEBUG,
                         format='[%(asctime)s] %(levelname).5s %(message)s',
                         datefmt='%Y.%m.%d %H:%M:%S')
-
-    for path in args.paths:
-        convert(Path(path), Path(args.output))
+    if args.prepare:
+        for path in args.paths:
+            prepare(Path(path), Path(args.output))
+    else:
+        for path in args.paths:
+            convert(Path(path), Path(args.output))
 
 
 if __name__ == '__main__':
