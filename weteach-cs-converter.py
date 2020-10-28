@@ -180,6 +180,8 @@ def convert_md(element, output_dir, structure, sections):
         structure.append(book_item_unit)
 
     book_item_topic = book_item(tname, "section", True)
+    
+    print('tname', tname)
 
     if tname:
         top_item['children'].append(book_item_topic)
@@ -189,14 +191,14 @@ def convert_md(element, output_dir, structure, sections):
     current_item = None
 
     for line in normalized_output.split('\n'):
-        result = re.match(r"(.*)(\d)+\.(\d|[ABCDS])+\.(\d|[ABCDS])+\s[\-]+", line)
+        result = re.match(r"(.*)(\d)+\.(\d|[ABCDS])+\.(\d|[ABCDS])+\s[\-–]+", line)
         if not result:
             current_content.append(line)
             continue
 
         line_strip = line.lstrip('*').strip()
         result_sp = re.match(
-            r"(Lab )?(\d\.)?(\d)+\.(\d|[ABCDS])+\.(\d|[ABCDS])+\s[\-]+\s?([a-zA-Z\s\-0-9]+)(\*\*)?.*", line_strip
+            r"(Lab )?(\d\.)?(\d)+\.(\d|[ABCDS])+\.(\d|[ABCDS])+\s[\-–]+\s?([a-zA-Z\s\-0-9]+)(\*\*)?.*", line_strip
         )
         if not result_sp:
             current_content.append(line)
@@ -249,6 +251,8 @@ def convert_md(element, output_dir, structure, sections):
         ]
 
         book_item_lab = book_item(title, "page", False)
+        
+        print('title', title)
 
         if ex_name in line:
             sub_position_file = line.index(ex_name)
