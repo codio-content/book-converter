@@ -152,11 +152,11 @@ def convert_md(element, output_dir, structure, sections):
     utf8_output = read_md(element.doc)
 
     unit_name, topic_name, normalized_output = normalize_output(utf8_output, str(output_dir))
-
-    result = re.match(r"(.*)Unit\s(\d+)\s(Lab\s|Labs\s)?[\-]+(?P<uname>[a-zA-Z0-9\s]+)", unit_name)
+    #result = re.match(r"(.*)Unit\s(\d+)\s(Lab\s|Labs\s)?[\-]+(?P<uname>[a-zA-Z0-9\s]+)", unit_name)
+    result = re.match(r"(.*)Unit\s(\d+)\s(Lab\s|Labs\s)?[\-–]+(?P<uname>[a-zA-Z0-9\s]+)", unit_name)
     uname = 'Unit ' + result.group(2) + ' -- ' + result.group('uname').strip()
     tname = ''
-
+    
     if topic_name:
         result = re.match(r"(.*)(Topic|Topics)\s(\d)(?P<tname>.*)", topic_name)
         tname = (result.group(2) + ' ' + result.group(3) + result.group(4)).rstrip('*').replace('--', '-')
