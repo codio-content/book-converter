@@ -9,7 +9,7 @@ from converter.guides.tools import write_file, slugify, write_json
 from converter.guides.item import SectionItem, CHAPTER
 
 
-def generate_chips_toc(converted_path, source_path, ignore_exists=False):
+def generate_chips_toc(converted_path, source_path, ignore_exists=True):
     converted_path = Path(converted_path)
     if converted_path.exists() and not ignore_exists:
         raise Exception("Path exists")
@@ -22,7 +22,7 @@ def generate_chips_toc(converted_path, source_path, ignore_exists=False):
     else:
         source_type = 'readme'
         f_list = [Path(source_path.joinpath('README.md'))]
-    toc = get_chips_toc(source_path.parent, f_list, source_type)
+    toc = get_chips_toc(f_list, source_type)
     content = to_yaml(toc, source_path, source_type)
     a_path = converted_path.joinpath("codio_structure.yml").resolve()
     write_file(a_path, content)
@@ -40,24 +40,24 @@ def get_doc_files(docs_path):
     return sorted(files, key=sort_natural)
 
 
-def get_chips_toc(path, files, source_type):
+def get_chips_toc(files, source_type):
     toc = []
     if source_type == 'docs':
         for file in files:
-            lines = get_chips_lines(path, file)
+            lines = get_chips_lines(file)
             if not lines:
                 return None
             toc.append(process_docs_lines(lines)[0])
     elif source_type == 'readme':
-        lines = get_chips_lines(path, files[0])
+        lines = get_chips_lines(files[0])
         if not lines:
             return None
         toc = process_readme_lines(lines)
     return toc
 
 
-def get_chips_lines(folder, file_path):
-    a_path = folder.joinpath(file_path).resolve()
+def get_chips_lines(file_path):
+    a_path = Path.cwd().parent.joinpath(file_path).resolve()
     with open(a_path, 'r', errors='replace') as file:
         return file.readlines()
 
@@ -183,10 +183,10 @@ def convert_chips_doc(config, base_path, yes=False):
     if source_type == 'docs':
         docs_path = Path(chips_path.joinpath('docs'))
         f_list = get_doc_files(docs_path)
-        toc = get_chips_toc(chips_path.parent, f_list, source_type)
+        toc = get_chips_toc(f_list, source_type)
     elif source_type == 'readme':
         f_list = [Path(chips_path.joinpath('README.md'))]
-        toc = get_chips_toc(chips_path.parent, f_list, source_type)
+        toc = get_chips_toc(f_list, source_type)
     else:
         raise Exception("Invalid source type")
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
