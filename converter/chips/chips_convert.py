@@ -9,7 +9,7 @@ from converter.guides.tools import write_file, slugify, write_json
 from converter.guides.item import SectionItem, CHAPTER
 
 
-def generate_chips_toc(converted_path, source_path, ignore_exists=True):
+def generate_chips_toc(converted_path, source_path, ignore_exists=False):
     converted_path = Path(converted_path)
     if converted_path.exists() and not ignore_exists:
         raise Exception("Path exists")
