@@ -57,7 +57,7 @@ def get_chips_toc(files, source_type):
 
 
 def get_chips_lines(file_path):
-    a_path = Path.cwd().parent.joinpath(file_path).resolve()
+    a_path = Path.cwd().joinpath(file_path).resolve()
     with open(a_path, 'r', errors='replace') as file:
         return file.readlines()
 
@@ -164,7 +164,7 @@ def to_yaml(structure, source_path, source_type):
   directory: {}
   {}
 sections:
-""".format(source_path.resolve(), source)
+""".format(source_path, source)
     for item in structure:
         yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
     return yaml_structure
