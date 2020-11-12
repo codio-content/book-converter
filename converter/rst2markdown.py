@@ -107,6 +107,7 @@ class Rst2Markdown(object):
         self._extrtoolembed_re = re.compile(
             r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE
         )
+        self._table_re = re.compile(r"""[+][=]{3,}[+]([=]{3,}[+])+""")
 
     def _heading1(self, matchobj):
         return ''
@@ -417,6 +418,15 @@ class Rst2Markdown(object):
                 counter = 0
         return lines
 
+    @staticmethod
+    def _remove_line_boundaries_by_rst(output):
+        output = re.sub(r"\s+[+][-]{3,}[+]([-]{3,}[+])+", "", output)
+        return output
+
+    @staticmethod
+    def _table(matchobj):
+        return matchobj.group().replace('+', '|').replace('=', '-')
+
     def get_figure_counter(self):
         return self._figure_counter
 
@@ -456,6 +466,8 @@ class Rst2Markdown(object):
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
+        output = self._remove_line_boundaries_by_rst(output)
+        output = self._table_re.sub(self._table, output)
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
         output = self._todo_block_re.sub(self._todo_block, output)
