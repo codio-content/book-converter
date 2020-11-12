@@ -178,7 +178,7 @@ class LaTeX2Markdown(object):
         output = Tags(output).convert()
         output = NewLine(output).convert()
 
-        output = re.sub(r"\\label{.*?}", r"", output)
+        output = re.sub(r"\n? *\\label{.*?}", r"", output)
 
         # convert all matched % back
         output = re.sub(self._percent_token, "%", output)
