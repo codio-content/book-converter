@@ -122,7 +122,7 @@ False---the ID is optional, though must be unique if provided.</details></p>
 
 
 |||challenge
-Given the following HTML markup: 
+ Given the following HTML markup: 
 **source:ch_arch/code/htmlexercise.html**
 ```code
 ch_arch/code/htmlexercise.html
