@@ -106,6 +106,7 @@ class Rst2Markdown(object):
         self._extrtoolembed_re = re.compile(
             r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE)
         self._term_def_re = re.compile(r"""^:(?P<term>[^:\n]+): *\n(?P<content>(?: +[^\n]+\n*)*)""", flags=re.MULTILINE)
+        self._lineblock_re = re.compile(r"""^((?: {2,})?\|)[^\n]*(?:\n(?:\1| {2,})[^\n]+)*""", flags=re.MULTILINE)
 
     def _heading1(self, matchobj):
         return ''
@@ -192,6 +193,12 @@ class Rst2Markdown(object):
             out.append(line)
         content = '\n'.join(out)
         return f'<div style="padding: 50px;">{caret_token}{content}{caret_token}</div>{caret_token}{caret_token}'
+
+    def _lineblock(self, matchobj):
+        caret_token = self._caret_token
+        content = matchobj.group(0)
+        content = re.sub('^( *\| ?| {2,})', '', content, flags=re.MULTILINE)
+        return f'<div style="padding-left: 50px;">{caret_token}{content}{caret_token}</div>{caret_token}'
 
     def _todo_block(self, matchobj):
         return ''
@@ -454,6 +461,7 @@ class Rst2Markdown(object):
         output = self._heading3_re.sub(self._heading3, output)
         output = self._heading4_re.sub(self._heading4, output)
         output = self._term_def_re.sub(self._term_def, output)
+        output = self._lineblock_re.sub(self._lineblock, output)
         output = self._image_re.sub(self._image, output)
         output = self._image_capt_re.sub(self._image_capt, output)
         output = self._topic_example_re.sub(self._topic_example, output)
