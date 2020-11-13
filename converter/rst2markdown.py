@@ -9,6 +9,7 @@ from collections import namedtuple
 
 AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
+ExternalLink = namedtuple('ExternalLink', ['position', 'ref', 'label'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
@@ -69,6 +70,7 @@ class Rst2Markdown(object):
         self._figure_counter = 0
         self._assessments = list()
         self._iframe_images = list()
+        self._externals_links = list()
         self.lines_array = lines_array
         self._exercises = exercises
         self.workspace_dir = workspace_dir
@@ -108,6 +110,8 @@ class Rst2Markdown(object):
             r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE
         )
         self._table_re = re.compile(r"""[+][=]{3,}[+]([=]{3,}[+])+""")
+        self._external_link_re = re.compile(
+            r"""\s*\.\. \|external_link(?P<position>\d*)\|.*?\n\s*<a href="(?P<link>.*?)".*>(?P<label>.*?)</a>""")
 
     def _heading1(self, matchobj):
         return ''
@@ -427,6 +431,19 @@ class Rst2Markdown(object):
     def _table(matchobj):
         return matchobj.group().replace('+', '|').replace('=', '-')
 
+    def _external_link(self, matchobj):
+        self._externals_links.append(ExternalLink(matchobj.group('position'),
+                                                  matchobj.group('link'),
+                                                  matchobj.group('label')))
+        return ""
+
+    def _set_external_links(self, output):
+        for link in self._externals_links:
+            flag = f'|external_link{link.position}|'
+            md_ref = f'[{link.label}]({link.ref})'
+            output = output.replace(flag, md_ref)
+        return output
+
     def get_figure_counter(self):
         return self._figure_counter
 
@@ -468,6 +485,8 @@ class Rst2Markdown(object):
         output = self._sidebar_re.sub(self._sidebar, output)
         output = self._remove_line_boundaries_by_rst(output)
         output = self._table_re.sub(self._table, output)
+        output = self._external_link_re.sub(self._external_link, output)
+        output = self._set_external_links(output)
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
         output = self._todo_block_re.sub(self._todo_block, output)
