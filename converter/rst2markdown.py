@@ -76,8 +76,8 @@ class Rst2Markdown(object):
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
-        self._list_re = re.compile(r"""^(?P<type>[#|\d]\.|[*]) (?P<content>.*?\n(?: .*?\n.*?)*)""",
-                                   flags=re.MULTILINE + re.DOTALL)
+        self._list_re = re.compile(r"""^ *(?P<type>[*+\-]|[0-9#]+[\.]) [^\n]*(?:\n(?!\1|\S)[^\n]*)*""",
+                                   flags=re.MULTILINE)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
         self._ref_re = re.compile(r""":(ref|chap):`(?P<name>.*?)(?P<label_name><.*?>)?`""", flags=re.DOTALL)
         self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""", flags=re.DOTALL)
@@ -125,7 +125,8 @@ class Rst2Markdown(object):
     def _list(self, matchobj):
         caret_token = self._caret_token
         list_type = matchobj.group('type')
-        content = matchobj.group('content')
+        item = matchobj.group(0)
+        content = item[len(list_type):]
         content = content.strip()
         out = []
         for line in content.split('\n'):
