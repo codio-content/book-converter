@@ -79,8 +79,8 @@ class Rst2Markdown(object):
         self._list_re = re.compile(r"""^(?P<type>[#|\d]\.|[*]) (?P<content>.*?\n(?: .*?\n.*?)*)""",
                                    flags=re.MULTILINE + re.DOTALL)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
-        self._ref_re = re.compile(r""":(ref|chap):`(?P<name>.*?)(?P<label_name><.*?>)?`""")
-        self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""")
+        self._ref_re = re.compile(r""":(ref|chap):`(?P<name>.*?)(?P<label_name><.*?>)?`""", flags=re.DOTALL)
+        self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""", flags=re.DOTALL)
         self._math_re = re.compile(r""":math:`(?P<content>.*?)`""")
         self._math_block_re = re.compile(r""" {,3}.. math::\n^[\s\S]*?(?P<content>.*?)(?=\n{2,})""",
                                          flags=re.MULTILINE + re.DOTALL)
@@ -105,8 +105,8 @@ class Rst2Markdown(object):
         )
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
         self._extrtoolembed_re = re.compile(
-            r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE
-        )
+            r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE)
+        self._term_def_re = re.compile(r"""^:(?P<term>[^:\n]+): *\n(?P<content>(?: +[^\n]+\n*)*)""", flags=re.MULTILINE)
 
     def _heading1(self, matchobj):
         return ''
@@ -225,6 +225,17 @@ class Rst2Markdown(object):
         content = content.strip()
         return f'{caret_token}|||xdiscipline{caret_token}{caret_token}**{name}**{caret_token}{caret_token}' \
                f'{content}{caret_token}{caret_token}|||{caret_token}{caret_token}'
+
+    def _term_def(self, matchobj):
+        caret_token = self._caret_token
+        term = matchobj.group('term')
+        content = matchobj.group('content')
+        space = re.search('\n *', content)
+        space = len(space.group(0)) - 1
+        reg_exp = r"\n^ {{{}}}".format(space)
+        content = re.sub(reg_exp, '', content, flags=re.MULTILINE)
+        content = content.strip()
+        return f'{caret_token}{caret_token}**{term}**: {content}{caret_token}{caret_token}'
 
     def _code_lines(self, data):
         flag = False
@@ -442,6 +453,7 @@ class Rst2Markdown(object):
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
         output = self._heading4_re.sub(self._heading4, output)
+        output = self._term_def_re.sub(self._term_def, output)
         output = self._image_re.sub(self._image, output)
         output = self._image_capt_re.sub(self._image_capt, output)
         output = self._inlineav_re.sub(self._inlineav, output)
