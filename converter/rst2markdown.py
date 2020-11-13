@@ -231,11 +231,11 @@ class Rst2Markdown(object):
         term = matchobj.group('term')
         content = matchobj.group('content')
         space = re.search('\n *', content)
-        space = len(space.group(0)) - 1
-        reg_exp = r"\n^ {{{}}}".format(space)
-        content = re.sub(reg_exp, '', content, flags=re.MULTILINE)
+        space_count = len(space.group(0)) - 1
+        space_regex = f"\n^ {{{space_count}}}"
+        content = re.sub(space_regex, '', content, flags=re.MULTILINE)
         content = content.strip()
-        return f'{caret_token}{caret_token}**{term}**: {content}{caret_token}{caret_token}'
+        return f'{caret_token}**{term}**: {content}{caret_token}{caret_token}'
 
     def _code_lines(self, data):
         flag = False
