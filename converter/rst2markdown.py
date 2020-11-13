@@ -9,7 +9,7 @@ from collections import namedtuple
 
 AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
-ExternalLink = namedtuple('ExternalLink', ['position', 'ref', 'label'])
+ExternalLink = namedtuple('ExternalLink', ['flag', 'ref', 'label'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
@@ -111,7 +111,7 @@ class Rst2Markdown(object):
         )
         self._table_re = re.compile(r"""[+][=]{3,}[+]([=]{3,}[+])+""")
         self._external_link_re = re.compile(
-            r"""\s*\.\. \|external_link(?P<position>\d*)\|.*?\n\s*<a href="(?P<link>.*?)".*>(?P<label>.*?)</a>""")
+            r"""\s*\.\. (?P<flag>.*?) raw:: html\n\s*<a\n?\s*href="(?P<link>.*?)".*\n?.*>(?P<label>.*?)</a>""")
 
     def _heading1(self, matchobj):
         return ''
@@ -432,16 +432,16 @@ class Rst2Markdown(object):
         return matchobj.group().replace('+', '|').replace('=', '-')
 
     def _external_link(self, matchobj):
-        self._externals_links.append(ExternalLink(matchobj.group('position'),
+        print('-------------', matchobj.group('flag'))
+        self._externals_links.append(ExternalLink(matchobj.group('flag'),
                                                   matchobj.group('link'),
                                                   matchobj.group('label')))
         return ""
 
     def _set_external_links(self, output):
         for link in self._externals_links:
-            flag = f'|external_link{link.position}|'
             md_ref = f'[{link.label}]({link.ref})'
-            output = output.replace(flag, md_ref)
+            output = output.replace(link.flag, md_ref)
         return output
 
     def get_figure_counter(self):

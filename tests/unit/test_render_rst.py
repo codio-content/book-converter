@@ -55,3 +55,9 @@ class TestSuite(unittest.TestCase):
         self.assertTrue('chomskycon' in js_av_images[0].src.lower())
         self.assertTrue('chomskycon' in js_av_images[0].path.lower())
         self.assertTrue('chomskycon' in js_av_images[0].content.lower())
+
+    def test_table_render(self):
+        self.run_case("table")
+
+    def test_external_link_render(self):
+        self.run_case("external_link")
