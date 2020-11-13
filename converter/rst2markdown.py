@@ -278,7 +278,7 @@ class Rst2Markdown(object):
         assessment = AssessmentData(assessment_id, name, 'custom', 1, {'question': 'Resolve the challenge above'})
         self._assessments.append(assessment)
 
-        return f'\n{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \
+        return f'{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \
                f'?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java' \
                f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
                f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
@@ -447,11 +447,6 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
-
-        match = re.search(r"The ADT defines the logical form", output)
-        if match:
-            test = 1
-
         output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
@@ -460,6 +455,7 @@ class Rst2Markdown(object):
         output = self._term_def_re.sub(self._term_def, output)
         output = self._image_re.sub(self._image, output)
         output = self._image_capt_re.sub(self._image_capt, output)
+        output = self._topic_example_re.sub(self._topic_example, output)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._avembed_re.sub(self._avembed, output)
         output = self._list_re.sub(self._list, output)
@@ -468,7 +464,6 @@ class Rst2Markdown(object):
         output = self._term_re.sub(self._term, output)
         output = self._math_re.sub(self._math, output)
         output = self._math_block_re.sub(self._math_block, output)
-        output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
