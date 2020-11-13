@@ -88,8 +88,7 @@ class Rst2Markdown(object):
                                          flags=re.MULTILINE + re.DOTALL)
         self._paragraph_re = re.compile(r"""^(?!\s|\d|#\.|\*|\..).*?(?=\n^\s*$)""", flags=re.MULTILINE + re.DOTALL)
         self._topic_example_re = re.compile(
-            r"""^(?!\s)\.\. topic:: (?P<type>Example)\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S)|.*)""",
-            flags=re.MULTILINE + re.DOTALL)
+            r"""^\.{2} topic:{2} +(?P<type>.*?)\n(?P<content>(?:\n* +[^\n]+\n*)*)""", flags=re.MULTILINE + re.DOTALL)
         self._epigraph_re = re.compile(r"""^(?!\s)\.\. epigraph::\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
                                        flags=re.MULTILINE + re.DOTALL)
         self._image_re = re.compile(r"""\.\. odsafig:: (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)""")
@@ -279,7 +278,7 @@ class Rst2Markdown(object):
         assessment = AssessmentData(assessment_id, name, 'custom', 1, {'question': 'Resolve the challenge above'})
         self._assessments.append(assessment)
 
-        return f'{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \
+        return f'\n{caret_token}<iframe id="{name}_iframe" src="{OPEN_DSA_CDN}/{file_name}' \
                f'?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java' \
                f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
                f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
@@ -448,6 +447,11 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
+
+        match = re.search(r"The ADT defines the logical form", output)
+        if match:
+            test = 1
+
         output = self._extrtoolembed_re.sub(self._extrtoolembed, output)
         output = self._heading1_re.sub(self._heading1, output)
         output = self._heading2_re.sub(self._heading2, output)
