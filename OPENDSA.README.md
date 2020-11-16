@@ -131,7 +131,7 @@ assets:
       dst: ".guides/opendsa_v1/khan-exercises"
   - "RST/Images":
       pattern: "*.*"
-      dst: ".guides/content/Images"
+      dst: "Images"
 optimization:
   optimizeImages: true
 ```
