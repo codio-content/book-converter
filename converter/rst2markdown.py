@@ -206,6 +206,7 @@ class Rst2Markdown(object):
         options_dict = {}
         caret_token = self._caret_token
         image = matchobj.group('path')
+        relative_path = f'./{image}'
         options = matchobj.group('options')
         option_re = re.compile('[\t ]+:([^:]+): (.+)')
         options = options.split('\n')
@@ -214,14 +215,15 @@ class Rst2Markdown(object):
             if match:
                 options_dict[match[1]] = match[2]
                 alt = options_dict.get('alt', '')
-        return f'![{alt}]({image}){caret_token}{caret_token}'
+        return f'![{alt}]({relative_path}){caret_token}{caret_token}'
 
     def _image_capt(self, matchobj):
         caret_token = self._caret_token
         image = matchobj.group('path')
+        relative_path = f'./{image}'
         caption = matchobj.group('caption')
         caption = caption.strip()
-        return f'![{caption}]({image}){caret_token}{caption}{caret_token}{caret_token}'
+        return f'![{caption}]({relative_path}){caret_token}{caption}{caret_token}{caret_token}'
 
     def _sidebar(self, matchobj):
         caret_token = self._caret_token
@@ -432,7 +434,6 @@ class Rst2Markdown(object):
         return matchobj.group().replace('+', '|').replace('=', '-')
 
     def _external_link(self, matchobj):
-        print('-------------', matchobj.group('flag'))
         self._externals_links.append(ExternalLink(matchobj.group('flag'),
                                                   matchobj.group('link'),
                                                   matchobj.group('label')))
