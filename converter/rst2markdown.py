@@ -88,10 +88,11 @@ class Rst2Markdown(object):
                                          flags=re.MULTILINE + re.DOTALL)
         self._paragraph_re = re.compile(r"""^(?!\s|\d\. |#\. |\* |- |\.\. ).*?(?=\n^\s*$)""",
                                         flags=re.MULTILINE + re.DOTALL)
-        self._topic_example_re = re.compile(
+        self._topic_re = re.compile(
             r"""^\.{2} topic:{2} +(?P<type>.*?)\n(?P<content>(?:\n* +[^\n]+\n*)*)""", flags=re.MULTILINE + re.DOTALL)
-        self._epigraph_re = re.compile(r"""^(?!\s)\.\. epigraph::\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
-                                       flags=re.MULTILINE + re.DOTALL)
+        self._tip_re = re.compile(
+            r"""^\.{2} tip:{2} *\n(?P<content>(?:\n* +[^\n]+\n*)*)""", flags=re.MULTILINE)
+        self._epigraph_re = re.compile(r"""[ ]*\.\. epigraph:: *\n*(?P<content>(?: +[^\n]+\n*)*)""")
         self._image_re = re.compile(r"""\.\. odsafig:: (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)""")
         self._image_capt_re = re.compile(r"""\.\. odsafig:: (?P<path>.*?)\n(?:.*?\n +(?P<caption>.*\n\n))""")
         self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
@@ -190,7 +191,7 @@ class Rst2Markdown(object):
         content = content.replace('\n', ' ')
         return content
 
-    def _topic_example(self, matchobj):
+    def _topic(self, matchobj):
         caret_token = self._caret_token
         topic_type = matchobj.group('type')
         content = matchobj.group('content')
@@ -201,6 +202,13 @@ class Rst2Markdown(object):
                f'{self._figure_counter}**<br/><br/>' \
                f'{caret_token}{caret_token}{content}</div><br/>{caret_token}{caret_token}'
 
+    def _tip(self, matchobj):
+        caret_token = self._caret_token
+        content = matchobj.group('content')
+        return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
+               f'{caret_token}{caret_token}**Tip**{caret_token}{caret_token}{content}' \
+               f'</div><br/>{caret_token}{caret_token}'
+
     def _epigraph(self, matchobj):
         caret_token = self._caret_token
         content = matchobj.group('content')
@@ -210,7 +218,7 @@ class Rst2Markdown(object):
             line = line.strip()
             out.append(line)
         content = '\n'.join(out)
-        return f'<div style="padding: 50px;">{caret_token}{content}{caret_token}</div>{caret_token}{caret_token}'
+        return f'<div style="padding: 10px 30px;">{caret_token}{content}{caret_token}</div>{caret_token}{caret_token}'
 
     def _lineblock(self, matchobj):
         caret_token = self._caret_token
@@ -487,7 +495,8 @@ class Rst2Markdown(object):
         output = self._lineblock_re.sub(self._lineblock, output)
         output = self._image_re.sub(self._image, output)
         output = self._image_capt_re.sub(self._image_capt, output)
-        output = self._topic_example_re.sub(self._topic_example, output)
+        output = self._topic_re.sub(self._topic, output)
+        output = self._tip_re.sub(self._tip, output)
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._avembed_re.sub(self._avembed, output)
         output = self._list_re.sub(self._list, output)
