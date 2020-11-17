@@ -82,22 +82,23 @@ class Rst2Markdown(object):
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
-        self._list_re = re.compile(r"""^(?P<type>[#|\d]\.|[*]) (?P<content>.*?\n(?: .*?\n.*?)*)""",
-                                   flags=re.MULTILINE + re.DOTALL)
+        self._list_re = re.compile(r"""^( *)(?P<type>[*+\-]|[0-9#]+[\.]) [^\n]*(?:\n(?!\1\2|\S)[^\n]*)*""",
+                                   flags=re.MULTILINE)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
-        self._ref_re = re.compile(r""":(ref|chap):`(?P<name>.*?)(?P<label_name><.*?>)?`""")
-        self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""")
+        self._ref_re = re.compile(r""":(ref|chap):`(?P<name>.*?)(?P<label_name><.*?>)?`""", flags=re.DOTALL)
+        self._term_re = re.compile(r""":term:`(?P<name>.*?)(<(?P<label_name>.*?)>)?`""", flags=re.DOTALL)
         self._math_re = re.compile(r""":math:`(?P<content>.*?)`""")
         self._math_block_re = re.compile(r""" {,3}.. math::\n^[\s\S]*?(?P<content>.*?)(?=\n{2,})""",
                                          flags=re.MULTILINE + re.DOTALL)
         self._todo_block_re = re.compile(r"""\.\. TODO::\n(?P<options>^ +:.*?: \S*\n$)(?P<text>.*?\n^$\n(?=\S*)|.*)""",
                                          flags=re.MULTILINE + re.DOTALL)
-        self._paragraph_re = re.compile(r"""^(?!\s|\d|#\.|\*|\..).*?(?=\n^\s*$)""", flags=re.MULTILINE + re.DOTALL)
-        self._topic_example_re = re.compile(
-            r"""^(?!\s)\.\. topic:: (?P<type>Example)\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S)|.*)""",
-            flags=re.MULTILINE + re.DOTALL)
-        self._epigraph_re = re.compile(r"""^(?!\s)\.\. epigraph::\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
-                                       flags=re.MULTILINE + re.DOTALL)
+        self._paragraph_re = re.compile(r"""^(?!\s|\d\. |#\. |\* |- |\.\. ).*?(?=\n^\s*$)""",
+                                        flags=re.MULTILINE + re.DOTALL)
+        self._topic_re = re.compile(
+            r"""^\.{2} topic:{2} +(?P<type>.*?)\n(?P<content>(?:\n* +[^\n]+\n*)*)""", flags=re.MULTILINE + re.DOTALL)
+        self._tip_re = re.compile(
+            r"""^\.{2} tip:{2} *\n(?P<content>(?:\n* +[^\n]+\n*)*)""", flags=re.MULTILINE)
+        self._epigraph_re = re.compile(r"""[ ]*\.\. epigraph:: *\n*(?P<content>(?: +[^\n]+\n*)*)""")
         self._inlineav_re = re.compile(
             r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>:.*?: .*?\n)+(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL
@@ -107,11 +108,9 @@ class Rst2Markdown(object):
         )
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
         self._extrtoolembed_re = re.compile(
-            r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE
-        )
-        self._table_re = re.compile(r"""[+][=]{3,}[+]([=]{3,}[+])+""")
-        self._external_link_re = re.compile(
-            r"""\s*\.\. (?P<flag>.*?) raw:: html\n\s*<a\n?\s*href="(?P<link>.*?)".*\n?.*>(?P<label>.*?)</a>""")
+            r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE)
+        self._term_def_re = re.compile(r"""^:(?P<term>[^:\n]+): *\n(?P<content>(?: +[^\n]+\n*)*)""", flags=re.MULTILINE)
+        self._lineblock_re = re.compile(r"""^((?: {2,})?\|)[^\n]*(?:\n(?:\1| {2,})[^\n]+)*""", flags=re.MULTILINE)
 
     def _heading1(self, matchobj):
         return ''
@@ -130,17 +129,35 @@ class Rst2Markdown(object):
 
     def _list(self, matchobj):
         caret_token = self._caret_token
-        list_type = matchobj.group('type')
-        content = matchobj.group('content')
+        content = matchobj.group(0)
         content = content.strip()
+        items = []
+        match_all_items = list(re.finditer(r'^( *)([*+-]|[0-9#]+[.]) [\s\S]+?(?:\n{2,}(?! )(?!\1\2 |\S)\n*|\s*$)',
+                                           content, flags=re.MULTILINE))
+        if len(match_all_items) > 1:
+            for item in match_all_items:
+                item = f'{item.group(0)}{caret_token}'
+                item = self._clearing_line_breaks(item)
+                items.append(item)
+            content = '\n'.join(items)
+        else:
+            content = self._clearing_text_spaces(content)
+            content = self._clearing_line_breaks(content)
+        return f'{content}{caret_token}'
+
+    def _clearing_text_spaces(self, data):
+        space = re.search('\n *', data)
+        if space:
+            space_count = len(space.group(0))
+            space_regex = f"\n^ {{{space_count}}}"
+            data = re.sub(space_regex, '', data, flags=re.MULTILINE)
+        return data
+
+    def _clearing_line_breaks(self, data):
         out = []
-        for line in content.split('\n'):
-            line = line.strip()
+        for line in data.split('\n'):
             out.append(line)
-        list_item = ' '.join(out)
-        if list_type == '*':
-            return f'* {list_item}{caret_token}'
-        return f'{list_type} {list_item}{caret_token}'
+        return ' '.join(out)
 
     def _ext_links(self, matchobj):
         name = matchobj.group('name')
@@ -176,7 +193,7 @@ class Rst2Markdown(object):
         content = content.replace('\n', ' ')
         return content
 
-    def _topic_example(self, matchobj):
+    def _topic(self, matchobj):
         caret_token = self._caret_token
         topic_type = matchobj.group('type')
         content = matchobj.group('content')
@@ -187,6 +204,13 @@ class Rst2Markdown(object):
                f'{self._figure_counter}**<br/><br/>' \
                f'{caret_token}{caret_token}{content}</div><br/>{caret_token}{caret_token}'
 
+    def _tip(self, matchobj):
+        caret_token = self._caret_token
+        content = matchobj.group('content')
+        return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
+               f'{caret_token}{caret_token}**Tip**{caret_token}{caret_token}{content}' \
+               f'</div><br/>{caret_token}{caret_token}'
+
     def _epigraph(self, matchobj):
         caret_token = self._caret_token
         content = matchobj.group('content')
@@ -196,10 +220,32 @@ class Rst2Markdown(object):
             line = line.strip()
             out.append(line)
         content = '\n'.join(out)
-        return f'<div style="padding: 50px;">{caret_token}{content}{caret_token}</div>{caret_token}{caret_token}'
+        return f'<div style="padding: 10px 30px;">{caret_token}{content}{caret_token}</div>{caret_token}{caret_token}'
+
+    def _lineblock(self, matchobj):
+        caret_token = self._caret_token
+        content = matchobj.group(0)
+        content = re.sub(r'^( *\| ?| {2,})', '', content, flags=re.MULTILINE)
+        out = []
+        for line in content.split('\n'):
+            line = line.strip()
+            out.append(f' {line}')
+        content = '\n'.join(out)
+        return f' <div style="padding-left: 50px;">{caret_token}{content}{caret_token} </div>{caret_token}'
 
     def _todo_block(self, matchobj):
         return ''
+
+    def _term_def(self, matchobj):
+        caret_token = self._caret_token
+        term = matchobj.group('term')
+        content = matchobj.group('content')
+        space = re.search('\n *', content)
+        space_count = len(space.group(0)) - 1
+        space_regex = f"\n^ {{{space_count}}}"
+        content = re.sub(space_regex, '', content, flags=re.MULTILINE)
+        content = content.strip()
+        return f'{caret_token}**{term}**: {content}{caret_token}{caret_token}'
 
     def _code_lines(self, data):
         flag = False
@@ -417,6 +463,10 @@ class Rst2Markdown(object):
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
         output = self._heading4_re.sub(self._heading4, output)
+        output = self._term_def_re.sub(self._term_def, output)
+        output = self._lineblock_re.sub(self._lineblock, output)
+        output = self._topic_re.sub(self._topic, output)
+        output = self._tip_re.sub(self._tip, output)
         output = Image(output, self._caret_token, self._chapter_num, self._subsection_num).convert()
         output = re.sub(r".. _[\S ]+:", "", output)  # todo: line moved below. removes tags for images
         output = self._inlineav_re.sub(self._inlineav, output)
@@ -427,7 +477,6 @@ class Rst2Markdown(object):
         output = self._term_re.sub(self._term, output)
         output = self._math_re.sub(self._math, output)
         output = self._math_block_re.sub(self._math_block, output)
-        output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = Sidebar(output, self._caret_token).convert()
