@@ -126,7 +126,6 @@ class Rst2Markdown(object):
 
     def _list(self, matchobj):
         caret_token = self._caret_token
-        list_type = matchobj.group('type')
         content = matchobj.group(0)
         content = content.strip()
         items = []
@@ -135,21 +134,27 @@ class Rst2Markdown(object):
         if len(match_all_items) > 1:
             for item in match_all_items:
                 item = f'{item.group(0)}{caret_token}'
+                item = self._clearing_line_breaks(item)
                 items.append(item)
-            return '\n'.join(items)
+            content = '\n'.join(items)
+        else:
+            content = self._clearing_text_spaces(content)
+            content = self._clearing_line_breaks(content)
+        return f'{content}{caret_token}'
 
-        space = re.search('\n *', content)
+    def _clearing_text_spaces(self, data):
+        space = re.search('\n *', data)
         if space:
             space_count = len(space.group(0))
             space_regex = f"\n^ {{{space_count}}}"
-            content = re.sub(space_regex, '', content, flags=re.MULTILINE)
+            data = re.sub(space_regex, '', data, flags=re.MULTILINE)
+        return data
 
+    def _clearing_line_breaks(self, data):
         out = []
-        for line in content.split('\n'):
-            line = line.strip()
+        for line in data.split('\n'):
             out.append(line)
-        content = ' '.join(out)
-        return f'{content}{caret_token}'
+        return ' '.join(out)
 
     def _ext_links(self, matchobj):
         name = matchobj.group('name')
