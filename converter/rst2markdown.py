@@ -7,9 +7,13 @@ from converter.guides.tools import slugify
 from string import Template
 from collections import namedtuple
 
+from converter.rst.table import Table
+from converter.rst.image import Image
+from converter.rst.sidebar import Sidebar
+from converter.rst.external_link import ExternalLink
+
 AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
-ExternalLink = namedtuple('ExternalLink', ['flag', 'ref', 'label'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
@@ -70,7 +74,6 @@ class Rst2Markdown(object):
         self._figure_counter = 0
         self._assessments = list()
         self._iframe_images = list()
-        self._externals_links = list()
         self.lines_array = lines_array
         self._exercises = exercises
         self.workspace_dir = workspace_dir
@@ -94,10 +97,6 @@ class Rst2Markdown(object):
             flags=re.MULTILINE + re.DOTALL)
         self._epigraph_re = re.compile(r"""^(?!\s)\.\. epigraph::\n*^$\n {3}(?P<content>.*?\n^$\n(?=\S))""",
                                        flags=re.MULTILINE + re.DOTALL)
-        self._image_re = re.compile(r"""\.\. odsafig:: (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)""")
-        self._image_capt_re = re.compile(r"""\.\. odsafig:: (?P<path>.*?)\n(?:.*?\n +(?P<caption>.*\n))""")
-        self._sidebar_re = re.compile(r"""\.\. sidebar:: (?P<name>.*?)\n^$\n(?P<content>.*?)\n^$(?=\S*)""",
-                                      flags=re.MULTILINE + re.DOTALL)
         self._inlineav_re = re.compile(
             r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>:.*?: .*?\n)+(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL
@@ -200,36 +199,6 @@ class Rst2Markdown(object):
 
     def _todo_block(self, matchobj):
         return ''
-
-    def _image(self, matchobj):
-        alt = ''
-        options_dict = {}
-        caret_token = self._caret_token
-        image = matchobj.group('path')
-        options = matchobj.group('options')
-        option_re = re.compile('[\t ]+:([^:]+): (.+)')
-        options = options.split('\n')
-        for opt in options:
-            match = option_re.match(opt)
-            if match:
-                options_dict[match[1]] = match[2]
-                alt = options_dict.get('alt', '')
-        return f'![{alt}]({image}){caret_token}{caret_token}'
-
-    def _image_capt(self, matchobj):
-        caret_token = self._caret_token
-        image = matchobj.group('path')
-        caption = matchobj.group('caption')
-        caption = caption.strip()
-        return f'![{caption}]({image}){caret_token}{caption}{caret_token}{caret_token}'
-
-    def _sidebar(self, matchobj):
-        caret_token = self._caret_token
-        name = matchobj.group('name')
-        content = matchobj.group('content')
-        content = content.strip()
-        return f'{caret_token}|||xdiscipline{caret_token}{caret_token}**{name}**{caret_token}{caret_token}' \
-               f'{content}{caret_token}{caret_token}|||{caret_token}{caret_token}'
 
     def _code_lines(self, data):
         flag = False
@@ -422,27 +391,6 @@ class Rst2Markdown(object):
                 counter = 0
         return lines
 
-    @staticmethod
-    def _remove_line_boundaries_by_rst(output):
-        output = re.sub(r"\s+[+][-]{3,}[+]([-]{3,}[+])+", "", output)
-        return output
-
-    @staticmethod
-    def _table(matchobj):
-        return matchobj.group().replace('+', '|').replace('=', '-')
-
-    def _external_link(self, matchobj):
-        self._externals_links.append(ExternalLink(matchobj.group('flag'),
-                                                  matchobj.group('link'),
-                                                  matchobj.group('label')))
-        return ""
-
-    def _set_external_links(self, output):
-        for link in self._externals_links:
-            md_ref = f'[{link.label}]({link.ref})'
-            output = output.replace(link.flag, md_ref)
-        return output
-
     def get_figure_counter(self):
         return self._figure_counter
 
@@ -459,7 +407,7 @@ class Rst2Markdown(object):
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
         output = '\n'.join(self.lines_array)
-        output = re.sub(r".. _[\S ]+:", "", output)
+        # output = re.sub(r".. _[\S ]+:", "", output)  # todo: line moved below. removes tags for images
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
@@ -468,8 +416,8 @@ class Rst2Markdown(object):
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
         output = self._heading4_re.sub(self._heading4, output)
-        output = self._image_re.sub(self._image, output)
-        output = self._image_capt_re.sub(self._image_capt, output)
+        output = Image(output, self._caret_token, self._chapter_num, self._subsection_num).convert()
+        output = re.sub(r".. _[\S ]+:", "", output)  # todo: line moved below. removes tags for images
         output = self._inlineav_re.sub(self._inlineav, output)
         output = self._avembed_re.sub(self._avembed, output)
         output = self._list_re.sub(self._list, output)
@@ -481,11 +429,9 @@ class Rst2Markdown(object):
         output = self._topic_example_re.sub(self._topic_example, output)
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._paragraph_re.sub(self._paragraph, output)
-        output = self._sidebar_re.sub(self._sidebar, output)
-        output = self._remove_line_boundaries_by_rst(output)
-        output = self._table_re.sub(self._table, output)
-        output = self._external_link_re.sub(self._external_link, output)
-        output = self._set_external_links(output)
+        output = Sidebar(output, self._caret_token).convert()
+        output = Table(output).convert()
+        output = ExternalLink(output).convert()
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
         output = self._todo_block_re.sub(self._todo_block, output)

@@ -61,3 +61,9 @@ class TestSuite(unittest.TestCase):
 
     def test_external_link_render(self):
         self.run_case("external_link")
+
+    def test_sidebar_render(self):
+        self.run_case('sidebar')
+
+    def test_image_render(self):
+        self.run_case('image')
