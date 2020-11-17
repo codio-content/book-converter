@@ -1,4 +1,4 @@
-.. sidebar:: Portrait of Carl Gauss [#]_
+.. sidebar:: Portrait of Carl Gauss
 
    .. odsafig:: Images/Carl_Friedrich_Gauss.jpg
 

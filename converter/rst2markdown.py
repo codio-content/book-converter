@@ -11,6 +11,7 @@ from converter.rst.table import Table
 from converter.rst.image import Image
 from converter.rst.sidebar import Sidebar
 from converter.rst.external_link import ExternalLink
+from converter.rst.footnote import Footnote
 
 AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
@@ -435,5 +436,6 @@ class Rst2Markdown(object):
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
         output = self._todo_block_re.sub(self._todo_block, output)
+        output = Footnote(output).convert()
         output = re.sub(self._caret_token, "\n", output)
         return output

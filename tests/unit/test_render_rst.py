@@ -67,3 +67,6 @@ class TestSuite(unittest.TestCase):
 
     def test_image_render(self):
         self.run_case('image')
+
+    def test_foot_note_render(self):
+        self.run_case('footnote')
