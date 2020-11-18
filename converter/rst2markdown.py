@@ -1,7 +1,6 @@
 import pathlib
 import re
 import uuid
-from collections import namedtuple
 
 from converter.rst.avembed import AvEmbed
 from converter.rst.code_include import CodeInclude
@@ -25,7 +24,6 @@ from converter.rst.tip import Tip
 from converter.rst.todo_block import TodoBlock
 from converter.rst.topic import Topic
 
-AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
 

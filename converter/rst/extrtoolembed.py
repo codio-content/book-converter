@@ -1,7 +1,5 @@
 import re
-from collections import namedtuple
-
-AssessmentData = namedtuple('AssessmentData', ['id', 'name', 'type', 'points', 'ex_data'])
+from converter.rst.model.assessment_data import AssessmentData
 
 
 class ExtrToolEmbed(object):
