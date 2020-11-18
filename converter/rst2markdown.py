@@ -111,6 +111,10 @@ class Rst2Markdown(object):
             r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE)
         self._term_def_re = re.compile(r"""^:(?P<term>[^:\n]+): *\n(?P<content>(?: +[^\n]+\n*)*)""", flags=re.MULTILINE)
         self._lineblock_re = re.compile(r"""^((?: {2,})?\|)[^\n]*(?:\n(?:\1| {2,})[^\n]+)*""", flags=re.MULTILINE)
+        self._definition_re = re.compile(
+            r"""^(?!\s|\d\. |#\. |\* |- |\.\. ):?(?P<term>[^\n]+)\n(?P<content> {2,}[^\n]+(?:\n {2,}[^\n]+\s*)*\n+)""",
+            flags=re.MULTILINE
+        )
 
     def _heading1(self, matchobj):
         return ''
@@ -143,7 +147,7 @@ class Rst2Markdown(object):
         else:
             content = self._clearing_text_spaces(content)
             content = self._clearing_line_breaks(content)
-        return f'{content}{caret_token}'
+        return content
 
     def _clearing_text_spaces(self, data):
         space = re.search('\n *', data)
@@ -201,7 +205,7 @@ class Rst2Markdown(object):
         self._figure_counter += 1
         return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
                f'{caret_token}{caret_token}**{topic_type} {self._chapter_num}.{self._subsection_num}.' \
-               f'{self._figure_counter}**<br/><br/>' \
+               f'{self._figure_counter}**<br/>' \
                f'{caret_token}{caret_token}{content}</div><br/>{caret_token}{caret_token}'
 
     def _tip(self, matchobj):
@@ -222,6 +226,24 @@ class Rst2Markdown(object):
         content = '\n'.join(out)
         return f'<div style="padding: 10px 30px;">{caret_token}{content}{caret_token}</div>{caret_token}{caret_token}'
 
+    def _definition(self, matchobj):
+        caret_token = self._caret_token
+        term = matchobj.group('term')
+        term = term.strip('**').strip()
+        content = matchobj.group('content')
+
+        space = re.search('\n *', content)
+        space_count = len(space.group(0)) - 1
+        space_regex = f"\n^ {{{space_count}}}"
+        content = re.sub(space_regex, '', content, flags=re.MULTILINE)
+
+        lines = content.split('\n')
+        out = []
+        for line in lines:
+            out.append(f'{line.strip()}{caret_token}')
+        content = '\n'.join(out)
+        return f'{caret_token}{caret_token}**{term}**{caret_token}{content}{caret_token}{caret_token}'
+
     def _lineblock(self, matchobj):
         caret_token = self._caret_token
         content = matchobj.group(0)
@@ -235,17 +257,6 @@ class Rst2Markdown(object):
 
     def _todo_block(self, matchobj):
         return ''
-
-    def _term_def(self, matchobj):
-        caret_token = self._caret_token
-        term = matchobj.group('term')
-        content = matchobj.group('content')
-        space = re.search('\n *', content)
-        space_count = len(space.group(0)) - 1
-        space_regex = f"\n^ {{{space_count}}}"
-        content = re.sub(space_regex, '', content, flags=re.MULTILINE)
-        content = content.strip()
-        return f'{caret_token}**{term}**: {content}{caret_token}{caret_token}'
 
     def _code_lines(self, data):
         flag = False
@@ -463,7 +474,7 @@ class Rst2Markdown(object):
         output = self._heading2_re.sub(self._heading2, output)
         output = self._heading3_re.sub(self._heading3, output)
         output = self._heading4_re.sub(self._heading4, output)
-        output = self._term_def_re.sub(self._term_def, output)
+        output = self._definition_re.sub(self._definition, output)
         output = self._lineblock_re.sub(self._lineblock, output)
         output = self._topic_re.sub(self._topic, output)
         output = self._tip_re.sub(self._tip, output)
