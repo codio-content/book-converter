@@ -287,11 +287,11 @@ class Rst2Markdown(object):
             self._figure_counter = figure_counter
 
         if iframe_images:
-            self._iframe_images.append(iframe_images)
+            self._iframe_images.extend(iframe_images)
 
         output, assessments = AvEmbed(output, self._caret_token, OPEN_DSA_CDN).convert()
-        # if assessments:
-        #     self._assessments.append(assessments)
+        if assessments:
+            self._assessments.extend(assessments)
         output = self._list_re.sub(self._list, output)
         output = self._ext_links_re.sub(self._ext_links, output)
         output = self._ref_re.sub(self._ref, output)
