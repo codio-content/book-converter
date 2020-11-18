@@ -76,7 +76,7 @@ class Rst2Markdown(object):
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
-        self._list_re = re.compile(r"""^( *)(?P<type>[*+\-]|[0-9#]+[\.]) [^\n]*(?:\n(?!\1\2|\S)[^\n]*)*""",
+        self._list_re = re.compile(r"""^( *)(?P<type>[*+\-]|[0-9#]+[\.|)]) [^\n]*(?:\n(?!\1\2|\S)[^\n]*)*""",
                                    flags=re.MULTILINE)
         self._ext_links_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
         self._ref_re = re.compile(r""":(ref|chap):`(?P<name>.*?)(?P<label_name><.*?>)?`""", flags=re.DOTALL)
@@ -145,7 +145,7 @@ class Rst2Markdown(object):
         else:
             content = self._clearing_text_spaces(content)
             content = self._clearing_line_breaks(content)
-        return content
+        return f'{content}\n'
 
     def _clearing_text_spaces(self, data):
         space = re.search('\n *', data)
@@ -188,6 +188,7 @@ class Rst2Markdown(object):
         content = matchobj.group('content')
         content = content.strip()
         content = content.replace("\\+", "+")
+        content = content.replace("&", "\\&")
         return f'<center style="font-size: 80%;">$${content}$$</center>'
 
     def _paragraph(self, matchobj):
@@ -467,15 +468,17 @@ class Rst2Markdown(object):
         list_flag = False
         for ind, line in enumerate(lines):
             next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
-            if line.startswith('#. ') or line.startswith('   #. '):
+            if self.bullet_match(line):
                 list_flag = True
                 counter += 1
                 lines[ind] = line.replace("#", str(counter), 1)
-            if next_line[:1].strip() and not next_line.startswith('#. ') \
-                    and not next_line.startswith('   #. ') and list_flag:
+            if next_line[:1].strip() and not self.bullet_match(next_line) and list_flag:
                 list_flag = False
                 counter = 0
         return lines
+
+    def bullet_match(self, line):
+        return re.search(r'^ *#[.|)] ', line)
 
     def get_figure_counter(self):
         return self._figure_counter
