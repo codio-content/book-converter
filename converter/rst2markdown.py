@@ -89,7 +89,7 @@ class Rst2Markdown(object):
         self._paragraph_re = re.compile(r"""^(?!\s|\d\. |#\. |\* |- |\.\. ).*?(?=\n^\s*$)""",
                                         flags=re.MULTILINE + re.DOTALL)
         self._topic_re = re.compile(
-            r"""^\.{2} topic:{2} +(?P<type>.*?)\n(?P<content>(?:\n* +[^\n]+\n*)*)""", flags=re.MULTILINE + re.DOTALL)
+            r"""^\.{2} topic:{2} +(?P<type>.*?)\n(?P<content>.*?)\n+(?=\S)""", flags=re.MULTILINE + re.DOTALL)
         self._tip_re = re.compile(
             r"""^\.{2} tip:{2} *\n(?P<content>(?:\n* +[^\n]+\n*)*)""", flags=re.MULTILINE)
         self._epigraph_re = re.compile(r"""[ ]*\.\. epigraph:: *\n*(?P<content>(?: +[^\n]+\n*)*)""")
@@ -108,7 +108,7 @@ class Rst2Markdown(object):
         self._extrtoolembed_re = re.compile(
             r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE)
         self._term_def_re = re.compile(r"""^:(?P<term>[^:\n]+): *\n(?P<content>(?: +[^\n]+\n*)*)""", flags=re.MULTILINE)
-        self._lineblock_re = re.compile(r"""^((?: {2,})?\|)[^\n]*(?:\n(?:\1| {2,})[^\n]+)*""", flags=re.MULTILINE)
+        self._lineblock_re = re.compile(r"""^((?: {2,})?\| )[^\n]*(?:\n(?:\1| {2,})[^\n]+)*""", flags=re.MULTILINE)
         self._definition_re = re.compile(
             r"""^(?!\s|\d\. |#\. |\* |- |\.\. ):?(?P<term>[^\n]+)\n(?P<content> {2,}[^\n]+(?:\n {2,}[^\n]+\s*)*\n+)""",
             flags=re.MULTILINE
@@ -188,7 +188,7 @@ class Rst2Markdown(object):
         content = matchobj.group('content')
         content = content.strip()
         content = content.replace("\\+", "+")
-        return f'<center>$${content}$$</center>'
+        return f'<center style="font-size: 80%;">$${content}$$</center>'
 
     def _paragraph(self, matchobj):
         content = matchobj.group(0)
@@ -204,7 +204,7 @@ class Rst2Markdown(object):
         return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
                f'{caret_token}{caret_token}**{topic_type} {self._chapter_num}.{self._subsection_num}.' \
                f'{self._figure_counter}**<br/>' \
-               f'{caret_token}{caret_token}{content}</div><br/>{caret_token}{caret_token}'
+               f'{caret_token}{caret_token}{content}\n\n</div><br/>{caret_token}{caret_token}'
 
     def _tip(self, matchobj):
         caret_token = self._caret_token
