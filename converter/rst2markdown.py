@@ -84,8 +84,9 @@ class Rst2Markdown(object):
         self._math_re = re.compile(r""":math:`(?P<content>.*?)`""")
         self._math_block_re = re.compile(r""" {,3}.. math::\n^[\s\S]*?(?P<content>.*?)(?=\n{2,})""",
                                          flags=re.MULTILINE + re.DOTALL)
-        self._todo_block_re = re.compile(r"""\.\. TODO::\n(?P<options>^ +:.*?: \S*\n$)(?P<text>.*?\n^$\n(?=\S*)|.*)""",
-                                         flags=re.MULTILINE + re.DOTALL)
+        self._todo_block_re = re.compile(
+            r"""\.\. [a-zA-Z]+::\n +:type: (?P<type>[a-zA-Z]+)\n*(?P<content>(?:\s+[^\n]+\n*)*)""", flags=re.MULTILINE
+        )
         self._paragraph_re = re.compile(r"""^(?!\s|\d\. |#\. |\* |- |\.\. ).*?(?=\n^\s*$)""",
                                         flags=re.MULTILINE + re.DOTALL)
         self._topic_re = re.compile(
@@ -509,6 +510,7 @@ class Rst2Markdown(object):
         output = self._lineblock_re.sub(self._lineblock, output)
         output = self._image_re.sub(self._image, output)
         output = self._image_capt_re.sub(self._image_capt, output)
+        output = self._todo_block_re.sub(self._todo_block, output)
         output = self._topic_re.sub(self._topic, output)
         output = self._tip_re.sub(self._tip, output)
         output = self._inlineav_re.sub(self._inlineav, output)
@@ -524,6 +526,5 @@ class Rst2Markdown(object):
         output = self._sidebar_re.sub(self._sidebar, output)
         output = self._code_lines(output)
         output = self._code_include_re.sub(self._code_include, output)
-        output = self._todo_block_re.sub(self._todo_block, output)
         output = re.sub(self._caret_token, "\n", output)
         return output
