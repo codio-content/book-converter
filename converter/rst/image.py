@@ -14,7 +14,7 @@ class Image(object):
         self._figure_counter = 1
         self._figures = list()
         self._image_re = re.compile(
-            r"""(\.\. _(?P<tag>.*?):)?\n\s*\s\.\. odsafig:: (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?(\n(?P<caption>( +.+\n)+))?""")
+            r"""(\.\. _(?P<tag>.*?):\n\s*)?\.\. odsafig:: (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)? *(\n(?P<caption>( +.+\n)+))?""")
 
     @staticmethod
     def _get_image_options(raw_options):
