@@ -89,7 +89,7 @@ class Rst2Markdown(object):
         self._paragraph_re = re.compile(r"""^(?!\s|\d\. |#\. |\* |- |\.\. ).*?(?=\n^\s*$)""",
                                         flags=re.MULTILINE + re.DOTALL)
         self._topic_re = re.compile(
-            r"""^\.{2} topic:{2} +(?P<type>.*?)\n(?P<content>.*?)\n+(?=\S)""", flags=re.MULTILINE + re.DOTALL)
+            r"""^\.{2} topic:{2} +(?P<type>.*?)\n\n*(?P<content>(?:\s+[^\n]+\n*)*)""", flags=re.MULTILINE)
         self._tip_re = re.compile(
             r"""^\.{2} tip:{2} *\n(?P<content>(?:\n* +[^\n]+\n*)*)""", flags=re.MULTILINE)
         self._epigraph_re = re.compile(r"""[ ]*\.\. epigraph:: *\n*(?P<content>(?: +[^\n]+\n*)*)""")
@@ -188,7 +188,7 @@ class Rst2Markdown(object):
         content = matchobj.group('content')
         content = content.strip()
         content = content.replace("\\+", "+")
-        content = content.replace("&", "\\&")
+        content = content.replace("&=&", "\\&=\\&")
         return f'<center style="font-size: 80%;">$${content}$$</center>'
 
     def _paragraph(self, matchobj):
