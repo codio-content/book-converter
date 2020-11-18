@@ -145,7 +145,7 @@ class Rst2Markdown(object):
         else:
             content = self._clearing_text_spaces(content)
             content = self._clearing_line_breaks(content)
-        return f'{content}{caret_token}'
+        return content
 
     def _clearing_text_spaces(self, data):
         space = re.search('\n *', data)
@@ -203,7 +203,7 @@ class Rst2Markdown(object):
         self._figure_counter += 1
         return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
                f'{caret_token}{caret_token}**{topic_type} {self._chapter_num}.{self._subsection_num}.' \
-               f'{self._figure_counter}**<br/><br/>' \
+               f'{self._figure_counter}**<br/>' \
                f'{caret_token}{caret_token}{content}</div><br/>{caret_token}{caret_token}'
 
     def _tip(self, matchobj):
