@@ -110,6 +110,10 @@ class Rst2Markdown(object):
             r"""^$\n^.*?\n-+\n\n?\.\. extrtoolembed:: '(?P<name>.*?)'\n( *:.*?: .*?\n)?(?=\S|$)""", flags=re.MULTILINE)
         self._term_def_re = re.compile(r"""^:(?P<term>[^:\n]+): *\n(?P<content>(?: +[^\n]+\n*)*)""", flags=re.MULTILINE)
         self._lineblock_re = re.compile(r"""^((?: {2,})?\| )[^\n]*(?:\n(?:\1| {2,})[^\n]+)*""", flags=re.MULTILINE)
+        self._comment_re = re.compile(r"""^\.{2}\s+([^\n]+|\n\s+[^\n]+)(?:\n+|$)""", flags=re.MULTILINE)
+        self._only_re = re.compile(r""".. only:: [a-zA-z\d]+\n\n*((?:\s+[^\n]+\n*)*)""")
+        self._indented_code_re = re.compile(r"""^(?P<text>[^\n]*)::\n+(?P<code>( {2,})[^\n]*\n(?:(?:\3[^\n]*)?\n)*)""",
+                                            flags=re.MULTILINE)
         self._definition_re = re.compile(
             r"""^(?!\s|\d\. |#\. |\* |- |\.\. ):?(?P<term>[^\n]+)\n(?P<content> {2,}[^\n]+(?:\n {2,}[^\n]+\s*)*\n+)""",
             flags=re.MULTILINE
@@ -258,6 +262,12 @@ class Rst2Markdown(object):
     def _todo_block(self, matchobj):
         return ''
 
+    def _comment(self, matchobj):
+        return ''
+
+    def _only(self, matchobj):
+        return ''
+
     def _image(self, matchobj):
         alt = ''
         options_dict = {}
@@ -288,22 +298,13 @@ class Rst2Markdown(object):
         return f'{caret_token}|||xdiscipline{caret_token}{caret_token}**{name}**{caret_token}{caret_token}' \
                f'{content}{caret_token}{caret_token}|||{caret_token}{caret_token}'
 
-    def _code_lines(self, data):
-        flag = False
-        lines = data.split("\n")
-        for ind, line in enumerate(lines):
-            prev_line = lines[ind - 1]
-            next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
-            indent_size = len(line) - len(line.lstrip())
-            if not prev_line.strip() and line.strip():
-                if indent_size == 2 or indent_size == 3:
-                    flag = True
-            if flag and not line.strip().startswith(":"):
-                lines[ind] = line.replace(line, f"```{line}```")
-            if flag:
-                if not next_line.strip() or indent_size < 2:
-                    flag = False
-        return "\n".join(lines)
+    def _indented_code(self, matchobj):
+        caret_token = self._caret_token
+        text = matchobj.group('text')
+        code = matchobj.group('code')
+        code = code.strip()
+        return f'{caret_token}{text}:{caret_token}{caret_token}``{code}``{caret_token}{caret_token}'
+
 
     def _extrtoolembed(self, matchobj):
         name = matchobj.group('name').lower()
@@ -524,7 +525,9 @@ class Rst2Markdown(object):
         output = self._epigraph_re.sub(self._epigraph, output)
         output = self._paragraph_re.sub(self._paragraph, output)
         output = self._sidebar_re.sub(self._sidebar, output)
-        output = self._code_lines(output)
+        output = self._only_re.sub(self._only, output)
+        output = self._indented_code_re.sub(self._indented_code, output)
         output = self._code_include_re.sub(self._code_include, output)
+        # output = self._comment_re.sub(self._comment, output)
         output = re.sub(self._caret_token, "\n", output)
         return output
