@@ -8,8 +8,7 @@ class Bibliography(object):
         self._bib_re = re.compile(r"""^\.\. (?P<label>\[[a-zA-z\d]+])\n*(?P<text>(?:\s+[^\n]+\n*)*)""",
                                   flags=re.MULTILINE)
 
-    @staticmethod
-    def _bib(matchobj):
+    def _bib(self, matchobj):
         label = matchobj.group('label')
         text = matchobj.group('text')
         out = []
@@ -17,7 +16,7 @@ class Bibliography(object):
             line = line.strip()
             out.append(line)
         text = ' '.join(out)
-        return f'{label.strip()} {text.strip()}'
+        return f'{self._caret_token}**{label.strip()}** {text.strip()}{self._caret_token}'
 
     def convert(self):
         output = self.str
