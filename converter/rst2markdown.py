@@ -112,8 +112,9 @@ class Rst2Markdown(object):
         self._lineblock_re = re.compile(r"""^((?: {2,})?\| )[^\n]*(?:\n(?:\1| {2,})[^\n]+)*""", flags=re.MULTILINE)
         self._comment_re = re.compile(r"""^\.{2}\s+([^\n]+|\n\s+[^\n]+)(?:\n+|$)""", flags=re.MULTILINE)
         self._only_re = re.compile(r""".. only:: [a-zA-z\d]+\n\n*((?:\s+[^\n]+\n*)*)""")
-        self._indented_code_re = re.compile(r"""^(?P<text>[^\n]*)::\n+(?P<code>( {2,})[^\n]*\n(?:(?:\3[^\n]*)?\n)*)""",
-                                            flags=re.MULTILINE)
+        self._indented_code_re = re.compile(
+            r"""^(?P<text>[^\n]*)::\n+(?P<code>(?P<indent> {2,})[^\n]*\n(?:(?:\3[^\n]*)?\n)*)""", flags=re.MULTILINE
+        )
         self._definition_re = re.compile(
             r"""^(?!\s|\d\. |#\. |\* |- |\.\. ):?(?P<term>[^\n]+)\n(?P<content> {2,}[^\n]+(?:\n {2,}[^\n]+\s*)*\n+)""",
             flags=re.MULTILINE
@@ -301,9 +302,13 @@ class Rst2Markdown(object):
     def _indented_code(self, matchobj):
         caret_token = self._caret_token
         text = matchobj.group('text')
+        indent = matchobj.group('indent')
         code = matchobj.group('code')
-        code = code.strip()
-        return f'{caret_token}{text}:{caret_token}{caret_token}``{code}``{caret_token}{caret_token}'
+        space = len(indent)
+        space_re = f"^ {{{space}}}"
+        code = re.sub(space_re, '', code.strip(), flags=re.MULTILINE) if space else code.strip()
+        return f'{caret_token}{text}:{caret_token}{caret_token}```{caret_token}{code}{caret_token}```' \
+               f'{caret_token}{caret_token}'
 
 
     def _extrtoolembed(self, matchobj):
