@@ -9,7 +9,7 @@ class CodeInclude(object):
         self._caret_token = caret_token
         self._workspace_dir = workspace_dir
         self._load_file = load_file_method
-        self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
+        self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
     def _code_include(self, matchobj):
         options = {}
