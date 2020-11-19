@@ -1,7 +1,7 @@
 import re
 from collections import namedtuple
 
-MASK_IMAGE_TO_MD = '![{alt}]({image}){caret_token}{caption}{caret_token}{caret_token}'
+MASK_IMAGE_TO_MD = '![{alt}]({image}){caret_token}{caption}{caret_token}{caret_token}\n'
 Figure = namedtuple('Figure', ['position', 'tag'])
 
 
@@ -15,6 +15,8 @@ class Image(object):
         self._figures = list()
         self._image_re = re.compile(
             r"""(\.\. _(?P<tag>.*?):\n\s*)?\.\. odsafig:: (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)? *(\n(?P<caption>( +.+\n)+))?""")
+        self._figure_re = re.compile(
+            r"""(\.\. _(?P<tag>.*?):\n\s*)?\.\. figure:: (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)? *(\n(?P<caption>( +.+\n)+))?""")
 
     @staticmethod
     def _get_image_options(raw_options):
@@ -73,4 +75,6 @@ class Image(object):
     def convert(self):
         output = self.str
         output = self._image_re.sub(self._image, output)
+        output = self._figure_re.sub(self._image, output)
+        output = self._set_figure_links_by_tag(output)
         return output
