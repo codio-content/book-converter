@@ -3,6 +3,7 @@ import re
 import uuid
 
 from converter.rst.avembed import AvEmbed
+from converter.rst.bibliography import Bibliography
 from converter.rst.code_include import CodeInclude
 from converter.rst.comment import Comment
 from converter.rst.definition import Definition
@@ -124,6 +125,7 @@ class Rst2Markdown(object):
         output = IndentedCode(output, self._caret_token).convert()
         output = CodeInclude(output, self._caret_token, self.workspace_dir, self.load_file).convert()
         output = Footnote(output).convert()
+        output = Bibliography(output, self._caret_token).convert()
         # output = Comment(output).convert()
         output = re.sub(self._caret_token, "\n", output)
         return output
