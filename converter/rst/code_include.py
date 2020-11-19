@@ -9,7 +9,7 @@ class CodeInclude(object):
         self._caret_token = caret_token
         self._workspace_dir = workspace_dir
         self._load_file = load_file_method
-        self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?)\n(?P<options>(?: +:.*?: \S*\n)+)?""")
+        self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
     def _code_include(self, matchobj):
         options = {}
@@ -52,10 +52,10 @@ class CodeInclude(object):
                         content = ''
                         continue
                     if line.strip().startswith(end_tag_string):
-                        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
+                        return f'{caret_token}```{caret_token}{content.strip()}{caret_token}```{caret_token}{caret_token}'
                 line = re.sub(r"/\* \*\*\* .*? \*\*\* \*/", "", line)
                 content += line
-        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
+        return f'{caret_token}```{caret_token}{content.strip()}{caret_token}```{caret_token}{caret_token}'
 
     def convert(self):
         output = self.str
