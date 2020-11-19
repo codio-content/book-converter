@@ -4,6 +4,7 @@ import uuid
 
 from converter.rst.avembed import AvEmbed
 from converter.rst.code_include import CodeInclude
+from converter.rst.comment import Comment
 from converter.rst.definition import Definition
 from converter.rst.epigraph import Epigraph
 from converter.rst.external_link import ExternalLink
@@ -11,10 +12,12 @@ from converter.rst.extrtoolembed import ExtrToolEmbed
 from converter.rst.footnote import Footnote
 from converter.rst.heading import Heading
 from converter.rst.image import Image
+from converter.rst.indented_code import IndentedCode
 from converter.rst.inlineav import InlineAv
 from converter.rst.line_block import LineBlock
 from converter.rst.list import List
 from converter.rst.match import Match
+from converter.rst.only import Only
 from converter.rst.paragraph import Paragraph
 from converter.rst.ref import Ref
 from converter.rst.sidebar import Sidebar
@@ -38,24 +41,6 @@ class Rst2Markdown(object):
         self.lines_array = lines_array
         self._exercises = exercises
         self.workspace_dir = workspace_dir
-
-    @staticmethod
-    def _code_lines(data):
-        flag = False
-        lines = data.split("\n")
-        for ind, line in enumerate(lines):
-            prev_line = lines[ind - 1]
-            next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
-            indent_size = len(line) - len(line.lstrip())
-            if not prev_line.strip() and line.strip():
-                if indent_size == 2 or indent_size == 3:
-                    flag = True
-            if flag and not line.strip().startswith(":"):
-                lines[ind] = line.replace(line, f"```{line}```")
-            if flag:
-                if not next_line.strip() or indent_size < 2:
-                    flag = False
-        return "\n".join(lines)
 
     def _enum_lists_parse(self, lines):
         counter = 0
@@ -102,6 +87,7 @@ class Rst2Markdown(object):
         output = Heading(output, self._caret_token).convert()
         output = Definition(output, self._caret_token).convert()
         output = LineBlock(output, self._caret_token).convert()
+        output = TodoBlock(output).convert()
         output, figure_counter = Topic(output, self._caret_token,
                                        self._chapter_num, self._subsection_num,
                                        self._figure_counter).convert()
@@ -134,9 +120,10 @@ class Rst2Markdown(object):
         output = Sidebar(output, self._caret_token).convert()
         output = Table(output).convert()
         output = ExternalLink(output).convert()
-        output = self._code_lines(output)
+        output = Only(output).convert()
+        output = IndentedCode(output, self._caret_token).convert()
         output = CodeInclude(output, self._caret_token, self.workspace_dir, self.load_file).convert()
-        output = TodoBlock(output).convert()
         output = Footnote(output).convert()
+        # output = Comment(output).convert()
         output = re.sub(self._caret_token, "\n", output)
         return output
