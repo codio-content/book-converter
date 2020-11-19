@@ -5,7 +5,7 @@ class List(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._list_re = re.compile(r"""^( *)(?P<type>[*+\-]|[0-9#]+[\.]) [^\n]*(?:\n(?!\1\2|\S)[^\n]*)*""",
+        self._list_re = re.compile(r"""^( *)(?P<type>[*+\-]|[0-9#]+[\.|)]) [^\n]*(?:\n(?!\1\2|\S)[^\n]*)*""",
                                    flags=re.MULTILINE)
 
     def _list(self, matchobj):
@@ -24,7 +24,7 @@ class List(object):
         else:
             content = self._clearing_text_spaces(content)
             content = self._clearing_line_breaks(content)
-        return content
+        return f'{content}\n'
 
     @staticmethod
     def _clearing_text_spaces(data):

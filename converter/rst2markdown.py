@@ -57,21 +57,23 @@ class Rst2Markdown(object):
                     flag = False
         return "\n".join(lines)
 
-    @staticmethod
-    def _enum_lists_parse(lines):
+    def _enum_lists_parse(self, lines):
         counter = 0
         list_flag = False
         for ind, line in enumerate(lines):
             next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
-            if line.startswith('#. ') or line.startswith('   #. '):
+            if self.bullet_match(line):
                 list_flag = True
                 counter += 1
                 lines[ind] = line.replace("#", str(counter), 1)
-            if next_line[:1].strip() and not next_line.startswith('#. ') \
-                    and not next_line.startswith('   #. ') and list_flag:
+            if next_line[:1].strip() and not self.bullet_match(next_line) and list_flag:
                 list_flag = False
                 counter = 0
         return lines
+
+    @staticmethod
+    def bullet_match(line):
+        return re.search(r'^ *#[.|)] ', line)
 
     def get_figure_counter(self):
         return self._figure_counter

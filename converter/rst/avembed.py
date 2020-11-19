@@ -10,7 +10,7 @@ class AvEmbed(object):
         self._open_dsa_cdn = open_dsa_cdn
         self._assessments = list()
         self._avembed_re = re.compile(
-            r"""\s*\.\. avembed:: (?P<name>.*?) (?P<type>[a-z]{2})\n(?P<options>(\s+:.*?:\s+.*\n)+)?"""
+            r"""\s*\.\. avembed:: (?P<name>.*?) (?P<type>[a-z]{2}) *\n(?P<options>(\s+:.*?:\s+.*\n)+)?"""
         )
 
     def _avembed(self, matchobj):

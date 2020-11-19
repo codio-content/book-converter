@@ -19,7 +19,8 @@ class Match(object):
         content = matchobj.group('content')
         content = content.strip()
         content = content.replace("\\+", "+")
-        return f'<center>$${content}$$</center>'
+        content = content.replace("&=&", "\\&=\\&")
+        return f'<center style="font-size: 80%;">$${content}$$</center>'
 
     def convert(self):
         output = self.str
