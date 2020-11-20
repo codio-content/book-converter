@@ -6,7 +6,7 @@ class Footnote(object):
         self.str = source_string
         self._footnote_counter = 0
         self._marker_footnote_re = re.compile(r"""\[#]_""")
-        self._footnote_re = re.compile(r"""^\.\. \[#\] (?P<content>(?:[^\n]+\n)*)""", flags=re.MULTILINE)
+        self._footnote_re = re.compile(r"""^\.\. \[#] (?P<content>(?:[^\n]+\n)*)""", flags=re.MULTILINE)
 
     def _foot_note_marker(self, matchobj):
         self._footnote_counter += 1

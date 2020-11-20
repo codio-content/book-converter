@@ -101,8 +101,8 @@ class InlineAv(object):
             caption = f'<center>{counter} {caption}</center><br/>{caret_token}{caret_token}'
         scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src="{self._open_dsa_cdn}/{x}">'
                                              f'</script>{caret_token}', script_opt)))
-        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" href="{self._open_dsa_cdn}/{x}"/>'
-                                               f'{caret_token}', css_opt)))
+        css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" '
+                                               f'href="{self._open_dsa_cdn}/{x}"/>{caret_token}', css_opt)))
         iframe_name = slugify(name)
         """
         reason for subpath - some dynamic images have relative imports like ../../../SourceCode/target_file

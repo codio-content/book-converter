@@ -6,8 +6,8 @@ class SimpleTable(object):
         self.str = source_string
         self._caret_token = caret_token
         self._simple_table_re = re.compile(
-            r"""( *[=]{3,}([ ]{2,}[=]{3,})+)\n(?P<headers>.*?)\n( *[=]{3,}([ ]{2,}[=]{3,})+)\n(?P<rows>(.*? {2,}.*?\n)+)( *[=]{3,}([ ]{2,}[=]{3,})+)"""
-        )
+            r"""([ ]*[=]{3,}([ ]{2,}[=]{3,})+)\n(?P<headers>.*?)\n([ ]*[=]{3,}([ ]{2,}[=]{3,})+)\n
+                (?P<rows>(.*?[ ]{2,}.*?\n)+)([ ]*[=]{3,}([ ]{2,}[=]{3,})+)""", flags=re.VERBOSE)
 
     def _simple_table(self, matchobj):
         headers = self._get_row(matchobj.group('headers'))
