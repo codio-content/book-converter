@@ -18,8 +18,9 @@ class IndentedCode(object):
         code = matchobj.group('code')
         space = len(indent)
         space_re = f"^ {{{space}}}"
+        colon = ':' if text else ''
         code = re.sub(space_re, '', code.strip(), flags=re.MULTILINE) if space else code.strip()
-        return f'{caret_token}{text}:{caret_token}{caret_token}```{caret_token}{code}{caret_token}```' \
+        return f'{caret_token}{text}{colon}{caret_token}{caret_token}```{caret_token}{code}{caret_token}```' \
                f'{caret_token}{caret_token}'
 
     def convert(self):
