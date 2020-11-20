@@ -11,13 +11,14 @@ from converter.rst.epigraph import Epigraph
 from converter.rst.external_link import ExternalLink
 from converter.rst.extrtoolembed import ExtrToolEmbed
 from converter.rst.footnote import Footnote
+from converter.rst.glossary import Glossary
 from converter.rst.heading import Heading
 from converter.rst.image import Image
 from converter.rst.indented_code import IndentedCode
 from converter.rst.inlineav import InlineAv
 from converter.rst.line_block import LineBlock
 from converter.rst.list import List
-from converter.rst.match import Match
+from converter.rst.math import Math
 from converter.rst.only import Only
 from converter.rst.paragraph import Paragraph
 from converter.rst.ref import Ref
@@ -97,7 +98,6 @@ class Rst2Markdown(object):
 
         output = Tip(output, self._caret_token).convert()
         output = Image(output, self._caret_token, self._chapter_num, self._subsection_num).convert()
-        output = re.sub(r".. _[\S ]+:", "", output)  # todo: line moved below. removes tags for images
         output, figure_counter, iframe_images = InlineAv(output, self._caret_token,
                                                          self.workspace_dir, self._chapter_num,
                                                          self._subsection_num, OPEN_DSA_CDN,
@@ -115,7 +115,7 @@ class Rst2Markdown(object):
         output = List(output, self._caret_token).convert()
         output = Ref(output).convert()
         output = Term(output).convert()
-        output = Match(output).convert()
+        output = Math(output).convert()
         output = SimpleTable(output, self._caret_token).convert()
         output = Epigraph(output, self._caret_token).convert()
         output = Paragraph(output).convert()
@@ -127,6 +127,7 @@ class Rst2Markdown(object):
         output = IndentedCode(output, self._caret_token).convert()
         output = CodeInclude(output, self._caret_token, self.workspace_dir, self.load_file).convert()
         output = Footnote(output).convert()
+        output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
         # output = Comment(output).convert()
         output = re.sub(self._caret_token, "\n", output)

@@ -1,12 +1,11 @@
 import re
 
 
-class Match(object):
+class Math(object):
     def __init__(self, source_string):
         self.str = source_string
         self._math_re = re.compile(r""":math:`(?P<content>.*?)`""")
-        self._math_block_re = re.compile(r""" {,3}.. math::\n^[\s\S]*?(?P<content>.*?)(?=\n{2,})""",
-                                         flags=re.MULTILINE + re.DOTALL)
+        self._math_block_re = re.compile(r""".. math::\n(?P<content>[\s\S]*?)(?=\n{2})""")
 
     @staticmethod
     def _math(matchobj):

@@ -21,9 +21,6 @@ class List(object):
                 item = self._clearing_line_breaks(item)
                 items.append(item)
             content = '\n'.join(items)
-        else:
-            content = self._clearing_text_spaces(content)
-            content = self._clearing_line_breaks(content)
         return f'{content}\n'
 
     @staticmethod
