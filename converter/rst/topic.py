@@ -9,7 +9,7 @@ class Topic(object):
         self._subsection_num = subsection_num
         self._figure_counter = figure_counter
         self._topic_re = re.compile(
-            r"""^\.{2} topic:{2} +(?P<type>.*?)\n\n*(?P<content>(?:\s+[^\n]+\n*)*)""", flags=re.MULTILINE)
+            r"""^\.{2} topic::? +(?P<type>.*?)\n\n*(?P<content>(?:\s+[^\n]+\n*)*)""", flags=re.MULTILINE)
 
     def _topic(self, matchobj):
         caret_token = self._caret_token
