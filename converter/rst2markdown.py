@@ -18,7 +18,7 @@ from converter.rst.indented_code import IndentedCode
 from converter.rst.inlineav import InlineAv
 from converter.rst.line_block import LineBlock
 from converter.rst.list import List
-from converter.rst.match import Match
+from converter.rst.math import Math
 from converter.rst.only import Only
 from converter.rst.paragraph import Paragraph
 from converter.rst.ref import Ref
@@ -115,7 +115,7 @@ class Rst2Markdown(object):
         output = List(output, self._caret_token).convert()
         output = Ref(output).convert()
         output = Term(output).convert()
-        output = Match(output).convert()
+        output = Math(output).convert()
         output = Epigraph(output, self._caret_token).convert()
         output = Paragraph(output).convert()
         output = Sidebar(output, self._caret_token).convert()
