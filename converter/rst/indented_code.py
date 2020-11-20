@@ -6,7 +6,7 @@ class IndentedCode(object):
         self.str = source_string
         self._caret_token = caret_token
         self._indented_code_re = re.compile(
-            r"""^(?!.. )(?P<text>[^\n]*)::\n+(?P<code>(?P<indent> {2,})[^\n]*\n(?:(?:\3[^\n]*)?\n)*)""",
+            r"""^(?!\.\. )(?P<text>[^\n]*)::\n+(?P<code>(?P<indent> {2,})(?:[^\n]+\n)*)""",
             flags=re.MULTILINE
         )
 
