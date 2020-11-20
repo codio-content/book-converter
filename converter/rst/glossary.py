@@ -14,10 +14,19 @@ class Glossary(object):
         match_items = list(re.finditer(r'^ +(?P<term>[^\n]+)\n?\n(?P<text>(?:[^\n]+\n)*)', content,
                                        flags=re.MULTILINE))
         for item in match_items:
-            item = f'{item.group("term")}{item.group("text")}{self._caret_token}'
+            term = item.group("term")
+            text = self._clearing_line_breaks(item.group("text"))
+            item = f'**{term}**{self._caret_token}{text}{self._caret_token}<hr>{self._caret_token}'
             items_list.append(item)
         content = '\n'.join(items_list)
-        return f'{self._caret_token}{content}'
+        return content
+
+    @staticmethod
+    def _clearing_line_breaks(data):
+        out = []
+        for line in data.split('\n'):
+            out.append(line)
+        return ' '.join(out)
 
     def convert(self):
         output = self.str

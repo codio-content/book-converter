@@ -10,8 +10,7 @@ class Term(object):
     def _term(matchobj):
         name = matchobj.group('name')
         name = name.strip()
-        label_name = matchobj.group('label_name')
-        return f'**{name}**'
+        return f'<span style="color: brown;">**{name}**</span>'
 
     def convert(self):
         output = self.str
