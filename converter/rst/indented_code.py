@@ -6,12 +6,14 @@ class IndentedCode(object):
         self.str = source_string
         self._caret_token = caret_token
         self._indented_code_re = re.compile(
-            r"""^(?!.. )(?P<text>[^\n]*)::\n+(?P<code>(?P<indent> {2,})[^\n]*\n(?:(?:\3[^\n]*)?\n)*)""", flags=re.MULTILINE
+            r"""^(?!.. )(?P<text>[^\n]*)::\n+(?P<code>(?P<indent> {2,})[^\n]*\n(?:(?:\3[^\n]*)?\n)*)""",
+            flags=re.MULTILINE
         )
 
     def _indented_code(self, matchobj):
         caret_token = self._caret_token
         text = matchobj.group('text')
+        text = text.rstrip(':')
         indent = matchobj.group('indent')
         code = matchobj.group('code')
         space = len(indent)

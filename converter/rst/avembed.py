@@ -28,12 +28,12 @@ class AvEmbed(object):
         assessment = AssessmentData(assessment_id, name, 'custom', 1, {'question': 'Resolve the challenge above'})
         self._assessments.append(assessment)
 
-        return f'{caret_token}<iframe id="{name}_iframe" src="{self._open_dsa_cdn}/{file_name}' \
+        return f'\n{caret_token}<iframe id="{name}_iframe" src="{self._open_dsa_cdn}/{file_name}' \
                f'?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java' \
                f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
                f'class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" ' \
                f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>' \
-               f'{caret_token}{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}{caret_token}'
+               f'{caret_token}{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}{caret_token}\n'
 
     def convert(self):
         output = self.str
