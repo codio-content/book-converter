@@ -27,6 +27,7 @@ from converter.rst.term import Term
 from converter.rst.tip import Tip
 from converter.rst.todo_block import TodoBlock
 from converter.rst.topic import Topic
+from converter.rst.simple_table import SimpleTable
 
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
@@ -87,7 +88,6 @@ class Rst2Markdown(object):
 
         output = Heading(output, self._caret_token).convert()
         output = Definition(output, self._caret_token).convert()
-        output = LineBlock(output, self._caret_token).convert()
         output = TodoBlock(output).convert()
         output, figure_counter = Topic(output, self._caret_token,
                                        self._chapter_num, self._subsection_num,
@@ -116,10 +116,12 @@ class Rst2Markdown(object):
         output = Ref(output).convert()
         output = Term(output).convert()
         output = Match(output).convert()
+        output = SimpleTable(output, self._caret_token).convert()
         output = Epigraph(output, self._caret_token).convert()
         output = Paragraph(output).convert()
-        output = Sidebar(output, self._caret_token).convert()
         output = Table(output).convert()
+        output = LineBlock(output, self._caret_token).convert()
+        output = Sidebar(output, self._caret_token).convert()
         output = ExternalLink(output).convert()
         output = Only(output).convert()
         output = IndentedCode(output, self._caret_token).convert()
