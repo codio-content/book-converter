@@ -145,8 +145,9 @@ class LaTeX2Markdown(object):
         if images:
             self._pdfs.extend(images)
         output, images, figure_counter = Figure(
-            output, self._figure_counter_offset, self._chapter_num, self._detect_asset_ext, self._caret_token,
-            self._refs).convert()
+            output, self._figure_counter_offset, self._chapter_num, self._detect_asset_ext,
+            self._caret_token, self._refs
+        ).convert()
         if images:
             self._pdfs.extend(images)
         if figure_counter:
