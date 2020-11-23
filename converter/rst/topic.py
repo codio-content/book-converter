@@ -17,10 +17,10 @@ class Topic(object):
         content = matchobj.group('content')
         content = re.sub(r"\n +", "\n ", content)
         self._figure_counter += 1
-        return f'<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
+        return f'\n<div style="padding: 20px; border: 1px; border-style: solid; border-color: silver;">' \
                f'{caret_token}{caret_token}**{topic_type} {self._chapter_num}.{self._subsection_num}.' \
                f'{self._figure_counter}**<br/>' \
-               f'{caret_token}{caret_token}{content}\n\n</div><br/>{caret_token}{caret_token}'
+               f'{caret_token}{caret_token}\n\n{content}\n\n</div><br/>{caret_token}{caret_token}\n'
 
     def convert(self):
         output = self.str

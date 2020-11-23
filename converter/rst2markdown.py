@@ -87,6 +87,10 @@ class Rst2Markdown(object):
         if assessments:
             self._assessments.extend(assessments)
 
+        match = re.search(r"We begin with an analysis", output)
+        if match:
+            test = 1
+
         output = Heading(output, self._caret_token).convert()
         output = Definition(output, self._caret_token).convert()
         output = TodoBlock(output).convert()
@@ -129,6 +133,6 @@ class Rst2Markdown(object):
         output = Footnote(output).convert()
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
-        # output = Comment(output).convert()
+        output = Comment(output).convert()
         output = re.sub(self._caret_token, "\n", output)
         return output
