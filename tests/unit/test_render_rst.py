@@ -59,7 +59,7 @@ class TestSuite(unittest.TestCase):
     def test_table_render(self):
         self.run_case("table")
 
-    def test_table_render(self):
+    def test_simple_table_render(self):
         self.run_case("simple_table")
 
     def test_external_link_render(self):

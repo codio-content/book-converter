@@ -5,7 +5,7 @@ class Table(object):
     def __init__(self, source_string):
         self.str = source_string
         self._table_re = re.compile(r"""[+][=]{3,}[+]([=]{3,}[+])+""")
-        self._table_row_re = re.compile(r""" *[|].{3,}[|](.{3,}[|])+""")
+        self._table_row_re = re.compile(r"""\n\s*[|].{3,}[|](.{3,}[|])+""")
 
     @staticmethod
     def _remove_line_boundaries_by_rst(output):
