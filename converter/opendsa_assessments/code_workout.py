@@ -49,25 +49,33 @@ class CodeWorkoutExercises(object):
             write_file(wrapper_code_path, wrapper_code)
             write_file(starter_code_path, starter_code)
 
+    def get_parsed_tests(self, exercise_data):
+        parsed_tests = parse_csv_lines(exercise_data.get('tests', ''))
+        return [item for item in parsed_tests if len(item)]
+
     def get_tester_code(self, exercise_data):
+        if not exercise_data:
+            return ''
+
+        num = 0
+        run_tests = ''
+        unit_tests = ''
         class_name = exercise_data.get('class_name', '')
         method_name = exercise_data.get('method_name', '')
-        tests = exercise_data.get('tests', '')
-        parsed_tests = parse_csv_lines(tests)
-        parsed_tests = [item for item in parsed_tests if len(item)]
-        if not parsed_tests:
-            return ''
-        size = len(parsed_tests)
+        parsed_tests = self.get_parsed_tests(exercise_data)
+        tests_count = len(parsed_tests)
 
-        run_tests = self.get_run_tests_code(parsed_tests, method_name)
-        unit_tests = self.get_unit_tests_code(parsed_tests, class_name, method_name)
+        for test in parsed_tests:
+            num += 1
+            run_tests += self.get_run_tests_code(test, method_name, num)
+            unit_tests += self.get_unit_tests_code(test, class_name, method_name, num)
 
         return f'import java.util.Objects;\n' \
                f'import java.util.concurrent.Callable;\n' \
                f'\n' \
                f'public class Tester {{\n' \
                f'   public static void main(String[] args) {{\n' \
-               f'       int total_tests = {size};\n' \
+               f'       int total_tests = {tests_count};\n' \
                f'       int passed_tests = 0;\n' \
                f'       String feedback = "";\n' \
                f'\n' \
@@ -89,82 +97,72 @@ class CodeWorkoutExercises(object):
                f'}}\n'
 
     @staticmethod
-    def get_unit_tests_code(parsed_tests, class_name, method_name):
-        num = 0
-        unit_tests = []
-        for test in parsed_tests:
-            if not test:
-                return ''
-            num += 1
-            actual = test[0]
-            expected = test[1]
-            expected = expected.strip() if expected is not None else expected
-            test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
-                        f'       private static final {class_name} instance = new {class_name}();\n' \
-                        f'\n' \
-                        f'       public Test{num}() {{\n' \
-                        f'       }}\n' \
-                        f'\n' \
-                        f'       public static Object getExpectedVal() {{\n' \
-                        f'          return {expected};\n' \
-                        f'       }}\n' \
-                        f'\n' \
-                        f'       public static Object getActualVal() {{\n' \
-                        f'          return instance.{method_name}({actual});\n' \
-                        f'       }}\n' \
-                        f'\n' \
-                        f'       public Boolean call() {{\n' \
-                        f'          return Objects.equals(getExpectedVal(), getActualVal());\n' \
-                        f'       }}\n' \
-                        f'   }}\n' \
-                        f'\n'
-            unit_tests.append(test_code)
-        return ''.join(unit_tests)
+    def get_unit_tests_code(test, class_name, method_name, num):
+        if not test:
+            return ''
+
+        actual = test[0]
+        expected = test[1]
+        expected = expected.strip() if expected is not None else expected
+        return f'   public static class Test{num} implements Callable<Boolean>{{\n' \
+               f'       private static final {class_name} instance = new {class_name}();\n' \
+               f'\n' \
+               f'       public Test{num}() {{\n' \
+               f'       }}\n' \
+               f'\n' \
+               f'       public static Object getExpectedVal() {{\n' \
+               f'          return {expected};\n' \
+               f'       }}\n' \
+               f'\n' \
+               f'       public static Object getActualVal() {{\n' \
+               f'          return instance.{method_name}({actual});\n' \
+               f'       }}\n' \
+               f'\n' \
+               f'       public Boolean call() {{\n' \
+               f'          return Objects.equals(getExpectedVal(), getActualVal());\n' \
+               f'       }}\n' \
+               f'   }}\n' \
+               f'\n'
 
     @staticmethod
-    def get_run_tests_code(parsed_tests, method_name):
-        run_scripts = []
-        num = 0
-        for test in parsed_tests:
-            if not test:
-                return ''
-            msg = ''
-            actual = test[0]
-            actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
-            actual = actual.replace('"', '\\"')
-            expected = test[1]
-            expected = expected.replace('"', '\\"')
-            passed_data = f': {method_name}({actual}) -> {expected}'
-            failed_data = f': {method_name}({actual})'
-            if len(test) == 3:
-                message = test[2]
-                if message:
-                    if message == 'example':
-                        msg = ''
-                    elif message == 'hidden':
-                        passed_data = ': hidden'
-                        failed_data = ': hidden'
-                    else:
-                        message = message.strip('"')
-                        msg = f'{message}\\n\\n'
-                        passed_data = ''
-                        failed_data = ''
-            num += 1
-            code = f'       if (runTest(new Test{num}())) {{\n' \
-                   f'           passed_tests++;\n' \
-                   f'           feedback += "{msg}Test <span style=\\"color:green\\"><b>PASSED</b></span>' \
-                   f'{passed_data}\\n\\n";\n' \
-                   f'       }} else {{\n' \
-                   f'           feedback += "{msg}Test <span style=\\"color:red\\"><b>FAILED</b></span>' \
-                   f'{failed_data}\\n";\n' \
-                   f'           try {{\n' \
-                   f'               Object exp = Test{num}.getExpectedVal();\n' \
-                   f'               Object act = Test{num}.getActualVal();\n' \
-                   f'               feedback += "Expected: " + exp + "\\n" + "but was: " + act + "\\n\\n";\n' \
-                   f'           }} catch (Exception | Error e) {{\n' \
-                   f'               feedback += e + "\\n\\n";\n' \
-                   f'           }}\n' \
-                   f'       }}\n' \
-                   f'\n'
-            run_scripts.append(code)
-        return ''.join(run_scripts)
+    def get_run_tests_code(test, method_name, num):
+        if not test:
+            return ''
+
+        msg = ''
+        actual = test[0]
+        actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
+        actual = actual.replace('"', '\\"')
+        expected = test[1]
+        expected = expected.replace('"', '\\"')
+        passed_data = f': {method_name}({actual}) -> {expected}'
+        failed_data = f': {method_name}({actual})'
+        if len(test) == 3:
+            message = test[2]
+            if message:
+                if message == 'example':
+                    msg = ''
+                elif message == 'hidden':
+                    passed_data = ': hidden'
+                    failed_data = ': hidden'
+                else:
+                    message = message.strip('"')
+                    msg = f'{message}\\n\\n'
+                    passed_data = ''
+                    failed_data = ''
+        return f'       if (runTest(new Test{num}())) {{\n' \
+               f'           passed_tests++;\n' \
+               f'           feedback += "{msg}Test <span style=\\"color:green\\"><b>PASSED</b></span>' \
+               f'{passed_data}\\n\\n";\n' \
+               f'       }} else {{\n' \
+               f'           feedback += "{msg}Test <span style=\\"color:red\\"><b>FAILED</b></span>' \
+               f'{failed_data}\\n";\n' \
+               f'           try {{\n' \
+               f'               Object exp = Test{num}.getExpectedVal();\n' \
+               f'               Object act = Test{num}.getActualVal();\n' \
+               f'               feedback += "Expected: " + exp + "\\n" + "but was: " + act + "\\n\\n";\n' \
+               f'           }} catch (Exception | Error e) {{\n' \
+               f'               feedback += e + "\\n\\n";\n' \
+               f'           }}\n' \
+               f'       }}\n' \
+               f'\n'
