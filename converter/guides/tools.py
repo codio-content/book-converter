@@ -1,3 +1,4 @@
+import csv
 import re
 import json
 
@@ -27,3 +28,7 @@ def get_text_in_brackets(line, start=0):
     if start == end or start == -1 or end == -1:
         return line
     return line[start + 1:end]
+
+
+def parse_csv_lines(data):
+    return [row for row in csv.reader(data.splitlines())]
