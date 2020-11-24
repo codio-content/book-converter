@@ -730,8 +730,8 @@ def convert_rst(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-    odsa_workout = CodeWorkoutExercises(guides_dir, generate_dir, exercises)
-    odsa_workout.create_assessments_data()
+    odsa_code_workout = CodeWorkoutExercises(guides_dir, generate_dir, exercises)
+    odsa_code_workout.create_assessments_data()
 
     write_metadata(guides_dir, metadata, book)
     write_assessments(guides_dir, all_assessments)

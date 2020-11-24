@@ -152,10 +152,11 @@ class CodeWorkoutExercises(object):
             num += 1
             code = f'       if (runTest(new Test{num}())) {{\n' \
                    f'           passed_tests++;\n' \
-                   f'           feedback += "{msg}Test <span style=\\"color:green\\"><b>PASSED</b></span>{passed_data}' \
-                   f'\\n\\n";\n' \
+                   f'           feedback += "{msg}Test <span style=\\"color:green\\"><b>PASSED</b></span>' \
+                   f'{passed_data}\\n\\n";\n' \
                    f'       }} else {{\n' \
-                   f'           feedback += "{msg}Test <span style=\\"color:red\\"><b>FAILED</b></span>{failed_data}\\n";\n' \
+                   f'           feedback += "{msg}Test <span style=\\"color:red\\"><b>FAILED</b></span>' \
+                   f'{failed_data}\\n";\n' \
                    f'           try {{\n' \
                    f'               Object exp = Test{num}.getExpectedVal();\n' \
                    f'               Object act = Test{num}.getActualVal();\n' \
