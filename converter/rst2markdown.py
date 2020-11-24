@@ -87,6 +87,7 @@ class Rst2Markdown(object):
         if assessments:
             self._assessments.extend(assessments)
 
+        output = Footnote(output).convert()
         output = Heading(output, self._caret_token).convert()
         output = Definition(output, self._caret_token).convert()
         output = TodoBlock(output).convert()
@@ -126,7 +127,6 @@ class Rst2Markdown(object):
         output = Only(output).convert()
         output = IndentedCode(output, self._caret_token).convert()
         output = CodeInclude(output, self._caret_token, self.workspace_dir, self.load_file).convert()
-        output = Footnote(output).convert()
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
         output = Comment(output).convert()

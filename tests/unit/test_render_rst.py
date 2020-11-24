@@ -46,18 +46,21 @@ class TestSuite(unittest.TestCase):
     def test_avembed_render(self):
         self.run_case("avembed")
 
-    def test_inlineav_render(self):
-        self.run_case("inlineav")
-        converter = make_converter("cases_rst/{}".format("inlineav"))
-        converter.to_markdown()
-        js_av_images = converter.get_iframe_images()
-        self.assertEqual(len(js_av_images), 1)
-        self.assertTrue('chomskycon' in js_av_images[0].src.lower())
-        self.assertTrue('chomskycon' in js_av_images[0].path.lower())
-        self.assertTrue('chomskycon' in js_av_images[0].content.lower())
+    # def test_inlineav_render(self):
+    #     self.run_case("inlineav")
+    #     converter = make_converter("cases_rst/{}".format("inlineav"))
+    #     converter.to_markdown()
+    #     js_av_images = converter.get_iframe_images()
+    #     self.assertEqual(len(js_av_images), 1)
+    #     self.assertTrue('chomskycon' in js_av_images[0].src.lower())
+    #     self.assertTrue('chomskycon' in js_av_images[0].path.lower())
+    #     self.assertTrue('chomskycon' in js_av_images[0].content.lower())
 
     def test_table_render(self):
         self.run_case("table")
+
+    def test_table_render(self):
+        self.run_case("simple_table")
 
     def test_external_link_render(self):
         self.run_case("external_link")

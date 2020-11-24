@@ -3,6 +3,7 @@ from converter.guides.tools import slugify
 from string import Template
 from collections import namedtuple
 
+Figure = namedtuple('Figure', ['position', 'tag'])
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
 GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
@@ -68,14 +69,15 @@ class InlineAv(object):
         self._open_dsa_cdn = open_dsa_cdn
         self._figure_counter = figure_counter
         self._iframe_images = list()
+        self._figures = list()
         self._inlineav_re = re.compile(
-            r"""(\.\. _.*?:\n^$\n)?\.\. inlineav:: (?P<name>.*?) (?P<type>.*?)(?P<options>:.*?: .*?\n)+(?=\S|$)""",
-            flags=re.MULTILINE + re.DOTALL
+            r"""(\.\.[ ]_(?P<tag>.*?):\n^$\n)?\.\.[ ]inlineav::[ ](?P<name>.*?)[ ]
+                (?P<type>.*?)(?P<options>:.*?:[ ].*?\n)+(?=\S|$)(?P<caption>(.*?\n))?(?=\S|$)""",
+            flags=re.MULTILINE + re.DOTALL + re.VERBOSE
         )
 
     def _inlineav(self, matchobj):
         images = {}
-        caption = ""
         caret_token = self._caret_token
         option_re = re.compile(':([^:]+): (.+)')
         name = matchobj.group('name')
@@ -88,17 +90,17 @@ class InlineAv(object):
             opt_match = option_re.match(line)
             if opt_match:
                 images[opt_match[1]] = opt_match[2]
-            elif line.strip():
-                caption += f'{line} '
         script_opt = images.get('scripts', '')
         script_opt = script_opt.split()
         css_opt = images.get('links', '')
         css_opt = css_opt.split()
         self._figure_counter += 1
-        counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter}'
-        if caption:
-            caption = caption.strip()
-            caption = f'<center>{counter} {caption}</center><br/>{caret_token}{caret_token}'
+        caption = self._get_caption(matchobj.group('caption'))
+
+        tag = matchobj.group('tag') if matchobj.group('tag') is not None else False
+        if tag:
+            self._figures.append(Figure(self._figure_counter, matchobj.group('tag')))
+
         scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src="{self._open_dsa_cdn}/{x}">'
                                              f'</script>{caret_token}', script_opt)))
         css_links = ''.join(list(map(lambda x: f'<link rel="stylesheet" type="text/css" '
@@ -154,7 +156,22 @@ class InlineAv(object):
                         return iframe_height + 30
         return 250
 
+    def _get_caption(self, raw_caption):
+        counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter}'
+        caption = ': '
+        if raw_caption:
+            caption = raw_caption.replace('\n', ' ')
+            caption = re.sub(r'\s+', ' ', caption)
+        return f'<center>Figure {counter}{caption}</center><br/>{self._caret_token}{self._caret_token}'
+
+    def _set_figure_links_by_tag(self, output):
+        for figure in self._figures:
+            output = output.replace(f'Figure :num:`Figure #{figure.tag}`',
+                                    f'Figure {self._chapter_num}.{self._subsection_num}.{figure.position}')
+        return output
+
     def convert(self):
         output = self.str
         output = self._inlineav_re.sub(self._inlineav, output)
+        output = self._set_figure_links_by_tag(output)
         return output, self._figure_counter, self._iframe_images
