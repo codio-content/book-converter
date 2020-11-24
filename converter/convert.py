@@ -9,7 +9,7 @@ import yaml
 from collections import OrderedDict
 from pathlib import Path
 
-from converter.opendsa_assessments.code_workout import CodeWorkoutExercises
+from converter.opendsa_assessments.code_workout import create_assessments_data
 from converter.rst2markdown import Rst2Markdown
 from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
 from converter.guides.tools import slugify, write_file, write_json, parse_csv_lines
@@ -730,8 +730,7 @@ def convert_rst(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-    odsa_code_workout = CodeWorkoutExercises(guides_dir, generate_dir, exercises)
-    odsa_code_workout.create_assessments_data()
+    create_assessments_data(guides_dir, generate_dir, exercises)
 
     write_metadata(guides_dir, metadata, book)
     write_assessments(guides_dir, all_assessments)
