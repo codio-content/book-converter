@@ -1,0 +1,2 @@
+.. tip::
+   **Use aggregation judiciously**

@@ -5,7 +5,7 @@ class Math(object):
     def __init__(self, source_string):
         self.str = source_string
         self._math_re = re.compile(r""":math:`(?P<content>.*?)`""")
-        self._math_block_re = re.compile(r""".. math::\n(?P<content>[\s\S]*?)(?=\n{2})""")
+        self._math_block_re = re.compile(r"""\.\. math::\n(?P<content>[\s\S]*?)(?=\n{2})""")
 
     @staticmethod
     def _math(matchobj):
