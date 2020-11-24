@@ -1,3 +1,4 @@
+import csv
 import logging
 import pathlib
 import re
@@ -326,20 +327,26 @@ def convert_test_assessment(assessment):
     class_name = assessment.ex_data.get('class_name', '')
     method_name = assessment.ex_data.get('method_name', '')
     instructions = assessment.ex_data.get('question', '')
+    instructions = re.sub(r'<img src=\"http://.*?(Exercises.*?)\">',
+                          r'<img src=".guides/opendsa_v1/\1">', instructions)
     ex_path = assessment.ex_data.get('ex_path', '')
     tests = assessment.ex_data.get('tests', '')
     test_matches = get_odsa_workout_unit_tests(tests)
-    for match in test_matches:
-        message = match.group('message')
-        if message == 'example':
-            actual = match.group('actual')
-            actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
-            expected = match.group('expected')
-            example = f'{method_name}({actual}) -> {expected}'
-            examples_list.append(example)
+    # if test_matches:
+    #     return
+
+    for item in test_matches:
+        if len(item) == 3:
+            message = item[2]
+            if message == 'example':
+                actual = item[0]
+                actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
+                expected = item[1]
+                example = f'`{method_name}({actual}) -> {expected}`\n\n'
+                examples_list.append(example)
     if examples_list:
         examples = '\n'.join(examples_list)
-        examples = f'\nExample:\n\n```{examples}```'
+        examples = f'\nExamples:\n\n{examples}'
     instructions = f'{instructions}{examples}'
     return {
         'type': 'test',
@@ -356,10 +363,7 @@ def convert_test_assessment(assessment):
 
 
 def get_odsa_workout_unit_tests(tests):
-    tests = re.sub('"",', '""\\,', tests)
-    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> ?\d+ ?|\".*?\")(?:,(?P<message>.*?)$)?""",
-                          flags=re.MULTILINE)
-    return list(re.finditer(tests_re, tests))
+    return [row for row in csv.reader(tests.splitlines())]
 
 
 def write_assessments(guides_dir, assessments):
@@ -453,10 +457,12 @@ def get_odsa_unit_tests(matches, class_name, method_name):
     num = 0
     unit_tests = []
     for match in matches:
+        if not match:
+            return ''
         num += 1
-        actual = match.group('actual')
-        expected = match.group('expected')
-        expected = expected.strip('"').strip() if expected is not None else expected
+        actual = match[0]
+        expected = match[1]
+        expected = expected.strip() if expected is not None else expected
         test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
                     f'       private static final {class_name} instance = new {class_name}();\n' \
                     f'\n' \
@@ -484,33 +490,36 @@ def get_odsa_run_tests_code(matches, method_name):
     run_scripts = []
     num = 0
     for match in matches:
+        if not match:
+            return ''
         msg = ''
-        actual = match.group('actual')
+        actual = match[0]
         actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
-        actual = actual.strip('"')
-        expected = match.group('expected')
-        expected = expected.strip('"')
-        message = match.group('message')
+        actual = actual.replace('"', '\\"')
+        expected = match[1]
+        expected = expected.replace('"', '\\"')
         passed_data = f': {method_name}({actual}) -> {expected}'
-        failed_data = f': {method_name}({actual})\\n'
-        if message:
-            if message == 'example':
-                msg = ''
-            elif message == 'hidden':
-                passed_data = ': hidden'
-                failed_data = ': hidden'
-            else:
-                message = message.strip('"')
-                msg = f'{message}\\n\\n'
-                passed_data = '\\n'
-                failed_data = '\\n'
+        failed_data = f': {method_name}({actual})'
+        if len(match) == 3:
+            message = match[2]
+            if message:
+                if message == 'example':
+                    msg = ''
+                elif message == 'hidden':
+                    passed_data = ': hidden'
+                    failed_data = ': hidden'
+                else:
+                    message = message.strip('"')
+                    msg = f'{message}\\n\\n'
+                    passed_data = ''
+                    failed_data = ''
         num += 1
         code = f'       if (runTest(new Test{num}())) {{\n' \
                f'           passed_tests++;\n' \
                f'           feedback += "{msg}Test <b>PASSED</b>{passed_data}' \
                f'\\n\\n";\n' \
                f'       }} else {{\n' \
-               f'           feedback += "{msg}Test <b>FAILED</b>{failed_data}";\n' \
+               f'           feedback += "{msg}Test <b>FAILED</b>{failed_data}\\n";\n' \
                f'           try {{\n' \
                f'               Object exp = Test{num}.getExpectedVal();\n' \
                f'               Object act = Test{num}.getActualVal();\n' \
