@@ -49,6 +49,13 @@ def get_parsed_tests(exercise_data):
     return [item for item in parsed_tests if len(item)]
 
 
+def parse_description_specifier(desc):
+    match = re.search(r"(?:(?:(example|hidden|static)\s*:\s*)+)(.*)", desc.strip())
+    if match:
+        desc = match[1].strip()
+    return desc
+
+
 def get_tester_code(exercise_data):
     if not exercise_data:
         return ''
@@ -62,34 +69,38 @@ def get_tester_code(exercise_data):
 
     for test in parsed_tests:
         num += 1
+        if len(test) >= 3:
+            desc = parse_description_specifier(test[2])
+            if desc == 'static':
+                continue
         run_tests += get_run_tests_code(test, method_name, num)
         unit_tests += get_unit_tests_code(test, class_name, method_name, num)
 
-        return f'import java.util.Objects;\n' \
-               f'import java.util.concurrent.Callable;\n' \
-               f'\n' \
-               f'public class Tester {{\n' \
-               f'   public static void main(String[] args) {{\n' \
-               f'       int total_tests = {tests_count};\n' \
-               f'       int passed_tests = 0;\n' \
-               f'       String feedback = "";\n' \
-               f'\n' \
-               f'{run_tests}' \
-               f'       String total = "" + total_tests;\n' \
-               f'       String passed = "" + passed_tests;\n' \
-               f'       String output = total + "\\n" + passed +"\\n" + feedback;\n' \
-               f'       System.out.println(output);\n' \
-               f'   }}\n' \
-               f'\n' \
-               f'   private static boolean runTest(Callable<Boolean> func) {{\n' \
-               f'       try {{\n' \
-               f'           return func.call();\n' \
-               f'       }} catch (Exception | Error e) {{\n' \
-               f'           return false;\n' \
-               f'       }}\n' \
-               f'   }}\n\n' \
-               f'{unit_tests}' \
-               f'}}\n'
+    return f'import java.util.Objects;\n' \
+           f'import java.util.concurrent.Callable;\n' \
+           f'\n' \
+           f'public class Tester {{\n' \
+           f'   public static void main(String[] args) {{\n' \
+           f'       int total_tests = {tests_count};\n' \
+           f'       int passed_tests = 0;\n' \
+           f'       String feedback = "";\n' \
+           f'\n' \
+           f'{run_tests}' \
+           f'       String total = "" + total_tests;\n' \
+           f'       String passed = "" + passed_tests;\n' \
+           f'       String output = total + "\\n" + passed +"\\n" + feedback;\n' \
+           f'       System.out.println(output);\n' \
+           f'   }}\n' \
+           f'\n' \
+           f'   private static boolean runTest(Callable<Boolean> func) {{\n' \
+           f'       try {{\n' \
+           f'           return func.call();\n' \
+           f'       }} catch (Exception | Error e) {{\n' \
+           f'           return false;\n' \
+           f'       }}\n' \
+           f'   }}\n\n' \
+           f'{unit_tests}' \
+           f'}}\n'
 
 
 def get_unit_tests_code(test, class_name, method_name, num):

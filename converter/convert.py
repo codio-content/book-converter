@@ -1,4 +1,3 @@
-import csv
 import logging
 import pathlib
 import re
