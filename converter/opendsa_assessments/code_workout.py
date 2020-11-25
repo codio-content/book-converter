@@ -60,6 +60,7 @@ def get_tester_code(exercise_data):
     if not exercise_data:
         return ''
     num = 0
+    message = ''
     run_tests = ''
     unit_tests = ''
     class_name = exercise_data.get('class_name', '')
@@ -69,12 +70,32 @@ def get_tester_code(exercise_data):
 
     for test in parsed_tests:
         num += 1
+        actual = test[0]
+        actual = actual.replace('"', '\\"')
+
+        expected = test[1]
+        expected = expected.replace('"', '\\"')
+        expected = expected.strip() if expected is not None else expected
+
+        passed_data = f': {method_name}({actual}) -> {expected}'
+        failed_data = f': {method_name}({actual})'
+
         if len(test) >= 3:
             desc = parse_description_specifier(test[2])
             if desc == 'static':
                 continue
-        run_tests += get_run_tests_code(test, method_name, num)
-        unit_tests += get_unit_tests_code(test, class_name, method_name, num)
+            if desc == 'example':
+                message = ''
+            elif desc == 'hidden':
+                passed_data = ': hidden test'
+                failed_data = ': hidden test'
+            else:
+                message = desc.strip('"')
+                message = f'{message}\\n\\n'
+                passed_data = ''
+                failed_data = ''
+        run_tests += get_run_tests_code(passed_data, failed_data, message, num)
+        unit_tests += get_unit_tests_code(actual, expected, method_name, class_name, num)
 
     return f'import java.util.Objects;\n' \
            f'import java.util.concurrent.Callable;\n' \
@@ -103,12 +124,7 @@ def get_tester_code(exercise_data):
            f'}}\n'
 
 
-def get_unit_tests_code(test, class_name, method_name, num):
-    if not test:
-        return ''
-    actual = test[0]
-    expected = test[1]
-    expected = expected.strip() if expected is not None else expected
+def get_unit_tests_code(actual, expected, method_name, class_name, num):
     return f'   public static class Test{num} implements Callable<Boolean>{{\n' \
            f'       private static final {class_name} instance = new {class_name}();\n' \
            f'\n' \
@@ -130,36 +146,13 @@ def get_unit_tests_code(test, class_name, method_name, num):
            f'\n'
 
 
-def get_run_tests_code(test, method_name, num):
-    if not test:
-        return ''
-    msg = ''
-    actual = test[0]
-    actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
-    actual = actual.replace('"', '\\"')
-    expected = test[1]
-    expected = expected.replace('"', '\\"')
-    passed_data = f': {method_name}({actual}) -> {expected}'
-    failed_data = f': {method_name}({actual})'
-    if len(test) == 3:
-        message = test[2]
-        if message:
-            if message == 'example':
-                msg = ''
-            elif message == 'hidden':
-                passed_data = ': hidden'
-                failed_data = ': hidden'
-            else:
-                message = message.strip('"')
-                msg = f'{message}\\n\\n'
-                passed_data = ''
-                failed_data = ''
+def get_run_tests_code(passed_data, failed_data, message, num):
     return f'       if (runTest(new Test{num}())) {{\n' \
            f'           passed_tests++;\n' \
-           f'           feedback += "{msg}Test <span style=\\"color:green\\"><b>PASSED</b></span>' \
+           f'           feedback += "{message}Test <span style=\\"color:green\\"><b>PASSED</b></span>' \
            f'{passed_data}\\n\\n";\n' \
            f'       }} else {{\n' \
-           f'           feedback += "{msg}Test <span style=\\"color:red\\"><b>FAILED</b></span>' \
+           f'           feedback += "{message}Test <span style=\\"color:red\\"><b>FAILED</b></span>' \
            f'{failed_data}\\n";\n' \
            f'           try {{\n' \
            f'               Object exp = Test{num}.getExpectedVal();\n' \
