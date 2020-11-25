@@ -71,10 +71,7 @@ def get_tester_code(exercise_data):
     for test in parsed_tests:
         num += 1
         actual = test[0]
-        actual = actual.replace('"', '\\"')
-
         expected = test[1]
-        expected = expected.replace('"', '\\"')
         expected = expected.strip() if expected is not None else expected
 
         passed_data = f': {method_name}({actual}) -> {expected}'
@@ -147,6 +144,11 @@ def get_unit_tests_code(actual, expected, method_name, class_name, num):
 
 
 def get_run_tests_code(passed_data, failed_data, message, num):
+    new_regex = re.compile(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*')
+    passed_data = passed_data.replace('"', '\\"')
+    failed_data = failed_data.replace('"', '\\"')
+    passed_data = new_regex.sub('', passed_data)
+    failed_data = new_regex.sub('', failed_data)
     return f'       if (runTest(new Test{num}())) {{\n' \
            f'           passed_tests++;\n' \
            f'           feedback += "{message}Test <span style=\\"color:green\\"><b>PASSED</b></span>' \
