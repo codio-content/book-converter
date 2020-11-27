@@ -19,6 +19,9 @@ if len(sys.argv) > 1:
     ex_private_path = f'.guides/secure/assessments/{ex_path}'
     file_path = f'{ex_private_path}/{class_name}.java'
 
+with open(f'{ex_private_path}/static_checks') as f:
+    static_checks = f.read()
+
 with open(f'{ex_private_path}/wrapper_code.java') as f:
     wrapper_code = f.read()
 
@@ -37,8 +40,8 @@ output = output.strip()
 error = error.strip()
 
 if error:
-    err_match = re.search('^\S+\.java:\s*([0-9]+)\s*:\s*(?:warning:\s*)?(.*)', error)
-    err_type = re.search('^\s*(found|expected|required|symbol)\s*:\s*(.*)', error, flags=re.MULTILINE)
+    err_match = re.search(r'^\S+\.java:\s*([0-9]+)\s*:\s*(?:warning:\s*)?(.*)', error)
+    err_type = re.search(r'^\s*(found|expected|required|symbol)\s*:\s*(.*)', error, flags=re.MULTILINE)
 
     insert_marker_re = re.compile(r"(.*?)[ ]*\b___\b", flags=re.DOTALL)
     match = insert_marker_re.search(wrapper_code)
@@ -59,8 +62,7 @@ if error:
     exit(1)
 #############################
 
-p = subprocess.Popen(f'java -cp /tmp/ Tester', shell=True, stdout=subprocess.PIPE,
-                     universal_newlines=True)
+p = subprocess.Popen(f'java -cp /tmp/ Tester', shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 output, error = p.communicate()
 output = output.strip()
 
@@ -71,11 +73,100 @@ if error:
     sys.exit(1)
 
 output = output.split('\n')
-total_tests = output.pop(0)
-passed_tests = output.pop(0)
+total_unit_tests = output.pop(0)
+passed_unit_tests = output.pop(0)
+method = output.pop(0)
 feedback = '\n'.join(output)
 
-grade = int(passed_tests) / int(total_tests) * 100
+
+##############################
+
+def get_required_count(value):
+    required_min_count = 1
+    required_max_count = None
+    opt1 = re.search(r'\s*(required|true|yes|present|found)\s*', value)
+    opt2 = re.search(r'\s*(prohibited|false|no|absent|not\s*found)\s*', value)
+    opt3 = re.search(r'\s*{\s*([0-9]+)\s*,\s*([0-9]+)\s*}\s*', value)
+    opt4 = re.search(r'\s*{\s*,\s*([0-9]+)\s*}\s*', value)
+    opt5 = re.search(r'\s*{\s*([0-9]+)\s*,\s*}\s*', value)
+    if opt1:
+        required_min_count = 1
+    elif opt2:
+        required_min_count = 0
+        required_max_count = 0
+    elif opt3:
+        required_min_count = int(opt3[1])
+        required_max_count = int(opt3[2])
+    elif opt4:
+        required_min_count = 0
+        required_max_count = int(opt4[1])
+    elif opt5:
+        required_min_count = int(opt5[1])
+    return required_min_count, required_max_count
+
+
+def get_static_check_regex(value):
+    if re.search(r'^\s*(loops?)\s*', value):
+        return r'\b(for|while|do)\b', 'loops'
+    elif re.search(r'^\s*(recursion)\s*', value):
+        return r'\b((this)\s*\.\s*|)(' + method + r')\s*\(', 'recursion'
+    elif re.search(r'^\s*methods?\s*:\s*', value):
+        method_name = re.search(r'\s*methods?\s*:\s*(?:\.\s*|)(.*?)\s*\(\)', value)[1]
+        return r'\b(\s*\.\s*|)(' + method_name + r')\s*\(\)', f'method: {method_name}()'
+    else:
+        return value, ''
+
+
+def without_comments(data):
+    return re.sub(r'(/\*([^*]|(\*+[^*/]))*\*+/)|(//[^\r\n]*)', '', data)
+
+
+def apply_static_check(line):
+    negative_feedback = ''
+
+    values = line.split('|||')
+    if len(values) > 3:
+        negative_feedback = values[3]
+
+    check_regex, check_type = get_static_check_regex(values[0])
+    required_min_count, required_max_count = get_required_count(values[1])
+    answer = without_comments(answer_code)
+
+    matched = re.findall(check_regex, answer)
+    actual_count = len(matched)
+
+    if actual_count < required_min_count:
+        if negative_feedback == '':
+            negative_feedback = f'Answer must use {check_type}'
+            if required_min_count > 1:
+                negative_feedback = f'{negative_feedback} at least {required_min_count} times'
+        print(negative_feedback)
+        exit(1)
+    elif required_max_count is not None and actual_count > required_max_count:
+        if negative_feedback == '':
+            negative_feedback = f'Answer cannot use {check_type}'
+            if required_max_count > 0:
+                negative_feedback = f'{negative_feedback} more than {required_max_count} times'
+            else:
+                negative_feedback = f'{negative_feedback}'
+        print(negative_feedback)
+        exit(1)
+
+    return f'{values[0]} -> {values[1]}'
+
+
+def get_static_checks_feedback():
+    out = ''
+    for line in static_checks.split('\n'):
+        output_str = apply_static_check(line)
+        out += f'\n{output_str}\nCheck <span style="color:green"><b>PASSED</b></span>\n'
+    return f'\n\n{out}'
+
+
+if static_checks:
+    feedback += get_static_checks_feedback()
+
+grade = int(passed_unit_tests) / int(total_unit_tests) * 100
 print(feedback)
 print("<br><h1>Total Grade: %d </h1>" % grade)
 res = send_partial(grade)

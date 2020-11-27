@@ -33,15 +33,17 @@ def create_assessments_data(guides_dir, generate_dir, exercises):
         wrapper_code_path = data_dir.joinpath('wrapper_code.java')
         starter_code_path = starter_code_dir.joinpath('starter_code.java')
         tester_code_path = data_dir.joinpath('Tester.java')
+        static_checks_path = data_dir.joinpath('static_checks')
 
         wrapper_code = exercise_data['wrapper_code']
         starter_code = exercise_data['starter_code']
         starter_code = starter_code.replace("___", "// Write your code below")
-        tester_code = get_tester_code(exercise_data)
+        tester_code, static_checks = get_tester_code(exercise_data)
 
         write_file(tester_code_path, tester_code)
         write_file(wrapper_code_path, wrapper_code)
         write_file(starter_code_path, starter_code)
+        write_file(static_checks_path, static_checks)
 
 
 def get_parsed_tests(exercise_data):
@@ -63,13 +65,12 @@ def get_tester_code(exercise_data):
     message = ''
     run_tests = ''
     unit_tests = ''
+    static_checks = []
     class_name = exercise_data.get('class_name', '')
     method_name = exercise_data.get('method_name', '')
     parsed_tests = get_parsed_tests(exercise_data)
-    tests_count = len(parsed_tests)
 
     for test in parsed_tests:
-        num += 1
         actual = test[0]
         expected = test[1]
         expected = expected.strip() if expected is not None else expected
@@ -80,6 +81,7 @@ def get_tester_code(exercise_data):
         if len(test) >= 3:
             desc = parse_description_specifier(test[2])
             if desc == 'static':
+                static_checks.append('|||'.join(test))
                 continue
             if desc == 'example':
                 message = ''
@@ -91,22 +93,24 @@ def get_tester_code(exercise_data):
                 message = f'{message}\\n\\n'
                 passed_data = ''
                 failed_data = ''
+        num += 1
         run_tests += get_run_tests_code(passed_data, failed_data, message, num)
         unit_tests += get_unit_tests_code(actual, expected, method_name, class_name, num)
 
-    return f'import java.util.Objects;\n' \
+    code = f'import java.util.Objects;\n' \
            f'import java.util.concurrent.Callable;\n' \
            f'\n' \
            f'public class Tester {{\n' \
            f'   public static void main(String[] args) {{\n' \
-           f'       int total_tests = {tests_count};\n' \
+           f'       int total_tests = {num};\n' \
            f'       int passed_tests = 0;\n' \
            f'       String feedback = "";\n' \
+           f'       String method_name = "{method_name}";\n' \
            f'\n' \
            f'{run_tests}' \
            f'       String total = "" + total_tests;\n' \
            f'       String passed = "" + passed_tests;\n' \
-           f'       String output = total + "\\n" + passed +"\\n" + feedback;\n' \
+           f'       String output = total + "\\n" + passed + "\\n" + method_name + "\\n" + feedback;\n' \
            f'       System.out.println(output);\n' \
            f'   }}\n' \
            f'\n' \
@@ -119,6 +123,7 @@ def get_tester_code(exercise_data):
            f'   }}\n\n' \
            f'{unit_tests}' \
            f'}}\n'
+    return code, '\n'.join(static_checks)
 
 
 def get_unit_tests_code(actual, expected, method_name, class_name, num):
