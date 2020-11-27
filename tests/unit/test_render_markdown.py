@@ -22,7 +22,7 @@ def load_md(path):
 def load_file(path):
     dn = os.path.dirname(os.path.realpath(__file__))
     fn = os.path.join(dn, path)
-    with open(fn, 'r') as file:
+    with open(fn, 'r', encoding='utf-8') as file:
         return file.read()
 
 
