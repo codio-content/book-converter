@@ -145,7 +145,8 @@ class LaTeX2Markdown(object):
         if images:
             self._pdfs.extend(images)
         output, images, figure_counter = Figure(
-            output, self._figure_counter_offset, self._chapter_num, self._detect_asset_ext, self._caret_token
+            output, self._figure_counter_offset, self._chapter_num, self._detect_asset_ext,
+            self._caret_token, self._refs
         ).convert()
         if images:
             self._pdfs.extend(images)
@@ -177,6 +178,8 @@ class LaTeX2Markdown(object):
         output = UnEscape(output).convert()
         output = Tags(output).convert()
         output = NewLine(output).convert()
+
+        output = re.sub(r"\n? *\\label{.*?}", r"", output)
 
         # convert all matched % back
         output = re.sub(self._percent_token, "%", output)

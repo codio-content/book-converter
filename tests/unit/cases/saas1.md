@@ -1,8 +1,6 @@
 ###  Software Development Processes: Plan and Document
 
 
-
-
 > If builders built buildings the way programmers wrote programs, then the first woodpecker that came along would destroy civilization.
 >
 > __Gerald Weinberg, <i>Weinberg's Second Law</i>__
