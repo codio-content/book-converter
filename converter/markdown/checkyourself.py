@@ -25,6 +25,7 @@ class CheckYouself(TextAsParagraph):
         block_contents = matchobj.group('block_contents')
         block_contents = re.sub(r"\s*\n\s*", " ", block_contents).strip()
         block_contents = block_contents.replace("\\\\", "<br/>")
+        block_contents = re.sub(r"\n? *\\label{.*?} *", r"", block_contents)
         answer_str = answer_re.sub(self.make_answer_block, block_contents)
         caret_token = self._caret_token
         answer_str = re.sub(r"\\{", r"{", answer_str)
