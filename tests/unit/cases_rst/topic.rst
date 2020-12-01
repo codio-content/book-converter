@@ -1,0 +1,3 @@
+.. topic:: Example
+
+   If we clarify the definition of sibling...

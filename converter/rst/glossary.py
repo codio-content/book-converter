@@ -5,7 +5,7 @@ class Glossary(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._glossary_re = re.compile(r""".. glossary::\n +:(?P<type>[a-zA-Z]+):\n*(?P<content>(?:\s+[^\n]+\n*)*)""")
+        self._glossary_re = re.compile(r"""\.\. glossary::\n +:(?P<type>[a-zA-Z]+):\n*(?P<content>(?:\s+[^\n]+\n*)*)""")
 
     def _glossary(self, matchobj):
         content = matchobj.group('content')

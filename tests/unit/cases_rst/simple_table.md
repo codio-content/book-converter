@@ -1,4 +1,4 @@
-SymbolVisibility
+Symbol|Visibility
 ------|----------------------------------------------
 ``+``|Public
 ``-``|Private
