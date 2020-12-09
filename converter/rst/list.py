@@ -15,21 +15,21 @@ class List(object):
         items = []
         match_all_items = list(re.finditer(r'^( *)([*+-]|[0-9#]+[.]) [\s\S]+?(?:\n{2,}(?! )(?!\1\2 |\S)\n*|\s*$)',
                                            content, flags=re.MULTILINE))
-        if len(match_all_items) > 1:
-            for item in match_all_items:
-                item = f'{item.group(0)}{caret_token}'
-                item = self._clearing_line_breaks(item)
-                items.append(item)
-            content = '\n'.join(items)
+        for item in match_all_items:
+            item = f'{item.group(0)}{caret_token}'
+            item = self._clearing_line_breaks(item)
+            items.append(item)
+        content = '\n'.join(items)
         return f'{content}\n'
 
     @staticmethod
     def _clearing_text_spaces(data):
         space = re.search('\n *', data)
-        if space:
-            space_count = len(space.group(0))
-            space_regex = f"\n^ {{{space_count}}}"
-            data = re.sub(space_regex, '', data, flags=re.MULTILINE)
+        if not space:
+            return data
+        space_count = len(space.group(0))
+        space_regex = f"\n^ {{{space_count}}}"
+        data = re.sub(space_regex, '', data, flags=re.MULTILINE)
         return data
 
     @staticmethod

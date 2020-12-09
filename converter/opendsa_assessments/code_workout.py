@@ -9,41 +9,47 @@ def create_assessments_data(guides_dir, generate_dir, exercises):
     if not exercises:
         return
     logging.debug("process create odsa test assessments content")
-    odsa_private_ex_dir = guides_dir.joinpath("secure/assessments")
-    odsa_private_ex_dir.mkdir(exist_ok=True, parents=True)
+    odsa_private_dir = guides_dir.joinpath("secure/assessments")
+    odsa_private_dir.mkdir(exist_ok=True, parents=True)
 
-    run_file_path = odsa_private_ex_dir.joinpath('run.py')
+    run_file_path = odsa_private_dir.joinpath('run.py')
     run_file_data = read_file('converter/opendsa_assessments/run.script')
     write_file(run_file_path, run_file_data)
     subprocess.call(f'chmod +x {run_file_path}', shell=True)
 
     for exercise in exercises:
         exercise_data = exercises[exercise]
-        group_name = exercise_data['dir_name']
-        file_name = exercise_data['file_name']
+        write_assessment_files(exercise_data, generate_dir, odsa_private_dir)
 
-        private_group_dir_path = odsa_private_ex_dir.joinpath(group_name)
-        private_group_dir_path.mkdir(exist_ok=True, parents=True)
-        data_dir = private_group_dir_path.joinpath(file_name)
-        data_dir.mkdir(exist_ok=True, parents=True)
 
-        starter_code_dir = generate_dir.joinpath(f'exercises/{group_name}/{file_name}')
-        starter_code_dir.mkdir(exist_ok=True, parents=True)
+def write_assessment_files(exercise_data, generate_dir, odsa_private_dir):
+    group_name = exercise_data.get('dir_name', None)
+    file_name = exercise_data.get('file_name', None)
+    if group_name is None or file_name is None:
+        return
 
-        wrapper_code_path = data_dir.joinpath('wrapper_code.java')
-        starter_code_path = starter_code_dir.joinpath('starter_code.java')
-        tester_code_path = data_dir.joinpath('Tester.java')
-        static_checks_path = data_dir.joinpath('static_checks')
+    private_group_dir_path = odsa_private_dir.joinpath(group_name)
+    private_group_dir_path.mkdir(exist_ok=True, parents=True)
+    data_dir = private_group_dir_path.joinpath(file_name)
+    data_dir.mkdir(exist_ok=True, parents=True)
 
-        wrapper_code = exercise_data['wrapper_code']
-        starter_code = exercise_data['starter_code']
-        starter_code = starter_code.replace("___", "// Write your code below")
-        tester_code, static_checks = get_tester_code(exercise_data)
+    starter_code_dir = generate_dir.joinpath(f'exercises/{group_name}/{file_name}')
+    starter_code_dir.mkdir(exist_ok=True, parents=True)
 
-        write_file(tester_code_path, tester_code)
-        write_file(wrapper_code_path, wrapper_code)
-        write_file(starter_code_path, starter_code)
-        write_file(static_checks_path, static_checks)
+    wrapper_code_path = data_dir.joinpath('wrapper_code.java')
+    starter_code_path = starter_code_dir.joinpath('starter_code.java')
+    tester_code_path = data_dir.joinpath('Tester.java')
+    static_checks_path = data_dir.joinpath('static_checks')
+
+    wrapper_code = exercise_data['wrapper_code']
+    starter_code = exercise_data['starter_code']
+    starter_code = starter_code.replace("___", "// Write your code below")
+    tester_code, static_checks = get_tester_code(exercise_data)
+
+    write_file(tester_code_path, tester_code)
+    write_file(wrapper_code_path, wrapper_code)
+    write_file(starter_code_path, starter_code)
+    write_file(static_checks_path, static_checks)
 
 
 def get_parsed_tests(exercise_data):
@@ -62,7 +68,6 @@ def get_tester_code(exercise_data):
     if not exercise_data:
         return ''
     num = 0
-    message = ''
     run_tests = ''
     unit_tests = ''
     static_checks = []
@@ -73,7 +78,8 @@ def get_tester_code(exercise_data):
     for test in parsed_tests:
         actual = test[0]
         expected = test[1]
-        expected = expected.strip() if expected is not None else expected
+        expected = expected.strip()
+        message = ''
 
         passed_data = f': {method_name}({actual}) -> {expected}'
         failed_data = f': {method_name}({actual})'

@@ -52,8 +52,7 @@ class CodeInclude(object):
                         content = ''
                         continue
                     if line.strip().startswith(end_tag_string):
-                        return f'{caret_token}```{caret_token}{content.strip()}{caret_token}```' \
-                               f'{caret_token}{caret_token}'
+                        break
                 line = re.sub(r"/\* \*\*\* .*? \*\*\* \*/", "", line)
                 content += line
         return f'{caret_token}```{caret_token}{content.strip()}{caret_token}```{caret_token}{caret_token}'

@@ -321,8 +321,6 @@ def convert_custom_assessment(assessment):
 
 
 def convert_code_workout_assessment(assessment):
-    examples_list = []
-    examples = ''
     class_name = assessment.ex_data.get('class_name', '')
     method_name = assessment.ex_data.get('method_name', '')
     instructions = assessment.ex_data.get('question', '')
@@ -331,20 +329,7 @@ def convert_code_workout_assessment(assessment):
     ex_path = assessment.ex_data.get('ex_path', '')
     tests = assessment.ex_data.get('tests', '')
     test_matches = parse_csv_lines(tests)
-
-    for item in test_matches:
-        if len(item) == 3:
-            message = item[2]
-            if message == 'example':
-                actual = item[0]
-                actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
-                expected = item[1]
-                example = f'`{method_name}({actual}) -> {expected}`\n\n'
-                examples_list.append(example)
-    if examples_list:
-        examples = '\n'.join(examples_list)
-        examples = f'\nExamples:\n\n{examples}'
-    instructions = f'{instructions}{examples}'
+    instructions = instructions_with_examples(test_matches, instructions, method_name)
     return {
         'type': 'test',
         'taskId': assessment.id,
@@ -357,6 +342,24 @@ def convert_code_workout_assessment(assessment):
             'points': assessment.points
         }
     }
+
+
+def instructions_with_examples(test_matches, instructions, method_name):
+    examples_list = []
+    examples = ''
+    for item in test_matches:
+        if len(item) == 3:
+            message = item[2]
+            if message == 'example':
+                actual = item[0]
+                actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
+                expected = item[1]
+                example = f'`{method_name}({actual}) -> {expected}`\n\n'
+                examples_list.append(example)
+    if examples_list:
+        examples = '\n'.join(examples_list)
+        examples = f'\nExamples:\n\n{examples}'
+    return f'{instructions}{examples}'
 
 
 def write_assessments(guides_dir, assessments):

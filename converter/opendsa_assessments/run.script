@@ -7,33 +7,7 @@ import re
 sys.path.append('/usr/share/codio/assessments')
 from lib.grade import send_partial
 
-error_msg = ''
-ex_path = ''
-ex_private_path = ''
-file_path = ''
-class_name = ''
 
-if len(sys.argv) > 1:
-    class_name = sys.argv[1]
-    ex_path = f'{sys.argv[2]}'
-    ex_private_path = f'.guides/secure/assessments/{ex_path}'
-    file_path = f'{ex_private_path}/{class_name}.java'
-
-with open(f'{ex_private_path}/static_checks') as f:
-    static_checks = f.read()
-
-with open(f'{ex_private_path}/wrapper_code.java') as f:
-    wrapper_code = f.read()
-
-with open(f'exercises/{ex_path}/starter_code.java') as f:
-    answer_code = f.read()
-
-code = re.sub(r"\b___\b", answer_code, wrapper_code)
-with open(file_path, 'w', encoding="utf-8") as f:
-    f.write(code)
-
-
-#############################
 def run_unit_tests():
     p = subprocess.Popen(f'javac -d /tmp/ {file_path} {ex_private_path}/Tester.java', shell=True,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
@@ -163,13 +137,39 @@ def get_static_checks_feedback():
     return f'\n\n{out}'
 
 
-feedback, total_unit_tests, passed_unit_tests, method = run_unit_tests()
+def read_file(f_path):
+    with open(f_path) as file:
+        return file.read()
 
-if static_checks:
-    feedback += get_static_checks_feedback()
 
-grade = int(passed_unit_tests) / int(total_unit_tests) * 100
-print(feedback)
-print("<br><h1>Total Grade: %d </h1>" % grade)
-res = send_partial(grade)
-exit(0 if res else 1)
+if __name__ == '__main__':
+    error_msg = ''
+    ex_path = ''
+    ex_private_path = ''
+    file_path = ''
+    class_name = ''
+
+    if len(sys.argv) > 1:
+        class_name = sys.argv[1]
+        ex_path = f'{sys.argv[2]}'
+        ex_private_path = f'.guides/secure/assessments/{ex_path}'
+        file_path = f'{ex_private_path}/{class_name}.java'
+
+    static_checks = read_file(f'{ex_private_path}/static_checks')
+    wrapper_code = read_file(f'{ex_private_path}/wrapper_code.java')
+    answer_code = read_file(f'exercises/{ex_path}/starter_code.java')
+    code = re.sub(r"\b___\b", answer_code, wrapper_code)
+
+    with open(file_path, 'w', encoding="utf-8") as f:
+        f.write(code)
+
+    feedback, total_unit_tests, passed_unit_tests, method = run_unit_tests()
+
+    if static_checks:
+        feedback += get_static_checks_feedback()
+
+    grade = int(passed_unit_tests) / int(total_unit_tests) * 100
+    print(feedback)
+    print("<br><h1>Total Grade: %d </h1>" % grade)
+    res = send_partial(grade)
+    exit(0 if res else 1)
