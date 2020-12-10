@@ -100,8 +100,8 @@ def get_tester_code(exercise_data):
                 passed_data = ''
                 failed_data = ''
         num += 1
-        run_tests += get_run_tests_code(passed_data, failed_data, message, num)
-        unit_tests += get_unit_tests_code(actual, expected, method_name, class_name, num)
+        run_tests += get_run_test_code(passed_data, failed_data, message, num)
+        unit_tests += get_unit_test_code(actual, expected, method_name, class_name, num)
 
     code = f'import java.util.Objects;\n' \
            f'import java.util.concurrent.Callable;\n' \
@@ -132,7 +132,7 @@ def get_tester_code(exercise_data):
     return code, '\n'.join(static_checks)
 
 
-def get_unit_tests_code(actual, expected, method_name, class_name, num):
+def get_unit_test_code(actual, expected, method_name, class_name, num):
     return f'   public static class Test{num} implements Callable<Boolean>{{\n' \
            f'       private static final {class_name} instance = new {class_name}();\n' \
            f'\n' \
@@ -154,7 +154,7 @@ def get_unit_tests_code(actual, expected, method_name, class_name, num):
            f'\n'
 
 
-def get_run_tests_code(passed_data, failed_data, message, num):
+def get_run_test_code(passed_data, failed_data, message, num):
     new_regex = re.compile(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*')
     passed_data = passed_data.replace('"', '\\"')
     failed_data = failed_data.replace('"', '\\"')
