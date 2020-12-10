@@ -5,18 +5,18 @@ import subprocess
 import re
 
 sys.path.append('/usr/share/codio/assessments')
-from lib.grade import send_partial
+from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
 
-def run_unit_tests():
+def run_unit_tests(static):
     p = subprocess.Popen(f'javac -d /tmp/ {file_path} {ex_private_path}/Tester.java', shell=True,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-    output, error = p.communicate()
-    error = error.strip()
+    out, compile_error = p.communicate()
+    compile_error = compile_error.strip()
 
-    if error:
-        err_match = re.search(r'^\S+\.java:\s*([0-9]+)\s*:\s*(?:warning:\s*)?(.*)', error)
-        err_type = re.search(r'^\s*(found|expected|required|symbol)\s*:\s*(.*)', error, flags=re.MULTILINE)
+    if compile_error:
+        err_match = re.search(r'^\S+\.java:\s*([0-9]+)\s*:\s*(?:warning:\s*)?(.*)', compile_error)
+        err_type = re.search(r'^\s*(found|expected|required|symbol)\s*:\s*(.*)', compile_error, flags=re.MULTILINE)
 
         insert_marker_re = re.compile(r"(.*?)[ ]*\b___\b", flags=re.DOTALL)
         match = insert_marker_re.search(wrapper_code)
@@ -31,28 +31,31 @@ def run_unit_tests():
                 error_message = f'line {line_no}: {err_match.group(2)}: {err_type.group(2)}'
             else:
                 error_message = f'line {line_no}: {err_match.group(2)}'
-            print(error_message)
+            return error_message, 1, 0, 0
         else:
-            print("ERROR: no answer insertion marker in wrapper code")
-        exit(1)
+            return "ERROR: no answer insertion marker in wrapper code", 1, 0, 0
 
     p = subprocess.Popen(f'java -cp /tmp/ Tester', shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-    output, error = p.communicate()
-    output = output.strip()
+    out, runtime_error = p.communicate()
+    out = out.strip()
 
     if p.returncode != 0:
-        sys.exit(1)
-    if error:
-        print(error)
-        sys.exit(1)
+        return runtime_error, 1, 0, 0
 
-    output = output.split('\n')
-    total_tests = output.pop(0)
-    passed_tests = output.pop(0)
-    method_name = output.pop(0)
-    feedback_output = '\n'.join(output)
+    out = out.split('\n')
+    total_tests = out.pop(0)
+    passed_tests = out.pop(0)
+    method_name = out.pop(0)
+    feedback_output = '\n'.join(out)
 
-    return feedback_output, total_tests, passed_tests, method_name
+    if static:
+        static_output, static_ret_code = run_static_checks(method_name)
+        if static_ret_code == 0:
+            feedback_output += static_output
+        else:
+            return static_output, 1, 0, 0
+
+    return feedback_output, 0, total_tests, passed_tests
 
 
 def get_required_count(value):
@@ -79,7 +82,7 @@ def get_required_count(value):
     return required_min_count, required_max_count
 
 
-def get_static_check_regex(value):
+def get_static_check_regex(value, method):
     if re.search(r'^\s*(loops?)\s*', value):
         return r'\b(for|while|do)\b', 'loops'
     elif re.search(r'^\s*(recursion)\s*', value):
@@ -95,14 +98,14 @@ def without_comments(data):
     return re.sub(r'(/\*([^*]|(\*+[^*/]))*\*+/)|(//[^\r\n]*)', '', data)
 
 
-def apply_static_check(line):
+def apply_static_check(line, method):
     negative_feedback = ''
 
     values = line.split('|||')
     if len(values) > 3:
         negative_feedback = values[3]
 
-    check_regex, check_type = get_static_check_regex(values[0])
+    check_regex, check_type = get_static_check_regex(values[0], method)
     required_min_count, required_max_count = get_required_count(values[1])
     answer = without_comments(answer_code)
 
@@ -114,8 +117,7 @@ def apply_static_check(line):
             negative_feedback = f'Answer must use {check_type}'
             if required_min_count > 1:
                 negative_feedback = f'{negative_feedback} at least {required_min_count} time(s)'
-        print(negative_feedback)
-        exit(1)
+        return negative_feedback, 1
     elif required_max_count is not None and actual_count > required_max_count:
         if negative_feedback == '':
             negative_feedback = f'Answer cannot use {check_type}'
@@ -123,18 +125,19 @@ def apply_static_check(line):
                 negative_feedback = f'{negative_feedback} more than {required_max_count} time(s)'
             else:
                 negative_feedback = f'{negative_feedback}'
-        print(negative_feedback)
-        exit(1)
+        return negative_feedback, 1
 
-    return f'{values[0]} -> {values[1]}'
+    return f'{values[0]} -> {values[1]}', 0
 
 
-def get_static_checks_feedback():
+def run_static_checks(method):
     out = ''
     for line in static_checks.split('\n'):
-        output_str = apply_static_check(line)
-        out += f'\n{output_str}\nCheck <span style="color:green"><b>PASSED</b></span>\n'
-    return f'\n\n{out}'
+        output, ret_code = apply_static_check(line, method)
+        if ret_code != 0:
+            return output, 1
+        out += f'\n{output}\nTest <span style="color:green"><b>PASSED</b></span>\n'
+    return f'\n\n{out}', 0
 
 
 def read_file(f_path):
@@ -163,13 +166,14 @@ if __name__ == '__main__':
     with open(file_path, 'w', encoding="utf-8") as f:
         f.write(code)
 
-    feedback, total_unit_tests, passed_unit_tests, method = run_unit_tests()
+    feedback, ret_code, total_tests, passed_tests = run_unit_tests(static_checks)
 
-    if static_checks:
-        feedback += get_static_checks_feedback()
+    if ret_code == 0:
+        grade = round(int(passed_tests) / int(total_tests) * 100)
+    else:
+        grade = 0
 
-    grade = int(passed_unit_tests) / int(total_unit_tests) * 100
-    print(feedback)
-    print("<br><h1>Total Grade: %d </h1>" % grade)
-    res = send_partial(grade)
+    output = f'{feedback}<br/><br/><h1>Total Grade: {grade}</h1>'
+
+    res = send_partial_v2(grade, output, FORMAT_V2_HTML)
     exit(0 if res else 1)
