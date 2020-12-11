@@ -143,8 +143,8 @@ class InlineAv(object):
     def detect_height_from_css(self, css_names, image_id):
         for css_name in css_names:
             css_path = self._workspace_dir.joinpath(css_name)
-            iframe_height_by_path = self._get_iframe_height_by_path(css_path, image_id)
-            if css_path.exists() and iframe_height_by_path:
+            iframe_height_by_path = self._get_iframe_height_by_path(css_path, image_id) if css_path.exists() else None
+            if iframe_height_by_path:
                 return iframe_height_by_path
         return 250
 

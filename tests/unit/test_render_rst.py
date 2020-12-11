@@ -1,3 +1,4 @@
+import pathlib
 import unittest
 import os
 
@@ -38,23 +39,25 @@ class TestSuite(unittest.TestCase):
         converter = make_converter(path)
         write_md_case(name, converter.to_markdown())
 
-    def run_case(self, name):
+    def run_case(self, name, custom_workspace_dir=None):
         path = "cases_rst/{}".format(name)
         converter = make_converter(path)
+        if custom_workspace_dir:
+            converter.workspace_dir = custom_workspace_dir
         self.assertEqual(load_md(path), converter.to_markdown().rstrip('\n'))
 
-    # def test_avembed_render(self):
-    #     self.run_case("avembed")
+    def test_avembed_render(self):
+        self.run_case("avembed")
 
-    # def test_inlineav_render(self):
-    #     self.run_case("inlineav")
-    #     converter = make_converter("cases_rst/{}".format("inlineav"))
-    #     converter.to_markdown()
-    #     js_av_images = converter.get_iframe_images()
-    #     self.assertEqual(len(js_av_images), 1)
-    #     self.assertTrue('chomskycon' in js_av_images[0].src.lower())
-    #     self.assertTrue('chomskycon' in js_av_images[0].path.lower())
-    #     self.assertTrue('chomskycon' in js_av_images[0].content.lower())
+    def test_inlineav_render(self):
+        self.run_case("inlineav")
+        converter = make_converter("cases_rst/{}".format("inlineav"))
+        converter.to_markdown()
+        js_av_images = converter.get_iframe_images()
+        self.assertEqual(len(js_av_images), 1)
+        self.assertTrue('chomskycon' in js_av_images[0].src.lower())
+        self.assertTrue('chomskycon' in js_av_images[0].path.lower())
+        self.assertTrue('chomskycon' in js_av_images[0].content.lower())
 
     def test_table_render(self):
         self.run_case("table")
@@ -77,8 +80,8 @@ class TestSuite(unittest.TestCase):
     def test_bibliography_render(self):
         self.run_case('bibliography')
 
-    # def test_code_include_render(self):
-    #     self.run_case('code_include')
+    def test_code_include_render(self):
+        self.run_case('code_include', pathlib.Path.cwd().joinpath('./tests/unit/cases_rst'))
 
     def test_glossary_render(self):
         self.run_case('glossary')
