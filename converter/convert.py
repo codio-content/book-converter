@@ -348,18 +348,24 @@ def instructions_with_examples(test_matches, instructions, method_name):
     examples_list = []
     examples = ''
     for item in test_matches:
-        if len(item) == 3:
-            message = item[2]
-            if message == 'example':
-                actual = item[0]
-                actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
-                expected = item[1]
-                example = f'`{method_name}({actual}) -> {expected}`\n\n'
-                examples_list.append(example)
+        example = _get_example(item, method_name)
+        if example:
+            examples_list.append(example)
     if examples_list:
         examples = '\n'.join(examples_list)
         examples = f'\nExamples:\n\n{examples}'
     return f'{instructions}{examples}'
+
+
+def _get_example(item, method_name):
+    example = False
+    message = item[2] if len(item) == 3 else False
+    if message and message == 'example':
+        actual = item[0]
+        actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
+        expected = item[1]
+        example = f'`{method_name}({actual}) -> {expected}`\n\n'
+    return example
 
 
 def write_assessments(guides_dir, assessments):
