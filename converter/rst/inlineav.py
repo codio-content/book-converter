@@ -143,18 +143,23 @@ class InlineAv(object):
     def detect_height_from_css(self, css_names, image_id):
         for css_name in css_names:
             css_path = self._workspace_dir.joinpath(css_name)
-            if not css_path.exists():
-                continue
-            with open(css_path, 'r') as file:
-                css_content = file.read().replace('\n', '')
-                result = re.match(rf"""#{image_id}(?P<content>.*?)}}""", css_content)
-                if result:
-                    css_height_opt = result.group('content')
-                    result_height = re.match(r""".*{.*height(\s)*:(\s)*(?P<height>\d+)px""", css_height_opt)
-                    if result_height:
-                        iframe_height = int(result_height.group('height'))
-                        return iframe_height + 30
+            iframe_height_by_path = self._get_iframe_height_by_path(css_path, image_id)
+            if css_path.exists() and iframe_height_by_path:
+                return iframe_height_by_path
         return 250
+
+    def _get_iframe_height_by_path(self, css_path, image_id):
+        with open(css_path, 'r') as file:
+            css_content = file.read().replace('\n', '')
+            result = re.match(rf"""#{image_id}(?P<content>.*?)}}""", css_content)
+            result_height = self._get_result_height_by_css_height_opt(result) if result is not None else False
+            iframe_height = int(result_height.group('height')) if result_height else None
+        return iframe_height
+
+    @staticmethod
+    def _get_result_height_by_css_height_opt(result):
+        css_height_opt = result.group('content')
+        return re.match(r""".*{.*height(\s)*:(\s)*(?P<height>\d+)px""", css_height_opt)
 
     def _get_caption(self, raw_caption):
         counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter}'
