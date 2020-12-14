@@ -10,7 +10,6 @@ class Ref(object):
     def _ref(matchobj):
         name = matchobj.group('name')
         name = name.strip()
-        label_name = matchobj.group('label_name')
         return f'Chapter: **{name}**'
 
     def convert(self):
