@@ -12,7 +12,6 @@ class CodeInclude(object):
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
     def _code_include(self, matchobj):
-        options = {}
         lines = []
         content = ''
         tag = None
@@ -22,14 +21,10 @@ class CodeInclude(object):
         option_re = re.compile('[\t ]+:([^:]+): (.+)')
         path = matchobj.group('path').strip()
         path = pathlib.Path(path)
-        opt = matchobj.group('options')
-        if opt:
-            opt = opt.split('\n')
-            for item in opt:
-                match = option_re.match(item)
-                if match:
-                    options[match[1]] = match[2]
-                    tag = options.get('tag', '')
+        option = matchobj.group('options')
+        if option:
+            match = option_re.match(option)
+            tag = match.group(2)
         file_path = pathlib.Path(path)
         if not str(file_path).endswith(".java"):
             file_path = "{}.java".format(file_path)

@@ -14,33 +14,33 @@ def run_unit_tests(static):
     out, compile_error = p.communicate()
     compile_error = compile_error.strip()
 
-    if compile_error:
+    if p.returncode != 0:
         err_match = re.search(r'^\S+\.java:\s*([0-9]+)\s*:\s*(?:warning:\s*)?(.*)', compile_error)
         err_type = re.search(r'^\s*(found|expected|required|symbol)\s*:\s*(.*)', compile_error, flags=re.MULTILINE)
 
         insert_marker_re = re.compile(r"(.*?)[ ]*\b___\b", flags=re.DOTALL)
         match = insert_marker_re.search(wrapper_code)
-        if match:
-            pre_lines = match.group(1)
-            pre_lines_count = pre_lines.count("\n")
-            answer_lines_count = wrapper_code.count("\n") if answer_code else 0
-            line_no = int(err_match.group(1)) - pre_lines_count
-            if line_no > answer_lines_count:
-                line_no = answer_lines_count
-            if err_type:
-                error_message = f'line {line_no}: {err_match.group(2)}: {err_type.group(2)}'
-            else:
-                error_message = f'line {line_no}: {err_match.group(2)}'
-            return error_message, 1, 0, 0
-        else:
+        if not match:
             return "ERROR: no answer insertion marker in wrapper code", 1, 0, 0
+
+        pre_lines = match.group(1)
+        pre_lines_count = pre_lines.count("\n")
+        answer_lines_count = wrapper_code.count("\n") if answer_code else 0
+        line_no = int(err_match.group(1)) - pre_lines_count
+        if line_no > answer_lines_count:
+            line_no = answer_lines_count
+        if err_type:
+            error_message = f'line {line_no}: {err_match.group(2)}: {err_type.group(2)}'
+        else:
+            error_message = f'line {line_no}: {err_match.group(2)}'
+        return error_message, 1, 0, 0
 
     p = subprocess.Popen(f'java -cp /tmp/ Tester', shell=True, stdout=subprocess.PIPE, universal_newlines=True)
     out, runtime_error = p.communicate()
     out = out.strip()
 
     if p.returncode != 0:
-        return runtime_error, 1, 0, 0
+        return runtime_error, p.returncode, 0, 0
 
     out = out.split('\n')
     total_tests = out.pop(0)
