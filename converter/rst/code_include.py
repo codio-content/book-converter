@@ -38,15 +38,12 @@ class CodeInclude(object):
     @staticmethod
     def _get_tag_by_opt(opt):
         option_re = re.compile('[\t ]+:([^:]+): (.+)')
-        options = {}
-        tag = None
         opt = opt.split('\n')
         for item in opt:
             match = option_re.match(item)
-            if match:
-                options[match[1]] = match[2]
-                tag = options.get('tag', '')
-        return tag
+            if match and match[1] == "tag":
+                return match[2]
+        return ''
 
     @staticmethod
     def _get_content(lines, tag):
