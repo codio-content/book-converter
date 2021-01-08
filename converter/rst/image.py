@@ -56,7 +56,7 @@ class Image(object):
         return output
 
     @staticmethod
-    def _get_caption( raw_caption, reference):
+    def _get_caption(raw_caption, reference):
         caption = raw_caption.replace('\n', ' ')
         caption = caption.strip()
         caption = re.sub(" +", " ", caption)
