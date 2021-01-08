@@ -29,20 +29,26 @@ from converter.rst.tip import Tip
 from converter.rst.todo_block import TodoBlock
 from converter.rst.topic import Topic
 from converter.rst.simple_table import SimpleTable
+from converter.rst.tag_reference import TagReference
 
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
 
 class Rst2Markdown(object):
-    def __init__(self, lines_array, exercises, workspace_dir=pathlib.Path('.'), chapter_num=0, subsection_num=0):
+    def __init__(self, lines_array,
+                 exercises,
+                 tag_references=None,
+                 workspace_dir=pathlib.Path('.'),
+                 chapter_num=0,
+                 subsection_num=0):
         self._caret_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
-        self._figure_counter = 0
         self._assessments = list()
         self._iframe_images = list()
         self.lines_array = lines_array
         self._exercises = exercises
+        self._tag_references = tag_references
         self.workspace_dir = workspace_dir
 
     def _enum_lists_parse(self, lines):
@@ -63,9 +69,6 @@ class Rst2Markdown(object):
     def bullet_match(line):
         return re.search(r'^ *#[.|)] ', line)
 
-    def get_figure_counter(self):
-        return self._figure_counter
-
     @staticmethod
     def load_file(path):
         with open(path, 'r') as file:
@@ -83,6 +86,7 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
+        output = TagReference(output, self._tag_references).convert()
         output, assessments = ExtrToolEmbed(output, self._exercises).convert()
         if assessments:
             self._assessments.extend(assessments)
@@ -91,21 +95,12 @@ class Rst2Markdown(object):
         output = Heading(output, self._caret_token).convert()
         output = Definition(output, self._caret_token).convert()
         output = TodoBlock(output).convert()
-        output, figure_counter = Topic(output, self._caret_token,
-                                       self._chapter_num, self._subsection_num,
-                                       self._figure_counter).convert()
-        if figure_counter:
-            self._figure_counter = figure_counter
-
+        output = Topic(output, self._caret_token, self._tag_references).convert()
         output = Tip(output, self._caret_token).convert()
-        output = Image(output, self._caret_token, self._chapter_num, self._subsection_num).convert()
-        output, figure_counter, iframe_images = InlineAv(output, self._caret_token,
-                                                         self.workspace_dir, self._chapter_num,
-                                                         self._subsection_num, OPEN_DSA_CDN,
-                                                         self._figure_counter
-                                                         ).convert()
-        if figure_counter:
-            self._figure_counter = figure_counter
+        output = Image(output, self._caret_token, self._tag_references).convert()
+        output, iframe_images = InlineAv(output, self._caret_token,
+                                         self.workspace_dir, OPEN_DSA_CDN,
+                                         self._tag_references).convert()
         if iframe_images:
             self._iframe_images.extend(iframe_images)
 

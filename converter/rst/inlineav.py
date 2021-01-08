@@ -3,7 +3,6 @@ from converter.guides.tools import slugify
 from string import Template
 from collections import namedtuple
 
-Figure = namedtuple('Figure', ['position', 'tag'])
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
 GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
@@ -59,17 +58,13 @@ function sendPostMessage() {{
 class InlineAv(object):
     def __init__(self, source_string,
                  caret_token, workspace_dir,
-                 chapter_num, subsection_num,
-                 open_dsa_cdn, figure_counter):
+                 open_dsa_cdn, tags):
         self.str = source_string
         self._caret_token = caret_token
         self._workspace_dir = workspace_dir
-        self._chapter_num = chapter_num
-        self._subsection_num = subsection_num
         self._open_dsa_cdn = open_dsa_cdn
-        self._figure_counter = figure_counter
         self._iframe_images = list()
-        self._figures = list()
+        self._tags = tags
         self._inlineav_re = re.compile(
             r"""(\.\.[ ]_(?P<tag>.*?):\n^$\n)?\.\.[ ]inlineav::[ ](?P<name>.*?)[ ]
                 (?P<type>.*?)(?P<options>:.*?:[ ].*?\n)+(?=\S|$)(?P<caption>(.*?\n))?(?=\S|$)""",
@@ -94,12 +89,12 @@ class InlineAv(object):
         script_opt = script_opt.split()
         css_opt = images.get('links', '')
         css_opt = css_opt.split()
-        self._figure_counter += 1
-        caption = self._get_caption(matchobj.group('caption'))
 
+        reference = ''
         tag = matchobj.group('tag') if matchobj.group('tag') is not None else False
-        if tag:
-            self._figures.append(Figure(self._figure_counter, matchobj.group('tag')))
+        if tag and tag in self._tags:
+            reference = self._tags[tag]
+        caption = self._get_caption(matchobj.group('caption'), reference)
 
         scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src="{self._open_dsa_cdn}/{x}">'
                                              f'</script>{caret_token}', script_opt)))
@@ -161,22 +156,14 @@ class InlineAv(object):
         css_height_opt = result.group('content')
         return re.match(r""".*{.*height(\s)*:(\s)*(?P<height>\d+)px""", css_height_opt)
 
-    def _get_caption(self, raw_caption):
-        counter = f'{self._chapter_num}.{self._subsection_num}.{self._figure_counter}'
+    def _get_caption(self, raw_caption, reference):
         caption = ': '
         if raw_caption:
             caption = raw_caption.replace('\n', ' ')
             caption = re.sub(r'\s+', ' ', caption)
-        return f'<center>Figure {counter}{caption}</center><br/>{self._caret_token}{self._caret_token}'
-
-    def _set_figure_links_by_tag(self, output):
-        for figure in self._figures:
-            output = output.replace(f':num:`Figure #{figure.tag}`',
-                                    f'{self._chapter_num}.{self._subsection_num}.{figure.position}')
-        return output
+        return f'<center>Figure {reference}{caption}</center><br/>{self._caret_token}{self._caret_token}'
 
     def convert(self):
         output = self.str
         output = self._inlineav_re.sub(self._inlineav, output)
-        output = self._set_figure_links_by_tag(output)
-        return output, self._figure_counter, self._iframe_images
+        return output, self._iframe_images

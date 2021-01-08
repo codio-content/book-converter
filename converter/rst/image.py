@@ -1,18 +1,13 @@
 import re
-from collections import namedtuple
 
 MASK_IMAGE_TO_MD = '![{alt}]({image}){caret_token}{caption}{caret_token}{caret_token}\n'
-Figure = namedtuple('Figure', ['position', 'tag'])
 
 
 class Image(object):
-    def __init__(self, source_string, caret_token, chapter_num, subsection_num):
+    def __init__(self, source_string, caret_token, tags):
         self.str = source_string
         self._caret_token = caret_token
-        self._chapter_num = chapter_num
-        self._subsection_num = subsection_num
-        self._figure_counter = 1
-        self._figures = list()
+        self._tags = tags
         self._image_re = re.compile(
             r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]odsafig::[ ](?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
                 (\n(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
@@ -36,24 +31,16 @@ class Image(object):
         image = matchobj.group('path')
         output = MASK_IMAGE_TO_MD.replace('{image}', image)
         output = self._set_alt(output, matchobj.group('options'))
-        output = self._set_caption(output, matchobj.group('caption'))
-        output = output.replace('{caret_token}', caret_token)
-
+        reference = ''
         tag = matchobj.group('tag') if matchobj.group('tag') is not None else False
-        if tag:
-            self._figures.append(Figure(self._figure_counter, matchobj.group('tag')))
-        self._figure_counter += 1
-
+        if tag and tag in self._tags:
+            reference = self._tags[tag]
+        output = self._set_caption(output, matchobj.group('caption'), reference)
+        output = output.replace('{caret_token}', caret_token)
         return output
 
-    def _set_figure_links_by_tag(self, output):
-        for figure in self._figures:
-            output = output.replace(f':num:`Figure #{figure.tag}`',
-                                    f'{self._chapter_num}.{self._subsection_num}.{figure.position}')
-        return output
-
-    def _set_caption(self, output, raw_caption):
-        caption = self._get_caption(raw_caption) if raw_caption is not None else False
+    def _set_caption(self, output, raw_caption, reference):
+        caption = self._get_caption(raw_caption, reference) if raw_caption is not None else False
         if caption:
             output = output.replace('{alt}', caption)
             output = output.replace('{caption}', '{caret_token}' + caption)
@@ -68,15 +55,15 @@ class Image(object):
             output = output.replace('{alt}', alt)
         return output
 
-    def _get_caption(self, raw_caption):
+    @staticmethod
+    def _get_caption( raw_caption, reference):
         caption = raw_caption.replace('\n', ' ')
         caption = caption.strip()
         caption = re.sub(" +", " ", caption)
-        return f'**Figure {self._chapter_num}.{self._subsection_num}.{self._figure_counter}:** *{caption}*'
+        return f'**Figure {reference}:** *{caption}*'
 
     def convert(self):
         output = self.str
         output = self._image_re.sub(self._image, output)
         output = self._figure_re.sub(self._image, output)
-        output = self._set_figure_links_by_tag(output)
         return output

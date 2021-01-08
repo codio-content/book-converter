@@ -647,6 +647,27 @@ def process_iframe_images(config, generate_dir, iframe_images):
             write_file(write_path, image.content)
 
 
+def get_tag_references(toc):
+    tag_references = dict()
+    chapter_num = 0
+    subsection_num = 0
+    for item in toc:
+        local_tag_counter = 1
+        if item.section_type == CHAPTER:
+            subsection_num = 0
+            chapter_num += 1
+        else:
+            subsection_num += 1
+
+        output = '\n'.join(item.lines)
+        tags = list(re.finditer(r"""(\.\.[ ]_(?P<name>[a-zA-Z0-9]*):)""", output))
+
+        for tag in tags:
+            tag_references[tag.group('name')] = f'{chapter_num}.{subsection_num}.{local_tag_counter}'
+            local_tag_counter += 1
+    return tag_references
+
+
 def convert_rst(config, base_path, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
@@ -671,6 +692,7 @@ def convert_rst(config, base_path, yes=False):
     label_counter = 0
     all_assessments = list()
     iframe_images = list()
+    tag_references = get_tag_references(toc)
 
     for item in toc:
         if item.section_type == CHAPTER:
@@ -697,6 +719,7 @@ def convert_rst(config, base_path, yes=False):
             rst_converter = Rst2Markdown(
                 lines,
                 exercises,
+                tag_references,
                 workspace_dir=workspace_dir,
                 chapter_num=chapter_num,
                 subsection_num=subsection_num
