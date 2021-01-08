@@ -48,8 +48,8 @@ class Image(object):
 
     def _set_figure_links_by_tag(self, output):
         for figure in self._figures:
-            output = output.replace(f'Figure :num:`Figure #{figure.tag}`',
-                                    f'Figure {self._chapter_num}.{self._subsection_num}.{figure.position}')
+            output = output.replace(f':num:`Figure #{figure.tag}`',
+                                    f'{self._chapter_num}.{self._subsection_num}.{figure.position}')
         return output
 
     def _set_caption(self, output, raw_caption):

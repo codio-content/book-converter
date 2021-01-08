@@ -113,7 +113,6 @@ class Rst2Markdown(object):
         if assessments:
             self._assessments.extend(assessments)
 
-        output = List(output, self._caret_token).convert()
         output = Ref(output).convert()
         output = Term(output).convert()
         output = Math(output).convert()
@@ -121,6 +120,7 @@ class Rst2Markdown(object):
         output = Table(output, self._caret_token).convert()
         output = Epigraph(output, self._caret_token).convert()
         output = Paragraph(output).convert()
+        output = List(output, self._caret_token).convert()
         output = LineBlock(output, self._caret_token).convert()
         output = Sidebar(output, self._caret_token).convert()
         output = ExternalLink(output).convert()
