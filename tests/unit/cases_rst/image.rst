@@ -1,10 +1,6 @@
-The representation of Figure :num:`Figure #GenBin` is likely to be
-easier to implement, space efficient, and more flexible than the other
-implementations presented in this section.
-
 .. _GenBin:
 
-.. odsafig:: Images/GenBin.png
+.. odsafig:: :figure_number:0.0.1: Images/GenBin.png
    :width: 400
    :align: center
    :capalign: justify

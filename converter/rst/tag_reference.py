@@ -8,11 +8,11 @@ class TagReference(object):
         self._tag_reference_re = re.compile(r""":num:`[a-zA-Z0-9]*[ ]#(?P<tag>[a-zA-Z0-9]*)`""")
 
     def _tag_reference(self, matchobj):
-        reference = ''
+        figure_number = ''
         tag = matchobj.group('tag') if matchobj.group('tag') is not None else False
         if tag and tag in self._tags:
-            reference = self._tags[tag]
-        return f'{reference}'
+            figure_number = self._tags[tag]
+        return f'{figure_number}'
 
     def convert(self):
         output = self.str

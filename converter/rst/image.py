@@ -4,15 +4,16 @@ MASK_IMAGE_TO_MD = '![{alt}]({image}){caret_token}{caption}{caret_token}{caret_t
 
 
 class Image(object):
-    def __init__(self, source_string, caret_token, tags):
+    def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._tags = tags
         self._image_re = re.compile(
-            r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]odsafig::[ ](?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
+            r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]odsafig::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
+                (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
                 (\n(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
         self._figure_re = re.compile(
-            r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]figure::[ ](?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
+            r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]figure::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
+                (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
                 (\n(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
 
     @staticmethod
@@ -31,16 +32,13 @@ class Image(object):
         image = matchobj.group('path')
         output = MASK_IMAGE_TO_MD.replace('{image}', image)
         output = self._set_alt(output, matchobj.group('options'))
-        reference = ''
-        tag = matchobj.group('tag') if matchobj.group('tag') is not None else False
-        if tag and tag in self._tags:
-            reference = self._tags[tag]
-        output = self._set_caption(output, matchobj.group('caption'), reference)
+        figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
+        output = self._set_caption(output, matchobj.group('caption'), figure_number)
         output = output.replace('{caret_token}', caret_token)
         return output
 
-    def _set_caption(self, output, raw_caption, reference):
-        caption = self._get_caption(raw_caption, reference) if raw_caption is not None else False
+    def _set_caption(self, output, raw_caption, figure_number):
+        caption = self._get_caption(raw_caption, figure_number) if raw_caption is not None else False
         if caption:
             output = output.replace('{alt}', caption)
             output = output.replace('{caption}', '{caret_token}' + caption)
@@ -56,11 +54,11 @@ class Image(object):
         return output
 
     @staticmethod
-    def _get_caption(raw_caption, reference):
+    def _get_caption(raw_caption, figure_number):
         caption = raw_caption.replace('\n', ' ')
         caption = caption.strip()
         caption = re.sub(" +", " ", caption)
-        return f'**Figure {reference}:** *{caption}*'
+        return f'**Figure {figure_number}:** *{caption}*'
 
     def convert(self):
         output = self.str

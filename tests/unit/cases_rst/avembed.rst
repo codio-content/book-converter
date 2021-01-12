@@ -3,7 +3,7 @@ right branch.
 The following slideshow shows an example for how to decode a message
 by traversing the tree appropriately.
 
-.. inlineav:: huffmanDecodeCON ss
+.. inlineav:: :figure_number:0.0.1: huffmanDecodeCON ss
    :long_name: Huffman Coding Tree Slideshow: Decoding
    :links: DataStructures/huffman.css AV/Binary/huffmanCON.css
    :scripts: DataStructures/huffman.js AV/Binary/huffmanDecodeCON.js
@@ -22,7 +22,7 @@ independent of the context of that letter in the message.
 
 .. slide:: Mid-Square Method
 
-   .. odsafig:: Images/MidSquare.png
+   .. odsafig:: :figure_number:0.0.1: Images/MidSquare.png
       :width: 100
       :align: center
       :capalign: justify

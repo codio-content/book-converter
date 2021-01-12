@@ -4,7 +4,7 @@ from string import Template
 from collections import namedtuple
 
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
-GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
+GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v2'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
 JSAV_IFRAME_SUBPATH = 'jsav/iframe/v6/'
 JSAV_IMAGE_IFRAME = f"""
@@ -24,6 +24,7 @@ JSAV_IMAGE_IFRAME = f"""
 <script type="text/javascript" src="{GUIDES_CDN}/jquery.transit.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/raphael.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/JSAV-min.js"></script>
+<script type="text/javascript" src="{GUIDES_CDN}/odsaAV-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/odsaUtils-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/odsaMOD-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/d3.min.js"></script>
@@ -56,18 +57,15 @@ function sendPostMessage() {{
 
 
 class InlineAv(object):
-    def __init__(self, source_string,
-                 caret_token, workspace_dir,
-                 open_dsa_cdn, tags):
+    def __init__(self, source_string, caret_token, workspace_dir, open_dsa_cdn):
         self.str = source_string
         self._caret_token = caret_token
         self._workspace_dir = workspace_dir
         self._open_dsa_cdn = open_dsa_cdn
         self._iframe_images = list()
-        self._tags = tags
         self._inlineav_re = re.compile(
-            r"""(\.\.[ ]_(?P<tag>.*?):\n^$\n)?\.\.[ ]inlineav::[ ](?P<name>.*?)[ ]
-                (?P<type>.*?)(?P<options>:.*?:[ ].*?\n)+(?=\S|$)(?P<caption>(.*?\n))?(?=\S|$)""",
+            r"""(\.\.[ ]_(?P<tag>.*?):\n^$\n)?\.\.[ ]inlineav::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
+                (?P<name>.*?)[ ](?P<type>.*?)(?P<options>:.*?:[ ].*?\n)+(?=\S|$)(?P<caption>(.*?\n))?(?=\S|$)""",
             flags=re.MULTILINE + re.DOTALL + re.VERBOSE
         )
 
@@ -90,11 +88,8 @@ class InlineAv(object):
         css_opt = images.get('links', '')
         css_opt = css_opt.split()
 
-        reference = ''
-        tag = matchobj.group('tag') if matchobj.group('tag') is not None else False
-        if tag and tag in self._tags:
-            reference = self._tags[tag]
-        caption = self._get_caption(matchobj.group('caption'), reference)
+        figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
+        caption = self._get_caption(matchobj.group('caption'), figure_number)
 
         scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src="{self._open_dsa_cdn}/{x}">'
                                              f'</script>{caret_token}', script_opt)))
@@ -156,12 +151,12 @@ class InlineAv(object):
         css_height_opt = result.group('content')
         return re.match(r""".*{.*height(\s)*:(\s)*(?P<height>\d+)px""", css_height_opt)
 
-    def _get_caption(self, raw_caption, reference):
+    def _get_caption(self, raw_caption, figure_number):
         caption = ': '
         if raw_caption:
             caption = raw_caption.replace('\n', ' ')
             caption = re.sub(r'\s+', ' ', caption)
-        return f'<center>Figure {reference}{caption}</center><br/>{self._caret_token}{self._caret_token}'
+        return f'<center>Figure {figure_number}{caption}</center><br/>{self._caret_token}{self._caret_token}'
 
     def convert(self):
         output = self.str

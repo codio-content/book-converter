@@ -31,7 +31,7 @@ from converter.rst.topic import Topic
 from converter.rst.simple_table import SimpleTable
 from converter.rst.tag_reference import TagReference
 
-OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
+OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v4'
 
 
 class Rst2Markdown(object):
@@ -95,12 +95,10 @@ class Rst2Markdown(object):
         output = Heading(output, self._caret_token).convert()
         output = Definition(output, self._caret_token).convert()
         output = TodoBlock(output).convert()
-        output = Topic(output, self._caret_token, self._tag_references).convert()
+        output = Topic(output, self._caret_token).convert()
         output = Tip(output, self._caret_token).convert()
-        output = Image(output, self._caret_token, self._tag_references).convert()
-        output, iframe_images = InlineAv(output, self._caret_token,
-                                         self.workspace_dir, OPEN_DSA_CDN,
-                                         self._tag_references).convert()
+        output = Image(output, self._caret_token,).convert()
+        output, iframe_images = InlineAv(output, self._caret_token, self.workspace_dir, OPEN_DSA_CDN).convert()
         if iframe_images:
             self._iframe_images.extend(iframe_images)
 

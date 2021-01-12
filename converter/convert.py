@@ -647,25 +647,36 @@ def process_iframe_images(config, generate_dir, iframe_images):
             write_file(write_path, image.content)
 
 
-def get_tag_references(toc):
+def prepare_figure_numbers(toc):
     tag_references = dict()
     chapter_num = 0
     subsection_num = 0
     for item in toc:
-        local_tag_counter = 1
         if item.section_type == CHAPTER:
             subsection_num = 0
             chapter_num += 1
         else:
             subsection_num += 1
 
-        output = '\n'.join(item.lines)
-        tags = list(re.finditer(r"""(\.\.[ ]_(?P<name>[a-zA-Z0-9]*):)""", output))
-
-        for tag in tags:
-            tag_references[tag.group('name')] = f'{chapter_num}.{subsection_num}.{local_tag_counter}'
-            local_tag_counter += 1
+        prepare_figure_numbers_for_item(item, chapter_num, subsection_num, tag_references)
     return tag_references
+
+
+def prepare_figure_numbers_for_item(item, chapter_num, subsection_num, tag_references):
+    figure_counter = 1
+    for i in range(len(item.lines)):
+        tag = re.search(r"""(\.\.[ ]_(?P<name>[a-zA-Z0-9]*):)""", item.lines[i])
+        if tag:
+            tag = tag.group('name')
+            tag_references[tag] = f'{chapter_num}.{subsection_num}.{figure_counter}'
+
+        matchobj = re.search(r"""(\.\.[ ](?P<figure_type>[a-z]*)::)""", item.lines[i])
+        figure_type = matchobj.group('figure_type') if matchobj and matchobj.group('figure_type') is not None else False
+        if figure_type and figure_type in ['odsafig', 'figure', 'inlineav', 'topic']:
+            item.lines[i] = item.lines[i].replace(
+                f'{figure_type}::',
+                f'{figure_type}:: :figure_number:{chapter_num}.{subsection_num}.{figure_counter}:')
+            figure_counter += 1
 
 
 def convert_rst(config, base_path, yes=False):
@@ -692,7 +703,7 @@ def convert_rst(config, base_path, yes=False):
     label_counter = 0
     all_assessments = list()
     iframe_images = list()
-    tag_references = get_tag_references(toc)
+    tag_references = prepare_figure_numbers(toc)
 
     for item in toc:
         if item.section_type == CHAPTER:
