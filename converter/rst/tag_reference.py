@@ -5,7 +5,7 @@ class TagReference(object):
     def __init__(self, source_string, tags):
         self.str = source_string
         self._tags = tags
-        self._tag_reference_re = re.compile(r""":num:`[a-zA-Z0-9]*[ ]#(?P<tag>[a-zA-Z0-9]*)`""")
+        self._tag_reference_re = re.compile(r""":num:`[a-zA-Z0-9]*[ ]?#(?P<tag>[a-zA-Z0-9]*)`""")
 
     def _tag_reference(self, matchobj):
         figure_number = ''

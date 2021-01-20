@@ -31,7 +31,7 @@ from converter.rst.topic import Topic
 from converter.rst.simple_table import SimpleTable
 from converter.rst.tag_reference import TagReference
 
-OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v4'
+OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
 
 class Rst2Markdown(object):
@@ -97,7 +97,7 @@ class Rst2Markdown(object):
         output = TodoBlock(output).convert()
         output = Topic(output, self._caret_token).convert()
         output = Tip(output, self._caret_token).convert()
-        output = Image(output, self._caret_token,).convert()
+        output = Image(output, self._caret_token).convert()
         output, iframe_images = InlineAv(output, self._caret_token, self.workspace_dir, OPEN_DSA_CDN).convert()
         if iframe_images:
             self._iframe_images.extend(iframe_images)
@@ -112,8 +112,8 @@ class Rst2Markdown(object):
         output = SimpleTable(output, self._caret_token).convert()
         output = Table(output, self._caret_token).convert()
         output = Epigraph(output, self._caret_token).convert()
-        output = Paragraph(output).convert()
-        output = List(output, self._caret_token).convert()
+        # output = Paragraph(output).convert()
+        # output = List(output, self._caret_token).convert()
         output = LineBlock(output, self._caret_token).convert()
         output = Sidebar(output, self._caret_token).convert()
         output = ExternalLink(output).convert()
@@ -123,5 +123,7 @@ class Rst2Markdown(object):
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
         output = Comment(output).convert()
+        output = re.sub("\n[ ]*", "\n", output)
+        output = Paragraph(output).convert()
         output = re.sub(self._caret_token, "\n", output)
         return output

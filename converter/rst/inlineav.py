@@ -3,8 +3,9 @@ from converter.guides.tools import slugify
 from string import Template
 from collections import namedtuple
 
+LOCAL_TEST = '/temp'
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
-GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v2'
+GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
 JSAV_IFRAME_SUBPATH = 'jsav/iframe/v6/'
 JSAV_IMAGE_IFRAME = f"""
@@ -24,7 +25,6 @@ JSAV_IMAGE_IFRAME = f"""
 <script type="text/javascript" src="{GUIDES_CDN}/jquery.transit.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/raphael.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/JSAV-min.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/odsaAV-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/odsaUtils-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/odsaMOD-min.js"></script>
 <script type="text/javascript" src="{GUIDES_CDN}/d3.min.js"></script>
@@ -53,6 +53,34 @@ function sendPostMessage() {{
 </script>
 </body>
 </html>
+"""
+MATHJAX_IN_AV_CONTAINER_SCRIPT = r"""
+<script>
+  if (typeof MathJax !== 'undefined') {
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [
+            ['$', '$'],
+            ['\\(', '\\)']
+          ],
+          displayMath: [
+            ['$$', '$$'],
+            ["\\[", "\\]"]
+          ],
+          processEscapes: true
+        },
+        "HTML-CSS": {
+          scale: "80"
+        }
+      });
+      $('.avcontainer').on("jsav-message", function() {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      });
+      $(".avcontainer").on("jsav-updatecounter", function() {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      });
+    }
+</script>
 """
 
 
@@ -101,22 +129,25 @@ class InlineAv(object):
         and it allow load it in correct way from cdn root
         """
 
-        iframe_src = f'{self._open_dsa_cdn}/{JSAV_IFRAME_SUBPATH}{iframe_name}.html'
+        # iframe_src = f'{self._open_dsa_cdn}/{JSAV_IFRAME_SUBPATH}{iframe_name}.html'
+        iframe_src = f'{LOCAL_TEST}/{JSAV_IFRAME_SUBPATH}{iframe_name}.html'
         iframe_content = ''
 
         if av_type == 'dgm':
             iframe_content = f'{css_links}\n' \
                              f'<div style="margin: 0" id="{name}"></div>\n' \
-                             f'{scripts}\n'
+                             f'{scripts}\n' \
+                             f'{MATHJAX_IN_AV_CONTAINER_SCRIPT}\n'
         if av_type == 'ss':
             iframe_content = f'{css_links}\n' \
-                             f'<div style="margin: 0" id="{name}" class="ssAV">\n' \
+                             f'<div style="margin: 0" id="{name}" class="ssAV avcontainer">\n' \
                              f'<span class="jsavcounter"></span>\n' \
                              f'<a class="jsavsettings" href="#">Settings</a>\n' \
                              f'<div class="jsavcontrols"></div>\n' \
                              f'<p class="jsavoutput jsavline"></p>\n' \
                              f'<div class="jsavcanvas"></div>\n' \
-                             f'</div>\n{scripts}\n'
+                             f'</div>\n{scripts}\n' \
+                             f'{MATHJAX_IN_AV_CONTAINER_SCRIPT}\n'
 
         iframe_content = re.sub(caret_token, '\n', iframe_content)
         iframe_body = Template(JSAV_IMAGE_IFRAME).substitute(title=name, content=iframe_content, name=name)
