@@ -12,12 +12,15 @@ class List(object):
     def _list(matchobj):
         tabs = matchobj.group('tabs')
         marker = matchobj.group('marker')
-        content = '*'
-        if marker:
-            content = FOUR_SPACES + content
+        indent_size = 0
         if tabs:
-            size = len(tabs)
-            content = size * FOUR_SPACES + content
+            indent_size = len(tabs)
+        if marker and marker == "|":
+            indent_size += 1
+        if indent_size >= 1:
+            indent_size = indent_size - 1
+        content = '* '
+        content = indent_size * FOUR_SPACES + content
         return '\n' + content
 
     def convert(self):

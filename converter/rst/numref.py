@@ -4,7 +4,7 @@ import re
 class Numref(object):
     def __init__(self, source_string):
         self.str = source_string
-        self._numref_re = re.compile(r""":numref:`<(?P<name>.*)>`""")
+        self._numref_re = re.compile(r""":?numref:?`<?(?P<name>.*)>?`""")
 
     @staticmethod
     def _numref(matchobj):
