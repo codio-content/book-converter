@@ -240,6 +240,12 @@ def get_rst_toc(folder, name, exercises={}):
     return toc
 
 
+def _math(matchobj):
+    content = matchobj.group('content')
+    content = content.replace("\\", "")
+    return f'{content}'
+
+
 def process_rst_file(path, exercises):
     with open(path, 'r', errors='replace') as file:
         lines = file.readlines()
@@ -257,6 +263,7 @@ def process_rst_lines(lines, exercises):
         is_chapter = next_line == "=" * len(line)
         if next_line.startswith("===") and is_chapter:
             section_name = line.replace("\\", "\\\\")
+            section_name = re.compile(r""":math:`(?P<content>.*?)`""").sub(_math, section_name)
             toc.append(SectionItem(
                 section_name=section_name,
                 section_type="section",

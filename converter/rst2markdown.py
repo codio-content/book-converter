@@ -16,9 +16,10 @@ from converter.rst.heading import Heading
 from converter.rst.image import Image
 from converter.rst.indented_code import IndentedCode
 from converter.rst.inlineav import InlineAv
-from converter.rst.line_block import LineBlock
+from converter.rst.numref import Numref
 from converter.rst.list import List
 from converter.rst.math import Math
+from converter.rst.math_block import MathBlock
 from converter.rst.only import Only
 from converter.rst.paragraph import Paragraph
 from converter.rst.ref import Ref
@@ -30,6 +31,8 @@ from converter.rst.todo_block import TodoBlock
 from converter.rst.topic import Topic
 from converter.rst.simple_table import SimpleTable
 from converter.rst.tag_reference import TagReference
+from converter.rst.preparer_math_block import PreparerMathBlock
+from converter.rst.character import Character
 
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
 
@@ -42,6 +45,7 @@ class Rst2Markdown(object):
                  chapter_num=0,
                  subsection_num=0):
         self._caret_token = str(uuid.uuid4())
+        self._math_block_separator_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
         self._assessments = list()
@@ -80,13 +84,54 @@ class Rst2Markdown(object):
     def get_iframe_images(self):
         return self._iframe_images
 
+    # def _prepare_math_block(self, arr):
+    #     self.started_math = False
+    #     self.indent = None
+    #     self.last_position_sep = None
+    #     self.separated = False
+    #     for i in range(len(arr)):
+    #         line = arr[i]
+    #         is_started_math = ".. math::" in line
+    #         if is_started_math:
+    #             self.started_math = is_started_math
+    #             continue
+    #         if self.started_math:
+    #             if len(line) == 0 and self.separated is True:
+    #                 arr[self.last_position_sep] = ""
+    #                 self.started_math = False
+    #                 self.indent = None
+    #                 self.last_position_sep = None
+    #                 self.separated = False
+    #                 continue
+    #             if len(line) == 0:
+    #                 self.separated = True
+    #                 if self.indent is None:
+    #                     continue
+    #                 else:
+    #                     arr[i] = f'{self._math_block_separator_token}'
+    #                     self.last_position_sep = i
+    #             else:
+    #                 self.separated = False
+    #                 curr_indent = len(line) - len(line.lstrip())
+    #                 if self.indent is None:
+    #                     self.indent = curr_indent
+    #                 if curr_indent == self.indent:
+    #                     continue
+    #                 else:
+    #                     self.started_math = False
+    #                     self.indent = None
+    #                     if self.last_position_sep is not None:
+    #                         arr[self.last_position_sep] = ""
+
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
-        output = '\n'.join(self.lines_array)
+        lines_array = PreparerMathBlock(self.lines_array, self._math_block_separator_token).prepare()
+        output = '\n'.join(lines_array)
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
         output = TagReference(output, self._tag_references).convert()
+        output = MathBlock(output, self._caret_token, self._math_block_separator_token).convert()
         output, assessments = ExtrToolEmbed(output, self._exercises).convert()
         if assessments:
             self._assessments.extend(assessments)
@@ -107,14 +152,11 @@ class Rst2Markdown(object):
             self._assessments.extend(assessments)
 
         output = Ref(output).convert()
+        output = Numref(output).convert()
         output = Term(output).convert()
-        output = Math(output).convert()
         output = SimpleTable(output, self._caret_token).convert()
         output = Table(output, self._caret_token).convert()
         output = Epigraph(output, self._caret_token).convert()
-        # output = Paragraph(output).convert()
-        # output = List(output, self._caret_token).convert()
-        output = LineBlock(output, self._caret_token).convert()
         output = Sidebar(output, self._caret_token).convert()
         output = ExternalLink(output).convert()
         output = Only(output).convert()
@@ -124,6 +166,10 @@ class Rst2Markdown(object):
         output = Bibliography(output, self._caret_token).convert()
         output = Comment(output).convert()
         output = re.sub("\n[ ]*", "\n", output)
+        # output = output.replace(r"\\$", "<span style='font-size: 80%;'>$</span>")
+        output = Character(output).convert()
         output = Paragraph(output).convert()
+        output = List(output).convert()
+        output = Math(output).convert()
         output = re.sub(self._caret_token, "\n", output)
         return output
