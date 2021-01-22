@@ -1,1 +1,1 @@
-and <span style="color: brown;">**inorder**</span>.
+and <span style="color: brown; font-weight:bold";>inorder</span>.

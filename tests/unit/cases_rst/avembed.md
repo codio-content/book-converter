@@ -22,10 +22,9 @@ In theory, Huffman coding is an optimal coding method whenever the true frequenc
 
 
 
-   ![Mid-square method example](Images/MidSquare.png)
+![Mid-square method example](Images/MidSquare.png)
 
-**Figure 0.0.1:** *
-
+**Figure 0.0.1:** * 
 <iframe id="MidSquare1_iframe" src="https://global.codio.com/opendsa/v4/AV/Hashing/MidSquare1.html?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" class="embeddedExercise" width="950" height="800" data-showhide="show" scrolling="yes" style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>
 
 {Check It!|assessment}(custom-midsquare1)
