@@ -3,9 +3,8 @@ from converter.guides.tools import slugify
 from string import Template
 from collections import namedtuple
 
-LOCAL_TEST = '/temp'
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
-GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
+GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v2'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
 JSAV_IFRAME_SUBPATH = 'jsav/iframe/v6/'
 JSAV_IMAGE_IFRAME = f"""
@@ -129,8 +128,7 @@ class InlineAv(object):
         and it allow load it in correct way from cdn root
         """
 
-        # iframe_src = f'{self._open_dsa_cdn}/{JSAV_IFRAME_SUBPATH}{iframe_name}.html'
-        iframe_src = f'{LOCAL_TEST}/{JSAV_IFRAME_SUBPATH}{iframe_name}.html'
+        iframe_src = f'{self._open_dsa_cdn}/{JSAV_IFRAME_SUBPATH}{iframe_name}.html'
         iframe_content = ''
 
         if av_type == 'dgm':

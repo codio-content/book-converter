@@ -34,7 +34,7 @@ from converter.rst.tag_reference import TagReference
 from converter.rst.preparer_math_block import PreparerMathBlock
 from converter.rst.character import Character
 
-OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v3'
+OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v4'
 
 
 class Rst2Markdown(object):
@@ -71,7 +71,7 @@ class Rst2Markdown(object):
 
     @staticmethod
     def bullet_match(line):
-        return re.search(r'^ *#[.|)] ', line)
+        return re.search(r'^ *[(]?#[.|)] ', line)
 
     @staticmethod
     def load_file(path):
@@ -83,45 +83,6 @@ class Rst2Markdown(object):
 
     def get_iframe_images(self):
         return self._iframe_images
-
-    # def _prepare_math_block(self, arr):
-    #     self.started_math = False
-    #     self.indent = None
-    #     self.last_position_sep = None
-    #     self.separated = False
-    #     for i in range(len(arr)):
-    #         line = arr[i]
-    #         is_started_math = ".. math::" in line
-    #         if is_started_math:
-    #             self.started_math = is_started_math
-    #             continue
-    #         if self.started_math:
-    #             if len(line) == 0 and self.separated is True:
-    #                 arr[self.last_position_sep] = ""
-    #                 self.started_math = False
-    #                 self.indent = None
-    #                 self.last_position_sep = None
-    #                 self.separated = False
-    #                 continue
-    #             if len(line) == 0:
-    #                 self.separated = True
-    #                 if self.indent is None:
-    #                     continue
-    #                 else:
-    #                     arr[i] = f'{self._math_block_separator_token}'
-    #                     self.last_position_sep = i
-    #             else:
-    #                 self.separated = False
-    #                 curr_indent = len(line) - len(line.lstrip())
-    #                 if self.indent is None:
-    #                     self.indent = curr_indent
-    #                 if curr_indent == self.indent:
-    #                     continue
-    #                 else:
-    #                     self.started_math = False
-    #                     self.indent = None
-    #                     if self.last_position_sep is not None:
-    #                         arr[self.last_position_sep] = ""
 
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
@@ -165,8 +126,7 @@ class Rst2Markdown(object):
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
         output = Comment(output).convert()
-        output = re.sub("\n[ ]*", "\n", output)
-        # output = output.replace(r"\\$", "<span style='font-size: 80%;'>$</span>")
+        output = re.sub(r"^[ ]*", "", output, flags=re.MULTILINE)
         output = Character(output).convert()
         output = Paragraph(output).convert()
         output = List(output).convert()
