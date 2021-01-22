@@ -16,7 +16,7 @@ class Glossary(object):
         for item in match_items:
             term = item.group("term")
             text = self._clearing_line_breaks(item.group("text"))
-            item = f'**{term}**{self._caret_token}{text}{self._caret_token}<hr>{self._caret_token}'
+            item = f'{self._caret_token}**{term}**{self._caret_token}{text}{self._caret_token}<hr>{self._caret_token}'
             items_list.append(item)
         content = '\n'.join(items_list)
         return content
