@@ -2,6 +2,7 @@ import re
 from converter.guides.tools import slugify
 from string import Template
 from collections import namedtuple
+from converter.rst.utils import css_property
 
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
 GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v2'
@@ -151,34 +152,17 @@ class InlineAv(object):
         iframe_body = Template(JSAV_IMAGE_IFRAME).substitute(title=name, content=iframe_content, name=name)
 
         self._iframe_images.append(IframeImage(iframe_src, f'{JSAV_IFRAME_SUBPATH}{iframe_name}.html', iframe_body))
-        iframe_height = self.detect_height_from_css(css_opt, name)
+
+        iframe_height = css_property.get_property_by_css(css_opt, name, 'height', self._workspace_dir)
+        iframe_height = 250 if iframe_height is None else iframe_height
+        iframe_width = css_property.get_property_by_css(css_opt, name, 'width', self._workspace_dir)
+        iframe_width = 900 if iframe_width is None else iframe_width
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{iframe_src}" ' \
-               f'width="900" height="{iframe_height}" scrolling="no" ' \
+               f'width="{iframe_width}" height="{iframe_height}" scrolling="no" ' \
                f'style="position: relative; top: 0px; border: 0; margin: 0; overflow: hidden;">' \
                f'Your browser does not support iframes.</iframe>{caret_token}' \
                f'<br/>{caret_token}{caption}{caret_token}'
-
-    def detect_height_from_css(self, css_names, image_id):
-        for css_name in css_names:
-            css_path = self._workspace_dir.joinpath(css_name)
-            iframe_height_by_path = self._get_iframe_height_by_path(css_path, image_id) if css_path.exists() else None
-            if iframe_height_by_path:
-                return iframe_height_by_path
-        return 250
-
-    def _get_iframe_height_by_path(self, css_path, image_id):
-        with open(css_path, 'r') as file:
-            css_content = file.read().replace('\n', '')
-            result = re.match(rf"""#{image_id}(?P<content>.*?)}}""", css_content)
-            result_height = self._get_result_height_by_css_height_opt(result) if result is not None else False
-            iframe_height = int(result_height.group('height')) if result_height else None
-        return iframe_height
-
-    @staticmethod
-    def _get_result_height_by_css_height_opt(result):
-        css_height_opt = result.group('content')
-        return re.match(r""".*{.*height(\s)*:(\s)*(?P<height>\d+)px""", css_height_opt)
 
     def _get_caption(self, raw_caption, figure_number):
         caption = ': '

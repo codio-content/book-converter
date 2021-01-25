@@ -108,7 +108,7 @@ class Rst2Markdown(object):
         if iframe_images:
             self._iframe_images.extend(iframe_images)
 
-        output, assessments = AvEmbed(output, self._caret_token, OPEN_DSA_CDN).convert()
+        output, assessments = AvEmbed(output, self._caret_token, OPEN_DSA_CDN, self.workspace_dir).convert()
         if assessments:
             self._assessments.extend(assessments)
 
