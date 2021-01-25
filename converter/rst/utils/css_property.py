@@ -1,4 +1,5 @@
 import re
+import logging
 
 
 def get_property_by_css(css_names, element_id, property_name, workspace_dir):
@@ -23,7 +24,7 @@ def _get_css_property_by_path(css_path, element_id, property_name):
             properties = re.search(rf"""#{element_id} *{{(?P<content>.*?)}}""", css_content)
             css_property = re.search(rf"""{property_name}:\s*(?P<property>[^;]*);?""", properties.group('content'))
             css_property = css_property.group('property')
-    except:
+    except BaseException as e:
         css_property = None
     return css_property
 
@@ -36,6 +37,6 @@ def _get_property_by_html(html_path, property_name):
             css_property \
                 = re.search(rf'''data-{property_name} *= *"(?P<property>\d*)"''', properties.group('content'))
             css_property = css_property.group('property')
-    except:
+    except BaseException as e:
         css_property = None
     return css_property
