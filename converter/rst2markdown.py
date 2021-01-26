@@ -34,7 +34,7 @@ from converter.rst.tag_reference import TagReference
 from converter.rst.preparer_math_block import PreparerMathBlock
 from converter.rst.character import Character
 
-OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v4'
+OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
 
 
 class Rst2Markdown(object):

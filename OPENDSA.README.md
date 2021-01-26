@@ -87,6 +87,9 @@ assets:
   - "AV":
       pattern: "*.css"
       dst: ".guides/opendsa_v1/AV"
+  - "AV":
+      pattern: "*.txt"
+      dst: ".guides/opendsa_v1/AV"
   - "lib":
       pattern: "*.js"
       dst: ".guides/opendsa_v1/lib"
