@@ -5,9 +5,9 @@ from collections import namedtuple
 from converter.rst.utils import css_property
 
 IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
-GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v2'
+GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
-JSAV_IFRAME_SUBPATH = 'jsav/iframe/v6/'
+JSAV_IFRAME_SUBPATH = 'jsav/iframe/v1/'
 JSAV_IMAGE_IFRAME = f"""
 <html>
 <head>

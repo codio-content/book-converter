@@ -103,7 +103,7 @@ class Rst2Markdown(object):
         output = TodoBlock(output).convert()
         output = Topic(output, self._caret_token).convert()
         output = Tip(output, self._caret_token).convert()
-        output = Image(output, self._caret_token).convert()
+        output = Image(output, self._caret_token, OPEN_DSA_CDN).convert()
         output, iframe_images = InlineAv(output, self._caret_token, self.workspace_dir, OPEN_DSA_CDN).convert()
         if iframe_images:
             self._iframe_images.extend(iframe_images)

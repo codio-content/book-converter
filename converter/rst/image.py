@@ -4,9 +4,10 @@ MASK_IMAGE_TO_MD = '![{alt}]({image}){caret_token}{caption}{caret_token}{caret_t
 
 
 class Image(object):
-    def __init__(self, source_string, caret_token):
+    def __init__(self, source_string, caret_token, open_dsa_cdn):
         self.str = source_string
         self._caret_token = caret_token
+        self._open_dsa_cdn = open_dsa_cdn
         self._image_re = re.compile(
             r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]odsafig::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
                 (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
@@ -29,8 +30,9 @@ class Image(object):
 
     def _image(self, matchobj):
         caret_token = self._caret_token
-        image = matchobj.group('path')
-        output = MASK_IMAGE_TO_MD.replace('{image}', image)
+        image_path = matchobj.group('path')
+        image_path = f'{self._open_dsa_cdn}{image_path}'
+        output = MASK_IMAGE_TO_MD.replace('{image}', image_path)
         output = self._set_alt(output, matchobj.group('options'))
         figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
         output = self._set_caption(output, matchobj.group('caption'), figure_number)
