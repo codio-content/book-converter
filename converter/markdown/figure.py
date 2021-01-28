@@ -22,6 +22,7 @@ class Figure(TextAsParagraph):
     def _figure_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         match_label = re.search(r'\\label{(.*?)}', block_contents)
+        label = None
         if match_label:
             label = match_label.group(1)
             block_contents = re.sub(r'\\label{.*?}', '', block_contents)
@@ -33,7 +34,7 @@ class Figure(TextAsParagraph):
             self._chapter_num, self._figure_counter + self._figure_counter_offset
         )
 
-        if self._refs.get(label, {}):
+        if label and self._refs.get(label, {}):
             caption = '**<p style="font-size: 10px">Figure {}'.format(
                 self._refs.get(label).get('ref')
             )
