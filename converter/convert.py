@@ -1,11 +1,17 @@
 import logging
+import pathlib
+import re
 import shutil
+import subprocess
 import uuid
+import yaml
 
+from collections import OrderedDict
 from pathlib import Path
 
-from converter.toc import get_latex_toc, get_bookdown_toc
-from converter.guides.tools import slugify, write_file, write_json
+from converter.rst2markdown import Rst2Markdown
+from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
+from converter.guides.tools import slugify, write_file, write_json, read_file
 from converter.guides.item import SectionItem, CHAPTER
 from converter.latex2markdown import LaTeX2Markdown
 from converter.bookdown2markdown import BookDown2Markdown
@@ -245,10 +251,22 @@ def make_section_items(item, slug_name, md_path, transformation_rules, converted
         configuration = transformation_rules[slug_name].get('configuration', {})
         if configuration:
             section = {**section, **configuration}
-    if not converted_md:
-        del book_item["pageId"]
-        section = None
+    # if not converted_md:
+    #     del book_item["pageId"]
+    #     section = None
     return section, book_item
+
+
+def make_odsa_ex_files(path):
+    path = path.replace("\\", "/")
+    return {
+               "path": "#tabs",
+               "action": "close"
+           }, {
+               "path": f"exercises/{path}/starter_code.java",
+               "panel": 0,
+               "action": "open"
+           }
 
 
 def process_assets(config, generate_dir, pdfs_for_convert, source_codes, bookdown=False):
@@ -279,6 +297,231 @@ def write_metadata(guides_dir, metadata, book):
     book_path = guides_dir.joinpath("book.json")
     write_json(metadata_path, metadata)
     write_json(book_path, book)
+
+
+def convert_assessment(assessment):
+    if assessment.type == 'custom':
+        return convert_custom_assessment(assessment)
+    elif assessment.type == 'test':
+        return convert_test_assessment(assessment)
+
+
+def convert_custom_assessment(assessment):
+    return {
+        'type': 'custom',
+        'taskId': assessment.id,
+        'source': {
+            'name': assessment.name,
+            'arePartialPointsAllowed': False,
+            'oneTimeTest': False,
+            'points': assessment.points,
+            'instructions': assessment.ex_data.get('question', '')
+        }
+    }
+
+
+def convert_test_assessment(assessment):
+    examples_list = []
+    examples = ''
+    class_name = assessment.ex_data.get('class_name', '')
+    method_name = assessment.ex_data.get('method_name', '')
+    instructions = assessment.ex_data.get('question', '')
+    ex_path = assessment.ex_data.get('ex_path', '')
+    tests = assessment.ex_data.get('tests', '')
+    test_matches = get_odsa_workout_unit_tests(tests)
+    for match in test_matches:
+        message = match.group('message')
+        if message == 'example':
+            actual = match.group('actual')
+            actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
+            expected = match.group('expected')
+            example = f'{method_name}({actual}) -> {expected}'
+            examples_list.append(example)
+    if examples_list:
+        examples = '\n'.join(examples_list)
+        examples = f'\nExample:\n\n```{examples}```'
+    instructions = f'{instructions}{examples}'
+    return {
+        'type': 'test',
+        'taskId': assessment.id,
+        'source': {
+            'name': assessment.name,
+            'instructions': instructions,
+            'command': f'.guides/secure/assessments/run.py {class_name} {ex_path}',
+            'arePartialPointsAllowed': True,
+            'oneTimeTest': False,
+            'points': assessment.points
+        }
+    }
+
+
+def get_odsa_workout_unit_tests(tests):
+    tests = re.sub('"",', '""\\,', tests)
+    tests_re = re.compile(r"""\"(?P<actual>.*?)\",(?P<expected> ?\d+ ?|\".*?\")(?:,(?P<message>.*?)$)?""",
+                          flags=re.MULTILINE)
+    return list(re.finditer(tests_re, tests))
+
+
+def write_assessments(guides_dir, assessments):
+    if not assessments:
+        return
+    logging.debug("write assessments")
+    assessments_path = guides_dir.joinpath("assessments.json")
+
+    unique_assessments = list({object_.id: object_ for object_ in assessments}.values())
+
+    converted_assessments = list(map(convert_assessment, unique_assessments))
+    write_json(assessments_path, converted_assessments)
+
+
+def create_odsa_test_assessments(guides_dir, generate_dir, exercises):
+    if not exercises:
+        return
+    logging.debug("process create odsa test assessments content")
+    odsa_private_ex_dir = guides_dir.joinpath("secure/assessments")
+    odsa_private_ex_dir.mkdir(exist_ok=True, parents=True)
+
+    run_file_path = odsa_private_ex_dir.joinpath('run.py')
+    run_file_data = read_file('converter/opendsa_ex_script/run.script')
+    write_file(run_file_path, run_file_data)
+    subprocess.call(f'chmod +x {run_file_path}', shell=True)
+
+    for exercise in exercises:
+        exercise_data = exercises[exercise]
+        group_name = exercise_data['dir_name']
+        file_name = exercise_data['file_name']
+
+        private_group_dir_path = odsa_private_ex_dir.joinpath(group_name)
+        private_group_dir_path.mkdir(exist_ok=True, parents=True)
+        data_dir = private_group_dir_path.joinpath(file_name)
+        data_dir.mkdir(exist_ok=True, parents=True)
+
+        starter_code_dir = generate_dir.joinpath(f'exercises/{group_name}/{file_name}')
+        starter_code_dir.mkdir(exist_ok=True, parents=True)
+
+        wrapper_code_path = data_dir.joinpath('wrapper_code.java')
+        starter_code_path = starter_code_dir.joinpath('starter_code.java')
+        test_code_path = data_dir.joinpath('Tester.java')
+        wrapper_code = exercise_data['wrapper_code']
+        starter_code = exercise_data['starter_code']
+        starter_code = starter_code.replace("___", "// Write your code below")
+        test_code = get_odsa_code_test_file(exercise_data)
+
+        write_file(test_code_path, test_code)
+        write_file(wrapper_code_path, wrapper_code)
+        write_file(starter_code_path, starter_code)
+
+
+def get_odsa_code_test_file(exercise_data):
+    class_name = exercise_data.get('class_name', '')
+    method_name = exercise_data.get('method_name', '')
+    tests = exercise_data.get('tests', '')
+    test_matches = get_odsa_workout_unit_tests(tests)
+    if not test_matches:
+        return ''
+    size = len(test_matches)
+    run_tests = get_odsa_run_tests_code(test_matches, method_name)
+    unit_tests = get_odsa_unit_tests(test_matches, class_name, method_name)
+    return f'import java.util.Objects;\n' \
+           f'import java.util.concurrent.Callable;\n' \
+           f'\n' \
+           f'public class Tester {{\n' \
+           f'   public static void main(String[] args) {{\n' \
+           f'       int total_tests = {size};\n' \
+           f'       int passed_tests = 0;\n' \
+           f'       String feedback = "";\n' \
+           f'\n' \
+           f'{run_tests}' \
+           f'       String total = "" + total_tests;\n' \
+           f'       String passed = "" + passed_tests;\n' \
+           f'       String output = total + "\\n" + passed +"\\n" + feedback;\n' \
+           f'       System.out.println(output);\n' \
+           f'   }}\n' \
+           f'\n' \
+           f'   private static boolean runTest(Callable<Boolean> func) {{\n' \
+           f'       try {{\n' \
+           f'           return func.call();\n' \
+           f'       }} catch (Exception | Error e) {{\n' \
+           f'           return false;\n' \
+           f'       }}\n' \
+           f'   }}\n\n' \
+           f'{unit_tests}' \
+           f'}}\n'
+
+
+def get_odsa_unit_tests(matches, class_name, method_name):
+    num = 0
+    unit_tests = []
+    for match in matches:
+        num += 1
+        actual = match.group('actual')
+        expected = match.group('expected')
+        expected = expected.strip('"').strip() if expected is not None else expected
+        test_code = f'   public static class Test{num} implements Callable<Boolean>{{\n' \
+                    f'       private static final {class_name} instance = new {class_name}();\n' \
+                    f'\n' \
+                    f'       public Test{num}() {{\n' \
+                    f'       }}\n' \
+                    f'\n' \
+                    f'       public static Object getExpectedVal() {{\n' \
+                    f'          return {expected};\n' \
+                    f'       }}\n' \
+                    f'\n' \
+                    f'       public static Object getActualVal() {{\n' \
+                    f'          return instance.{method_name}({actual});\n' \
+                    f'       }}\n' \
+                    f'\n' \
+                    f'       public Boolean call() {{\n' \
+                    f'          return Objects.equals(getExpectedVal(), getActualVal());\n' \
+                    f'       }}\n' \
+                    f'   }}\n' \
+                    f'\n'
+        unit_tests.append(test_code)
+    return ''.join(unit_tests)
+
+
+def get_odsa_run_tests_code(matches, method_name):
+    run_scripts = []
+    num = 0
+    for match in matches:
+        msg = ''
+        actual = match.group('actual')
+        actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
+        actual = actual.strip('"')
+        expected = match.group('expected')
+        expected = expected.strip('"')
+        message = match.group('message')
+        passed_data = f': {method_name}({actual}) -> {expected}'
+        failed_data = f': {method_name}({actual})\\n'
+        if message:
+            if message == 'example':
+                msg = ''
+            elif message == 'hidden':
+                passed_data = ': hidden'
+                failed_data = ': hidden'
+            else:
+                message = message.strip('"')
+                msg = f'{message}\\n\\n'
+                passed_data = '\\n'
+                failed_data = '\\n'
+        num += 1
+        code = f'       if (runTest(new Test{num}())) {{\n' \
+               f'           passed_tests++;\n' \
+               f'           feedback += "{msg}Test <b>PASSED</b>{passed_data}' \
+               f'\\n\\n";\n' \
+               f'       }} else {{\n' \
+               f'           feedback += "{msg}Test <b>FAILED</b>{failed_data}";\n' \
+               f'           try {{\n' \
+               f'               Object exp = Test{num}.getExpectedVal();\n' \
+               f'               Object act = Test{num}.getActualVal();\n' \
+               f'               feedback += "Expected: " + exp + "\\n" + "but was: " + act + "\\n\\n";\n' \
+               f'           }} catch (Exception | Error e) {{\n' \
+               f'               feedback += e + "\\n\\n";\n' \
+               f'           }}\n' \
+               f'       }}\n' \
+               f'\n'
+        run_scripts.append(code)
+    return ''.join(run_scripts)
 
 
 def convert(config, base_path, yes=False):
@@ -395,12 +638,33 @@ def assets_extension(base_src_dir):
             file = base_src_dir.joinpath('{}.{}'.format(asset_path, ext))
             if file.exists():
                 return ext
+
     return detect_asset_ext
 
 
 def cleanup_bookdown(lines):
     lines = lines[1:]
     return lines
+
+
+def cleanup_rst(lines):
+    updated = []
+    starts = (
+        '.. index::'
+    )
+    for line in lines:
+        if line.startswith(starts):
+            continue
+        updated.append(line)
+    return updated
+
+
+def get_labels(lines):
+    label = ''
+    for line in lines:
+        if line.startswith('.. _'):
+            label = line.strip()[4:-1]
+    return label
 
 
 def convert_bookdown(config, base_path, yes=False):
@@ -414,7 +678,6 @@ def convert_bookdown(config, base_path, yes=False):
     transformation_rules, insert_rules = prepare_codio_rules(config)
     toc = get_bookdown_toc(Path(config['workspace']['directory']), Path(config['workspace']['bookdown']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
-
     book, metadata = make_metadata_items(config)
 
     chapter = None
@@ -478,3 +741,149 @@ def convert_bookdown(config, base_path, yes=False):
     write_metadata(guides_dir, metadata, book)
 
     process_assets(config, generate_dir, pdfs_for_convert, [], bookdown=True)
+
+
+def get_code_exercises(workspace_dir):
+    exercises = {}
+    code_dir = workspace_dir.joinpath('ODSAprivate-master')
+    code_dir = pathlib.Path(code_dir)
+    if not code_dir.exists():
+        return {}
+    ex_dirs = [p for p in code_dir.iterdir() if not p.is_file()]
+    for directory in ex_dirs:
+        yaml_files = directory.glob("*.yaml")
+        ex_group_dir = pathlib.Path(directory).name
+        ex_group_dir = Path(ex_group_dir)
+        for file in yaml_files:
+            with open(file, 'r') as stream:
+                try:
+                    data = yaml.load(stream, Loader=yaml.FullLoader)
+                    ex_path = ex_group_dir.joinpath(file.stem)
+                    if isinstance(data, list):
+                        data = data[0]
+                    curr_ver = data.get('current_version', '')
+                    prompts = curr_ver.get('prompts', '')[0]['coding_prompt']
+                    name = data.get('name', '').lower()
+                    exercises[name] = {
+                        'name': name,
+                        'ex_path': str(ex_path),
+                        'file_name': file.stem,
+                        'dir_name': directory.name,
+                        'class_name': prompts.get('class_name', ''),
+                        'method_name': prompts.get('method_name', ''),
+                        'question': prompts.get('question', ''),
+                        'starter_code': prompts.get('starter_code', ''),
+                        'wrapper_code': prompts.get('wrapper_code', ''),
+                        'tests': prompts.get('tests', '')
+                    }
+                except yaml.YAMLError as exc:
+                    logging.error("load file exception", exc)
+                    raise BaseException("load file exception")
+    return exercises
+
+
+def process_iframe_images(config, generate_dir, iframe_images):
+    write_iframe = bool(config.get('opendsa', {}).get('writeIframe', False))
+    if write_iframe and iframe_images:
+        for image in iframe_images:
+            write_path = generate_dir.joinpath(image.path)
+            write_path.parent.mkdir(exist_ok=True, parents=True)
+            write_file(write_path, image.content)
+
+
+def convert_rst(config, base_path, yes=False):
+    generate_dir = base_path.joinpath("generate")
+    if not prepare_base_directory(generate_dir, yes):
+        return
+
+    logging.debug("start converting %s" % generate_dir)
+    guides_dir, content_dir = prepare_structure(generate_dir)
+    transformation_rules, insert_rules = prepare_codio_rules(config)
+    workspace_dir = Path(config['workspace']['directory'])
+    exercises = get_code_exercises(workspace_dir)
+    toc = get_rst_toc(workspace_dir, Path(config['workspace']['rst']), exercises)
+    toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
+    book, metadata = make_metadata_items(config)
+
+    chapter = None
+    chapter_num = 0
+    subsection_num = 0
+    children_containers = [book["children"]]
+    logging.debug("convert selected pages")
+
+    refs = OrderedDict()
+    label_counter = 0
+    all_assessments = list()
+    iframe_images = list()
+
+    for item in toc:
+        if item.section_type == CHAPTER:
+            subsection_num = 0
+            chapter_num += 1
+            slug_name = slugify(item.section_name)
+            chapter = item.section_name
+        else:
+            subsection_num += 1
+            slug_name = slugify(item.section_name, chapter=chapter)
+
+        logging.debug("convert page {} - {}".format(slug_name, chapter_num))
+
+        converted_md = item.markdown
+        if not converted_md:
+            label = get_labels(item.lines)
+            if label:
+                label_counter += 1
+                refs[label] = {
+                    'pageref': item.section_name
+                }
+
+            lines = cleanup_rst(item.lines)
+            rst_converter = Rst2Markdown(
+                lines,
+                exercises,
+                workspace_dir=workspace_dir,
+                chapter_num=chapter_num,
+                subsection_num=subsection_num
+            )
+            converted_md = rst_converter.to_markdown()
+            all_assessments += rst_converter.get_assessments()
+            iframe_images += rst_converter.get_iframe_images()
+
+            if slug_name in tokens:
+                for key, value in tokens.get(slug_name).items():
+                    converted_md = converted_md.replace(key, value)
+
+        md_path = content_dir.joinpath(slug_name + ".md")
+        section, book_item = make_section_items(item, slug_name, md_path, transformation_rules, converted_md)
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            book_item["children"] = []
+            if item.section_type == CHAPTER:
+                children_containers = [children_containers[0]]
+
+        children_containers[len(children_containers) - 1].append(book_item)
+
+        if item.codio_section == "end" and len(children_containers) > 1:
+            children_containers.pop()
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            children_containers.append(book_item["children"])
+
+        section["files"].append({
+            "path": "#tabs",
+            "action": "close"
+        })
+
+        if item.exercise:
+            section["files"] = make_odsa_ex_files(item.exercise_path)
+
+        if section:
+            metadata["sections"].append(section)
+
+        write_file(md_path, converted_md)
+
+    write_metadata(guides_dir, metadata, book)
+    write_assessments(guides_dir, all_assessments)
+    create_odsa_test_assessments(guides_dir, generate_dir, exercises)
+    process_assets(config, generate_dir, [], [])
+    process_iframe_images(config, generate_dir, iframe_images)

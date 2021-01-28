@@ -1,5 +1,4 @@
 import logging
-import glob
 import shutil
 from os import listdir
 
@@ -21,14 +20,17 @@ def copy_globing(asset, base_src_dir, generate_dir):
     src = base_src_dir.joinpath(key)
     dst = generate_dir.joinpath(key)
 
+    if isinstance(value, dict):
+        dst = generate_dir.joinpath(value['dst'])
+        value = value['pattern']
+
     dst.mkdir(exist_ok=True, parents=True)
 
-    for file in glob.glob(str(src.joinpath(value))):
-        shutil.copy(file, dst.joinpath(Path(file).name))
+    base_len = len(str(src.absolute())) + 1
 
-    for file in glob.glob(str(src.joinpath('**/{}'.format(value)))):
-        name = str(file).replace(str(src), '').lstrip('/')
-        file_path = dst.joinpath(name)
+    for file in Path(src).rglob(value):
+        sub_path = str(file.absolute())[base_len:]
+        file_path = dst.joinpath(sub_path)
         file_path.parent.mkdir(exist_ok=True, parents=True)
         shutil.copy(file, file_path)
 

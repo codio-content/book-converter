@@ -8,12 +8,17 @@ def slugify(item, chapter=""):
 
 
 def write_file(file_path, content):
-    with open(file_path, 'w') as f:
+    with open(file_path, 'w', encoding="utf-8") as f:
         f.write(content)
 
 
 def write_json(file_path, json_data):
-    write_file(file_path, json.dumps(json_data, sort_keys=True, indent=2, separators=(',', ': ')))
+    write_file(file_path, json.dumps(json_data, sort_keys=True, indent=2, separators=(',', ': '), ensure_ascii=False))
+
+
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
 
 
 def get_text_in_brackets(line, start=0):
@@ -21,4 +26,4 @@ def get_text_in_brackets(line, start=0):
     end = line.rfind('}')
     if start == end or start == -1 or end == -1:
         return line
-    return line[start+1:end]
+    return line[start + 1:end]

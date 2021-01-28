@@ -3,12 +3,11 @@ workspace:
   directory: toc_cases
   tex: toc_simple.tex
 assets:
-  - code
 sections:
   - name: "Computer programming"
     type: chapter
     configuration:
-      layout: 1-panels
+      layout: 1-panel
   - name: "What is a computer?"
     type: section
   - name: "What is programming?"
