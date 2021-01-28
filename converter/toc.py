@@ -345,11 +345,6 @@ def process_rst_lines(lines, exercises):
 
 def print_to_yaml(structure, tex, data_format):
     directory = tex.parent.parent.resolve() if data_format == 'rst' else tex.parent.resolve()
-  directory: {}
-  {}: {}
-assets:
-sections:
-""".format(directory, data_format, tex.name)
     first_item = True
     exercises_flag = False
     for ind, item in enumerate(structure):
