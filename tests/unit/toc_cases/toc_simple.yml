@@ -1,4 +1,3 @@
-name: "TODO: book name"
 workspace:
   directory: toc_cases
   tex: toc_simple.tex
