@@ -22,7 +22,7 @@ def load_md(path):
 def load_file(path):
     dn = os.path.dirname(os.path.realpath(__file__))
     fn = os.path.join(dn, path)
-    with open(fn, 'r') as file:
+    with open(fn, 'r', encoding='utf-8') as file:
         return file.read()
 
 
@@ -34,6 +34,9 @@ def make_converter(path, refs, chapter_num, load_workspace_file):
 
 
 class TestSuite(unittest.TestCase):
+
+    maxDiff = None
+
     def write_md(self, name, refs={}, chapter_num=1, load_workspace_file=lambda _: _):
         path = "cases/{}".format(name)
         converter = make_converter(path, refs, chapter_num, load_workspace_file)
@@ -297,3 +300,9 @@ class TestSuite(unittest.TestCase):
 
     def test_twoicons(self):
         self.run_case("twoicons")
+
+    def test_turingwinner(self):
+        self.run_case("turingwinner")
+
+    def test_equation(self):
+        self.run_case("equation")

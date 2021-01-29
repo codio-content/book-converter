@@ -14,7 +14,7 @@ def is_section(line):
 
 
 def is_chapter(line):
-    return line.startswith('\\chapter')
+    return line.startswith('\\chapter[') or line.startswith('\\chapter{')
 
 
 def is_toc(line):
@@ -40,6 +40,7 @@ def include_file(line):
 
 
 def cleanup_name(name):
+    name = convert_name(name)
     l_pos = name.find('{')
     r_pos = name.find('}')
     cut_pos = l_pos + 1
@@ -60,6 +61,15 @@ def cleanup_name(name):
     return name
 
 
+def convert_name(name):
+    name = re.sub(r"\\js({\})?", "JavaScript", name)
+    name = re.sub("``", "“", name)
+    name = re.sub("''", "”", name)
+    name = re.sub(r"--", "-", name)
+    name = re.sub(r" vs.\\", " vs.", name)
+    return name
+
+
 def get_name(line):
     level = 0
     start = 0
@@ -76,7 +86,7 @@ def get_name(line):
                 break
             else:
                 level -= 1
-    return cleanup_name(line[start + 1:end])
+    return cleanup_name(line[start + 1:end]), line[end + 1:].strip()
 
 
 def get_bookdown_name(line):
@@ -92,12 +102,14 @@ def is_section_file(line):
 
 
 def get_section_lines(line, tex_folder):
-    section_line_re = re.compile(r"""\\sectionfile{(?P<block_name>.*?)}{(?P<block_path>.*?)}""")
+    section_line_re = re.compile(r"""\\sectionfile(\[.*?\])?{(?P<block_name>.*?)}{(?P<block_path>.*?)}""")
     result = section_line_re.search(line)
     if result:
         file = result.group("block_path")
         if '.tex' not in file:
-            file = '_{}.tex'.format(file)
+            dirname = Path(tex_folder).name
+            prefix = dirname.split('ch_')[-1]
+            file = f'{prefix}_{file}.tex'
         tex_file = tex_folder.joinpath(file)
         if tex_file.exists():
             with open(tex_file, 'r', errors='replace') as file:
@@ -106,23 +118,66 @@ def get_section_lines(line, tex_folder):
     return []
 
 
+def cleanup_ifoddpage(lines):
+    updated = []
+    ifoddpage = False
+    for line in lines:
+        if "\\checkoddpage" in line:
+            continue
+        if ifoddpage and "\\fi" in line:
+            ifoddpage = False
+            continue
+        if ifoddpage:
+            continue
+        if "\\ifoddpage{" in line:
+            line = re.sub(r"\\ifoddpage{\\small(\\input{.*?})}", r"\1", line, flags=re.DOTALL)
+            line = line.strip()
+            ifoddpage = True
+        updated.append(line)
+    return updated
+
+
 def process_toc_lines(lines, tex_folder, parent_folder):
     toc = []
     line_pos = 1
     item_lines = []
+    chapter_line = ''
+    chapter_line_break = False
     for line in lines:
         line = line.rstrip('\r\n')
+        if chapter_line_break:
+            if line.endswith('}'):
+                line = chapter_line + line
+                chapter_line_break = False
+            else:
+                chapter_line += line
+                continue
         if is_toc(line):
             if toc:
                 if item_lines:
                     toc[len(toc) - 1].lines = item_lines
                 item_lines = []
             section_type = CHAPTER if is_chapter(line) else SECTION
-            toc.append(SectionItem(section_name=get_name(line), section_type=section_type, line_pos=line_pos))
+            if section_type == CHAPTER and not line.endswith('}'):
+                chapter_line = line
+                chapter_line_break = True
+                continue
+            section_name, additional_content_in_name = get_name(line)
+            toc.append(SectionItem(section_name=section_name, section_type=section_type, line_pos=line_pos))
             if is_section_file(line):
                 section_lines = get_section_lines(line, parent_folder)
+                section_lines = cleanup_ifoddpage(section_lines)
                 for sub_line in section_lines:
-                    item_lines.append(sub_line.rstrip('\n'))
+                    if is_input(sub_line):
+                        sub_content = get_include_lines(tex_folder, input_file(sub_line))
+                        if sub_content:
+                            item_lines.extend(sub_content)
+                            line_pos += len(sub_content)
+                    else:
+                        item_lines.append(sub_line.rstrip('\n'))
+            elif additional_content_in_name:
+                item_lines.append(additional_content_in_name)
+                line_pos += 1
         elif is_input(line) or is_include(line):
             if is_input(line):
                 sub_toc = get_latex_toc(tex_folder, input_file(line))

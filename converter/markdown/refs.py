@@ -12,8 +12,13 @@ class Refs(object):
 
     def _refs_block(self, matchobj):
         ref_name = matchobj.group('ref_name')
-        refs = self._refs.get(ref_name, {'ref': ref_name})
-        return '{}'.format(refs.get('ref', ''))
+        sec_match = re.search(r'sec:.*?:(.*)', ref_name)
+        if sec_match:
+            ref_name = sec_match.group(1)
+        ref = self._refs.get(ref_name, {'ref': ref_name})
+        if ref.get('item_num') is not None:
+            return '{}'.format(ref.get('item_num', ''))
+        return '{}'.format(ref.get('ref', ''))
 
     def _page_refs_block(self, matchobj):
         ref_name = matchobj.group('ref_name')

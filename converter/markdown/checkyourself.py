@@ -17,13 +17,20 @@ class CheckYouself(TextAsParagraph):
         answer_block_contents = matchobj.group('answer_block_contents')
         answer_block_contents = answer_block_contents.replace("\\\\", "<br/>")
         answer_block_contents = self.to_paragraph(answer_block_contents)
-        return '<details><summary>Check yourself</summary>{}</details>'.format(answer_block_contents)
+        caret_token = self._caret_token
+        return f'{caret_token}<p><details><summary>Check yourself</summary>' \
+               f'{caret_token}{caret_token}{answer_block_contents}</details></p>'
 
     def make_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
+        block_contents = re.sub(r"\s*\n\s*", " ", block_contents).strip()
+        block_contents = block_contents.replace("\\\\", "<br/>")
+        block_contents = re.sub(r"\n? *\\label{.*?} *", r"", block_contents)
         answer_str = answer_re.sub(self.make_answer_block, block_contents)
         caret_token = self._caret_token
-        return f'{caret_token}|||challenge{caret_token}{answer_str}{caret_token}|||{caret_token}'
+        answer_str = re.sub(r"\\{", r"{", answer_str)
+        answer_str = re.sub(r"\\}", r"}", answer_str)
+        return f'{caret_token}|||challenge{caret_token}{answer_str}{caret_token}{caret_token}|||{caret_token}'
 
     def convert(self):
         return checkyourself_re.sub(self.make_block, self.str)

@@ -1,6 +1,8 @@
 import uuid
 import re
 
+from converter.markdown.del_icons_description import DelIconsDescription
+from converter.markdown.equation import Equation
 from converter.markdown.inline_code_block import InlineCodeBlock
 from converter.markdown.code_block import CodeBlock
 from converter.markdown.bold import Bold
@@ -42,7 +44,10 @@ from converter.markdown.remove_comments import RemoveComments
 from converter.markdown.screencast import Screencast
 from converter.markdown.tabularx import Tabularx
 from converter.markdown.tabular import Tabular
+from converter.markdown.tags import Tags
+from converter.markdown.textfigure import Textfigure
 from converter.markdown.unescape import UnEscape
+from converter.markdown.turingwinner import TuringWinner
 
 
 class LaTeX2Markdown(object):
@@ -74,6 +79,7 @@ class LaTeX2Markdown(object):
     def _latex_to_markdown(self):
         output = self._latex_string
 
+        output = DelIconsDescription(output).convert()
         output, figure_counter = TableFigure(
             output, self._caret_token, self._load_workspace_file,
             self._figure_counter_offset, self._chapter_num, self._refs
@@ -86,6 +92,7 @@ class LaTeX2Markdown(object):
         output = Ignore(output).convert()
         output = SaasSpecific(output, self._caret_token).convert()
         output = ItalicBold(output).convert()
+        output = Equation(output, self._caret_token).convert()
         output, source_codes = CodeBlock(
             output, self._percent_token, self._caret_token, self._remove_trinket
         ).convert()
@@ -106,6 +113,7 @@ class LaTeX2Markdown(object):
             self._source_codes.extend(source_codes)
         output = re.sub(r"\\%", self._percent_token, output)
         output = InlineCodeBlock(output, self._percent_token).convert()
+        output = Textfigure(output, self._caret_token).convert()
 
         # remove comments
         output = RemoveComments(output).convert()
@@ -123,6 +131,9 @@ class LaTeX2Markdown(object):
         output = PitFall(output, self._caret_token).convert()
         output = Summary(output, self._caret_token).convert()
         output = Chips(output, self._caret_token).convert()
+        output, images = TuringWinner(output, self._caret_token, self._detect_asset_ext,).convert()
+        if images:
+            self._pdfs.extend(images)
         output = Cleanup(output).convert()
 
         output, images, figure_counter = PicFigure(
@@ -134,7 +145,8 @@ class LaTeX2Markdown(object):
         if images:
             self._pdfs.extend(images)
         output, images, figure_counter = Figure(
-            output, self._figure_counter_offset, self._chapter_num, self._detect_asset_ext, self._caret_token
+            output, self._figure_counter_offset, self._chapter_num, self._detect_asset_ext,
+            self._caret_token, self._refs
         ).convert()
         if images:
             self._pdfs.extend(images)
@@ -164,7 +176,10 @@ class LaTeX2Markdown(object):
         output = Center(output, self._caret_token).convert()
 
         output = UnEscape(output).convert()
+        output = Tags(output).convert()
         output = NewLine(output).convert()
+
+        output = re.sub(r"\n? *\\label{.*?}", r"", output)
 
         # convert all matched % back
         output = re.sub(self._percent_token, "%", output)

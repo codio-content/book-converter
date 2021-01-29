@@ -1,1 +1,1 @@
-If you don't want to use Git at all, you can download the code in a ZIP archive using the **Download ZIP** button on the GitHub page
+If you don't want to use Git at all, you can download the code in a ZIP archive using the <b>Download ZIP</b> button on the GitHub page

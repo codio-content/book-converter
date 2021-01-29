@@ -1,4 +1,7 @@
-box: python:3.7
+box:
+  id: python:3.7
+  username: $DOCKER_USER
+  password: $DOCKER_PASSWORD
 no-response-timeout: 10
 build:
   steps:

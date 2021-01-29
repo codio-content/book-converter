@@ -64,6 +64,7 @@ def make_refs(toc, chapter_counter_from=1):
     figs_counter = 0
     is_figure = False
     is_exercise = False
+    line_break = False
 
     for item in toc:
         if item.section_type == CHAPTER:
@@ -77,6 +78,14 @@ def make_refs(toc, chapter_counter_from=1):
         else:
             section_counter += 1
         for line in item.lines:
+            if line.startswith("\\sectionfile"):
+                result = re.search(r"\\sectionfile(\[.*?\])?{(?P<block_name>.*?)}{(?P<block_path>.*?)}", line)
+                label = result.group("block_path")
+                if label:
+                    refs[label] = {
+                        'pageref': item.section_name
+                    }
+                    refs[label]["ref"] = f'{chapter_counter}.{section_counter}'
             if line.startswith("\\begin{figure}"):
                 figs_counter += 1
                 is_figure = True
@@ -87,16 +96,44 @@ def make_refs(toc, chapter_counter_from=1):
                 is_exercise = True
             elif line.startswith("\\end{exercise}"):
                 is_exercise = False
-            elif "figure{" in line:
-                result = re.match(r'\\(?P<block_name>pic|table|codefile)figure{(?P<path>.*?)\}{(?P<ref>.*?)\}', line)
+            elif "figure{" in line or "figure[" in line:
+                result = re.search(r'\\(?P<block_name>pic|table|codefile)figure(\[.*\])?{(?P<path>.*?)}'
+                                   r'(%?\s*)?({(?P<ref>.*?)})?', line)
                 if result:
                     ref = result.group('ref')
+                    if ref:
+                        figs_counter += 1
+                        refs[ref] = {
+                            'pageref': item.section_name
+                        }
+                        refs[ref]["ref"] = f'{chapter_counter}.{figs_counter}'
+                    else:
+                        line_break = True
+                        continue
+            elif line_break:
+                res = re.search(r'{(?P<ref>fig:.*?)}', line)
+                if res:
+                    ref = res.group('ref')
                     figs_counter += 1
                     refs[ref] = {
                         'pageref': item.section_name
                     }
                     refs[ref]["ref"] = f'{chapter_counter}.{figs_counter}'
-            elif "\\label{" in line:
+                    line_break = False
+            elif "\\begin{enumerate}" in line:
+                items_counter = 0
+                for ln in item.lines:
+                    if "\\item" in ln:
+                        items_counter += 1
+                        result = re.search(r'\\item\\label{(?P<ref>item:.*?)}', ln)
+                        if result:
+                            ref = result.group('ref')
+                            refs[ref] = {
+                                'item_num': items_counter
+                            }
+                    if "\\end{enumerate}" in ln:
+                        items_counter = 0
+            elif "\\label{" in line and not line.startswith("\\item"):
                 start_pos = line.find("\\label{")
                 end_pos = line.find("}", start_pos)
                 label = line[start_pos + 7:end_pos]

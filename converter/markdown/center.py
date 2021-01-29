@@ -2,7 +2,8 @@ import re
 
 from converter.markdown.text_as_paragraph import TextAsParagraph
 
-center_re = re.compile(r"""\\begin{center}(?P<block_contents>.*?)\\end{center}""", flags=re.DOTALL + re.VERBOSE)
+center_re = re.compile(r"""\\begin{(center|centering)}(?P<block_contents>.*?)\\end{(center|centering)}""",
+                       flags=re.DOTALL + re.VERBOSE)
 
 
 class Center(TextAsParagraph):

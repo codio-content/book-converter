@@ -1,1 +1,1 @@
-An important skill for a computer scientist is **problem solving**.
+An important skill for a computer scientist is <b>problem solving</b>.

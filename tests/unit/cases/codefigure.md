@@ -1,5 +1,5 @@
 **Figure 1.1**
-**source:ch_javascript/code/json_example.js**
+**source: ch_javascript/code/json_example.js**
 ```code
 file content
 ```
@@ -7,16 +7,16 @@ file content
 
 
 **Figure 1.2**
-**source:ch_ruby_rails/code/class_example.rb**
+**source: ch_ruby_rails/code/class_example.rb**
 ```code
 file content
 ```
- A simple class definition in Ruby showing that explicit getter and setter methods are the only way to access instance variables from outside a class, and that Ruby provides shortcuts (lines 19--20) that avoid having to define every accessor method explicitly.  Rather than distinguish “private” vs.\ “public” instance and class variables, one simply provides public accessor methods (read-only, write-only, or read/write) for state that should be publicly visible.
+ A simple class definition in Ruby showing that explicit getter and setter methods are the only way to access instance variables from outside a class, and that Ruby provides shortcuts (lines 19--20) that avoid having to define every accessor method explicitly.  Rather than distinguish “private” vs. “public” instance and class variables, one simply provides public accessor methods (read-only, write-only, or read/write) for state that should be publicly visible.
 
 
 **Figure 1.3**
-**source:ch_ruby_rails/code/class_example.rb**
+**source: ch_ruby_rails/code/class_example.rb**
 ```code
 file content
 ```
- A simple class definition in Ruby showing that explicit getter and setter methods are the only way to access instance variables from outside a class, and that Ruby provides shortcuts (lines 19--20) that avoid having to define every accessor method explicitly.  Rather than distinguish “private” vs.\ “public” instance and class variables, one simply provides public accessor methods (read-only, write-only, or read/write) for state that should be publicly visible.
+ A simple class definition in Ruby showing that explicit getter and setter methods are the only way to access instance variables from outside a class, and that Ruby provides shortcuts (lines 19--20) that avoid having to define every accessor method explicitly.  Rather than distinguish “private” vs. “public” instance and class variables, one simply provides public accessor methods (read-only, write-only, or read/write) for state that should be publicly visible.

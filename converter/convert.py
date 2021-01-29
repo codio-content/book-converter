@@ -54,14 +54,14 @@ def prepare_codio_rules(config):
 def cleanup_latex(lines):
     updated = []
     starts = (
-        '%', '\\index{', '\\label{', '\\markboth{', '\\addcontentsline{',
-        '\\vspace', '\\newpage', '\\noindent',
-        '\\ttfamily', '\\chapter', '\\section', '\\newcommand', '\\vfill', '\\pagebreak'
+        '%', '\\label{', '\\markboth{', '\\addcontentsline{',
+        '\\vspace', '\\newpage', '\\vfill', '\\pagebreak',
+        '\\ttfamily', '\\chapter', '\\section', '\\newcommand'
     )
     for line in lines:
         if line.startswith(starts):
             continue
-        updated.append(line)
+        updated.append(line.rstrip('\n'))
     return updated
 
 
@@ -191,7 +191,7 @@ def prepare_structure(generate_dir):
 
 def make_metadata_items(config):
     book = {
-        "name": "TODO: book name",
+        "name": config.get("name"),
         "children": []
     }
     metadata = {

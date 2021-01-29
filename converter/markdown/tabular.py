@@ -9,6 +9,9 @@ class Tabular(TextAsParagraph):
     def __init__(self, latex_str, caret_token):
         super().__init__(latex_str, caret_token)
 
+        self._graphics_re = re.compile(r"\\includegraphics(\[.*?]){(.*?)}",
+                                       flags=re.DOTALL + re.VERBOSE)
+
         self._table_re = re.compile(r"""\\begin{(?P<block_name>tabular)}
                                     (?P<block_contents>.*?)
                                     \\end{(?P=block_name)}""",
@@ -21,14 +24,14 @@ class Tabular(TextAsParagraph):
             return default
 
     def _format_table(self, matchobj):
+        caret_token = self._caret_token
         block_contents = matchobj.group('block_contents')
-
         block_contents = block_contents.strip()
         sub_lines = block_contents.split('\n')
         size = get_text_in_brackets(sub_lines[0])
         block_contents = '\n'.join(sub_lines[1:])
         block_contents = block_contents.replace('\\hline', '')
-
+        block_contents = block_contents.replace('\\raggedright', '')
         token = str(uuid.uuid4())
 
         items = block_contents.split('\\\\')
@@ -43,10 +46,42 @@ class Tabular(TextAsParagraph):
                 continue
             pos = 0
             row = row.replace('\\&', token)
-            for ind in range(0, len(table_size)):
+
+            row = re.sub(r"\\multicolumn{(.*?)}{(.*?)}{(.*?)}", r"\3", row, flags=re.DOTALL + re.VERBOSE)
+            row = re.sub(r"\\multirow{(.*?)}{(.*?)}\s?{(.*?)}", r"\3", row, flags=re.DOTALL + re.VERBOSE)
+
+            tabularline_match = re.search(r"\\tabularline", block_contents, flags=re.DOTALL + re.VERBOSE)
+            if tabularline_match:
+                head = True
+                for line in block_contents.split('\n'):
+                    line = line.replace('\\\\', '<br/>').strip()
+                    line = line.strip()
+                    if not line:
+                        continue
+                    if '\\tabularline' in line and head:
+                        out += f'{caret_token}|{line}|{caret_token}|-|{caret_token}|'
+                        head = False
+                        continue
+                    if '\\tabularline' in line and not head:
+                        out += f'|{caret_token}'
+                        head = True
+                        continue
+                    out += f'{line} '
+                out = out.replace('\\tabularline', '')
+                break
+
+            t_size = len(table_size)
+
+            match = self._graphics_re.search(row)
+            if match:
+                row = row.replace('\\icondir', 'icons')
+                row = self._graphics_re.sub(r"<img alt='' src='\2' style='width:100px'/>", row)
+                t_size = len(row.split("&"))
+
+            for ind in range(0, t_size):
                 data = row.split('&')
                 col = self.safe_list_get(data, ind, '').strip()
-                col = col.replace('\n', '<br/>')
+                col = re.sub(r'\s*\n\s*', ' ', col)
                 col = col.replace('\\\\', '')
                 out += "|" + col.replace('|', '&#124;')
             if heading:

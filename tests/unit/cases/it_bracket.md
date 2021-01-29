@@ -1,1 +1,1 @@
-*Think Java* is an introduction to computer science and programming intended for readers with little or no experience.
+<i>Think Java</i> is an introduction to computer science and programming intended for readers with little or no experience.

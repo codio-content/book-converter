@@ -8,7 +8,7 @@ class ItalicBold(object):
     def make_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
         block_contents = re.sub(r"\\\\", r"\\", block_contents)
-        return "_**{}**_".format(block_contents)
+        return "___{}___".format(block_contents)
 
     def convert(self):
         output = self.str
