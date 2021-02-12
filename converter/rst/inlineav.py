@@ -154,12 +154,12 @@ class InlineAv(object):
         self._iframe_images.append(IframeImage(iframe_src, f'{JSAV_IFRAME_SUBPATH}{iframe_name}.html', iframe_body))
 
         iframe_height = css_property.get_property_by_css(css_opt, name, 'height', self._workspace_dir)
-        iframe_height = 250 if iframe_height is None else iframe_height
+        iframe_height = 250 if iframe_height is None else re.sub(r'\d+', self._increase_size, iframe_height)
         iframe_width = css_property.get_property_by_css(css_opt, name, 'width', self._workspace_dir)
-        iframe_width = 900 if iframe_width is None else iframe_width
+        iframe_width = 950 if iframe_width is None else re.sub(r'\d+', self._increase_size, iframe_width)
 
         return f'{caret_token}<iframe id="{name}_iframe" src="{iframe_src}" ' \
-               f'width="{iframe_width}" height="{iframe_height}" scrolling="no" ' \
+               f'width="{iframe_width}" height="{iframe_height}" scrolling="yes" ' \
                f'style="position: relative; top: 0px; border: 0; margin: 0; overflow: hidden;">' \
                f'Your browser does not support iframes.</iframe>{caret_token}' \
                f'<br/>{caret_token}{caption}{caret_token}'
@@ -170,6 +170,10 @@ class InlineAv(object):
             caption = raw_caption.replace('\n', ' ')
             caption = re.sub(r'\s+', ' ', caption)
         return f'<center>Figure {figure_number}{caption}</center><br/>{self._caret_token}{self._caret_token}'
+
+    @staticmethod
+    def _increase_size(match_obj):
+        return str(int(match_obj.group(0)) + 50)
 
     def convert(self):
         output = self.str
