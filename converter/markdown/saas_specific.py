@@ -32,6 +32,7 @@ class SaasSpecific(TextAsParagraph):
 
     def convert(self):
         output = self.str
+        output = re.sub(r"---", " --- ", output)
         output = re.sub(r"\\protect", "", output)
         output = re.sub(r"\\putbib", "", output)
         output = re.sub(r"\\ig({\})?", "Instructors' Manual", output)
