@@ -8,7 +8,7 @@ class Character(object):
 
     @staticmethod
     def _character(matchobj):
-        return "<span>$</span>"
+        return '<span>$</span>'
 
     def convert(self):
         output = self.str

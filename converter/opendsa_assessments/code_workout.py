@@ -1,6 +1,8 @@
 import logging
+import os
 import re
 import subprocess
+from string import Template
 
 from converter.guides.tools import read_file, write_file, parse_csv_lines
 
@@ -103,55 +105,23 @@ def get_tester_code(exercise_data):
         run_tests += get_run_test_code(passed_data, failed_data, message, num)
         unit_tests += get_unit_test_code(actual, expected, method_name, class_name, num)
 
-    code = f'import java.util.Objects;\n' \
-           f'import java.util.concurrent.Callable;\n' \
-           f'\n' \
-           f'public class Tester {{\n' \
-           f'   public static void main(String[] args) {{\n' \
-           f'       int total_tests = {num};\n' \
-           f'       int passed_tests = 0;\n' \
-           f'       String feedback = "";\n' \
-           f'       String method_name = "{method_name}";\n' \
-           f'\n' \
-           f'{run_tests}' \
-           f'       String total = "" + total_tests;\n' \
-           f'       String passed = "" + passed_tests;\n' \
-           f'       String output = total + "\\n" + passed + "\\n" + method_name + "\\n" + feedback;\n' \
-           f'       System.out.println(output);\n' \
-           f'   }}\n' \
-           f'\n' \
-           f'   private static boolean runTest(Callable<Boolean> func) {{\n' \
-           f'       try {{\n' \
-           f'           return func.call();\n' \
-           f'       }} catch (Exception | Error e) {{\n' \
-           f'           return false;\n' \
-           f'       }}\n' \
-           f'   }}\n\n' \
-           f'{unit_tests}' \
-           f'}}\n'
-    return code, '\n'.join(static_checks)
+    dict_for_tester_code = dict(num=num,
+                                method_name=method_name,
+                                run_tests=run_tests,
+                                unit_tests=unit_tests)
+    tester_code_tpl = read_template('templates/tester_code_tpl.java')
+    tester_code = Template(tester_code_tpl).substitute(dict_for_tester_code)
+    return tester_code, '\n'.join(static_checks)
 
 
 def get_unit_test_code(actual, expected, method_name, class_name, num):
-    return f'   public static class Test{num} implements Callable<Boolean>{{\n' \
-           f'       private static final {class_name} instance = new {class_name}();\n' \
-           f'\n' \
-           f'       public Test{num}() {{\n' \
-           f'       }}\n' \
-           f'\n' \
-           f'       public static Object getExpectedVal() {{\n' \
-           f'          return {expected};\n' \
-           f'       }}\n' \
-           f'\n' \
-           f'       public static Object getActualVal() {{\n' \
-           f'          return instance.{method_name}({actual});\n' \
-           f'       }}\n' \
-           f'\n' \
-           f'       public Boolean call() {{\n' \
-           f'          return Objects.equals(getExpectedVal(), getActualVal());\n' \
-           f'       }}\n' \
-           f'   }}\n' \
-           f'\n'
+    dict_for_unit_test_code = dict(num=num,
+                                   class_name=class_name,
+                                   expected=expected,
+                                   method_name=method_name,
+                                   actual=actual)
+    unit_test_code_tpl = read_template('templates/unit_test_code_tpl.java')
+    return Template(unit_test_code_tpl).substitute(dict_for_unit_test_code)
 
 
 def get_run_test_code(passed_data, failed_data, message, num):
@@ -160,19 +130,16 @@ def get_run_test_code(passed_data, failed_data, message, num):
     failed_data = failed_data.replace('"', '\\"')
     passed_data = new_regex.sub('', passed_data)
     failed_data = new_regex.sub('', failed_data)
-    return f'       if (runTest(new Test{num}())) {{\n' \
-           f'           passed_tests++;\n' \
-           f'           feedback += "{message}Test <span style=\\"color:green\\"><b>PASSED</b></span>' \
-           f'{passed_data}\\n\\n";\n' \
-           f'       }} else {{\n' \
-           f'           feedback += "{message}Test <span style=\\"color:red\\"><b>FAILED</b></span>' \
-           f'{failed_data}\\n";\n' \
-           f'           try {{\n' \
-           f'               Object exp = Test{num}.getExpectedVal();\n' \
-           f'               Object act = Test{num}.getActualVal();\n' \
-           f'               feedback += "Expected: " + exp + "\\n" + "but was: " + act + "\\n\\n";\n' \
-           f'           }} catch (Exception | Error e) {{\n' \
-           f'               feedback += e + "\\n\\n";\n' \
-           f'           }}\n' \
-           f'       }}\n' \
-           f'\n'
+
+    dict_for_run_test = dict(num=num,
+                             message=message,
+                             passed_data=passed_data,
+                             failed_data=failed_data)
+    run_test_code_tpl = read_template('templates/run_test_code_tpl.java')
+    return Template(run_test_code_tpl).substitute(dict_for_run_test)
+
+
+def read_template(relative_path):
+    current_dirname = os.path.dirname(__file__)
+    with open(os.path.join(current_dirname, relative_path)) as file:
+        return file.read()

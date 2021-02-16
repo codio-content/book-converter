@@ -1,6 +1,6 @@
 import re
 
-FOUR_SPACES = '    '
+TAB_SIZE = '    '
 
 
 class List(object):
@@ -20,7 +20,7 @@ class List(object):
         if indent_size >= 1:
             indent_size = indent_size - 1
         content = '* '
-        content = indent_size * FOUR_SPACES + content
+        content = indent_size * TAB_SIZE + content
         return '\n' + content
 
     def convert(self):

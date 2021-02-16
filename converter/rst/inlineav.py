@@ -1,4 +1,5 @@
 import re
+import os
 from converter.guides.tools import slugify
 from string import Template
 from collections import namedtuple
@@ -8,80 +9,16 @@ IframeImage = namedtuple('IframeImage', ['src', 'path', 'content'])
 GUIDES_CDN = '//static-assets.codio.com/guides/opendsa/v1'
 MATHJAX_CDN = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1'
 JSAV_IFRAME_SUBPATH = 'jsav/iframe/v1/'
-JSAV_IMAGE_IFRAME = f"""
-<html>
-<head>
-<title>$title</title>
-<link rel="stylesheet" href="{GUIDES_CDN}/haiku.css" type="text/css" />
-<link rel="stylesheet" href="{GUIDES_CDN}/normalize.css" type="text/css" />
-<link rel="stylesheet" href="{GUIDES_CDN}/JSAV.css" type="text/css" />
-<link rel="stylesheet" href="{GUIDES_CDN}/odsaMOD-min.css" type="text/css" />
-<link rel="stylesheet" href="{GUIDES_CDN}/jquery-ui.css" type="text/css" />
-<link rel="stylesheet" href="{GUIDES_CDN}/odsaStyle-min.css" type="text/css" />
 
-<script type="text/javascript" src="{GUIDES_CDN}/jquery-2.1.4.min.js"></script>
-<script type="text/javascript" src="{MATHJAX_CDN}/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/jquery-ui.min.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/jquery.transit.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/raphael.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/JSAV-min.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/odsaUtils-min.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/odsaMOD-min.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/d3.min.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/d3-selection-multi.v1.min.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/dataStructures.js"></script>
-<script type="text/javascript" src="{GUIDES_CDN}/conceptMap.js"></script>
-</head>
-<body>
-$content
-<script>
-window.addEventListener("load", sendPostMessage);
-var element = document.getElementById('$name');
-if (element) {{
-    element.addEventListener("resize", sendPostMessage);
-    element.addEventListener("click", sendPostMessage);
-}}
-var height;
-function sendPostMessage() {{
-    if (height !== element.offsetHeight && element) {{
-        height = element.offsetHeight;
-        window.parent.postMessage(
-            JSON.stringify({{frameHeight: height, frameId: "$name", status: 'iframe', av: "$name"}}), '*'
-        );
-    }}
-}}
-</script>
-</body>
-</html>
-"""
-MATHJAX_IN_AV_CONTAINER_SCRIPT = r"""
-<script>
-  if (typeof MathJax !== 'undefined') {
-      MathJax.Hub.Config({
-        tex2jax: {
-          inlineMath: [
-            ['$', '$'],
-            ['\\(', '\\)']
-          ],
-          displayMath: [
-            ['$$', '$$'],
-            ["\\[", "\\]"]
-          ],
-          processEscapes: true
-        },
-        "HTML-CSS": {
-          scale: "80"
-        }
-      });
-      $('.avcontainer').on("jsav-message", function() {
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-      });
-      $(".avcontainer").on("jsav-updatecounter", function() {
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-      });
-    }
-</script>
-"""
+
+def read_template(relative_path):
+    current_dirname = os.path.dirname(__file__)
+    with open(os.path.join(current_dirname, relative_path)) as file:
+        return file.read()
+
+
+jsav_image_iframe = read_template('templates/iframe_image_tpl.html')
+mathjax_in_av_container_script = read_template('templates/mathjax_in_av_container_script_tpl.js')
 
 
 class InlineAv(object):
@@ -136,7 +73,7 @@ class InlineAv(object):
             iframe_content = f'{css_links}\n' \
                              f'<div style="margin: 0" id="{name}"></div>\n' \
                              f'{scripts}\n' \
-                             f'{MATHJAX_IN_AV_CONTAINER_SCRIPT}\n'
+                             f'{mathjax_in_av_container_script}\n'
         if av_type == 'ss':
             iframe_content = f'{css_links}\n' \
                              f'<div style="margin: 0" id="{name}" class="ssAV avcontainer">\n' \
@@ -146,10 +83,15 @@ class InlineAv(object):
                              f'<p class="jsavoutput jsavline"></p>\n' \
                              f'<div class="jsavcanvas"></div>\n' \
                              f'</div>\n{scripts}\n' \
-                             f'{MATHJAX_IN_AV_CONTAINER_SCRIPT}\n'
+                             f'{mathjax_in_av_container_script}\n'
 
         iframe_content = re.sub(caret_token, '\n', iframe_content)
-        iframe_body = Template(JSAV_IMAGE_IFRAME).substitute(title=name, content=iframe_content, name=name)
+        dict_for_iframe_body = dict(title=name,
+                                    content=iframe_content,
+                                    name=name,
+                                    guides_cdn=GUIDES_CDN,
+                                    mathjax_cdn=MATHJAX_CDN)
+        iframe_body = Template(jsav_image_iframe).substitute(dict_for_iframe_body)
 
         self._iframe_images.append(IframeImage(iframe_src, f'{JSAV_IFRAME_SUBPATH}{iframe_name}.html', iframe_body))
 

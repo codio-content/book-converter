@@ -3,9 +3,9 @@
 import sys
 import subprocess
 import re
+from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
 sys.path.append('/usr/share/codio/assessments')
-from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
 
 def run_unit_tests(static):
@@ -61,37 +61,33 @@ def run_unit_tests(static):
 def get_required_count(value):
     required_min_count = 1
     required_max_count = None
-    opt1 = re.search(r'\s*(required|true|yes|present|found)\s*', value)
-    opt2 = re.search(r'\s*(prohibited|false|no|absent|not\s*found)\s*', value)
-    opt3 = re.search(r'\s*{\s*([0-9]+)\s*,\s*([0-9]+)\s*}\s*', value)
-    opt4 = re.search(r'\s*{\s*,\s*([0-9]+)\s*}\s*', value)
-    opt5 = re.search(r'\s*{\s*([0-9]+)\s*,\s*}\s*', value)
-    if opt1:
-        required_min_count = 1
-    elif opt2:
+    count_prohibited = re.search(r'\s*(prohibited|false|no|absent|not\s*found)\s*', value)
+    has_min_and_max_count = re.search(r'\s*{\s*([0-9]+)\s*,\s*([0-9]+)\s*}\s*', value)
+    has_max_count = re.search(r'\s*{\s*,\s*([0-9]+)\s*}\s*', value)
+    has_min_count = re.search(r'\s*{\s*([0-9]+)\s*,\s*}\s*', value)
+    if count_prohibited:
         required_min_count = 0
         required_max_count = 0
-    elif opt3:
-        required_min_count = int(opt3[1])
-        required_max_count = int(opt3[2])
-    elif opt4:
+    elif has_min_and_max_count:
+        required_min_count = int(has_min_and_max_count[1])
+        required_max_count = int(has_min_and_max_count[2])
+    elif has_max_count:
         required_min_count = 0
-        required_max_count = int(opt4[1])
-    elif opt5:
-        required_min_count = int(opt5[1])
+        required_max_count = int(has_max_count[1])
+    elif has_min_count:
+        required_min_count = int(has_min_count[1])
     return required_min_count, required_max_count
 
 
 def get_static_check_regex(value, method):
     if re.search(r'^\s*(loops?)\s*', value):
         return r'\b(for|while|do)\b', 'loops'
-    elif re.search(r'^\s*(recursion)\s*', value):
+    if re.search(r'^\s*(recursion)\s*', value):
         return r'\b((this)\s*\.\s*|)(' + method + r')\s*\(', 'recursion'
-    elif re.search(r'^\s*methods?\s*:\s*', value):
+    if re.search(r'^\s*methods?\s*:\s*', value):
         method_name = re.search(r'\s*methods?\s*:\s*(?:\.\s*|)(.*?)\s*\(\)', value)[1]
         return r'\b(\s*\.\s*|)(' + method_name + r')\s*\(\)', f'method: {method_name}()'
-    else:
-        return value, ''
+    return value, ''
 
 
 def without_comments(data):

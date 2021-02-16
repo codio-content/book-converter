@@ -18,7 +18,7 @@ class Definition(object):
 
         space = re.search('\n *', content)
         space_count = len(space.group(0)) - 1
-        space_regex = f"\n^ {{{space_count}}}"
+        space_regex = f'\n^ {{{space_count}}}'
         content = re.sub(space_regex, '', content, flags=re.MULTILINE)
 
         lines = content.split('\n')

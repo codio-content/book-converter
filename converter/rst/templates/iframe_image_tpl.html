@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>$title</title>
+
+        <link rel="stylesheet" href="$guides_cdn/haiku.css" type="text/css" />
+        <link rel="stylesheet" href="$guides_cdn/normalize.css" type="text/css" />
+        <link rel="stylesheet" href="$guides_cdn/JSAV.css" type="text/css" />
+        <link rel="stylesheet" href="$guides_cdn/odsaMOD-min.css" type="text/css" />
+        <link rel="stylesheet" href="$guides_cdn/jquery-ui.css" type="text/css" />
+        <link rel="stylesheet" href="$guides_cdn/odsaStyle-min.css" type="text/css" />
+
+        <script type="text/javascript" src="$guides_cdn/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript" src="$mathjax_cdn/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="$guides_cdn/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="$guides_cdn/jquery.transit.js"></script>
+        <script type="text/javascript" src="$guides_cdn/raphael.js"></script>
+        <script type="text/javascript" src="$guides_cdn/JSAV-min.js"></script>
+        <script type="text/javascript" src="$guides_cdn/odsaUtils-min.js"></script>
+        <script type="text/javascript" src="$guides_cdn/odsaMOD-min.js"></script>
+        <script type="text/javascript" src="$guides_cdn/d3.min.js"></script>
+        <script type="text/javascript" src="$guides_cdn/d3-selection-multi.v1.min.js"></script>
+        <script type="text/javascript" src="$guides_cdn/dataStructures.js"></script>
+        <script type="text/javascript" src="$guides_cdn/conceptMap.js"></script>
+    </head>
+    <body>
+        $content
+        <script>
+        window.addEventListener("load", sendPostMessage);
+        var element = document.getElementById('$name');
+        if (element) {{
+            element.addEventListener("resize", sendPostMessage);
+            element.addEventListener("click", sendPostMessage);
+        }}
+        var height;
+        function sendPostMessage() {{
+            if (height !== element.offsetHeight && element) {{
+                height = element.offsetHeight;
+                window.parent.postMessage(
+                    JSON.stringify({{frameHeight: height, frameId: "$name", status: 'iframe', av: "$name"}}), '*'
+                );
+            }}
+        }}
+        </script>
+    </body>
+</html>

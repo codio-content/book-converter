@@ -358,8 +358,8 @@ def instructions_with_examples(test_matches, instructions, method_name):
 
 
 def _get_example(item, method_name):
-    example = False
-    message = item[2] if len(item) == 3 else False
+    example = None
+    message = item[2] if len(item) == 3 else None
     if message and message == 'example':
         actual = item[0]
         actual = re.sub(r'new\s+[a-zA-Z0-9]+(\s*\[\s*])+\s*', '', actual)
