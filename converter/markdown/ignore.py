@@ -37,17 +37,17 @@ class Ignore(object):
 
     def convert(self):
         output = self.str
+        output = re.sub(r"\\index\n{(.*?)}", r"\\index{\1}", output)
         output = self.remove_chars(output, "\\vspace{")
+        output = self.remove_chars(output, "\\index{")
         output = re.sub(r"\\textit{.*?}", "", output)
-        output = re.sub(r"\\index\n{(.*?)}", r"\\index{\1}", output, flags=re.DOTALL)
-        output = re.sub(r"\n? *\\index{.*?\n?.*?}%", "", output)
-        output = re.sub(r"(?![ ])\n? *\\index{.*?\n?.*?}", "", output)
         output = re.sub(r"\\noindent", "", output)
         output = re.sub(r"\\bigconcepts", "", output)
         output = re.sub(r"\\prereqs?", "", output)
         output = re.sub(r"\\relax", "", output)
         output = re.sub(r"\\vfill", "", output)
         output = re.sub(r"\\indent", "", output)
+        output = re.sub(r"\\pitfallicon", "", output)
         output = re.sub(r"\\fallaciesandpitfalls", "", output)
         output = re.sub(r"\\makebox\[.*?\]{}", "<br/>", output)
         output = re.sub(r"\\hspace{.*?}", "", output)
