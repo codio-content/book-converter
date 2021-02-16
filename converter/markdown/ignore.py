@@ -47,6 +47,7 @@ class Ignore(object):
         output = re.sub(r"\\relax", "", output)
         output = re.sub(r"\\vfill", "", output)
         output = re.sub(r"\\indent", "", output)
+        output = re.sub(r"\\pitfallicon", "", output)
         output = re.sub(r"\\fallaciesandpitfalls", "", output)
         output = re.sub(r"\\makebox\[.*?\]{}", "<br/>", output)
         output = re.sub(r"\\hspace{.*?}", "", output)
