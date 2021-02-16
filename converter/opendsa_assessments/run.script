@@ -3,9 +3,9 @@
 import sys
 import subprocess
 import re
-from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
 sys.path.append('/usr/share/codio/assessments')
+from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
 
 def run_unit_tests(static):
