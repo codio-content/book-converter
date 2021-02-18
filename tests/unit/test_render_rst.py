@@ -1,3 +1,4 @@
+import pathlib
 import unittest
 import os
 
@@ -38,9 +39,11 @@ class TestSuite(unittest.TestCase):
         converter = make_converter(path)
         write_md_case(name, converter.to_markdown())
 
-    def run_case(self, name):
+    def run_case(self, name, custom_workspace_dir=None):
         path = "cases_rst/{}".format(name)
         converter = make_converter(path)
+        if custom_workspace_dir:
+            converter.workspace_dir = custom_workspace_dir
         self.assertEqual(load_md(path), converter.to_markdown().rstrip('\n'))
 
     def test_avembed_render(self):
@@ -55,3 +58,54 @@ class TestSuite(unittest.TestCase):
         self.assertTrue('chomskycon' in js_av_images[0].src.lower())
         self.assertTrue('chomskycon' in js_av_images[0].path.lower())
         self.assertTrue('chomskycon' in js_av_images[0].content.lower())
+
+    def test_table_render(self):
+        self.run_case("table")
+
+    def test_simple_table_render(self):
+        self.run_case("simple_table")
+
+    def test_external_link_render(self):
+        self.run_case("external_link")
+
+    def test_sidebar_render(self):
+        self.run_case('sidebar')
+
+    def test_image_render(self):
+        self.run_case('image')
+
+    def test_footnote_render(self):
+        self.run_case('footnote')
+
+    def test_bibliography_render(self):
+        self.run_case('bibliography')
+
+    def test_code_include_render(self):
+        self.run_case('code_include', pathlib.Path.cwd().joinpath('./tests/unit/cases_rst'))
+
+    def test_glossary_render(self):
+        self.run_case('glossary')
+
+    def test_heading_render(self):
+        self.run_case('heading')
+
+    def test_topic_render(self):
+        self.run_case('topic')
+
+    def test_tip_render(self):
+        self.run_case('tip')
+
+    def test_math_render(self):
+        self.run_case('math')
+
+    def test_only_render(self):
+        self.run_case('only')
+
+    def test_ref_render(self):
+        self.run_case('ref')
+
+    def test_term_render(self):
+        self.run_case('term')
+
+    def test_epigraph_render(self):
+        self.run_case('epigraph')

@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from pathlib import Path
 
-from converter.rst2markdown import AssessmentData
+from converter.rst.model.assessment_data import AssessmentData
 from converter.convert import convert_assessment, write_assessments
 
 

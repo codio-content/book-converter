@@ -1,0 +1,3 @@
+.. topic:: :figure_number:0.0.1: Example
+
+   If we clarify the definition of sibling...
