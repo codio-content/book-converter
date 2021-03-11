@@ -33,7 +33,7 @@ class CodeInclude(object):
             logging.error(e)
 
         content = self._get_content(lines, tag) if lines else ''
-        return f'{caret_token}```{caret_token}{content.strip()}{caret_token}```{caret_token}{caret_token}'
+        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
 
     @staticmethod
     def _get_tag_by_opt(opt):
@@ -45,8 +45,8 @@ class CodeInclude(object):
                 return match[2]
         return ''
 
-    @staticmethod
-    def _get_content(lines, tag):
+    def _get_content(self, lines, tag):
+        tag = tag.strip() if tag else tag
         start_tag_string = f'/* *** ODSATag: {tag} *** */' if tag else False
         end_tag_string = f'/* *** ODSAendTag: {tag} *** */' if tag else False
         content = ''
@@ -59,7 +59,7 @@ class CodeInclude(object):
             if end_tag_string and line.strip().startswith(end_tag_string):
                 break
             line = re.sub(r"/\* \*\*\* .*? \*\*\* \*/", "", line)
-            content += line
+            content += line.rstrip("\n") + self._caret_token
         return content
 
     def convert(self):
