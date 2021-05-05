@@ -679,32 +679,28 @@ def prepare_figure_numbers_for_item(item, chapter_num, subsection_num, tag_refer
             figure_counter += 1
 
 
-def convert_rst(config, base_path, yes=False):
+def convert_rst(config, base_path, code_lang, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
         return
-
     logging.debug("start converting %s" % generate_dir)
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
     exercises = get_code_exercises(workspace_dir)
-    toc = get_rst_toc(workspace_dir, Path(config['workspace']['rst']), exercises)
+    toc, json_config = get_rst_toc(workspace_dir, Path(config['workspace']['rst']), exercises)
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
-
     chapter = None
     chapter_num = 0
     subsection_num = 0
     children_containers = [book["children"]]
     logging.debug("convert selected pages")
-
     refs = OrderedDict()
     label_counter = 0
     all_assessments = list()
     iframe_images = list()
     tag_references = prepare_figure_numbers(toc)
-
     for item in toc:
         if item.section_type == CHAPTER:
             subsection_num = 0
@@ -714,9 +710,7 @@ def convert_rst(config, base_path, yes=False):
         else:
             subsection_num += 1
             slug_name = slugify(item.section_name, chapter=chapter)
-
         logging.debug("convert page {} - {}".format(slug_name, chapter_num))
-
         converted_md = item.markdown
         if not converted_md:
             label = get_labels(item.lines)
@@ -729,6 +723,8 @@ def convert_rst(config, base_path, yes=False):
             lines = cleanup_rst(item.lines)
             rst_converter = Rst2Markdown(
                 lines,
+                json_config,
+                code_lang,
                 exercises,
                 tag_references,
                 workspace_dir=workspace_dir,

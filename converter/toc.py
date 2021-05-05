@@ -215,14 +215,13 @@ def get_bookdown_toc(folder, name):
         return toc
 
 
-def get_rst_toc(folder, name, exercises={}):
+def get_rst_toc(workspace_dir, json_config_name, exercises={}):
     toc = []
-    rst_path = folder.joinpath('RST/en').resolve()
-    structure_dir = folder.joinpath('config')
-    structure_path = structure_dir.joinpath(name).resolve()
-    config = load_json_file(structure_path)
-    chapters = config.get('chapters')
-
+    source_path = workspace_dir.joinpath('RST/en').resolve()
+    json_config_dir = workspace_dir.joinpath('config')
+    json_config_path = json_config_dir.joinpath(json_config_name).resolve()
+    json_config = load_json_file(json_config_path)
+    chapters = json_config.get('chapters')
     for chapter in chapters:
         pages = chapters.get(chapter).keys()
         toc.append(SectionItem(
@@ -231,13 +230,13 @@ def get_rst_toc(folder, name, exercises={}):
             line_pos=0)
         )
         for page in pages:
-            rst_name = f'{page}.rst'
-            path = pathlib.Path(rst_path.joinpath(rst_name).resolve())
-            if not path.exists():
-                print("File %s doesn't exist\n" % rst_name)
+            rst_file_name = f'{page}.rst'
+            rst_file_path = pathlib.Path(source_path.joinpath(rst_file_name).resolve())
+            if not rst_file_path.exists():
+                print("File %s doesn't exist\n" % rst_file_name)
                 continue
-            toc += process_rst_file(path, exercises)
-    return toc
+            toc += process_rst_file(rst_file_path, exercises)
+    return toc, json_config
 
 
 def _math(matchobj):

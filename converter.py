@@ -7,12 +7,13 @@ from converter.convert import convert, convert_bookdown, convert_rst
 from converter.refs import ref_dict
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Process latex to codio guides.')
+    parser = ArgumentParser(description='Process convert to codio guides.')
     parser.add_argument('paths', metavar='PATH', type=str, nargs='+', help='path to a book config')
     parser.add_argument('--generate', type=str, help='path to a latex book')
     parser.add_argument('-l', '--log', action='store', default=None)
     parser.add_argument('-y', '--yes', action='store_true')
     parser.add_argument('-r', '--ref', action='store_true')
+    parser.add_argument('-cl', '--code_lang', type=str)
 
     args = parser.parse_args()
 
@@ -35,4 +36,4 @@ if __name__ == '__main__':
             elif config.get('workspace', {}).get('bookdown'):
                 convert_bookdown(config, base_path, args.yes)
             elif config.get('workspace', {}).get('rst'):
-                convert_rst(config, base_path, args.yes)
+                convert_rst(config, base_path, args.code_lang, args.yes)

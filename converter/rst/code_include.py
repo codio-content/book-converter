@@ -1,39 +1,62 @@
 import re
-import pathlib
 import logging
+from pathlib import Path
+
+CODE_LANG_DICT = {
+    'java': {
+        'name': 'Java',
+        'ext': ['java']
+    },
+    'c++': {
+        'name': 'C++',
+        'ext': ['cpp', 'h']
+    },
+    'python': {
+        'name': 'Python',
+        'ext': ['py']
+    },
+}
 
 
 class CodeInclude(object):
-    def __init__(self, source_string, caret_token, workspace_dir, load_file_method):
+    def __init__(self, source_string, caret_token, workspace_dir, load_file_method, code_dir, code_lang):
         self.str = source_string
         self._caret_token = caret_token
         self._workspace_dir = workspace_dir
         self._load_file = load_file_method
+        self.code_lang = code_lang
+        self.code_dir = code_dir
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
     def _code_include(self, matchobj):
         lines = []
         caret_token = self._caret_token
-        curr_dir = self._workspace_dir
-        code_dir = curr_dir.joinpath('SourceCode')
-        path = matchobj.group('path').strip()
-        path = pathlib.Path(path)
         opt = matchobj.group('options')
         tag = self._get_tag_by_opt(opt) if opt else None
-        file_path = pathlib.Path(path)
-        if not str(file_path).endswith(".java"):
-            file_path = "{}.java".format(file_path)
-        if not str(file_path).startswith('Java'):
-            java_dir = pathlib.Path('Java')
-            file_path = java_dir.joinpath(file_path)
-        file = code_dir.joinpath(file_path).resolve()
+        file_path = self._get_file_path(matchobj)
         try:
-            lines = self._load_file(file)
+            lines = self._load_file(file_path)
         except BaseException as e:
             logging.error(e)
-
         content = self._get_content(lines, tag) if lines else ''
         return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
+
+    def _get_file_path(self, matchobj):
+        source_code_path = self._workspace_dir.joinpath(self.code_dir)
+        rel_file_path = Path(matchobj.group('path').strip())
+        file_path = source_code_path.joinpath(rel_file_path).resolve()
+        if not Path(file_path).is_file():
+            if not self.code_lang:
+                self.code_lang = 'java'
+            lang = CODE_LANG_DICT[self.code_lang.lower()]
+            lang_dir = Path(lang['name'])
+            for ext in lang['ext']:
+                path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}')).resolve()
+                if Path(path).exists():
+                    return path
+            path = Path('Java').joinpath(f'{rel_file_path}.java')
+            return source_code_path.joinpath(path).resolve()
+        return file_path
 
     @staticmethod
     def _get_tag_by_opt(opt):
