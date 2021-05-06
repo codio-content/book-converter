@@ -16,8 +16,7 @@ class IndentedCode(object):
         text = text.rstrip(':')
         code = matchobj.group('code')
         colon = ':' if text else ''
-        code = re.sub("\n", f'{caret_token}', code)
-        return f'{caret_token}{text}{colon}{caret_token}{caret_token}```{caret_token}{code}{caret_token}```' \
+        return f'{caret_token}{text}{colon}{caret_token}{caret_token}```{code.strip()}```' \
                f'{caret_token}{caret_token}'
 
     def convert(self):
