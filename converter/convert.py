@@ -679,7 +679,7 @@ def prepare_figure_numbers_for_item(item, chapter_num, subsection_num, tag_refer
             figure_counter += 1
 
 
-def convert_rst(config, base_path, code_lang, yes=False):
+def convert_rst(config, base_path, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
         return
@@ -687,6 +687,7 @@ def convert_rst(config, base_path, code_lang, yes=False):
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
+    source_code = config['source_code']
     exercises = get_code_exercises(workspace_dir)
     toc, json_config = get_rst_toc(workspace_dir, Path(config['workspace']['rst']), exercises)
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
@@ -724,7 +725,7 @@ def convert_rst(config, base_path, code_lang, yes=False):
             rst_converter = Rst2Markdown(
                 lines,
                 json_config,
-                code_lang,
+                source_code,
                 exercises,
                 tag_references,
                 workspace_dir=workspace_dir,

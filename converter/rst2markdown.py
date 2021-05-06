@@ -40,7 +40,7 @@ OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
 class Rst2Markdown(object):
     def __init__(self, lines_array,
                  json_config,
-                 code_lang,
+                 source_code,
                  exercises,
                  tag_references=None,
                  workspace_dir=pathlib.Path('.'),
@@ -57,7 +57,7 @@ class Rst2Markdown(object):
         self._tag_references = tag_references
         self.workspace_dir = workspace_dir
         self.json_config = json_config
-        self.code_lang = code_lang
+        self.source_code = source_code
 
     def _enum_lists_parse(self, lines):
         counter = 0
@@ -132,7 +132,7 @@ class Rst2Markdown(object):
             self.workspace_dir,
             self.load_file,
             self.json_config.get('code_dir'),
-            self.code_lang
+            self.source_code
         ).convert()
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()

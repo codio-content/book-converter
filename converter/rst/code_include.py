@@ -19,13 +19,13 @@ CODE_LANG_DICT = {
 
 
 class CodeInclude(object):
-    def __init__(self, source_string, caret_token, workspace_dir, load_file_method, code_dir, code_lang):
+    def __init__(self, source_string, caret_token, workspace_dir, load_file_method, source_code_dir, source_code):
         self.str = source_string
         self._caret_token = caret_token
         self._workspace_dir = workspace_dir
         self._load_file = load_file_method
-        self.code_lang = code_lang
-        self.code_dir = code_dir
+        self.source_code = source_code
+        self.source_code_dir = source_code_dir
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
     def _code_include(self, matchobj):
@@ -42,13 +42,13 @@ class CodeInclude(object):
         return f'{caret_token}```{caret_token}{content}```{caret_token}{caret_token}'
 
     def _get_file_path(self, matchobj):
-        source_code_path = self._workspace_dir.joinpath(self.code_dir)
+        source_code_path = self._workspace_dir.joinpath(self.source_code_dir)
         rel_file_path = Path(matchobj.group('path').strip())
         file_path = source_code_path.joinpath(rel_file_path).resolve()
         if not Path(file_path).is_file():
-            if not self.code_lang:
-                self.code_lang = 'java'
-            lang = CODE_LANG_DICT[self.code_lang.lower()]
+            if not self.source_code:
+                self.source_code = 'java'
+            lang = CODE_LANG_DICT[self.source_code.lower()]
             lang_dir = Path(lang['name'])
             for ext in lang['ext']:
                 path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}')).resolve()

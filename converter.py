@@ -13,7 +13,6 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--log', action='store', default=None)
     parser.add_argument('-y', '--yes', action='store_true')
     parser.add_argument('-r', '--ref', action='store_true')
-    parser.add_argument('-cl', '--code_lang', type=str)
 
     args = parser.parse_args()
 
@@ -36,4 +35,4 @@ if __name__ == '__main__':
             elif config.get('workspace', {}).get('bookdown'):
                 convert_bookdown(config, base_path, args.yes)
             elif config.get('workspace', {}).get('rst'):
-                convert_rst(config, base_path, args.code_lang, args.yes)
+                convert_rst(config, base_path, args.yes)
