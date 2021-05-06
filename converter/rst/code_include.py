@@ -2,7 +2,7 @@ import re
 import logging
 from pathlib import Path
 
-CODE_LANG_DICT = {
+SOURCE_CODE_DICT = {
     'java': {
         'name': 'Java',
         'ext': ['java']
@@ -46,9 +46,8 @@ class CodeInclude(object):
         rel_file_path = Path(matchobj.group('path').strip())
         file_path = source_code_path.joinpath(rel_file_path).resolve()
         if not Path(file_path).is_file():
-            if not self.source_code:
-                self.source_code = 'java'
-            lang = CODE_LANG_DICT[self.source_code.lower()]
+            default = SOURCE_CODE_DICT.get('java')
+            lang = SOURCE_CODE_DICT.get(self.source_code.lower(), default)
             lang_dir = Path(lang['name'])
             for ext in lang['ext']:
                 path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}')).resolve()

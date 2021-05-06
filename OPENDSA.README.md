@@ -156,5 +156,6 @@ In generate folder will appear subfolder with name `jsav` - need to upload it to
 Add an option to the `codio_structure.yaml` with the language name from the list: "java", "c++", "python"
 
 ```yaml
-source_code: java
+opendsa:
+  source_code: java
 ```
