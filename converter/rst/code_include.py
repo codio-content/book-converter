@@ -54,8 +54,10 @@ class CodeInclude(object):
                 path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}')).resolve()
                 if Path(path).exists():
                     return path
-            path = Path('Java').joinpath(f'{rel_file_path}.java')
-            return source_code_path.joinpath(path).resolve()
+            java_path = source_code_path.joinpath(Path('Java').joinpath(f'{rel_file_path}.java')).resolve()
+            if not Path(java_path).exists():
+                return source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt')).resolve()
+            return java_path
         return file_path
 
     @staticmethod
