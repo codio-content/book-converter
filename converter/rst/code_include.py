@@ -39,7 +39,7 @@ class CodeInclude(object):
         except BaseException as e:
             logging.error(e)
         content = self._get_content(lines, tag) if lines else ''
-        return f'{caret_token}```{caret_token}{content}{caret_token}```{caret_token}{caret_token}'
+        return f'{caret_token}```{caret_token}{content}```{caret_token}{caret_token}'
 
     def _get_file_path(self, matchobj):
         source_code_path = self._workspace_dir.joinpath(self.code_dir)
