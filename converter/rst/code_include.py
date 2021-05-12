@@ -77,10 +77,10 @@ class CodeInclude(object):
         for line in lines:
             if not line:
                 continue
-            if start_tag_string and line.strip().startswith(start_tag_string):
+            if start_tag_string and start_tag_string in line:
                 content = ''
                 continue
-            if end_tag_string and line.strip().startswith(end_tag_string):
+            if end_tag_string and end_tag_string in line:
                 break
             line = re.sub(r"/\* \*\*\* .*? \*\*\* \*/", "", line)
             content += line.rstrip("\n") + self._caret_token
