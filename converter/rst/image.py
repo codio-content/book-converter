@@ -11,11 +11,11 @@ class Image(object):
         self._image_re = re.compile(
             r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]odsafig::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
                 (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
-                (\n(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
+                (\n(?![ ]+\.\.)(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
         self._figure_re = re.compile(
             r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]figure::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
                 (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
-                (\n(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
+                (\n(?![ ]+\.\.)(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
 
     @staticmethod
     def _get_image_options(raw_options):
