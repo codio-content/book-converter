@@ -45,18 +45,24 @@ class CodeInclude(object):
         source_code_path = self._workspace_dir.joinpath(self.source_code_dir)
         rel_file_path = Path(matchobj.group('path').strip())
         file_path = source_code_path.joinpath(rel_file_path).resolve()
-        if not Path(file_path).is_file():
-            default = SOURCE_CODE_DICT.get('java')
-            lang = SOURCE_CODE_DICT.get(self.source_code.lower(), default)
-            lang_dir = Path(lang['name'])
-            for ext in lang['ext']:
-                path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}')).resolve()
-                if Path(path).exists():
-                    return path
-            java_path = source_code_path.joinpath(Path('Java').joinpath(f'{rel_file_path}.java')).resolve()
-            if not Path(java_path).exists():
-                return source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt')).resolve()
-            return java_path
+        if Path(file_path).is_file():
+            return file_path
+
+        file_path = None
+        lang_key = self.source_code.lower() if (self.source_code.lower() in SOURCE_CODE_DICT) else 'java'
+        lang = SOURCE_CODE_DICT.get(lang_key)
+        lang_dir = Path(lang['name'])
+
+        for ext in lang['ext']:
+            path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}')).resolve()
+            if Path(path).exists():
+                file_path = path
+        path_for_java = source_code_path.joinpath(Path('Java').joinpath(f'{rel_file_path}.java')).resolve()
+        if not file_path and Path(path_for_java).exists():
+            file_path = path_for_java
+        path_for_pseudo = source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt')).resolve()
+        if not file_path and Path(path_for_pseudo).exists():
+            file_path = path_for_pseudo
         return file_path
 
     @staticmethod
