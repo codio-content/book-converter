@@ -738,11 +738,12 @@ def convert_rst(config, base_path, yes=False):
                 chapter_num=chapter_num,
                 subsection_num=subsection_num
             )
-            converted_md, code_paths = rst_converter.to_markdown()
-            for path in code_paths:
-                source_code_report.append(tuple([f'{chapter_num}. {chapter}', item.section_name, path]))
+            converted_md = rst_converter.to_markdown()
             all_assessments += rst_converter.get_assessments()
             iframe_images += rst_converter.get_iframe_images()
+
+            for code_path in rst_converter.source_code_paths():
+                source_code_report.append(tuple([f'{chapter_num}. {chapter}', item.section_name, code_path]))
 
             if slug_name in tokens:
                 for key, value in tokens.get(slug_name).items():

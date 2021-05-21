@@ -89,6 +89,9 @@ class Rst2Markdown(object):
     def get_iframe_images(self):
         return self._iframe_images
 
+    def source_code_paths(self):
+        return self._source_code_paths
+
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
         lines_array = PreparerMathBlock(self.lines_array, self._math_block_separator_token).prepare()
@@ -146,4 +149,4 @@ class Rst2Markdown(object):
         output = List(output).convert()
         output = Math(output).convert()
         output = re.sub(self._caret_token, "\n", output)
-        return output, self._source_code_paths
+        return output

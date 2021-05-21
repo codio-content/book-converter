@@ -35,8 +35,9 @@ class CodeInclude(object):
         opt = matchobj.group('options')
         tag = self._get_tag_by_opt(opt) if opt else None
         file_path = self._get_file_path(matchobj)
-        index = file_path.parts.index(self.source_code_dir.strip('//'))
-        self._source_code_paths.append('/'.join(file_path.parts[index+1:]))
+        if file_path:
+            index = file_path.parts.index(self.source_code_dir.strip('//'))
+            self._source_code_paths.append('/'.join(file_path.parts[index+1:]))
         try:
             lines = self._load_file(file_path)
         except BaseException as e:
