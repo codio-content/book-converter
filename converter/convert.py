@@ -681,7 +681,7 @@ def prepare_figure_numbers_for_item(item, chapter_num, subsection_num, tag_refer
 
 def print_source_code_report(data):
     print('########## Source code report ##########')
-    [print(item) for item in data]
+    [print(f'{item[0]} | {item[1]} | {item[2]}') for item in data]
 
 
 def convert_rst(config, base_path, yes=False):
@@ -740,7 +740,7 @@ def convert_rst(config, base_path, yes=False):
             )
             converted_md, code_paths = rst_converter.to_markdown()
             for path in code_paths:
-                source_code_report.append(tuple([chapter, item.section_name, path]))
+                source_code_report.append(tuple([f'{chapter_num}. {chapter}', item.section_name, path]))
             all_assessments += rst_converter.get_assessments()
             iframe_images += rst_converter.get_iframe_images()
 
