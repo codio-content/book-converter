@@ -679,6 +679,11 @@ def prepare_figure_numbers_for_item(item, chapter_num, subsection_num, tag_refer
             figure_counter += 1
 
 
+def print_source_code_report(data):
+    print('########## Source code report ##########')
+    [print(item) for item in data]
+
+
 def convert_rst(config, base_path, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
@@ -701,6 +706,7 @@ def convert_rst(config, base_path, yes=False):
     label_counter = 0
     all_assessments = list()
     iframe_images = list()
+    source_code_report = list()
     tag_references = prepare_figure_numbers(toc)
     for item in toc:
         if item.section_type == CHAPTER:
@@ -732,7 +738,9 @@ def convert_rst(config, base_path, yes=False):
                 chapter_num=chapter_num,
                 subsection_num=subsection_num
             )
-            converted_md = rst_converter.to_markdown()
+            converted_md, code_paths = rst_converter.to_markdown()
+            for path in code_paths:
+                source_code_report.append(tuple([chapter, item.section_name, path]))
             all_assessments += rst_converter.get_assessments()
             iframe_images += rst_converter.get_iframe_images()
 
@@ -775,3 +783,4 @@ def convert_rst(config, base_path, yes=False):
     write_assessments(guides_dir, all_assessments)
     process_assets(config, generate_dir, [], [])
     process_iframe_images(config, generate_dir, iframe_images)
+    print_source_code_report(source_code_report)

@@ -26,6 +26,7 @@ class CodeInclude(object):
         self._load_file = load_file_method
         self.source_code = source_code
         self.source_code_dir = source_code_dir
+        self._source_code_paths = []
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
     def _code_include(self, matchobj):
@@ -34,6 +35,8 @@ class CodeInclude(object):
         opt = matchobj.group('options')
         tag = self._get_tag_by_opt(opt) if opt else None
         file_path = self._get_file_path(matchobj)
+        index = file_path.parts.index(self.source_code_dir.strip('//'))
+        self._source_code_paths.append('/'.join(file_path.parts[index+1:]))
         try:
             lines = self._load_file(file_path)
         except BaseException as e:
@@ -44,7 +47,7 @@ class CodeInclude(object):
     def _get_file_path(self, matchobj):
         source_code_path = self._workspace_dir.joinpath(self.source_code_dir)
         rel_file_path = Path(matchobj.group('path').strip())
-        file_path = source_code_path.joinpath(rel_file_path).resolve()
+        file_path = source_code_path.joinpath(rel_file_path)
         if Path(file_path).is_file():
             return file_path
 
@@ -54,14 +57,14 @@ class CodeInclude(object):
         lang_dir = Path(lang['name'])
 
         for ext in lang['ext']:
-            path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}')).resolve()
+            path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}'))
             if Path(path).exists():
                 file_path = path
         java_lang = SOURCE_CODE_DICT.get('java')
-        path_for_java = source_code_path.joinpath(Path(java_lang['name']).joinpath(f'{rel_file_path}.java')).resolve()
+        path_for_java = source_code_path.joinpath(Path(java_lang['name']).joinpath(f'{rel_file_path}.java'))
         if not file_path and Path(path_for_java).exists():
             file_path = path_for_java
-        path_for_pseudo = source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt')).resolve()
+        path_for_pseudo = source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt'))
         if not file_path and Path(path_for_pseudo).exists():
             file_path = path_for_pseudo
         return file_path
@@ -96,4 +99,4 @@ class CodeInclude(object):
     def convert(self):
         output = self.str
         output = self._code_include_re.sub(self._code_include, output)
-        return output
+        return output, self._source_code_paths

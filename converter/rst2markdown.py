@@ -58,6 +58,7 @@ class Rst2Markdown(object):
         self.workspace_dir = workspace_dir
         self.json_config = json_config
         self.source_code = source_code
+        self._source_code_paths = list()
 
     def _enum_lists_parse(self, lines):
         counter = 0
@@ -126,7 +127,7 @@ class Rst2Markdown(object):
         output = ExternalLink(output).convert()
         output = Only(output).convert()
         output = IndentedCode(output, self._caret_token).convert()
-        output = CodeInclude(
+        output, source_code_paths = CodeInclude(
             output,
             self._caret_token,
             self.workspace_dir,
@@ -134,6 +135,8 @@ class Rst2Markdown(object):
             self.json_config.get('code_dir'),
             self.source_code
         ).convert()
+        if source_code_paths:
+            self._source_code_paths.extend(source_code_paths)
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
         output = Comment(output).convert()
@@ -143,4 +146,4 @@ class Rst2Markdown(object):
         output = List(output).convert()
         output = Math(output).convert()
         output = re.sub(self._caret_token, "\n", output)
-        return output
+        return output, self._source_code_paths
