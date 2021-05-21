@@ -89,7 +89,7 @@ class Rst2Markdown(object):
     def get_iframe_images(self):
         return self._iframe_images
 
-    def source_code_paths(self):
+    def get_source_code_paths(self):
         return self._source_code_paths
 
     def to_markdown(self):

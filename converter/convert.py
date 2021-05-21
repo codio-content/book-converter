@@ -742,7 +742,7 @@ def convert_rst(config, base_path, yes=False):
             all_assessments += rst_converter.get_assessments()
             iframe_images += rst_converter.get_iframe_images()
 
-            for code_path in rst_converter.source_code_paths():
+            for code_path in rst_converter.get_source_code_paths():
                 source_code_report.append(tuple([f'{chapter_num}. {chapter}', item.section_name, code_path]))
 
             if slug_name in tokens:
