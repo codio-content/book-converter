@@ -680,7 +680,7 @@ def prepare_figure_numbers_for_item(item, chapter_num, subsection_num, tag_refer
 
 
 def print_source_code_report(data):
-    print('########## Source code report ##########')
+    print('\n########## Source code report ##########\n')
     [print(f'{item[0]} | {item[1]} | {item[2]}') for item in data]
 
 
