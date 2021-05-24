@@ -31,28 +31,29 @@ class CodeInclude(object):
 
     def _code_include(self, matchobj):
         lines = []
+        code_nodes = []
         caret_token = self._caret_token
         opt = matchobj.group('options')
         tag = self._get_tag_by_opt(opt) if opt else None
-        file_path = self._get_file_path(matchobj)
-        if file_path:
+        for file_path in self._get_file_path(matchobj):
             index = file_path.parts.index(self.source_code_dir)
             self._source_code_paths.append('/'.join(file_path.parts[index+1:]))
-        try:
-            lines = self._load_file(file_path)
-        except BaseException as e:
-            logging.error(e)
-        content = self._get_content(lines, tag) if lines else ''
-        return f'{caret_token}```{caret_token}{content}```{caret_token}{caret_token}'
+            try:
+                lines = self._load_file(file_path)
+            except BaseException as e:
+                logging.error(e)
+            content = self._get_content(lines, tag) if lines else ''
+            code_nodes.append(f'{caret_token}```{caret_token}{content}```{caret_token}{caret_token}')
+        return '\n'.join(code_nodes)
 
     def _get_file_path(self, matchobj):
+        file_paths = []
         source_code_path = self._workspace_dir.joinpath(self.source_code_dir)
         rel_file_path = Path(matchobj.group('path').strip())
         file_path = source_code_path.joinpath(rel_file_path)
         if Path(file_path).is_file():
-            return file_path
+            return [file_path]
 
-        file_path = None
         lang_key = self.source_code.lower() if self.source_code.lower() in SOURCE_CODE_DICT else 'java'
         lang = SOURCE_CODE_DICT.get(lang_key)
         lang_dir = Path(lang['name'])
@@ -60,15 +61,17 @@ class CodeInclude(object):
         for ext in lang['ext']:
             file_path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}'))
             if Path(file_path).exists():
-                return file_path
+                file_paths.append(file_path)
+        if file_paths:
+            return file_paths
+
         java_lang = SOURCE_CODE_DICT.get('java')
         path_for_java = source_code_path.joinpath(Path(java_lang['name']).joinpath(f'{rel_file_path}.java'))
         if Path(path_for_java).exists():
-            file_path = path_for_java
+            return [path_for_java]
         path_for_pseudo = source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt'))
         if Path(path_for_pseudo).exists():
-            file_path = path_for_pseudo
-        return file_path
+            return [path_for_pseudo]
 
     @staticmethod
     def _get_tag_by_opt(opt):
