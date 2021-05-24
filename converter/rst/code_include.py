@@ -61,13 +61,14 @@ class CodeInclude(object):
             path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}'))
             if Path(path).exists():
                 file_path = path
-        java_lang = SOURCE_CODE_DICT.get('java')
-        path_for_java = source_code_path.joinpath(Path(java_lang['name']).joinpath(f'{rel_file_path}.java'))
-        if not file_path and Path(path_for_java).exists():
-            file_path = path_for_java
-        path_for_pseudo = source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt'))
-        if not file_path and Path(path_for_pseudo).exists():
-            file_path = path_for_pseudo
+        if not file_path:
+            java_lang = SOURCE_CODE_DICT.get('java')
+            path_for_java = source_code_path.joinpath(Path(java_lang['name']).joinpath(f'{rel_file_path}.java'))
+            if Path(path_for_java).exists():
+                file_path = path_for_java
+            path_for_pseudo = source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt'))
+            if Path(path_for_pseudo).exists():
+                file_path = path_for_pseudo
         return file_path
 
     @staticmethod
