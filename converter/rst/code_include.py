@@ -25,7 +25,7 @@ class CodeInclude(object):
         self._workspace_dir = workspace_dir
         self._load_file = load_file_method
         self.source_code = source_code
-        self.source_code_dir = source_code_dir
+        self.source_code_dir = source_code_dir.strip('//')
         self._source_code_paths = []
         self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
@@ -36,7 +36,7 @@ class CodeInclude(object):
         tag = self._get_tag_by_opt(opt) if opt else None
         file_path = self._get_file_path(matchobj)
         if file_path:
-            index = file_path.parts.index(self.source_code_dir.strip('//'))
+            index = file_path.parts.index(self.source_code_dir)
             self._source_code_paths.append('/'.join(file_path.parts[index+1:]))
         try:
             lines = self._load_file(file_path)
@@ -53,22 +53,21 @@ class CodeInclude(object):
             return file_path
 
         file_path = None
-        lang_key = self.source_code.lower() if (self.source_code.lower() in SOURCE_CODE_DICT) else 'java'
+        lang_key = self.source_code.lower() if self.source_code.lower() in SOURCE_CODE_DICT else 'java'
         lang = SOURCE_CODE_DICT.get(lang_key)
         lang_dir = Path(lang['name'])
 
         for ext in lang['ext']:
-            path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}'))
-            if Path(path).exists():
-                file_path = path
-        if not file_path:
-            java_lang = SOURCE_CODE_DICT.get('java')
-            path_for_java = source_code_path.joinpath(Path(java_lang['name']).joinpath(f'{rel_file_path}.java'))
-            if Path(path_for_java).exists():
-                file_path = path_for_java
-            path_for_pseudo = source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt'))
-            if Path(path_for_pseudo).exists():
-                file_path = path_for_pseudo
+            file_path = source_code_path.joinpath(lang_dir.joinpath(f'{rel_file_path}.{ext}'))
+            if Path(file_path).exists():
+                return file_path
+        java_lang = SOURCE_CODE_DICT.get('java')
+        path_for_java = source_code_path.joinpath(Path(java_lang['name']).joinpath(f'{rel_file_path}.java'))
+        if Path(path_for_java).exists():
+            file_path = path_for_java
+        path_for_pseudo = source_code_path.joinpath(Path('Pseudo').joinpath(f'{rel_file_path}.txt'))
+        if Path(path_for_pseudo).exists():
+            file_path = path_for_pseudo
         return file_path
 
     @staticmethod
