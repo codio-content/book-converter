@@ -30,7 +30,7 @@ def load_md(path):
 
 
 def make_converter(path):
-    return Rst2Markdown(load_rst(path).split('\n'), OrderedDict())
+    return Rst2Markdown(load_rst(path).split('\n'), {'code_dir': 'SourceCode'}, 'java', OrderedDict())
 
 
 class TestSuite(unittest.TestCase):

@@ -150,3 +150,12 @@ opendsa:
 ```
 
 In generate folder will appear subfolder with name `jsav` - need to upload it to base CDN path 
+
+### Selecting the source code language
+
+Add an option to the `codio_structure.yaml` with the language name from the list: "java", "c++", "python"
+
+```yaml
+opendsa:
+  source_code: java
+```

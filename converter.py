@@ -7,7 +7,7 @@ from converter.convert import convert, convert_bookdown, convert_rst
 from converter.refs import ref_dict
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description='Process latex to codio guides.')
+    parser = ArgumentParser(description='Process convert to codio guides.')
     parser.add_argument('paths', metavar='PATH', type=str, nargs='+', help='path to a book config')
     parser.add_argument('--generate', type=str, help='path to a latex book')
     parser.add_argument('-l', '--log', action='store', default=None)

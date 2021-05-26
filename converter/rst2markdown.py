@@ -39,6 +39,8 @@ OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
 
 class Rst2Markdown(object):
     def __init__(self, lines_array,
+                 json_config,
+                 source_code,
                  exercises,
                  tag_references=None,
                  workspace_dir=pathlib.Path('.'),
@@ -54,6 +56,9 @@ class Rst2Markdown(object):
         self._exercises = exercises
         self._tag_references = tag_references
         self.workspace_dir = workspace_dir
+        self.json_config = json_config
+        self.source_code = source_code
+        self._source_code_paths = list()
 
     def _enum_lists_parse(self, lines):
         counter = 0
@@ -83,6 +88,9 @@ class Rst2Markdown(object):
 
     def get_iframe_images(self):
         return self._iframe_images
+
+    def get_source_code_paths(self):
+        return self._source_code_paths
 
     def to_markdown(self):
         self.lines_array = self._enum_lists_parse(self.lines_array)
@@ -122,7 +130,16 @@ class Rst2Markdown(object):
         output = ExternalLink(output).convert()
         output = Only(output).convert()
         output = IndentedCode(output, self._caret_token).convert()
-        output = CodeInclude(output, self._caret_token, self.workspace_dir, self.load_file).convert()
+        output, source_code_paths = CodeInclude(
+            output,
+            self._caret_token,
+            self.workspace_dir,
+            self.load_file,
+            self.json_config.get('code_dir'),
+            self.source_code
+        ).convert()
+        if source_code_paths:
+            self._source_code_paths.extend(source_code_paths)
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
         output = Comment(output).convert()
