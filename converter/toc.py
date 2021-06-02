@@ -341,7 +341,7 @@ def generate_toc(file_path, structure_path, ignore_exists=False):
         toc = get_bookdown_toc(tex, tex.name)
         data_format = 'bookdown'
     elif rst:
-        toc = get_rst_toc(tex.parent.parent, tex.name)
+        toc, json_config = get_rst_toc(tex.parent.parent, tex.name)
         data_format = 'rst'
     else:
         toc = get_latex_toc(tex.parent, tex.name)
