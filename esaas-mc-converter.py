@@ -8,10 +8,11 @@ from pathlib import Path
 
 from converter.guides.tools import write_json, read_file, write_file
 
-FileToProcess = namedtuple('FileToProcess', ['name', 'mc_items'])
+FileToProcess = namedtuple('FileToProcess', ['name', 'assessment_items'])
 AssessmentItem = namedtuple('AssessmentItem', ['type', 'options'])
 
 SELECT_MULTIPLE = 'select_multiple'
+PAGE = 'page'
 
 
 def slugify(in_str):
@@ -45,13 +46,12 @@ def get_section_item(name, files):
 
 def get_assessment_item(assessment, name, assessment_count):
     instructions = ''
-    answer_count = 0
     answers = []
-    for opt in assessment.options:
-        if opt[0] == 'text':
-            instructions = opt[1]
-        answer_count += 1
-        answers.append(get_mc_answers(opt, answer_count))
+    for option in assessment.options:
+        if option[0] == 'text':
+            instructions = option[1]
+            continue
+        answers.append(get_assessment_answer(option))
 
     return {
         "type": "multiple-choice",
@@ -87,11 +87,11 @@ def get_assessment_item(assessment, name, assessment_count):
     }
 
 
-def get_mc_answers(opt, count):
+def get_assessment_answer(option):
     return {
         "_id": str(uuid.uuid4()),
-        "correct": opt[0] == 'answer',
-        "answer": opt[1]
+        "correct": option[0] == 'answer',
+        "answer": option[1]
     }
 
 
@@ -119,75 +119,76 @@ def write_section_files(section, output_dir):
     content_file.parent.mkdir(parents=True, exist_ok=True)
     relative_path = content_file.relative_to(output_dir)
     base_content = section.get('content-file', '')
-    content = f'{base_content}\n'
-    write_file(content_file, content)
+    write_file(content_file, f'{base_content}\n')
     section['content-file'] = str(str(relative_path).replace("\\", "/"))
     return section
 
 
-def get_codio_structure(to_process):
+def convert_to_codio_structure(to_process):
     structure = []
     sections = []
     assessments = []
 
     for item in to_process:
-        book_item = get_book_item(item.name, "chapter")
+        book_item = get_book_item(item.name, PAGE)
         structure.append(book_item)
+
         files = [
             {
                 "action": "close",
                 "path": "#tabs"
             }
         ]
-        content = generate_content(item.name, item.mc_items)
+        content = generate_content(item.name, item.assessment_items)
         current_item = get_section_item(item.name, files)
         current_item['content-file'] = '\n'.join(content)
         sections.append(current_item)
 
         assessment_count = 0
-        for assessment in item.mc_items:
+        for assessment in item.assessment_items:
             assessment_count += 1
             assessments.append(get_assessment_item(assessment, item.name, assessment_count))
 
     return structure, sections, assessments
 
 
-def generate_content(assessment_name, mc_items):
+def generate_content(assessment_name, assessment_items):
     count = 0
     current_content = []
-    for _ in mc_items:
+    for _ in assessment_items:
         count += 1
-        current_content.append(f"{{Check It!|assessment}}(multiple-choice-{slugify(assessment_name)}-{count})")
+        current_content.append(f"{{Check It!|assessment}}(multiple-choice-{slugify(assessment_name)}-{count})\n")
     return current_content
 
 
 def convert(base_directory, output_dir):
     shutil.rmtree(output_dir, ignore_errors=True)
-
     to_process = []
     for file in (base_directory.glob('*.rb')):
+        assessment_items = []
         file_data = read_file(file.resolve())
 
         match_title = re.search(r"^quiz[ ]['\"](?P<name>.*?)['\"](?:[ ]do)?$", file_data, flags=re.MULTILINE)
         if not match_title:
-            print(file, 'PARSE ERROR')
             return
         name = match_title.group('name').strip()
-        print(file)
 
-        mc_items = []
         result = re.finditer(r"^[ ]+(?P<type>choice_answer|select_multiple).*?\n(?P<content>.*?)[ ]{2}end", file_data,
                              flags=re.MULTILINE + re.DOTALL)
+        if not match_title:
+            print(file, 'PARSE ERROR')
+            return
+        print(file)
 
         for item in list(result):
             mc_type = item.group('type')
             content = item.group('content')
             options = re.findall(r"[ ]{4}(?P<option>.*?)[ ]['\"](?P<value>.*?)['\"]\n", content)
-            mc_items.append(AssessmentItem(mc_type, options))
+            assessment_items.append(AssessmentItem(mc_type, options))
 
-        to_process.append(FileToProcess(name, mc_items))
+        to_process.append(FileToProcess(name, assessment_items))
 
-    structure, sections, assessments = get_codio_structure(to_process)
+    structure, sections, assessments = convert_to_codio_structure(to_process)
 
     output_dir.mkdir()
     guides_dir = output_dir.joinpath('.guides')
