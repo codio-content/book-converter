@@ -48,10 +48,15 @@ def get_assessment_item(assessment, name, assessment_count):
     instructions = ''
     answers = []
     for option in assessment.options:
+        if option[0] == 'group':
+            continue
+        if option[0] == 'tags':
+            continue
         if option[0] == 'text':
             instructions = option[1]
             continue
-        answers.append(get_assessment_answer(option))
+        if option[0] == 'answer' or option[0] =='distractor':
+            answers.append(get_assessment_answer(option))
 
     return {
         "type": "multiple-choice",
