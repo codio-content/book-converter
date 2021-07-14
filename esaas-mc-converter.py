@@ -9,7 +9,7 @@ from pathlib import Path
 from converter.guides.tools import write_json, read_file, write_file
 
 FileToProcess = namedtuple('FileToProcess', ['name', 'assessment_items'])
-AssessmentItem = namedtuple('AssessmentItem', ['type', 'options'])
+AssessmentItem = namedtuple('AssessmentItem', ['type', 'options', 'settings'])
 
 SELECT_MULTIPLE = 'select_multiple'
 PAGE = 'page'
@@ -47,6 +47,7 @@ def get_section_item(name, files):
 def get_assessment_item(assessment, name, assessment_count):
     instructions = ''
     answers = []
+
     for option in assessment.options:
         if option[0] == 'group':
             continue
@@ -55,8 +56,15 @@ def get_assessment_item(assessment, name, assessment_count):
         if option[0] == 'text':
             instructions = option[1]
             continue
-        if option[0] == 'answer' or option[0] =='distractor':
+        if option[0] == 'answer' or option[0] == 'distractor':
             answers.append(get_assessment_answer(option))
+
+    isRandomized = False
+    points = 20
+    if assessment.settings:
+        for settings_item in assessment.settings:
+            isRandomized = settings_item.get('randomize')
+            points = settings_item.get('points')
 
     return {
         "type": "multiple-choice",
@@ -66,14 +74,14 @@ def get_assessment_item(assessment, name, assessment_count):
             "showName": True,
             "instructions": instructions,
             "multipleResponse": assessment.type == SELECT_MULTIPLE,
-            "isRandomized": True,
+            "isRandomized": isRandomized,
             "answers": answers,
             "guidance": "",
             "showGuidanceAfterResponseOption": {
                 "type": "Never"
             },
             "showExpectedAnswer": True,
-            "points": 20,
+            "points": points,
             "incorrectPoints": 0,
             "arePartialPointsAllowed": False,
             "metadata": {
@@ -178,8 +186,8 @@ def convert(base_directory, output_dir):
             return
         name = match_title.group('name').strip()
 
-        result = re.finditer(r"^[ ]+(?P<type>choice_answer|select_multiple).*?\n(?P<content>.*?)[ ]{2}end", file_data,
-                             flags=re.MULTILINE + re.DOTALL)
+        result = re.finditer(r"^[ ]+(?P<type>choice_answer|select_multiple)\s+(?P<settings>:.*? => .*?)?\s+do\n"
+                             r"(?P<content>.*?)[ ]{2}end", file_data, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
         if not match_title:
             print(file, 'PARSE ERROR')
             return
@@ -188,8 +196,17 @@ def convert(base_directory, output_dir):
         for item in list(result):
             mc_type = item.group('type')
             content = item.group('content')
+
+            settings = []
+            match_settings = item.group('settings')
+            if match_settings is not None:
+                for settings_item in match_settings.split(','):
+                    match_option = re.search(r"^:((?P<key>.*?) => (?P<value>.*?))$", settings_item, flags=re.MULTILINE)
+                    if match_option:
+                        settings.append({match_option.group('key'): match_option.group('value')})
+
             options = re.findall(r"[ ]{4}(?P<option>.*?)[ ]['\"](?P<value>.*?)['\"]\n", content)
-            assessment_items.append(AssessmentItem(mc_type, options))
+            assessment_items.append(AssessmentItem(mc_type, options, settings))
 
         to_process.append(FileToProcess(name, assessment_items))
 
