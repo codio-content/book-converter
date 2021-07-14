@@ -91,7 +91,7 @@ def get_mc_answers(opt, count):
     return {
         "_id": str(uuid.uuid4()),
         "correct": opt[0] == 'answer',
-        "answer": f"{count}"
+        "answer": opt[1]
     }
 
 
