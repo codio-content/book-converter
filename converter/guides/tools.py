@@ -13,7 +13,8 @@ def write_file(file_path, content):
 
 
 def write_json(file_path, json_data, sort_keys=True):
-    write_file(file_path, json.dumps(json_data, sort_keys=sort_keys, indent=2, separators=(',', ': '), ensure_ascii=False))
+    write_file(file_path, json.dumps(
+        json_data, sort_keys=sort_keys, indent=2, separators=(',', ': '), ensure_ascii=False))
 
 
 def read_file(file_path):
