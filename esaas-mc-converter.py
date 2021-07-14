@@ -63,8 +63,8 @@ def get_assessment_item(assessment, name, assessment_count):
     points = 20
     if assessment.settings:
         for settings_item in assessment.settings:
-            isRandomized = settings_item.get('randomize')
-            points = settings_item.get('points')
+            isRandomized = settings_item.get('randomize', False)
+            points = settings_item.get('points', 20)
 
     return {
         "type": "multiple-choice",
@@ -186,7 +186,7 @@ def convert(base_directory, output_dir):
             return
         name = match_title.group('name').strip()
 
-        result = re.finditer(r"^[ ]+(?P<type>choice_answer|select_multiple)\s+(?P<settings>:.*? => .*?)?\s+do\n"
+        result = re.finditer(r"^[ ]+(?P<type>choice_answer|select_multiple)(?P<settings>\s+:.*? => .*?)?\s+do\n"
                              r"(?P<content>.*?)[ ]{2}end", file_data, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
         if not match_title:
             print(file, 'PARSE ERROR')
@@ -201,7 +201,7 @@ def convert(base_directory, output_dir):
             match_settings = item.group('settings')
             if match_settings is not None:
                 for settings_item in match_settings.split(','):
-                    match_option = re.search(r"^:((?P<key>.*?) => (?P<value>.*?))$", settings_item, flags=re.MULTILINE)
+                    match_option = re.search(r":((?P<key>.*?) => (?P<value>.*?))$", settings_item, flags=re.MULTILINE)
                     if match_option:
                         settings.append({match_option.group('key'): match_option.group('value')})
 
