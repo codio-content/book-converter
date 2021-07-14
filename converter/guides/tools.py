@@ -12,12 +12,12 @@ def write_file(file_path, content):
         f.write(content)
 
 
-def write_json(file_path, json_data):
-    write_file(file_path, json.dumps(json_data, sort_keys=True, indent=2, separators=(',', ': '), ensure_ascii=False))
+def write_json(file_path, json_data, sort_keys=True):
+    write_file(file_path, json.dumps(json_data, sort_keys=sort_keys, indent=2, separators=(',', ': '), ensure_ascii=False))
 
 
 def read_file(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', errors='replace', encoding="utf-8") as file:
         return file.read()
 
 
