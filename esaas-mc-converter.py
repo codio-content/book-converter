@@ -44,7 +44,7 @@ def get_section_item(name, files):
     }
 
 
-def get_assessment_item(assessment, name, assessment_count):
+def get_assessment_item(assessment, name, count):
     instructions = ''
     answers = []
 
@@ -59,29 +59,22 @@ def get_assessment_item(assessment, name, assessment_count):
         if option[0] == 'answer' or option[0] == 'distractor':
             answers.append(get_assessment_answer(option))
 
-    isRandomized = False
-    points = 20
-    if assessment.settings:
-        for settings_item in assessment.settings:
-            isRandomized = settings_item.get('randomize', False)
-            points = settings_item.get('points', 20)
-
     return {
         "type": "multiple-choice",
-        "taskId": f"multiple-choice-{slugify(name)}-{assessment_count}",
+        "taskId": f"multiple-choice-{slugify(name)}-{count}",
         "source": {
-            "name": f"{name} {assessment_count}",
+            "name": f"{name} {count}",
             "showName": True,
             "instructions": instructions,
             "multipleResponse": assessment.type == SELECT_MULTIPLE,
-            "isRandomized": isRandomized,
+            "isRandomized": assessment.settings.get('randomize', False),
             "answers": answers,
             "guidance": "",
             "showGuidanceAfterResponseOption": {
-                "type": "Never"
+                "type": "Always"
             },
             "showExpectedAnswer": True,
-            "points": points,
+            "points": int(assessment.settings.get('points', 20)),
             "incorrectPoints": 0,
             "arePartialPointsAllowed": False,
             "metadata": {
@@ -197,13 +190,13 @@ def convert(base_directory, output_dir):
             mc_type = item.group('type')
             content = item.group('content')
 
-            settings = []
+            settings = {}
             match_settings = item.group('settings')
             if match_settings is not None:
                 for settings_item in match_settings.split(','):
                     match_option = re.search(r":((?P<key>.*?) => (?P<value>.*?))$", settings_item, flags=re.MULTILINE)
                     if match_option:
-                        settings.append({match_option.group('key'): match_option.group('value')})
+                        settings[match_option.group('key')] = match_option.group('value')
 
             options = re.findall(r"[ ]{4}(?P<option>.*?)[ ]['\"](?P<value>.*?)['\"]\n", content)
             assessment_items.append(AssessmentItem(mc_type, options, settings))
