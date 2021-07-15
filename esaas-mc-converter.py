@@ -59,10 +59,15 @@ def get_assessment_item(assessment, name, count):
             instructions = option[1] if option[1] != "" else option[2]
             continue
         if option_type == 'answer' or option_type == 'distractor':
-            match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", option[1], flags=re.MULTILINE)
+            data = option[1] if option[1] != "" else option[2]
+
+            match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", data, flags=re.MULTILINE)
             if match_guidance:
                 guidance.append(match_guidance.group('explanation'))
-            answers.append(get_assessment_answer(option))
+
+            answer = re.sub(r"(?!\n)(.*?)}?(?:}\n|(,\s+:explanation => .*?$))", r"\1", data,
+                            flags=re.MULTILINE + re.DOTALL)
+            answers.append(get_assessment_answer(option_type, answer))
 
     return {
         "type": "multiple-choice",
@@ -98,11 +103,10 @@ def get_assessment_item(assessment, name, count):
     }
 
 
-def get_assessment_answer(option):
-    answer = re.sub(r"(.*?),\s+:explanation => .*?$", r"\1", option[1], flags=re.MULTILINE)
+def get_assessment_answer(option_type, answer):
     return {
         "_id": str(uuid.uuid4()),
-        "correct": option[0] == 'answer',
+        "correct": option_type == 'answer',
         "answer": answer.replace("\\n", "")
     }
 
@@ -211,8 +215,9 @@ def convert(base_directory, output_dir):
                     if match_settings_item:
                         settings[match_settings_item.group('key')] = match_settings_item.group('value')
 
-            options = re.findall(r"\s+(?:#[ ])?(?P<option>.*?)\s+(?:['\"](?P<value>.*?)['\"]$"
-                                 r"|%[qQ]{(?P<another_value>.*?)})", content + '\n', flags=re.MULTILINE + re.DOTALL)
+            options = re.findall(r"[ ]{4}[# ]?(?P<option>.*?)\s+(?:['\"](?P<value>.*?)['\"]"
+                                 r"|[%][qQ]{(?P<another_value>.*?))(?=\s{4}.*?[ ]+(?:[%]|['\"])|\n^$)",
+                                 content + '\n', flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
             assessment_items.append(AssessmentItem(mc_type, options, settings))
 
         to_process.append(FileToProcess(name, assessment_items))
