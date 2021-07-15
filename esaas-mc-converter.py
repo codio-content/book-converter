@@ -46,6 +46,7 @@ def get_section_item(name, files):
 
 def get_assessment_item(assessment, name, count):
     instructions = ''
+    guidance = []
     answers = []
 
     for option in assessment.options:
@@ -57,6 +58,9 @@ def get_assessment_item(assessment, name, count):
             instructions = option[1]
             continue
         if option[0] == 'answer' or option[0] == 'distractor':
+            match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", option[1], flags=re.MULTILINE)
+            if match_guidance:
+                guidance.append(match_guidance.group('explanation'))
             answers.append(get_assessment_answer(option))
 
     return {
@@ -65,11 +69,11 @@ def get_assessment_item(assessment, name, count):
         "source": {
             "name": f"{name} {count}",
             "showName": True,
-            "instructions": instructions,
+            "instructions": instructions.replace("\\n", ""),
             "multipleResponse": assessment.type == SELECT_MULTIPLE,
             "isRandomized": assessment.settings.get('randomize', False),
             "answers": answers,
-            "guidance": "",
+            "guidance": '\n\n'.join(guidance),
             "showGuidanceAfterResponseOption": {
                 "type": "Always"
             },
@@ -94,10 +98,11 @@ def get_assessment_item(assessment, name, count):
 
 
 def get_assessment_answer(option):
+    answer = re.sub(r"(.*?),\s+:explanation => .*?$", r"\1", option[1], flags=re.MULTILINE)
     return {
         "_id": str(uuid.uuid4()),
         "correct": option[0] == 'answer',
-        "answer": option[1]
+        "answer": answer.replace("\\n", "")
     }
 
 
