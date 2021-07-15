@@ -50,14 +50,15 @@ def get_assessment_item(assessment, name, count):
     answers = []
 
     for option in assessment.options:
-        if option[0] == 'group':
+        option_type = option[0].strip()
+        if option_type == 'group':
             continue
-        if option[0] == 'tags':
+        if option_type == 'tags':
             continue
-        if option[0] == 'text':
-            instructions = option[1]
+        if option_type == 'text':
+            instructions = option[1] if option[1] != "" else option[2]
             continue
-        if option[0] == 'answer' or option[0] == 'distractor':
+        if option_type == 'answer' or option_type == 'distractor':
             match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", option[1], flags=re.MULTILINE)
             if match_guidance:
                 guidance.append(match_guidance.group('explanation'))
@@ -179,14 +180,20 @@ def convert(base_directory, output_dir):
         assessment_items = []
         file_data = read_file(file.resolve())
 
-        match_title = re.search(r"^quiz[ ]['\"](?P<name>.*?)['\"](?:[ ]do)?$", file_data, flags=re.MULTILINE)
-        if not match_title:
-            return
-        name = match_title.group('name').strip()
+        match_data = re.search(r"^quiz\s+['\"](?P<name>.*?)['\"]\s+(?:do)?\n(?P<assessments_block>.*(?=end))",
+                               file_data, flags=re.MULTILINE + re.DOTALL)
 
-        result = re.finditer(r"^[ ]+(?P<type>choice_answer|select_multiple)(?P<settings>\s+:.*? => .*?)?\s+do\n"
-                             r"(?P<content>.*?)[ ]{2}end", file_data, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
-        if not match_title:
+        if not match_data:
+            return
+        name = match_data.group('name').strip()
+        assessments_block = match_data.group('assessments_block')
+        assessments_block = re.sub(r"^\s+#+$", "", assessments_block, flags=re.MULTILINE)
+        assessments_block += "\n"
+
+        result = re.finditer(r"^\s+(?P<type>choice_answer|select_multiple)(?P<settings>\s+:.*? => ?.*?)?\s+do\n"
+                             r"(?P<content>.*?)(?:\s+end\s+\n(?!\n\s*\S)|(?=\s+\1))",
+                             assessments_block, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+        if not result:
             print(file, 'PARSE ERROR')
             return
         print(file)
@@ -199,11 +206,13 @@ def convert(base_directory, output_dir):
             match_settings = item.group('settings')
             if match_settings is not None:
                 for settings_item in match_settings.split(','):
-                    match_option = re.search(r":((?P<key>.*?) => (?P<value>.*?))$", settings_item, flags=re.MULTILINE)
-                    if match_option:
-                        settings[match_option.group('key')] = match_option.group('value')
+                    match_settings_item = re.search(r":((?P<key>.*?) => (?P<value>.*?))$", settings_item,
+                                                    flags=re.MULTILINE)
+                    if match_settings_item:
+                        settings[match_settings_item.group('key')] = match_settings_item.group('value')
 
-            options = re.findall(r"[ ]{4}(?P<option>.*?)[ ]['\"](?P<value>.*?)['\"]\n", content)
+            options = re.findall(r"\s+(?:#[ ])?(?P<option>.*?)\s+(?:['\"](?P<value>.*?)['\"]$"
+                                 r"|%[qQ]{(?P<another_value>.*?)})", content + '\n', flags=re.MULTILINE + re.DOTALL)
             assessment_items.append(AssessmentItem(mc_type, options, settings))
 
         to_process.append(FileToProcess(name, assessment_items))
