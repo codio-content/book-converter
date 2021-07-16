@@ -12,7 +12,7 @@ FileToProcess = namedtuple('FileToProcess', ['name', 'file_name', 'assessment_it
 AssessmentItem = namedtuple('AssessmentItem', ['type', 'options', 'settings'])
 
 SELECT_MULTIPLE = 'select_multiple'
-PAGE = 'page'
+CHAPTER = 'chapter'
 
 
 def slugify(in_str):
@@ -52,7 +52,7 @@ def get_assessment_item(assessment, name, file_name, count):
         "name": "Assessment Type",
         "value": "Multiple Choice"
     }, {
-        "name": "source_name",
+        "name": "source",
         "value": file_name
     }]
 
@@ -163,7 +163,7 @@ def convert_to_codio_structure(to_process):
     assessments = []
 
     for item in to_process:
-        book_item = get_book_item(item.name, PAGE)
+        book_item = get_book_item(item.name, CHAPTER)
         structure.append(book_item)
 
         files = [
@@ -244,21 +244,27 @@ def convert(base_directory, output_dir):
     structure, sections, assessments = convert_to_codio_structure(to_process)
 
     output_dir.mkdir()
-    guides_dir = output_dir.joinpath('.guides')
-    guides_dir.mkdir()
-    book_file = guides_dir.joinpath('book.json').resolve()
-    write_json(book_file, full_book_structure(structure), False)
 
-    updated_sections = list(map(lambda section: write_section_files(section, output_dir), sections))
-    metadata_file = guides_dir.joinpath('metadata.json')
-    write_json(metadata_file, full_metadata(updated_sections), False)
+    for item in to_process:
+        chapter_dir = output_dir.joinpath(item.file_name)
+        chapter_dir.mkdir()
 
-    assessments_file = guides_dir.joinpath('assessments.json')
-    write_json(assessments_file, assessments, False)
+        guides_dir = chapter_dir.joinpath('.guides')
+        guides_dir.mkdir()
+
+        book_file = guides_dir.joinpath('book.json').resolve()
+        write_json(book_file, full_book_structure(structure), False)
+
+        updated_sections = list(map(lambda section: write_section_files(section, chapter_dir), sections))
+        metadata_file = guides_dir.joinpath('metadata.json')
+        write_json(metadata_file, full_metadata(updated_sections), False)
+
+        assessments_file = guides_dir.joinpath('assessments.json')
+        write_json(assessments_file, assessments, False)
 
 
 def main():
-    parser = ArgumentParser(description='Process convert esaas mc (RUQL) to codio mc format.')
+    parser = ArgumentParser(description='Process convert ESaaS MC assessments to Codio MC assessments format.')
     parser.add_argument('paths', metavar='PATH', type=str, nargs='+', help='path to a sources directory')
     parser.add_argument('-l', '--log', action='store', default=None)
     parser.add_argument('--output', type=str, help='path to output folder')
