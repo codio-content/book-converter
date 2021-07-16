@@ -11,8 +11,17 @@ from converter.guides.tools import write_json, read_file, write_file
 FileToProcess = namedtuple('FileToProcess', ['name', 'file_name', 'assessment_items'])
 AssessmentItem = namedtuple('AssessmentItem', ['type', 'options', 'settings'])
 
-SELECT_MULTIPLE = 'select_multiple'
 CHAPTER = 'chapter'
+
+CHOICE_ANSWER = 'choice_answer'
+SELECT_MULTIPLE = 'select_multiple'
+FILL_IN_BLANK = 'fill_in'
+
+ASSESSMENT_TYPE = {
+    CHOICE_ANSWER: 'multiple-choice',
+    SELECT_MULTIPLE: 'multiple-choice',
+    FILL_IN_BLANK: 'fill-in-the-blanks'
+}
 
 
 def slugify(in_str):
@@ -91,6 +100,13 @@ def get_assessment_item(assessment, name, file_name, count):
 
             answers.append(get_assessment_answer(option_type, answer))
 
+    if assessment.type == CHOICE_ANSWER or assessment.type == SELECT_MULTIPLE:
+        return get_multiple_choice_structure(name, count, instructions, assessment, answers, guidance, tags)
+    if assessment.type == FILL_IN_BLANK:
+        return get_fill_in_blank_structure(name, count, instructions, assessment, answers, guidance, tags)
+
+
+def get_multiple_choice_structure(name, count, instructions, assessment, answers, guidance, tags):
     return {
         "type": "multiple-choice",
         "taskId": f"multiple-choice-{slugify(name)}-{count}",
@@ -116,6 +132,45 @@ def get_assessment_item(assessment, name, file_name, count):
             },
             "bloomsObjectiveLevel": "",
             "learningObjectives": ""
+        }
+    }
+
+
+def get_fill_in_blank_structure(name, count, instructions, assessment, answers, guidance, tags):
+    answer = answers[0].get('answer').strip()
+    return {
+        "type": "fill-in-the-blanks",
+        "taskId": f"fill-in-the-blanks-{slugify(name)}-{count}",
+        "source": {
+            "name": f"{name} {count}",
+            "showName": True,
+            "instructions": instructions.replace("\\n", ""),
+            "showValues": False,
+            "text": f"<<<{answer}>>>",
+            "distractors": "",
+            "guidance": '\n\n'.join(guidance),
+            "showGuidanceAfterResponseOption": {
+                "type": "Always"
+            },
+            "showExpectedAnswer": True,
+            "points": int(assessment.settings.get('points', 20)),
+            "arePartialPointsAllowed": False,
+            "metadata": {
+                "tags": tags,
+                "files": [],
+                "opened": []
+            },
+            "bloomsObjectiveLevel": "",
+            "learningObjectives": "",
+            "tokens": {
+                "blank": [
+                    answer
+                ],
+                "text": [
+                    0
+                ],
+                "regexPositions": []
+            }
         }
     }
 
@@ -187,9 +242,10 @@ def convert_to_codio_structure(item):
 def generate_content(assessment_name, assessment_items):
     count = 0
     current_content = []
-    for _ in assessment_items:
+    for item in assessment_items:
         count += 1
-        current_content.append(f"{{Check It!|assessment}}(multiple-choice-{slugify(assessment_name)}-{count})\n")
+        assessment_type = ASSESSMENT_TYPE[item.type]
+        current_content.append(f"{{Check It!|assessment}}({assessment_type}-{slugify(assessment_name)}-{count})\n")
     return current_content
 
 
@@ -212,7 +268,7 @@ def convert(base_directory, output_dir):
         assessments_block = re.sub(r"^\s+#+$", "", assessments_block, flags=re.MULTILINE)
         assessments_block += "\n"
 
-        result = re.finditer(r"^\s+(?P<type>choice_answer|select_multiple)(?P<settings>\s+:.*? => ?.*?)?\s+do\n"
+        result = re.finditer(r"^\s+(?P<type>choice_answer|select_multiple|fill_in)(?P<settings>\s+:.*? => ?.*?)?\s+do\n"
                              r"(?P<content>.*?)(?:\s+end\s+\n(?!\n\s*\S)|(?=\s+\1))",
                              assessments_block, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
         if not result:
