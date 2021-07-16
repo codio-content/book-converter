@@ -157,30 +157,29 @@ def write_section_files(section, output_dir):
     return section
 
 
-def convert_to_codio_structure(to_process):
+def convert_to_codio_structure(item):
     structure = []
     sections = []
     assessments = []
 
-    for item in to_process:
-        book_item = get_book_item(item.name, CHAPTER)
-        structure.append(book_item)
+    book_item = get_book_item(item.name, CHAPTER)
+    structure.append(book_item)
 
-        files = [
-            {
-                "action": "close",
-                "path": "#tabs"
-            }
-        ]
-        content = generate_content(item.name, item.assessment_items)
-        current_item = get_section_item(item.name, files)
-        current_item['content-file'] = '\n'.join(content)
-        sections.append(current_item)
+    files = [
+        {
+            "action": "close",
+            "path": "#tabs"
+        }
+    ]
+    content = generate_content(item.name, item.assessment_items)
+    current_item = get_section_item(item.name, files)
+    current_item['content-file'] = '\n'.join(content)
+    sections.append(current_item)
 
-        assessment_count = 0
-        for assessment in item.assessment_items:
-            assessment_count += 1
-            assessments.append(get_assessment_item(assessment, item.name, item.file_name, assessment_count))
+    assessment_count = 0
+    for assessment in item.assessment_items:
+        assessment_count += 1
+        assessments.append(get_assessment_item(assessment, item.name, item.file_name, assessment_count))
 
     return structure, sections, assessments
 
@@ -241,11 +240,11 @@ def convert(base_directory, output_dir):
 
         to_process.append(FileToProcess(name, file_name_without_ext, assessment_items))
 
-    structure, sections, assessments = convert_to_codio_structure(to_process)
-
     output_dir.mkdir()
 
     for item in to_process:
+        structure, sections, assessments = convert_to_codio_structure(item)
+
         chapter_dir = output_dir.joinpath(item.file_name)
         chapter_dir.mkdir()
 
