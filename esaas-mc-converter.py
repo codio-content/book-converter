@@ -8,7 +8,7 @@ from pathlib import Path
 
 from converter.guides.tools import write_json, read_file, write_file
 
-FileToProcess = namedtuple('FileToProcess', ['name', 'assessment_items'])
+FileToProcess = namedtuple('FileToProcess', ['name', 'file_name', 'assessment_items'])
 AssessmentItem = namedtuple('AssessmentItem', ['type', 'options', 'settings'])
 
 SELECT_MULTIPLE = 'select_multiple'
@@ -44,16 +44,29 @@ def get_section_item(name, files):
     }
 
 
-def get_assessment_item(assessment, name, count):
+def get_assessment_item(assessment, name, file_name, count):
     instructions = ''
     guidance = []
     answers = []
+    tags = [{
+        "name": "Assessment Type",
+        "value": "Multiple Choice"
+    }, {
+        "name": "source_name",
+        "value": file_name
+    }]
 
     for option in assessment.options:
         option_type = option[0].strip()
         if option_type == 'group':
             continue
         if option_type == 'tags':
+            tags_list = option[1].split(',')
+            for tag in tags_list:
+                match_tag = re.search(r"topic:(?P<tag_value>.*?)'$", tag)
+                if match_tag:
+                    tag = match_tag.group('tag_value')
+                    tags.append({'name': 'topic', 'value': tag})
             continue
         if option_type == 'text':
             instructions = option[1] if option[1] != "" else option[2]
@@ -97,12 +110,7 @@ def get_assessment_item(assessment, name, count):
             "incorrectPoints": 0,
             "arePartialPointsAllowed": False,
             "metadata": {
-                "tags": [
-                    {
-                        "name": "Assessment Type",
-                        "value": "Multiple Choice"
-                    }
-                ],
+                "tags": tags,
                 "files": [],
                 "opened": []
             },
@@ -172,7 +180,7 @@ def convert_to_codio_structure(to_process):
         assessment_count = 0
         for assessment in item.assessment_items:
             assessment_count += 1
-            assessments.append(get_assessment_item(assessment, item.name, assessment_count))
+            assessments.append(get_assessment_item(assessment, item.name, item.file_name, assessment_count))
 
     return structure, sections, assessments
 
@@ -191,6 +199,8 @@ def convert(base_directory, output_dir):
     to_process = []
     for file in (base_directory.glob('*.rb')):
         assessment_items = []
+        file_name_without_ext = file.name.rsplit(".", 1)[0]
+
         file_data = read_file(file.resolve())
 
         match_data = re.search(r"^quiz\s+['\"](?P<name>.*?)['\"]\s+(?:do)?\n(?P<assessments_block>.*(?=end))",
@@ -229,7 +239,7 @@ def convert(base_directory, output_dir):
                                  content + '\n', flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
             assessment_items.append(AssessmentItem(mc_type, options, settings))
 
-        to_process.append(FileToProcess(name, assessment_items))
+        to_process.append(FileToProcess(name, file_name_without_ext, assessment_items))
 
     structure, sections, assessments = convert_to_codio_structure(to_process)
 
