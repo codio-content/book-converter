@@ -65,8 +65,17 @@ def get_assessment_item(assessment, name, count):
             if match_guidance:
                 guidance.append(match_guidance.group('explanation'))
 
-            answer = re.sub(r"(?!\n)(.*?)}?(?:}\n|(,\s+:explanation => .*?$))", r"\1", data,
-                            flags=re.MULTILINE + re.DOTALL)
+            match_answer = re.search(r"%[qQ]{(?P<answer>.*?)}(, :explanation => .*?$)?", data,
+                                     flags=re.MULTILINE + re.DOTALL)
+            if match_answer:
+                answer = match_answer.group('answer')
+            else:
+                answer = re.search(r"(?!\n).*(?=, :explanation =>)", data)
+                if answer:
+                    answer = answer.group(0)
+                else:
+                    answer = data
+
             answers.append(get_assessment_answer(option_type, answer))
 
     return {
@@ -216,7 +225,7 @@ def convert(base_directory, output_dir):
                         settings[match_settings_item.group('key')] = match_settings_item.group('value')
 
             options = re.findall(r"[ ]{4}[# ]?(?P<option>.*?)\s+(?:['\"](?P<value>.*?)['\"]"
-                                 r"|[%][qQ]{(?P<another_value>.*?))(?=\s{4}.*?[ ]+(?:[%]|['\"])|\n^$)",
+                                 r"|(?P<another_value>%[qQ]{.*?))(?=\s{4}.*?[ ]+(?:[%]|['\"])|\n^$)",
                                  content + '\n', flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
             assessment_items.append(AssessmentItem(mc_type, options, settings))
 
