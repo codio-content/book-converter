@@ -11,7 +11,7 @@ from converter.guides.tools import write_json, read_file, write_file
 FileToProcess = namedtuple('FileToProcess', ['name', 'file_name', 'assessment_items'])
 AssessmentItem = namedtuple('AssessmentItem', ['type', 'options', 'settings'])
 
-CHAPTER = 'chapter'
+PAGE = 'page'
 
 CHOICE_ANSWER = 'choice_answer'
 SELECT_MULTIPLE = 'select_multiple'
@@ -217,7 +217,7 @@ def convert_to_codio_structure(item):
     sections = []
     assessments = []
 
-    book_item = get_book_item(item.name, CHAPTER)
+    book_item = get_book_item(item.name, PAGE)
     structure.append(book_item)
 
     files = [
