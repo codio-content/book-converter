@@ -70,40 +70,53 @@ def get_assessment_item(assessment, name, file_name, count):
         if option_type == 'group':
             continue
         if option_type == 'tags':
-            tags_list = option[1].split(',')
-            for tag in tags_list:
-                match_tag = re.search(r"topic:(?P<tag_value>.*?)'$", tag)
-                if match_tag:
-                    tag = match_tag.group('tag_value')
-                    tags.append({'name': 'topic', 'value': tag})
+            tags = get_tags(option)
             continue
         if option_type == 'text':
             instructions = option[1] if option[1] != "" else option[2]
             continue
         if option_type == 'answer' or option_type == 'distractor':
-            data = option[1] if option[1] != "" else option[2]
-
-            match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", data, flags=re.MULTILINE)
-            if match_guidance:
-                guidance.append(match_guidance.group('explanation'))
-
-            match_answer = re.search(r"%[qQ]{(?P<answer>.*?)}(, :explanation => .*?$)?", data,
-                                     flags=re.MULTILINE + re.DOTALL)
-            if match_answer:
-                answer = match_answer.group('answer')
-            else:
-                answer = re.search(r"(?!\n).*(?=, :explanation =>)", data)
-                if answer:
-                    answer = answer.group(0)
-                else:
-                    answer = data
-
-            answers.append(get_assessment_answer(option_type, answer))
+            answers = get_answers(option, option_type)
 
     if assessment.type == CHOICE_ANSWER or assessment.type == SELECT_MULTIPLE:
         return get_multiple_choice_structure(name, count, instructions, assessment, answers, guidance, tags)
     if assessment.type == FILL_IN_BLANK:
         return get_fill_in_blank_structure(name, count, instructions, assessment, answers, guidance, tags)
+
+
+def get_answers(option, option_type):
+    answers = []
+    guidance = []
+    data = option[1] if option[1] != "" else option[2]
+
+    match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", data, flags=re.MULTILINE)
+    if match_guidance:
+        guidance.append(match_guidance.group('explanation'))
+
+    match_answer = re.search(r"%[qQ]{(?P<answer>.*?)}(, :explanation => .*?$)?", data,
+                             flags=re.MULTILINE + re.DOTALL)
+    if match_answer:
+        answer = match_answer.group('answer')
+    else:
+        answer = re.search(r"(?!\n).*(?=, :explanation =>)", data)
+        if answer:
+            answer = answer.group(0)
+        else:
+            answer = data
+
+    answers.append(get_assessment_answer(option_type, answer))
+    return answers
+
+
+def get_tags(option):
+    tags = []
+    tags_list = option[1].split(',')
+    for tag in tags_list:
+        match_tag = re.search(r"topic:(?P<tag_value>.*?)'$", tag)
+        if match_tag:
+            tag = match_tag.group('tag_value')
+            tags.append({'name': 'topic', 'value': tag})
+    return tags
 
 
 def get_multiple_choice_structure(name, count, instructions, assessment, answers, guidance, tags):
@@ -251,8 +264,7 @@ def generate_content(assessment_name, assessment_items):
     return current_content
 
 
-def convert(base_directory, output_dir):
-    shutil.rmtree(output_dir, ignore_errors=True)
+def get_data_to_process(base_directory):
     to_process = []
     for file in (base_directory.glob('*.rb')):
         assessment_items = []
@@ -297,10 +309,14 @@ def convert(base_directory, output_dir):
             assessment_items.append(AssessmentItem(mc_type, options, settings))
 
         to_process.append(FileToProcess(name, file_name_without_ext, assessment_items))
+    return to_process
 
+
+def convert(base_directory, output_dir):
+    shutil.rmtree(output_dir, ignore_errors=True)
     output_dir.mkdir()
 
-    for item in to_process:
+    for item in get_data_to_process(base_directory):
         structure, sections, assessments = convert_to_codio_structure(item)
 
         chapter_dir = output_dir.joinpath(item.file_name)
