@@ -67,10 +67,11 @@ def get_assessment_item(assessment, name, file_name, count):
 
     for option in assessment.options:
         option = option.strip()
-        match_option = re.search(r"(?P<type>tags|group|text|answer|distractor)(?P<value>[ ]%[qQ]{.*?^}"
+        match_option = re.search(r"(?P<type>tags|group|text|answer|distractor)(?P<value>[ ]%[qQ]{.*?}"
                                  r"(?:,[ ]:explanation[ ]=> .*?\n|\n)|[ ]['\"].*?['\"]\n)", option + '\n',
                                  flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
-        if not option:
+        if not match_option:
+            print(file_name, '- option not match')
             return
         option_type = match_option.group('type')
         option_value = match_option.group('value').strip()
@@ -291,7 +292,7 @@ def get_data_to_process(base_directory):
                     if match_settings_item:
                         settings[match_settings_item.group('key')] = match_settings_item.group('value')
 
-            options = re.findall(r"\s{4}(?:tags|group|text|answer|distractor)(?:[ ]%[qQ]{.*?^}"
+            options = re.findall(r"\s{4}(?:tags|group|text|answer|distractor)(?:[ ]%[qQ]{.*?}"
                                  r"(?:,[ ]:explanation[ ]=> .*?\n|\n)|[ ]['\"].*?['\"]\n)", content + '\n',
                                  flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
             assessment_items.append(AssessmentItem(mc_type, options, settings))
