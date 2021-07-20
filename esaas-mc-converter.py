@@ -66,11 +66,28 @@ def get_assessment_item(assessment, name, file_name, count):
     }]
 
     for option in assessment.options:
-        option_type = option[0].strip()
+        option = option.strip()
+        match_option = re.search(r"(?P<type>tags|group|text|answer|distractor)(?P<value>[ ]%[qQ]{.*?^}"
+                                 r"(?:,[ ]:explanation[ ]=> .*?\n|\n)|[ ]['\"].*?['\"]\n)", option + '\n',
+                                 flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+        if not option:
+            return
+        option_type = match_option.group('type')
+        option_value = match_option.group('value').strip()
+
+        match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", option_value, flags=re.MULTILINE)
+        if match_guidance:
+            guidance.append(match_guidance.group('explanation'))
+
+        option_value = re.sub(r", :explanation => (?P<explanation>.*?)$", "", option_value, flags=re.MULTILINE)
+
+        option_value = re.sub(r"%[qQ]{(.*?)}", r"\1", option_value + '\n', flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+
+        option_value = option_value.strip().strip('\"')
         if option_type == 'group':
             continue
         if option_type == 'tags':
-            tags_list = option[1].split(',')
+            tags_list = option_value.split(',')
             for tag in tags_list:
                 match_tag = re.search(r"topic:(?P<tag_value>.*?)'$", tag)
                 if match_tag:
@@ -78,15 +95,11 @@ def get_assessment_item(assessment, name, file_name, count):
                     tags.append({'name': 'topic', 'value': tag})
             continue
         if option_type == 'text':
-            instructions = option[1] if option[1] != "" else option[2]
+            instructions = option_value
             continue
         if option_type == 'answer' or option_type == 'distractor':
-            data = option[1] if option[1] != "" else option[2]
-            match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", data, flags=re.MULTILINE)
-            if match_guidance:
-                guidance.append(match_guidance.group('explanation'))
             is_correct = option_type == 'answer'
-            answers.append(get_answer(data, is_correct))
+            answers.append(get_answer(option_value, is_correct))
 
     if assessment.type == CHOICE_ANSWER or assessment.type == SELECT_MULTIPLE:
         return get_multiple_choice_structure(name, count, instructions, assessment, answers, guidance, tags)
@@ -94,18 +107,7 @@ def get_assessment_item(assessment, name, file_name, count):
         return get_fill_in_blank_structure(name, count, instructions, assessment, answers, guidance, tags)
 
 
-def get_answer(data, is_correct):
-    match_answer = re.search(r"%[qQ]{(?P<answer>.*?)}(, :explanation => .*?$)?", data,
-                             flags=re.MULTILINE + re.DOTALL)
-    if match_answer:
-        answer = match_answer.group('answer')
-    else:
-        answer = re.search(r"(?!\n).*(?=, :explanation =>)", data)
-        if answer:
-            answer = answer.group(0)
-        else:
-            answer = data
-
+def get_answer(answer, is_correct):
     return {
         "_id": str(uuid.uuid4()),
         "correct": is_correct,
@@ -289,9 +291,9 @@ def get_data_to_process(base_directory):
                     if match_settings_item:
                         settings[match_settings_item.group('key')] = match_settings_item.group('value')
 
-            options = re.findall(r"[ ]{4}[# ]?(?P<option>.*?)\s+(?:['\"](?P<value>.*?)['\"]"
-                                 r"|(?P<another_value>%[qQ]{.*?))(?=\s{4}.*?[ ]+(?:[%]|['\"])|\n^$)",
-                                 content + '\n', flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+            options = re.findall(r"\s{4}(?:tags|group|text|answer|distractor)(?:[ ]%[qQ]{.*?^}"
+                                 r"(?:,[ ]:explanation[ ]=> .*?\n|\n)|[ ]['\"].*?['\"]\n)", content + '\n',
+                                 flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
             assessment_items.append(AssessmentItem(mc_type, options, settings))
 
         to_process.append(FileToProcess(name, file_name_without_ext, assessment_items))
