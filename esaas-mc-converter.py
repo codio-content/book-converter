@@ -70,13 +70,23 @@ def get_assessment_item(assessment, name, file_name, count):
         if option_type == 'group':
             continue
         if option_type == 'tags':
-            tags = get_tags(option)
+            tags_list = option[1].split(',')
+            for tag in tags_list:
+                match_tag = re.search(r"topic:(?P<tag_value>.*?)'$", tag)
+                if match_tag:
+                    tag = match_tag.group('tag_value')
+                    tags.append({'name': 'topic', 'value': tag})
             continue
         if option_type == 'text':
             instructions = option[1] if option[1] != "" else option[2]
             continue
         if option_type == 'answer' or option_type == 'distractor':
-            answers = get_answers(option, option_type)
+            data = option[1] if option[1] != "" else option[2]
+            match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", data, flags=re.MULTILINE)
+            if match_guidance:
+                guidance.append(match_guidance.group('explanation'))
+            is_correct = option_type == 'answer'
+            answers.append(get_answer(data, is_correct))
 
     if assessment.type == CHOICE_ANSWER or assessment.type == SELECT_MULTIPLE:
         return get_multiple_choice_structure(name, count, instructions, assessment, answers, guidance, tags)
@@ -84,15 +94,7 @@ def get_assessment_item(assessment, name, file_name, count):
         return get_fill_in_blank_structure(name, count, instructions, assessment, answers, guidance, tags)
 
 
-def get_answers(option, option_type):
-    answers = []
-    guidance = []
-    data = option[1] if option[1] != "" else option[2]
-
-    match_guidance = re.search(r"\s+:explanation => (?P<explanation>.*?)$", data, flags=re.MULTILINE)
-    if match_guidance:
-        guidance.append(match_guidance.group('explanation'))
-
+def get_answer(data, is_correct):
     match_answer = re.search(r"%[qQ]{(?P<answer>.*?)}(, :explanation => .*?$)?", data,
                              flags=re.MULTILINE + re.DOTALL)
     if match_answer:
@@ -104,19 +106,11 @@ def get_answers(option, option_type):
         else:
             answer = data
 
-    answers.append(get_assessment_answer(option_type, answer))
-    return answers
-
-
-def get_tags(option):
-    tags = []
-    tags_list = option[1].split(',')
-    for tag in tags_list:
-        match_tag = re.search(r"topic:(?P<tag_value>.*?)'$", tag)
-        if match_tag:
-            tag = match_tag.group('tag_value')
-            tags.append({'name': 'topic', 'value': tag})
-    return tags
+    return {
+        "_id": str(uuid.uuid4()),
+        "correct": is_correct,
+        "answer": answer.replace("\\n", "")
+    }
 
 
 def get_multiple_choice_structure(name, count, instructions, assessment, answers, guidance, tags):
@@ -187,14 +181,6 @@ def get_fill_in_blank_structure(name, count, instructions, assessment, answers, 
                 "regexPositions": []
             }
         }
-    }
-
-
-def get_assessment_answer(option_type, answer):
-    return {
-        "_id": str(uuid.uuid4()),
-        "correct": option_type == 'answer',
-        "answer": answer.replace("\\n", "")
     }
 
 
