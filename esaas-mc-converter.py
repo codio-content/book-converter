@@ -264,17 +264,17 @@ def get_data_to_process(base_directory):
         file_data = read_file(file.resolve())
 
         match_quiz_data = re.search(r"^quiz\s+['\"](?P<name>.*?)['\"]\s+(?:do)?\n(?P<assessments_block>.*(?=end))",
-                               file_data, flags=re.MULTILINE + re.DOTALL)
-        if not match_quiz_data :
+                                    file_data, flags=re.MULTILINE + re.DOTALL)
+        if not match_quiz_data:
             return
-        chapter_name = match_quiz_data .group('name').strip()
-        assessments_block = match_quiz_data .group('assessments_block')
+        chapter_name = match_quiz_data.group('name').strip()
+        assessments_block = match_quiz_data.group('assessments_block')
         assessments_block = re.sub(r"^\s+#+$", "", assessments_block, flags=re.MULTILINE)
         assessments_block += "\n"
 
-        exercise_blocks = re.finditer(r"^\s+(?P<type>choice_answer|select_multiple|fill_in)(?P<settings>\s+:.*? => ?.*?)?\s+do\n"
-                             r"(?P<content>.*?)(?:\s+end\s+\n(?!\n\s*\S)|(?=\s+\1))",
-                             assessments_block, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+        exercise_blocks = re.finditer(
+            r"^\s+(?P<type>choice_answer|select_multiple|fill_in)(?P<settings>\s+:.*? => ?.*?)?\s+do\n(?P<content>.*?)"
+            r"(?:\s+end\s+\n(?!\n\s*\S)|(?=\s+\1))", assessments_block, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
         if not exercise_blocks:
             print(file, 'PARSE ERROR')
             return
