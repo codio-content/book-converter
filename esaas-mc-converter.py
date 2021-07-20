@@ -111,7 +111,7 @@ def get_answer(answer, is_correct):
     return {
         "_id": str(uuid.uuid4()),
         "correct": is_correct,
-        "answer": answer.replace("\\n", "")
+        "answer": answer
     }
 
 
@@ -124,7 +124,7 @@ def get_multiple_choice_structure(name, count, instructions, assessment, answers
         "source": {
             "name": f"{name} {count}",
             "showName": True,
-            "instructions": instructions.replace("\\n", ""),
+            "instructions": instructions,
             "multipleResponse": multipleResponse,
             "isRandomized": assessment.settings.get('randomize', False),
             "answers": answers,
@@ -155,7 +155,7 @@ def get_fill_in_blank_structure(name, count, instructions, assessment, answers, 
         "source": {
             "name": f"{name} {count}",
             "showName": True,
-            "instructions": instructions.replace("\\n", ""),
+            "instructions": instructions,
             "showValues": False,
             "text": f"<<<{answer}>>>",
             "distractors": "",
