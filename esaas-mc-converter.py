@@ -107,6 +107,8 @@ def get_assessment_item(assessment, name, file_name, count):
 
 
 def get_multiple_choice_structure(name, count, instructions, assessment, answers, guidance, tags):
+    correct_answers_count = sum(map(lambda item: item.get('correct'), answers))
+    multipleResponse = assessment.type == SELECT_MULTIPLE or correct_answers_count > 1
     return {
         "type": "multiple-choice",
         "taskId": f"multiple-choice-{slugify(name)}-{count}",
@@ -114,7 +116,7 @@ def get_multiple_choice_structure(name, count, instructions, assessment, answers
             "name": f"{name} {count}",
             "showName": True,
             "instructions": instructions.replace("\\n", ""),
-            "multipleResponse": assessment.type == SELECT_MULTIPLE,
+            "multipleResponse": multipleResponse,
             "isRandomized": assessment.settings.get('randomize', False),
             "answers": answers,
             "guidance": '\n\n'.join(guidance),
