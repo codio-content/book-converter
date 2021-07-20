@@ -124,7 +124,7 @@ def get_multiple_choice_structure(name, count, instructions, assessment, answers
         "source": {
             "name": f"{name} {count}",
             "showName": True,
-            "instructions": instructions,
+            "instructions": instructions.replace("\\n", ""),
             "multipleResponse": multipleResponse,
             "isRandomized": assessment.settings.get('randomize', False),
             "answers": answers,
@@ -155,7 +155,7 @@ def get_fill_in_blank_structure(name, count, instructions, assessment, answers, 
         "source": {
             "name": f"{name} {count}",
             "showName": True,
-            "instructions": instructions,
+            "instructions": instructions.replace("\\n", ""),
             "showValues": False,
             "text": f"<<<{answer}>>>",
             "distractors": "",
