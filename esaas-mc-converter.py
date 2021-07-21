@@ -297,7 +297,7 @@ def get_data_to_process(base_directory):
                     if match_settings_item:
                         settings[match_settings_item.group('key')] = match_settings_item.group('value')
 
-            options = re.findall(r"\s{4}(?:tags|group|text|answer|distractor)(?:[ ]%[qQ]{.*?}"
+            options = re.findall(r"(?:tags|group|text|answer|distractor)(?:[ ]%[qQ]{.*?}"
                                  r"(?:,[ ]:explanation[ ]=> .*?\n|\n)|[ ]['\"].*?['\"]\n)", content + '\n',
                                  flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
             assessment_items.append(AssessmentItem(mc_type, options, settings))
