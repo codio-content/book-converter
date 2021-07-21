@@ -67,8 +67,8 @@ def get_assessment_item(assessment, name, file_name, exercise_num):
 
     for option in assessment.options:
         option = option.strip()
-        match_option = re.search(r"(?P<type>tags|group|text|answer|distractor)(?P<value>[ ]%[qQ]{.*?}"
-                                 r"(?:,[ ]:explanation[ ]=> .*?\n|\n)|[ ]['\"].*?['\"]\n)", option + '\n',
+        match_option = re.search(r"(?P<type>tags|group|text|answer|distractor)(?P<value>\s+%[qQ]{.*?}"
+                                 r"(?:,[ ]:explanation[ ]=> .*?\n|\n)|\s+['\"].*?['\"]\n)", option + '\n',
                                  flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
         if not match_option:
             print(file_name, '- option not match')
