@@ -94,9 +94,13 @@ def get_assessment_item(assessment, name, file_name, exercise_num):
 
         option_value = re.sub(r", :explanation => (?P<explanation>.*?)$", "", option_value, flags=re.MULTILINE)
         option_value = re.sub(r"%[qQ]{(.*?)}", r"\1", option_value + '\n', flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
-        option_value = option_value.strip().strip('\"')
+        option_value = option_value.strip().strip('\"').strip('\'')
+        option_value = option_value.replace("==", " == ")
 
         if option_type == 'text':
+            option_value = re.sub(r"<pre>|</pre>", "```", option_value)
+            option_value = re.sub(r"&lt;", "<", option_value)
+            option_value = re.sub(r"&gt;", ">", option_value)
             instructions = option_value
             continue
 
