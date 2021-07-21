@@ -9,7 +9,7 @@ from pathlib import Path
 from converter.guides.tools import write_json, read_file, write_file
 
 FileToProcess = namedtuple('FileToProcess', ['name', 'file_name', 'assessment_items'])
-AssessmentItem = namedtuple('AssessmentItem', ['type', 'options', 'settings'])
+AssessmentItem = namedtuple('AssessmentItem', ['type', 'options', 'settings', 'id'])
 
 PAGE = 'page'
 
@@ -127,7 +127,7 @@ def get_multiple_choice_structure(name, exercise_num, instructions, assessment, 
     multipleResponse = assessment.type == SELECT_MULTIPLE or correct_answers_count > 1
     return {
         "type": "multiple-choice",
-        "taskId": f"multiple-choice-{slugify(name)}-{exercise_num}",
+        "taskId": f"multiple-choice-{assessment.id}",
         "source": {
             "name": f"{name} {exercise_num}",
             "showName": True,
@@ -158,7 +158,7 @@ def get_fill_in_blank_structure(name, exercise_num, instructions, assessment, an
     answer = answers[0].get('answer').strip()
     return {
         "type": "fill-in-the-blanks",
-        "taskId": f"fill-in-the-blanks-{slugify(name)}-{exercise_num}",
+        "taskId": f"fill-in-the-blanks-{assessment.id}",
         "source": {
             "name": f"{name} {exercise_num}",
             "showName": True,
@@ -236,7 +236,7 @@ def convert_to_codio_structure(item):
     book_item = get_book_item(item.name, PAGE)
     structure.append(book_item)
 
-    content = generate_content(item.name, item.assessment_items)
+    content = generate_content(item.assessment_items)
     current_item = get_section_item(item.name, files)
     current_item['content-file'] = '\n'.join(content)
     sections.append(current_item)
@@ -249,13 +249,11 @@ def convert_to_codio_structure(item):
     return structure, sections, assessments
 
 
-def generate_content(assessment_name, assessment_items):
-    count = 0
+def generate_content(assessment_items):
     current_content = []
-    for item in assessment_items:
-        count += 1
-        assessment_type = ASSESSMENT_TYPE[item.type]
-        current_content.append(f"{{Check It!|assessment}}({assessment_type}-{slugify(assessment_name)}-{count})\n")
+    for assessment in assessment_items:
+        assessment_type = ASSESSMENT_TYPE[assessment.type]
+        current_content.append(f"{{Check It!|assessment}}({assessment_type}-{assessment.id})\n")
     return current_content
 
 
@@ -287,6 +285,7 @@ def get_data_to_process(base_directory):
         for item in list(exercise_blocks):
             mc_type = item.group('type')
             content = item.group('content')
+            assessment_id = str(uuid.uuid4())
 
             settings = {}
             match_settings = item.group('settings')
@@ -300,7 +299,7 @@ def get_data_to_process(base_directory):
             options = re.findall(r"(?:tags|group|text|answer|distractor)(?:[ ]%[qQ]{.*?}"
                                  r"(?:,[ ]:explanation[ ]=> .*?\n|\n)|[ ]['\"].*?['\"]\n)", content + '\n',
                                  flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
-            assessment_items.append(AssessmentItem(mc_type, options, settings))
+            assessment_items.append(AssessmentItem(mc_type, options, settings, assessment_id))
 
         to_process.append(FileToProcess(chapter_name, file_name_without_ext, assessment_items))
     return to_process
