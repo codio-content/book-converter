@@ -431,7 +431,7 @@ def convert(config, base_path, yes=False):
                 exercise_num=exercise_num, remove_trinket=remove_trinket,
                 remove_exercise=remove_exercise, detect_asset_ext=detect_asset_ext,
                 load_workspace_file=workspace_file(Path(config['workspace']['directory'])),
-                code_syntax=config['code_syntax']
+                code_syntax=config.get('code_syntax', 'code')
             )
 
             converted_md = md_converter.to_markdown()
