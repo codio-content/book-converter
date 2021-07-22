@@ -6,7 +6,8 @@ Code = namedtuple('Code', ['name', 'source'])
 
 
 class CodeBlock(object):
-    def __init__(self, latex_str, percent_token, caret_token, remove_trinket):
+    def __init__(self, latex_str, percent_token, caret_token, remove_trinket, code_syntax):
+        self.code_syntax = code_syntax
         self.str = latex_str
         self.token = percent_token
         self._caret_token = caret_token
@@ -35,7 +36,7 @@ class CodeBlock(object):
             return ''
         block_contents = re.sub(r"%", self.token, block_contents)
         block_contents = re.sub(r"\n", self._caret_token, block_contents)
-        return "```code{}```".format(block_contents)
+        return f"```{self.code_syntax}{block_contents}```"
 
     def convert(self):
         output = self.str

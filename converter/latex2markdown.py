@@ -49,8 +49,10 @@ class LaTeX2Markdown(object):
     def __init__(
             self, latex_array, refs={}, chapter_num=1, figure_num=0,
             exercise_num=0, remove_trinket=False, remove_exercise=False,
-            detect_asset_ext=lambda _: _, load_workspace_file=lambda _: ''
+            detect_asset_ext=lambda _: _, load_workspace_file=lambda _: '',
+            code_syntax='code'
     ):
+        self._code_syntax = code_syntax
         self._latex_string = '\n'.join(latex_array)
         self._percent_token = str(uuid.uuid4())
         self._caret_token = str(uuid.uuid4())
@@ -87,20 +89,20 @@ class LaTeX2Markdown(object):
         output = SaasSpecific(output, self._caret_token).convert()
         output = ItalicBold(output).convert()
         output, source_codes = CodeBlock(
-            output, self._percent_token, self._caret_token, self._remove_trinket
+            output, self._percent_token, self._caret_token, self._remove_trinket, self._code_syntax
         ).convert()
         if source_codes:
             self._source_codes.extend(source_codes)
         output, source_codes, figure_counter = CodeFigure(
             output, self._caret_token, self._percent_token, self._load_workspace_file,
-            self._figure_counter_offset, self._chapter_num, self._refs
+            self._figure_counter_offset, self._chapter_num, self._refs, self._code_syntax
         ).convert()
         if figure_counter:
             self.increment_figure_counter(figure_counter)
         if source_codes:
             self._source_codes.extend(source_codes)
         output, source_codes = CodeFile(
-            output, self._caret_token, self._percent_token, self._load_workspace_file
+            output, self._caret_token, self._percent_token, self._load_workspace_file, self._code_syntax
         ).convert()
         if source_codes:
             self._source_codes.extend(source_codes)
