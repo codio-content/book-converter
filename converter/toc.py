@@ -1,12 +1,21 @@
 import pathlib
+from collections import namedtuple
+
 import yaml
 import re
 
 from pathlib import Path
 
 from converter.guides.item import SectionItem, SECTION, CHAPTER
-from converter.guides.tools import write_file, get_text_in_brackets
+from converter.guides.tools import write_file, get_text_in_brackets, read_file_lines
 from converter.loader import load_json_file
+
+LATEX = 'latex'
+BOOKDOWN = 'bookdown'
+RST = 'rst'
+
+RST_TOC_EXT = '.rst',
+RST_JSON_TOC_EXT = '.json'
 
 
 def is_section(line):
@@ -156,11 +165,11 @@ def get_include_lines(tex_folder, tex_name):
         return file.readlines()
 
 
-def get_latex_toc(tex_folder, tex_name):
-    lines = get_include_lines(tex_folder, tex_name)
+def get_latex_toc(tex_folder):
+    lines = get_include_lines(tex_folder, tex_folder.name)
     if not lines:
         return None
-    a_path = tex_folder.joinpath(tex_name).resolve()
+    a_path = tex_folder.joinpath(tex_folder.name).resolve()
     return process_toc_lines(lines, tex_folder, a_path.parent)
 
 
@@ -203,8 +212,8 @@ def process_bookdown_file(folder, name, name_without_ext):
         return process_bookdown_lines(lines, name_without_ext)
 
 
-def get_bookdown_toc(folder, name):
-    a_path = folder.joinpath(name).resolve()
+def get_bookdown_toc(folder):
+    a_path = folder.joinpath(folder.name).resolve()
     with open(a_path, 'r', errors='replace') as stream:
         content = yaml.load(stream, Loader=yaml.FullLoader)
         rmd_files = content.get('rmd_files')
@@ -215,28 +224,84 @@ def get_bookdown_toc(folder, name):
         return toc
 
 
-def get_rst_toc(workspace_dir, json_config_name, exercises={}):
+def get_rst_toc(source_path, config_path, exercises={}):
     toc = []
-    source_path = workspace_dir.joinpath('RST/en').resolve()
-    json_config_dir = workspace_dir.joinpath('config')
-    json_config_path = json_config_dir.joinpath(json_config_name).resolve()
-    json_config = load_json_file(json_config_path)
-    chapters = json_config.get('chapters')
-    for chapter in chapters:
-        pages = chapters.get(chapter).keys()
-        toc.append(SectionItem(
-            section_name=chapter,
-            section_type='chapter',
-            line_pos=0)
-        )
-        for page in pages:
-            rst_file_name = f'{page}.rst'
-            rst_file_path = pathlib.Path(source_path.joinpath(rst_file_name).resolve())
-            if not rst_file_path.exists():
-                print("File %s doesn't exist\n" % rst_file_name)
+
+    if config_path.suffix == RST_JSON_TOC_EXT:
+        json_config = load_json_file(config_path)
+        chapters = json_config.get('chapters')
+        for chapter in chapters:
+            pages = chapters.get(chapter).keys()
+            toc.append(SectionItem(
+                section_name=chapter,
+                section_type='chapter',
+                line_pos=0)
+            )
+            for page in pages:
+                rst_file_name = f'{page}.rst'
+                rst_file_path = pathlib.Path(source_path.joinpath(rst_file_name).resolve())
+                if not rst_file_path.exists():
+                    print("File %s doesn't exist\n" % rst_file_name)
+                    continue
+                toc += process_rst_file(rst_file_path, exercises)
+        return toc
+
+    if config_path.suffix == RST_TOC_EXT[0]:
+        masterTocTree = get_toctree_item(config_path)
+        get_toctree(source_path, masterTocTree)
+
+        return toc
+
+
+def get_toctree(source_path, master):
+    if master is None:
+        return
+    for item in master.paths:
+        path = source_path.joinpath(item)
+        tree = get_toctree_item(path)
+        if tree is None:
+            continue
+        master.children.insert(0, tree)
+
+        get_toctree(path.parent, master.children[0])
+
+
+def get_toctree_item(path):
+    toctree = []
+    settings = []
+    children = []
+    paths = []
+    tocTreeFlag = False
+    chaptersFlag = False
+    tocTree = namedtuple('tocTree', ['name', 'paths', 'settings', 'children'])
+
+    try:
+        lines = read_file_lines(path)
+    except BaseException as e:
+        raise BaseException(e)
+
+    for ind, line in enumerate(lines):
+        next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
+        if '.. toctree:' in line:
+            tocTreeFlag = True
+            continue
+        if tocTreeFlag and line.strip().startswith(':'):
+            settings.append(line.strip())
+            if not next_line.strip():
+                chaptersFlag = True
+            continue
+        if chaptersFlag:
+            line = line.strip()
+            if not line:
                 continue
-            toc += process_rst_file(rst_file_path, exercises)
-    return toc, json_config
+            paths.append(line)
+            if not next_line.strip() or next_line.startswith('.. '):
+                toctree.append(tocTree(path.stem, paths, settings, children))
+                break
+
+    if not toctree:
+        return
+    return toctree[0]
 
 
 def _math(matchobj):
@@ -294,14 +359,14 @@ def process_rst_lines(lines, exercises):
     return toc
 
 
-def print_to_yaml(structure, tex, data_format):
-    directory = tex.parent.parent.resolve() if data_format == 'rst' else tex.parent.resolve()
-    yaml_structure = """workspace:
-  directory: {}
-  {}: {}
+def print_to_yaml(structure, workspace_path, source_path, config_path, data_format):
+    yaml_structure = f"""workspace:
+  directory: {workspace_path}
+  sources: {source_path}
+  {data_format}: {config_path}
 assets:
 sections:
-""".format(directory, data_format, tex.name)
+"""
     first_item = True
     exercises_flag = False
     for ind, item in enumerate(structure):
@@ -330,24 +395,29 @@ sections:
     return yaml_structure
 
 
-def generate_toc(file_path, structure_path, ignore_exists=False):
-    path = Path(file_path)
-    if path.exists() and not ignore_exists:
-        raise Exception("Path exists")
-    tex = Path(structure_path)
-    bookdown = str(structure_path).endswith('_bookdown.yml')
-    rst = str(structure_path).endswith('.json')
-    if bookdown:
-        toc = get_bookdown_toc(tex, tex.name)
-        data_format = 'bookdown'
-    elif rst:
-        toc, json_config = get_rst_toc(tex.parent.parent, tex.name)
-        data_format = 'rst'
-    else:
-        toc = get_latex_toc(tex.parent, tex.name)
-        data_format = 'tex'
-    path.mkdir(parents=True, exist_ok=ignore_exists)
+def generate_toc(output_path, source_path, config_path, content_type, ignore_exists=True):
+    workspace_dir = Path(source_path).parts[0]
+    workspace_path = Path.cwd().parent.joinpath(workspace_dir).resolve()
+    source_path = Path.cwd().parent.joinpath(source_path).resolve()
+    config_path = Path.cwd().parent.joinpath(config_path).resolve()
+    output_path = Path(output_path)
 
-    content = print_to_yaml(toc, tex, data_format)
-    a_path = path.joinpath("codio_structure.yml").resolve()
+    if output_path.exists() and not ignore_exists:
+        raise Exception("Output dir already exists")
+    output_path.mkdir(parents=True, exist_ok=ignore_exists)
+
+    if content_type == LATEX:
+        toc = get_latex_toc(config_path)
+    elif content_type == BOOKDOWN:
+        toc = get_bookdown_toc(config_path)
+    elif content_type == RST:
+        toc = get_rst_toc(source_path, config_path)
+    else:
+        raise Exception("Unknown source type")
+
+    if toc is None:
+        raise Exception("TOC is empty")
+
+    content = print_to_yaml(toc, workspace_path, source_path, config_path, content_type)
+    a_path = output_path.joinpath("codio_structure.yml").resolve()
     write_file(a_path, content)

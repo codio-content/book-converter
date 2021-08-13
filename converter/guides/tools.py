@@ -18,8 +18,13 @@ def write_json(file_path, json_data):
 
 
 def read_file(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', errors='replace', encoding="utf-8") as file:
         return file.read()
+
+
+def read_file_lines(file_path):
+    with open(file_path, 'r', errors='replace', encoding="utf-8") as file:
+        return file.readlines()
 
 
 def get_text_in_brackets(line, start=0):
