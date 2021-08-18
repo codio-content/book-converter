@@ -19,6 +19,9 @@ from converter.assets import copy_assets, convert_assets, process_source_code, c
 from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from, make_bookdown_refs
 from converter.optimizer import optimize
 
+RST_TOC_EXT = '.rst',
+RST_JSON_TOC_EXT = '.json'
+
 
 def get_guide_content_path(file_path):
     file_path = str(file_path)
@@ -685,6 +688,14 @@ def print_source_code_report(data):
 
 
 def convert_rst(config, base_path, yes=False):
+    config_type = Path(config.get('workspace', {}).get('rst'))
+    if config_type.suffix == RST_JSON_TOC_EXT:
+        convert_rst_v1(config, base_path, yes)
+    if config_type.suffix == RST_TOC_EXT[0]:
+        convert_rst_v2(config, base_path, yes)
+
+
+def convert_rst_v1(config, base_path, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
         return
@@ -732,6 +743,109 @@ def convert_rst(config, base_path, yes=False):
             rst_converter = Rst2Markdown(
                 lines,
                 json_config,
+                source_code,
+                exercises,
+                tag_references,
+                workspace_dir=workspace_dir,
+                chapter_num=chapter_num,
+                subsection_num=subsection_num
+            )
+            converted_md = rst_converter.to_markdown()
+            all_assessments += rst_converter.get_assessments()
+            iframe_images += rst_converter.get_iframe_images()
+
+            for code_path in rst_converter.get_source_code_paths():
+                source_code_report.append(tuple([f'{chapter_num}. {chapter}', item.section_name, code_path]))
+
+            if slug_name in tokens:
+                for key, value in tokens.get(slug_name).items():
+                    converted_md = converted_md.replace(key, value)
+
+        md_path = content_dir.joinpath(slug_name + ".md")
+        section, book_item = make_section_items(item, slug_name, md_path, transformation_rules, converted_md)
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            book_item["children"] = []
+            if item.section_type == CHAPTER:
+                children_containers = [children_containers[0]]
+
+        children_containers[len(children_containers) - 1].append(book_item)
+
+        if item.codio_section == "end" and len(children_containers) > 1:
+            children_containers.pop()
+
+        if item.section_type == CHAPTER or item.codio_section == "start":
+            children_containers.append(book_item["children"])
+
+        section["files"].append({
+            "path": "#tabs",
+            "action": "close"
+        })
+
+        if item.exercise:
+            section["files"] = make_odsa_ex_files(item.exercise_path)
+
+        if section:
+            metadata["sections"].append(section)
+
+        write_file(md_path, converted_md)
+
+    create_assessments_data(guides_dir, generate_dir, exercises)
+
+    write_metadata(guides_dir, metadata, book)
+    write_assessments(guides_dir, all_assessments)
+    process_assets(config, generate_dir, [], [])
+    process_iframe_images(config, generate_dir, iframe_images)
+    print_source_code_report(source_code_report)
+
+
+def convert_rst_v2(config, base_path, yes=False):
+    generate_dir = base_path.joinpath("generate")
+    if not prepare_base_directory(generate_dir, yes):
+        return
+    logging.debug("start converting %s" % generate_dir)
+    guides_dir, content_dir = prepare_structure(generate_dir)
+    transformation_rules, insert_rules = prepare_codio_rules(config)
+    workspace_dir = Path(config['workspace']['directory'])
+    source_dir = Path(config['workspace']['sources'])
+    source_code = config.get('opendsa', {}).get('source_code', 'java')
+    exercises = get_code_exercises(source_dir)
+    toc = get_rst_toc(source_dir, Path(config['workspace']['rst']), exercises)
+    toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
+    book, metadata = make_metadata_items(config)
+    chapter = None
+    chapter_num = 0
+    subsection_num = 0
+    children_containers = [book["children"]]
+    logging.debug("convert selected pages")
+    refs = OrderedDict()
+    label_counter = 0
+    all_assessments = list()
+    iframe_images = list()
+    source_code_report = list()
+    tag_references = prepare_figure_numbers(toc)
+    for item in toc:
+        if item.section_type == CHAPTER:
+            subsection_num = 0
+            chapter_num += 1
+            slug_name = slugify(item.section_name)
+            chapter = item.section_name
+        else:
+            subsection_num += 1
+            slug_name = slugify(item.section_name, chapter=chapter)
+        logging.debug("convert page {} - {}".format(slug_name, chapter_num))
+        converted_md = item.markdown
+        if not converted_md:
+            label = get_labels(item.lines)
+            if label:
+                label_counter += 1
+                refs[label] = {
+                    'pageref': item.section_name
+                }
+
+            lines = cleanup_rst(item.lines)
+            rst_converter = Rst2Markdown(
+                lines,
                 source_code,
                 exercises,
                 tag_references,

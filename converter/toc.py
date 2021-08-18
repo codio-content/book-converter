@@ -226,12 +226,11 @@ def get_bookdown_toc(folder):
 
 def get_rst_toc(source_path, config_path, exercises={}):
     toc = []
-
     if config_path.suffix == RST_JSON_TOC_EXT:
         json_config = load_json_file(config_path)
         chapters = json_config.get('chapters')
         for chapter in chapters:
-            pages = chapters.get(chapter).keys()
+            pages = chapters.get(chapter)
             toc.append(SectionItem(
                 section_name=chapter,
                 section_type='chapter',
@@ -243,38 +242,87 @@ def get_rst_toc(source_path, config_path, exercises={}):
                 if not rst_file_path.exists():
                     print("File %s doesn't exist\n" % rst_file_name)
                     continue
-                toc += process_rst_file(rst_file_path, exercises)
-        return toc
+                lines = get_rst_lines(rst_file_path)
+                toc += process_rst_lines(lines, exercises)
+        return toc, json_config
 
     if config_path.suffix == RST_TOC_EXT[0]:
-        masterTocTree = get_toctree_item(config_path)
-        get_toctree(source_path, masterTocTree)
+        chapters = get_toctree_item(config_path, {})
+        process_toctree(source_path, chapters)
 
+        for chapter in chapters:
+            pages = chapters.get(chapter)
+            file_path = pathlib.Path(source_path.joinpath(chapter).resolve())
+            if not file_path.exists():
+                print("File %s doesn't exist\n" % chapter)
+                continue
+            lines = get_rst_lines(file_path)
+            add_toc_item(toc, file_path, "chapter", lines, codio_section=None)
+
+            curr_dir = source_path.joinpath(chapter).parent
+            for page in pages:
+                codio_section = None
+                children_pages = pages[page]
+                if children_pages:
+                    codio_section = 'start'
+
+                file_path = pathlib.Path(curr_dir.joinpath(page).resolve())
+                if not file_path.exists():
+                    print("File %s doesn't exist\n" % page)
+                    continue
+                add_toc_item(toc, file_path, "section", lines, codio_section)
+
+                if children_pages:
+                    codio_section = None
+                    for ind, child in enumerate(children_pages):
+                        last_child = ind + 1 == len(children_pages)
+                        if last_child:
+                            codio_section = 'end'
+                        file_path = pathlib.Path(curr_dir.joinpath(child).resolve())
+                        if not file_path.exists():
+                            print("File %s doesn't exist\n" % child)
+                            continue
+                        add_toc_item(toc, file_path, "section", lines, codio_section)
         return toc
 
 
-def get_toctree(source_path, master):
-    if master is None:
-        return
-    for item in master.paths:
+def add_toc_item(toc, file_path, section_type, lines, codio_section):
+    name = get_chapter_name(file_path)
+    toc.append(SectionItem(
+        section_name=name,
+        section_type=section_type,
+        lines=lines,
+        codio_section=codio_section,
+        line_pos=0)
+    )
+
+
+def get_chapter_name(file_path):
+    name = ''
+    lines = get_rst_lines(file_path)
+    for ind, line in enumerate(lines):
+        next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
+        if name == '' and line.strip() != '' and (next_line.startswith(':::')
+                                                  or next_line.startswith('===') or next_line.startswith('---')):
+            name = line.strip()
+            break
+    return name
+
+
+def process_toctree(source_path, toc_tree):
+    for item in toc_tree:
         path = source_path.joinpath(item)
-        tree = get_toctree_item(path)
-        if tree is None:
+        var = toc_tree[item]
+        res = get_toctree_item(path, var)
+        if res is None:
             continue
-        master.children.insert(0, tree)
-
-        get_toctree(path.parent, master.children[0])
+        process_toctree(path.parent, res)
 
 
-def get_toctree_item(path):
-    toctree = []
+def get_toctree_item(path, structure):
     settings = []
-    children = []
-    paths = []
     tocTreeFlag = False
     chaptersFlag = False
-    tocTree = namedtuple('tocTree', ['name', 'paths', 'settings', 'children'])
-
     try:
         lines = read_file_lines(path)
     except BaseException as e:
@@ -282,6 +330,7 @@ def get_toctree_item(path):
 
     for ind, line in enumerate(lines):
         next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
+
         if '.. toctree:' in line:
             tocTreeFlag = True
             continue
@@ -294,14 +343,13 @@ def get_toctree_item(path):
             line = line.strip()
             if not line:
                 continue
-            paths.append(line)
-            if not next_line.strip() or next_line.startswith('.. '):
-                toctree.append(tocTree(path.stem, paths, settings, children))
-                break
 
-    if not toctree:
+            structure[line] = {}
+            if not next_line.strip() or next_line.startswith('.. '):
+                break
+    if not structure:
         return
-    return toctree[0]
+    return structure
 
 
 def _math(matchobj):
@@ -310,10 +358,10 @@ def _math(matchobj):
     return f'{content}'
 
 
-def process_rst_file(path, exercises):
+def get_rst_lines(path):
     with open(path, 'r', errors='replace') as file:
         lines = file.readlines()
-        return process_rst_lines(lines, exercises)
+        return lines
 
 
 def process_rst_lines(lines, exercises):
@@ -370,7 +418,9 @@ sections:
     first_item = True
     exercises_flag = False
     for ind, item in enumerate(structure):
-        yaml_structure += "  - name: \"{}\"\n    type: {}\n".format(item.section_name, item.section_type)
+        yaml_structure += f"  - name: \"{item.section_name}\"\n    type: {item.section_type}\n"
+        if item.codio_section:
+            yaml_structure += f"    codio_section: \"{item.codio_section}\"\n"
 
         next_item = structure[ind + 1] if ind + 1 < len(structure) else {}
         prev_item = structure[ind - 1]

@@ -38,10 +38,11 @@ OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
 
 
 class Rst2Markdown(object):
-    def __init__(self, lines_array,
-                 json_config,
+    def __init__(self,
+                 lines_array,
                  source_code,
                  exercises,
+                 json_config={},
                  tag_references=None,
                  workspace_dir=pathlib.Path('.'),
                  chapter_num=0,
@@ -135,7 +136,7 @@ class Rst2Markdown(object):
             self._caret_token,
             self.workspace_dir,
             self.load_file,
-            self.json_config.get('code_dir'),
+            self.json_config.get('code_dir', ''),
             self.source_code
         ).convert()
         if source_code_paths:

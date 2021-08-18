@@ -3,16 +3,17 @@ CHAPTER = "chapter"
 
 
 class SectionItem(object):
-    def __init__(self, section_name, section_type=SECTION, exercise=False, exercise_path='', line_pos=0):
+    def __init__(self, section_name, section_type=SECTION, lines='', codio_section=None, exercise=False,
+                 exercise_path='', line_pos=0):
         self.contains_exercises = None
         self.section_type = section_type
         self.section_name = section_name
         self.exercise = exercise
         self.exercise_path = exercise_path
         self.line_pos = line_pos
-        self.lines = []
+        self.lines = lines
         self.markdown = None
-        self.codio_section = None
+        self.codio_section = codio_section
 
     def __str__(self):
         return self.__repr__()
@@ -21,6 +22,8 @@ class SectionItem(object):
         return str({
             'section_name': self.section_name,
             'section_type': self.section_type,
+            'codio_section ': self.codio_section,
+            'lines': self.lines,
             'exercise': self.exercise,
             'exercise_path': self.exercise_path,
             'contains_exercises': self.contains_exercises,
