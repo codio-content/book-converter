@@ -5,7 +5,7 @@ class Heading(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:=)+\s*$""", flags=re.MULTILINE)
+        self._heading1_re = re.compile(r"""^(?P<content>.*?\n)?(?:[=|:])+\s*$""", flags=re.MULTILINE)
         self._heading2_re = re.compile(r"""^(?P<content>.*?\n)?(?:-)+\s*$""", flags=re.MULTILINE)
         self._heading3_re = re.compile(r"""^(?P<content>.*?\n)?(?:~)+\s*$""", flags=re.MULTILINE)
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)

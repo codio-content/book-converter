@@ -3,8 +3,10 @@ CHAPTER = "chapter"
 
 
 class SectionItem(object):
-    def __init__(self, section_name, section_type=SECTION, lines='', codio_section=None, exercise=False,
+    def __init__(self, section_name, section_type=SECTION, lines=None, codio_section=None, exercise=False,
                  exercise_path='', line_pos=0):
+        if lines is None:
+            lines = list()
         self.contains_exercises = None
         self.section_type = section_type
         self.section_name = section_name

@@ -244,7 +244,7 @@ def get_rst_toc(source_path, config_path, exercises={}):
                     continue
                 lines = get_rst_lines(rst_file_path)
                 toc += process_rst_lines(lines, exercises)
-        return toc, json_config
+        return toc
 
     if config_path.suffix == RST_TOC_EXT[0]:
         chapters = get_toctree_item(config_path, {})
@@ -256,8 +256,7 @@ def get_rst_toc(source_path, config_path, exercises={}):
             if not file_path.exists():
                 print("File %s doesn't exist\n" % chapter)
                 continue
-            lines = get_rst_lines(file_path)
-            add_toc_item(toc, file_path, "chapter", lines, codio_section=None)
+            add_toc_item(toc, file_path, "chapter", codio_section=None)
 
             curr_dir = source_path.joinpath(chapter).parent
             for page in pages:
@@ -270,7 +269,7 @@ def get_rst_toc(source_path, config_path, exercises={}):
                 if not file_path.exists():
                     print("File %s doesn't exist\n" % page)
                     continue
-                add_toc_item(toc, file_path, "section", lines, codio_section)
+                add_toc_item(toc, file_path, "section", codio_section)
 
                 if children_pages:
                     codio_section = None
@@ -282,12 +281,13 @@ def get_rst_toc(source_path, config_path, exercises={}):
                         if not file_path.exists():
                             print("File %s doesn't exist\n" % child)
                             continue
-                        add_toc_item(toc, file_path, "section", lines, codio_section)
+                        add_toc_item(toc, file_path, "section", codio_section)
         return toc
 
 
-def add_toc_item(toc, file_path, section_type, lines, codio_section):
+def add_toc_item(toc, file_path, section_type, codio_section):
     name = get_chapter_name(file_path)
+    lines = [line.rstrip('\r\n') for line in get_rst_lines(file_path)]
     toc.append(SectionItem(
         section_name=name,
         section_type=section_type,
@@ -360,8 +360,7 @@ def _math(matchobj):
 
 def get_rst_lines(path):
     with open(path, 'r', errors='replace') as file:
-        lines = file.readlines()
-        return lines
+        return file.readlines()
 
 
 def process_rst_lines(lines, exercises):

@@ -506,16 +506,16 @@ def cleanup_bookdown(lines):
     return lines
 
 
-def cleanup_rst(lines):
-    updated = []
-    starts = (
-        '.. index::'
-    )
-    for line in lines:
-        if line.startswith(starts):
-            continue
-        updated.append(line)
-    return updated
+# def cleanup_rst(lines):
+#     updated = []
+#     starts = (
+#         '.. index::'
+#     )
+#     for line in lines:
+#         if line.startswith(starts):
+#             continue
+#         updated.append(line)
+#     return updated
 
 
 def get_labels(lines):
@@ -706,7 +706,7 @@ def convert_rst_v1(config, base_path, yes=False):
     source_dir = Path(config['workspace']['sources'])
     source_code = config.get('opendsa', {}).get('source_code', 'java')
     exercises = get_code_exercises(source_dir)
-    toc, json_config = get_rst_toc(source_dir, Path(config['workspace']['rst']), exercises)
+    toc = get_rst_toc(source_dir, Path(config['workspace']['rst']), exercises)
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
     chapter = None
@@ -739,10 +739,8 @@ def convert_rst_v1(config, base_path, yes=False):
                     'pageref': item.section_name
                 }
 
-            lines = cleanup_rst(item.lines)
             rst_converter = Rst2Markdown(
-                lines,
-                json_config,
+                item.lines,
                 source_code,
                 exercises,
                 tag_references,
@@ -843,9 +841,8 @@ def convert_rst_v2(config, base_path, yes=False):
                     'pageref': item.section_name
                 }
 
-            lines = cleanup_rst(item.lines)
             rst_converter = Rst2Markdown(
-                lines,
+                item.lines,
                 source_code,
                 exercises,
                 tag_references,

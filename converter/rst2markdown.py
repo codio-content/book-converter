@@ -4,6 +4,7 @@ import uuid
 
 from converter.rst.avembed import AvEmbed
 from converter.rst.bibliography import Bibliography
+from converter.rst.code_block import CodeBlock
 from converter.rst.code_include import CodeInclude
 from converter.rst.comment import Comment
 from converter.rst.definition import Definition
@@ -14,8 +15,12 @@ from converter.rst.footnote import Footnote
 from converter.rst.glossary import Glossary
 from converter.rst.heading import Heading
 from converter.rst.image import Image
+from converter.rst.image2 import Image2
+from converter.rst.image2directive import Image2Directives
 from converter.rst.indented_code import IndentedCode
+from converter.rst.ignore import Ignore
 from converter.rst.inlineav import InlineAv
+from converter.rst.note import Note
 from converter.rst.numref import Numref
 from converter.rst.list import List
 from converter.rst.math import Math
@@ -33,6 +38,7 @@ from converter.rst.simple_table import SimpleTable
 from converter.rst.tag_reference import TagReference
 from converter.rst.preparer_math_block import PreparerMathBlock
 from converter.rst.character import Character
+from converter.rst.youtube import Youtube
 
 OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
 
@@ -47,6 +53,7 @@ class Rst2Markdown(object):
                  workspace_dir=pathlib.Path('.'),
                  chapter_num=0,
                  subsection_num=0):
+        self._images2 = list()
         self._caret_token = str(uuid.uuid4())
         self._math_block_separator_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
@@ -100,15 +107,25 @@ class Rst2Markdown(object):
         output = re.sub(r"\|---\|", "--", output)
         output = re.sub(r"\+\+", "\\+\\+", output)
         output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
+
+        # csawesome book
+        output = Ignore(output).convert()
+        output = Youtube(output, self._caret_token).convert()
+        output, images = Image2Directives(output).convert()
+        if images:
+            self._images2.extend(images)
+            output = Image2(output, self._images2, self._caret_token).convert()
+        output = CodeBlock(output, self._caret_token).convert()
+        output = Note(output, self._caret_token).convert()
+
         output = TagReference(output, self._tag_references).convert()
         output = MathBlock(output, self._caret_token, self._math_block_separator_token).convert()
         output, assessments = ExtrToolEmbed(output, self._exercises).convert()
         if assessments:
             self._assessments.extend(assessments)
-
         output = Footnote(output).convert()
         output = Heading(output, self._caret_token).convert()
-        output = Definition(output, self._caret_token).convert()
+        # output = Definition(output, self._caret_token).convert()
         output = TodoBlock(output).convert()
         output = Topic(output, self._caret_token).convert()
         output = Tip(output, self._caret_token).convert()
@@ -116,11 +133,9 @@ class Rst2Markdown(object):
         output, iframe_images = InlineAv(output, self._caret_token, self.workspace_dir, OPEN_DSA_CDN).convert()
         if iframe_images:
             self._iframe_images.extend(iframe_images)
-
         output, assessments = AvEmbed(output, self._caret_token, OPEN_DSA_CDN, self.workspace_dir).convert()
         if assessments:
             self._assessments.extend(assessments)
-
         output = Ref(output).convert()
         output = Numref(output).convert()
         output = Term(output).convert()
@@ -143,10 +158,10 @@ class Rst2Markdown(object):
             self._source_code_paths.extend(source_code_paths)
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
-        output = Comment(output).convert()
-        output = re.sub(r"^[ ]*", "", output, flags=re.MULTILINE)
+        # output = Comment(output).convert()
+        # output = re.sub(r"^[ ]*", "", output, flags=re.MULTILINE)
         output = Character(output).convert()
-        output = Paragraph(output).convert()
+        # output = Paragraph(output).convert()
         output = List(output).convert()
         output = Math(output).convert()
         output = re.sub(self._caret_token, "\n", output)
