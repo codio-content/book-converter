@@ -9,7 +9,7 @@ from collections import OrderedDict
 from pathlib import Path
 
 from converter.opendsa_assessments.code_workout import create_assessments_data
-from converter.rst.assesments.assessment_const import MULTIPLE_CHOICE
+from converter.rst.assesments.assessment_const import MULTIPLE_CHOICE, FILL_IN_THE_BLANKS
 from converter.rst2markdown import Rst2Markdown
 from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
 from converter.guides.tools import slugify, write_file, write_json, parse_csv_lines
@@ -310,6 +310,8 @@ def convert_assessment(assessment):
         return convert_code_workout_assessment(assessment)
     elif assessment.type == MULTIPLE_CHOICE:
         return convert_mc_assessment(assessment)
+    elif assessment.type == FILL_IN_THE_BLANKS:
+        return convert_fillintheblanks_assessment(assessment)
 
 
 def convert_custom_assessment(assessment):
@@ -398,6 +400,64 @@ def convert_mc_assessment(assessment):
             },
             "bloomsObjectiveLevel": "",
             "learningObjectives": ""
+        }
+    }
+
+
+def convert_fillintheblanks_assessment(assessment):
+    feedback = []
+    text = ''
+    options = assessment.options
+    question = options.get('question', {})
+
+    token_blank = []
+    token_text = []
+    for item in question.split('[blank]'):
+        token_text.append(item)
+        token_text.append(0)
+
+    for opt in options.keys():
+        if opt == 'correct_answers':
+            for item in options[opt]:
+                text = question.replace('[blank]', f'<<<{item}>>>')
+                token_blank.append(item)
+
+        if opt.startswith('feedback'):
+            feedback_name = opt.replace('feedback_', '')
+            value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
+            feedback.append(value)
+
+    tokens = {
+        "blank": token_blank,
+        "text": token_text,
+        "regexPositions": []
+    }
+
+    return {
+        "type": assessment.type,
+        "taskId": assessment.id,
+        "source": {
+            "name": assessment.name,
+            "showName": True,
+            "instructions": "",
+            "showValues": False,
+            "text": text,
+            "distractors": "",
+            "guidance": "",
+            "showGuidanceAfterResponseOption": {
+                "type": "Always"
+            },
+            "showExpectedAnswer": True,
+            "points": assessment.points,
+            "arePartialPointsAllowed": False,
+            "metadata": {
+                "tags": [],
+                "files": [],
+                "opened": []
+            },
+            "bloomsObjectiveLevel": "",
+            "learningObjectives": "",
+            "tokens": tokens
         }
     }
 
