@@ -406,9 +406,11 @@ def convert_fillintheblanks_assessment(assessment):
 
     token_blank = []
     token_text = []
-    for item in text.split('[blank]'):
+    split_text = text.split('[blank]')
+    for ind, item in enumerate(split_text):
         token_text.append(item)
-        token_text.append(0)
+        if ind != len(split_text) - 1:
+            token_text.append(0)
 
     for opt in options.keys():
         if opt == 'correct_answers':
@@ -487,7 +489,7 @@ def write_assessments(guides_dir, assessments):
     assessments_path = guides_dir.joinpath("assessments.json")
     unique_assessments = list({object_.id: object_ for object_ in assessments}.values())
     converted_assessments = list(map(convert_assessment, unique_assessments))
-    write_json(assessments_path, converted_assessments)
+    write_json(assessments_path, converted_assessments, sort_keys=False)
 
 
 def convert(config, base_path, yes=False):
