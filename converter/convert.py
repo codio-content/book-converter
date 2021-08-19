@@ -370,7 +370,7 @@ def convert_mc_assessment(assessment):
 
         if opt.startswith('feedback'):
             feedback_name = opt.replace('feedback_', '')
-            value = f'{feedback_name}: {options[opt]}'
+            value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
             feedback.append(value)
 
     return {
@@ -383,7 +383,7 @@ def convert_mc_assessment(assessment):
             "multipleResponse": False,
             "isRandomized": False,
             "answers": answers,
-            "guidance": '\n'.join(feedback),
+            "guidance": '\n\n'.join(feedback),
             "showGuidanceAfterResponseOption": {
                 "type": "Always"
             },
@@ -431,7 +431,6 @@ def write_assessments(guides_dir, assessments):
         return
     logging.debug("write assessments")
     assessments_path = guides_dir.joinpath("assessments.json")
-
     unique_assessments = list({object_.id: object_ for object_ in assessments}.values())
     converted_assessments = list(map(convert_assessment, unique_assessments))
     write_json(assessments_path, converted_assessments)
