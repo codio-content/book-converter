@@ -10,7 +10,7 @@ class CodeBlock(object):
 
     def _code_block(self, matchobj):
         caret_token = self._caret_token
-        content = matchobj.group('content')
+        content = matchobj.group('content').lstrip('\n').rstrip()
         lang = matchobj.group('lang').strip()
         return f'{caret_token}``` {lang}{caret_token}{content}{caret_token}```{caret_token}{caret_token}\n'
 
