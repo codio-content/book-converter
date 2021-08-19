@@ -1,6 +1,4 @@
 import pathlib
-from collections import namedtuple
-
 import yaml
 import re
 

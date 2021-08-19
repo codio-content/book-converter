@@ -16,9 +16,9 @@ class Image2Directives(object):
         options = {}
         image_id = matchobj.group('id')
         path = matchobj.group('path')
-        options_group = matchobj.group('opt').split('\n')
+        options_group = matchobj.group('opt')
         option_re = re.compile(':([^:]+): (.+)')
-        for line in options_group:
+        for line in options_group.split('\n'):
             opt_match = option_re.match(line.strip())
             if opt_match:
                 options[opt_match[1]] = opt_match[2]

@@ -9,6 +9,7 @@ from collections import OrderedDict
 from pathlib import Path
 
 from converter.opendsa_assessments.code_workout import create_assessments_data
+from converter.rst.assesments.assessment_const import MULTIPLE_CHOICE
 from converter.rst2markdown import Rst2Markdown
 from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
 from converter.guides.tools import slugify, write_file, write_json, parse_csv_lines
@@ -307,6 +308,8 @@ def convert_assessment(assessment):
         return convert_custom_assessment(assessment)
     elif assessment.type == 'test':
         return convert_code_workout_assessment(assessment)
+    elif assessment.type == MULTIPLE_CHOICE:
+        return convert_mc_assessment(assessment)
 
 
 def convert_custom_assessment(assessment):
@@ -333,6 +336,7 @@ def convert_code_workout_assessment(assessment):
     tests = assessment.ex_data.get('tests', '')
     test_matches = parse_csv_lines(tests)
     instructions = instructions_with_examples(test_matches, instructions, method_name)
+
     return {
         'type': 'test',
         'taskId': assessment.id,
@@ -343,6 +347,57 @@ def convert_code_workout_assessment(assessment):
             'arePartialPointsAllowed': True,
             'oneTimeTest': False,
             'points': assessment.points
+        }
+    }
+
+
+def convert_mc_assessment(assessment):
+    answers = []
+    feedback = []
+    options = assessment.options
+    question = options.get('question', {})
+    correctAnswer = options.get('correct', '')
+    for opt in options.keys():
+        if opt.startswith('answer'):
+            answer_name = opt.replace('answer_', '')
+            answer_text = f'{answer_name.upper()}. {options[opt]}'
+            answer = {
+                "_id": str(uuid.uuid4()),
+                "correct": correctAnswer == answer_name.lower(),
+                "answer": answer_text
+            }
+            answers.append(answer)
+
+        if opt.startswith('feedback'):
+            feedback_name = opt.replace('feedback_', '')
+            value = f'{feedback_name}: {options[opt]}'
+            feedback.append(value)
+
+    return {
+        "type": assessment.type,
+        "taskId": assessment.id,
+        "source": {
+            "name": assessment.name,
+            "showName": True,
+            "instructions": question,
+            "multipleResponse": False,
+            "isRandomized": False,
+            "answers": answers,
+            "guidance": '\n'.join(feedback),
+            "showGuidanceAfterResponseOption": {
+                "type": "Always"
+            },
+            "showExpectedAnswer": True,
+            "points": assessment.points,
+            "incorrectPoints": 0,
+            "arePartialPointsAllowed": False,
+            "metadata": {
+                "tags": [],
+                "files": [],
+                "opened": []
+            },
+            "bloomsObjectiveLevel": "",
+            "learningObjectives": ""
         }
     }
 
@@ -378,7 +433,6 @@ def write_assessments(guides_dir, assessments):
     assessments_path = guides_dir.joinpath("assessments.json")
 
     unique_assessments = list({object_.id: object_ for object_ in assessments}.values())
-
     converted_assessments = list(map(convert_assessment, unique_assessments))
     write_json(assessments_path, converted_assessments)
 
@@ -392,7 +446,7 @@ def convert(config, base_path, yes=False):
     logging.debug("start converting %s" % generate_dir)
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
-    toc = get_latex_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
+    toc = get_latex_toc(Path(config['workspace']['directory']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     refs = make_refs(toc, chapter_counter_from=get_ref_chapter_counter_from(config))
     refs = override_refs(refs, config)
@@ -705,8 +759,8 @@ def convert_rst_v1(config, base_path, yes=False):
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['sources'])
     source_code = config.get('opendsa', {}).get('source_code', 'java')
-    exercises = get_code_exercises(source_dir)
-    toc = get_rst_toc(source_dir, Path(config['workspace']['rst']), exercises)
+    source_exercises = get_code_exercises(source_dir)
+    toc = get_rst_toc(source_dir, Path(config['workspace']['rst']), source_exercises)
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
     chapter = None
@@ -716,7 +770,7 @@ def convert_rst_v1(config, base_path, yes=False):
     logging.debug("convert selected pages")
     refs = OrderedDict()
     label_counter = 0
-    all_assessments = list()
+    assessments = list()
     iframe_images = list()
     source_code_report = list()
     tag_references = prepare_figure_numbers(toc)
@@ -742,14 +796,14 @@ def convert_rst_v1(config, base_path, yes=False):
             rst_converter = Rst2Markdown(
                 item.lines,
                 source_code,
-                exercises,
+                source_exercises,
                 tag_references,
                 workspace_dir=workspace_dir,
                 chapter_num=chapter_num,
                 subsection_num=subsection_num
             )
             converted_md = rst_converter.to_markdown()
-            all_assessments += rst_converter.get_assessments()
+            assessments += rst_converter.get_assessments()
             iframe_images += rst_converter.get_iframe_images()
 
             for code_path in rst_converter.get_source_code_paths():
@@ -788,10 +842,10 @@ def convert_rst_v1(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-    create_assessments_data(guides_dir, generate_dir, exercises)
+    create_assessments_data(guides_dir, generate_dir, source_exercises)
 
     write_metadata(guides_dir, metadata, book)
-    write_assessments(guides_dir, all_assessments)
+    write_assessments(guides_dir, assessments)
     process_assets(config, generate_dir, [], [])
     process_iframe_images(config, generate_dir, iframe_images)
     print_source_code_report(source_code_report)
@@ -807,8 +861,8 @@ def convert_rst_v2(config, base_path, yes=False):
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['sources'])
     source_code = config.get('opendsa', {}).get('source_code', 'java')
-    exercises = get_code_exercises(source_dir)
-    toc = get_rst_toc(source_dir, Path(config['workspace']['rst']), exercises)
+    active_code_exercises = list()
+    toc = get_rst_toc(source_dir, Path(config['workspace']['rst']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
     chapter = None
@@ -818,7 +872,7 @@ def convert_rst_v2(config, base_path, yes=False):
     logging.debug("convert selected pages")
     refs = OrderedDict()
     label_counter = 0
-    all_assessments = list()
+    assessments = list()
     iframe_images = list()
     source_code_report = list()
     tag_references = prepare_figure_numbers(toc)
@@ -844,14 +898,13 @@ def convert_rst_v2(config, base_path, yes=False):
             rst_converter = Rst2Markdown(
                 item.lines,
                 source_code,
-                exercises,
                 tag_references,
                 workspace_dir=workspace_dir,
                 chapter_num=chapter_num,
                 subsection_num=subsection_num
             )
             converted_md = rst_converter.to_markdown()
-            all_assessments += rst_converter.get_assessments()
+            assessments += rst_converter.get_assessments()
             iframe_images += rst_converter.get_iframe_images()
 
             for code_path in rst_converter.get_source_code_paths():
@@ -890,10 +943,10 @@ def convert_rst_v2(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-    create_assessments_data(guides_dir, generate_dir, exercises)
+    # create_assessments_data(guides_dir, generate_dir, active_code_exercises)
 
     write_metadata(guides_dir, metadata, book)
-    write_assessments(guides_dir, all_assessments)
+    write_assessments(guides_dir, assessments)
     process_assets(config, generate_dir, [], [])
     process_iframe_images(config, generate_dir, iframe_images)
     print_source_code_report(source_code_report)
