@@ -35,10 +35,9 @@ class FillInTheBlanks(object):
                 correct_answers[key] = value
                 options['correct_answers'] = correct_answers
 
-
-        question = [item.strip() for item in options_group_list if item != '']
-        if question:
-            options['question'] = question[0]
+        text = [item.strip() for item in options_group_list if item != '']
+        if text:
+            options['text'] = text[0]
         if feedback:
             options['feedback'] = feedback
 

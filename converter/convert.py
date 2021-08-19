@@ -393,11 +393,6 @@ def convert_mc_assessment(assessment):
             "points": assessment.points,
             "incorrectPoints": 0,
             "arePartialPointsAllowed": False,
-            "metadata": {
-                "tags": [],
-                "files": [],
-                "opened": []
-            },
             "bloomsObjectiveLevel": "",
             "learningObjectives": ""
         }
@@ -406,20 +401,19 @@ def convert_mc_assessment(assessment):
 
 def convert_fillintheblanks_assessment(assessment):
     feedback = []
-    text = ''
     options = assessment.options
-    question = options.get('question', {})
+    text = options.get('text', {})
 
     token_blank = []
     token_text = []
-    for item in question.split('[blank]'):
+    for item in text.split('[blank]'):
         token_text.append(item)
         token_text.append(0)
 
     for opt in options.keys():
         if opt == 'correct_answers':
             for item in options[opt]:
-                text = question.replace('[blank]', f'<<<{item}>>>')
+                text = re.sub(r'\[blank]', f'<<<{item}>>>', text, 1)
                 token_blank.append(item)
 
         if opt.startswith('feedback'):
@@ -450,11 +444,6 @@ def convert_fillintheblanks_assessment(assessment):
             "showExpectedAnswer": True,
             "points": assessment.points,
             "arePartialPointsAllowed": False,
-            "metadata": {
-                "tags": [],
-                "files": [],
-                "opened": []
-            },
             "bloomsObjectiveLevel": "",
             "learningObjectives": "",
             "tokens": tokens
