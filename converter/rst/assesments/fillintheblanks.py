@@ -18,7 +18,7 @@ class FillInTheBlanks(object):
         caret_token = self._caret_token
         name = matchobj.group('name')
         options_group = matchobj.group('options')
-        option_re = re.compile('\s+(?P<correct>-)?\s+:(?P<key>[^:]+): (?P<value>.+)')
+        option_re = re.compile(r'\s+(?P<correct>-)?\s+:(?P<key>[^:]+): (?P<value>.+)')
         options_group_list = options_group.split('\n')
         feedback = []
         correct_answers = {}

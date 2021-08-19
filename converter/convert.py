@@ -412,9 +412,14 @@ def convert_fillintheblanks_assessment(assessment):
 
     for opt in options.keys():
         if opt == 'correct_answers':
-            for item in options[opt]:
-                text = re.sub(r'\[blank]', f'<<<{item}>>>', text, 1)
-                token_blank.append(item)
+            blank_match = re.search(r'\[blank]', text)
+            if blank_match:
+                for item in options[opt]:
+                    text = text.replace('[blank]', f'<<<{item}>>>', 1)
+                    token_blank.append(item)
+            else:
+                correct_answer = list(options[opt].keys())[0]
+                text = f'{text}\n<<<{correct_answer}>>>'
 
         if opt.startswith('feedback'):
             feedback_name = opt.replace('feedback_', '')
