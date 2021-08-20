@@ -2,18 +2,14 @@ import pathlib
 import re
 import uuid
 
-from converter.rst.assesments.activecode import ActiveCode
 from converter.rst.assesments.fillintheblanks import FillInTheBlanks
 from converter.rst.assesments.free_text import FreeText
 from converter.rst.assesments.mchoice import MultiChoice
-from converter.rst.assesments.parsons import Parsons
 from converter.rst.assesments.timed import Timed
 from converter.rst.avembed import AvEmbed
 from converter.rst.bibliography import Bibliography
 from converter.rst.code_block import CodeBlock
 from converter.rst.code_include import CodeInclude
-from converter.rst.comment import Comment
-from converter.rst.definition import Definition
 from converter.rst.epigraph import Epigraph
 from converter.rst.external_link import ExternalLink
 from converter.rst.extrtoolembed import ExtrToolEmbed
@@ -32,7 +28,6 @@ from converter.rst.list import List
 from converter.rst.math import Math
 from converter.rst.math_block import MathBlock
 from converter.rst.only import Only
-from converter.rst.paragraph import Paragraph
 from converter.rst.ref import Ref
 from converter.rst.sidebar import Sidebar
 from converter.rst.table import Table

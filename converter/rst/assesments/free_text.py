@@ -9,10 +9,12 @@ class FreeText(object):
         self.str = source_string
         self._caret_token = caret_token
         self._assessments = list()
-        self._free_text_re = re.compile(r"""^( *\.\.\spoll:: ?(?P<name>.*?)?\n)(?P<options>.*?)\n(?=\S)""",
+        self._poll_re = re.compile(r"""^( *\.\.\spoll:: ?(?P<name>.*?)?\n)(?P<options>.*?)\n(?=\S)""",
                                    flags=re.MULTILINE + re.DOTALL)
+        self._shortanswer_re = re.compile(r"""^( *\.\.\sshortanswer:: ?(?P<name>.*?)?\n)(?P<content>.*?)\n(?=\S)""",
+                                          flags=re.MULTILINE + re.DOTALL)
 
-    def _free_text(self, matchobj):
+    def _poll(self, matchobj):
         options = {}
         caret_token = self._caret_token
         name = matchobj.group('name')
@@ -34,6 +36,20 @@ class FreeText(object):
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
 
+    def _shortanswer(self, matchobj):
+        options = {}
+        caret_token = self._caret_token
+        name = matchobj.group('name')
+        question = matchobj.group('content')
+        if question:
+            options['question'] = question.strip()
+        assessment_id = f'active-code-{name.lower()}'
+        self._assessments.append(AssessmentData(assessment_id, name, FREE_TEXT, DEFAULT_POINTS, options))
+
+        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
+
     def convert(self):
-        output = self._free_text_re.sub(self._free_text, self.str)
+        output = self.str
+        output = self._poll_re.sub(self._poll, output)
+        output = self._shortanswer_re.sub(self._shortanswer, output)
         return output, self._assessments
