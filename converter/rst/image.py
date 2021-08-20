@@ -8,14 +8,18 @@ class Image(object):
         self.str = source_string
         self._caret_token = caret_token
         self._open_dsa_cdn = open_dsa_cdn
-        self._image_re = re.compile(
+        self._odsafig_re = re.compile(
             r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]odsafig::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
                 (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
                 (\n(?![ ]+\.\.)(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
+
         self._figure_re = re.compile(
             r"""(\.\.[ ]_(?P<tag>.*?):\n\s*)?\.\.[ ]figure::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
                 (?P<path>.*?)\n(?P<options>(?:\s+:.*?:\s+.*\n)+)?[ ]*
                 (\n(?![ ]+\.\.)(?P<caption>(?:[ ]+.+\n)+))?""", flags=re.VERBOSE)
+
+        self._image_re = re.compile(r"""^( *\.\.\simage:: ?(?P<path>.*?)?\n)(?P<options>.*?)\n(?=\S|\s+\n)""",
+                                    flags=re.MULTILINE + re.DOTALL)
 
     @staticmethod
     def _get_image_options(raw_options):
@@ -28,10 +32,11 @@ class Image(object):
                 options_dict[match[1]] = match[2]
         return options_dict
 
-    def _image(self, matchobj):
+    def _figure(self, matchobj):
         caret_token = self._caret_token
         image_path = matchobj.group('path')
-        image_path = f'{self._open_dsa_cdn}/{image_path}'
+        # TODO cdn
+        # image_path = f'{self._open_dsa_cdn}/{image_path}'
         output = MASK_IMAGE_TO_MD.replace('{image}', image_path)
         output = self._set_alt(output, matchobj.group('options'))
         figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
@@ -62,8 +67,22 @@ class Image(object):
         caption = re.sub(" +", " ", caption)
         return f'**Figure {figure_number}:** *{caption}*'
 
+    def _image(self, matchobj):
+        options = {}
+        caret_token = self._caret_token
+        image_path = matchobj.group('path')
+        options_group = matchobj.group('options')
+        option_re = re.compile(':([^:]+): (.+)')
+        for line in options_group.split('\n'):
+            opt_match = option_re.match(line.strip())
+            if option_re.match(line.strip()):
+                options[opt_match[1]] = opt_match[2]
+        width = options.get('width', '')
+        return f'{caret_token}<img src="{image_path}" alt="" style="width:{width};">{caret_token}'
+
     def convert(self):
         output = self.str
         output = self._image_re.sub(self._image, output)
-        output = self._figure_re.sub(self._image, output)
+        output = self._odsafig_re.sub(self._figure, output)
+        output = self._figure_re.sub(self._figure, output)
         return output

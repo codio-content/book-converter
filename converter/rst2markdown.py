@@ -2,8 +2,12 @@ import pathlib
 import re
 import uuid
 
+from converter.rst.assesments.activecode import ActiveCode
 from converter.rst.assesments.fillintheblanks import FillInTheBlanks
+from converter.rst.assesments.free_text import FreeText
 from converter.rst.assesments.mchoice import MultiChoice
+from converter.rst.assesments.parsons import Parsons
+from converter.rst.assesments.timed import Timed
 from converter.rst.avembed import AvEmbed
 from converter.rst.bibliography import Bibliography
 from converter.rst.code_block import CodeBlock
@@ -112,12 +116,12 @@ class Rst2Markdown(object):
 
         # csawesome book
         output = Ignore(output).convert()
+        output = Timed(output, self._caret_token).convert()
         output = Youtube(output, self._caret_token).convert()
         output, images = Image2Directives(output).convert()
         if images:
             self._images2.extend(images)
             output = Image2(output, self._images2, self._caret_token).convert()
-        output = CodeBlock(output, self._caret_token).convert()
         output = Note(output, self._caret_token).convert()
         output, assessments = MultiChoice(output, self._caret_token).convert()
         if assessments:
@@ -125,6 +129,17 @@ class Rst2Markdown(object):
         output, assessments = FillInTheBlanks(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
+        output, assessments = FreeText(output, self._caret_token).convert()
+        if assessments:
+            self._assessments.extend(assessments)
+        #     output, assessments = Parsons(output, self._caret_token).convert()
+        # if assessments:
+        #     self._assessments.extend(assessments)
+        # output, assessments = ActiveCode(output, self._caret_token).convert()
+        # if assessments:
+        #     self._assessments.extend(assessments)
+
+        output = CodeBlock(output, self._caret_token).convert()
 
         output = TagReference(output, self._tag_references).convert()
         output = MathBlock(output, self._caret_token, self._math_block_separator_token).convert()

@@ -9,7 +9,7 @@ from collections import OrderedDict
 from pathlib import Path
 
 from converter.opendsa_assessments.code_workout import create_assessments_data
-from converter.rst.assesments.assessment_const import MULTIPLE_CHOICE, FILL_IN_THE_BLANKS
+from converter.rst.assesments.assessment_const import MULTIPLE_CHOICE, FILL_IN_THE_BLANKS, FREE_TEXT
 from converter.rst2markdown import Rst2Markdown
 from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
 from converter.guides.tools import slugify, write_file, write_json, parse_csv_lines
@@ -312,6 +312,8 @@ def convert_assessment(assessment):
         return convert_mc_assessment(assessment)
     elif assessment.type == FILL_IN_THE_BLANKS:
         return convert_fillintheblanks_assessment(assessment)
+    elif assessment.type == FREE_TEXT:
+        return convert_freetext_assessment(assessment)
 
 
 def convert_custom_assessment(assessment):
@@ -417,10 +419,12 @@ def convert_fillintheblanks_assessment(assessment):
             blank_match = re.search(r'\[blank]', text)
             if blank_match:
                 for item in options[opt]:
+                    item = item.replace('$', '\\$')
                     text = text.replace('[blank]', f'<<<{item}>>>', 1)
                     token_blank.append(item)
             else:
                 correct_answer = list(options[opt].keys())[0]
+                correct_answer = correct_answer.replace('$', '\\$')
                 text = f'{text}\n<<<{correct_answer}>>>'
 
         if opt.startswith('feedback'):
@@ -451,9 +455,60 @@ def convert_fillintheblanks_assessment(assessment):
             "showExpectedAnswer": True,
             "points": assessment.points,
             "arePartialPointsAllowed": False,
+            "metadata": {
+                "tags": [
+                    {
+                        "name": "Assessment Type",
+                        "value": "Fill in the Blanks"
+                    }
+                ],
+                "files": [],
+                "opened": []
+            },
             "bloomsObjectiveLevel": "",
             "learningObjectives": "",
             "tokens": tokens
+        }
+    }
+
+
+def convert_freetext_assessment(assessment):
+    options = assessment.options
+    question = options.get('question', {})
+
+    instructions = f'{question}\n\n'
+    for ind, item in enumerate(options, start=1):
+        if item.startswith('option_'):
+            instructions += f'{ind}. {options[item]}\n\n'
+
+    return {
+        "type": assessment.type,
+        "taskId": assessment.id,
+        "source": {
+            "name": assessment.name,
+            "showName": True,
+            "instructions": instructions,
+            "guidance": '',
+            "showGuidanceAfterResponseOption": {
+                "type": "Always"
+            },
+            "previewType": "NONE",
+            "arePartialPointsAllowed": False,
+            "oneTimeTest": False,
+            "points": assessment.points,
+            "rubrics": [],
+            "metadata": {
+                "tags": [
+                    {
+                        "name": "Assessment Type",
+                        "value": "Free Text"
+                    }
+                ],
+                "files": [],
+                "opened": []
+            },
+            "bloomsObjectiveLevel": "",
+            "learningObjectives": ""
         }
     }
 
