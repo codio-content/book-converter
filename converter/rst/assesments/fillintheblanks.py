@@ -44,7 +44,7 @@ class FillInTheBlanks(object):
         assessment_id = f'fill-in-the-blanks-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, FILL_IN_THE_BLANKS, DEFAULT_POINTS, options))
 
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
+        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
 
     def convert(self):
         output = self._fillintheblanks_re.sub(self._fillintheblanks, self.str)

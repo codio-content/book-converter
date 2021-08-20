@@ -2,9 +2,11 @@ import pathlib
 import re
 import uuid
 
+from converter.rst.assesments.activecode import ActiveCode
 from converter.rst.assesments.fillintheblanks import FillInTheBlanks
 from converter.rst.assesments.free_text import FreeText
 from converter.rst.assesments.mchoice import MultiChoice
+from converter.rst.assesments.parsons import Parsons
 from converter.rst.assesments.timed import Timed
 from converter.rst.avembed import AvEmbed
 from converter.rst.bibliography import Bibliography
@@ -28,6 +30,7 @@ from converter.rst.list import List
 from converter.rst.math import Math
 from converter.rst.math_block import MathBlock
 from converter.rst.only import Only
+from converter.rst.raw_html import RawHtml
 from converter.rst.ref import Ref
 from converter.rst.sidebar import Sidebar
 from converter.rst.table import Table
@@ -102,6 +105,7 @@ class Rst2Markdown(object):
         return self._source_code_paths
 
     def to_markdown(self):
+        self.lines_array.append('\n')
         self.lines_array = self._enum_lists_parse(self.lines_array)
         lines_array = PreparerMathBlock(self.lines_array, self._math_block_separator_token).prepare()
         output = '\n'.join(lines_array)
@@ -112,6 +116,7 @@ class Rst2Markdown(object):
         # csawesome book
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
+        output = RawHtml(output, self._caret_token).convert()
         output = Youtube(output, self._caret_token).convert()
         output, images = Image2Directives(output).convert()
         if images:
@@ -127,12 +132,12 @@ class Rst2Markdown(object):
         output, assessments = FreeText(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
-        #     output, assessments = Parsons(output, self._caret_token).convert()
-        # if assessments:
-        #     self._assessments.extend(assessments)
-        # output, assessments = ActiveCode(output, self._caret_token).convert()
-        # if assessments:
-        #     self._assessments.extend(assessments)
+            output, assessments = Parsons(output, self._caret_token).convert()
+        if assessments:
+            self._assessments.extend(assessments)
+        output, assessments = ActiveCode(output, self._caret_token).convert()
+        if assessments:
+            self._assessments.extend(assessments)
 
         output = CodeBlock(output, self._caret_token).convert()
 

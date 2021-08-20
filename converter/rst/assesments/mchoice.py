@@ -32,7 +32,7 @@ class MultiChoice(object):
         assessment_id = f'multiple-choice-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, MULTIPLE_CHOICE, DEFAULT_POINTS, options))
 
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
+        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
 
     def convert(self):
         output = self._mchoice_re.sub(self._mchoice, self.str)

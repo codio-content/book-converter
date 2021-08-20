@@ -34,7 +34,7 @@ class FreeText(object):
         assessment_id = f'active-code-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, FREE_TEXT, DEFAULT_POINTS, options))
 
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
+        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
 
     def _shortanswer(self, matchobj):
         options = {}
@@ -46,7 +46,7 @@ class FreeText(object):
         assessment_id = f'active-code-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, FREE_TEXT, DEFAULT_POINTS, options))
 
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}'
+        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
 
     def convert(self):
         output = self.str
