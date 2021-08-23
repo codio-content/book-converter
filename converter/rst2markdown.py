@@ -105,7 +105,7 @@ class Rst2Markdown(object):
         return self._source_code_paths
 
     def to_markdown(self):
-        self.lines_array.append('\n')
+        self.lines_array.append('\n<br>\n')
         self.lines_array = self._enum_lists_parse(self.lines_array)
         lines_array = PreparerMathBlock(self.lines_array, self._math_block_separator_token).prepare()
         output = '\n'.join(lines_array)
@@ -116,8 +116,6 @@ class Rst2Markdown(object):
         # csawesome book
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
-        output = RawHtml(output, self._caret_token).convert()
-        output = Youtube(output, self._caret_token).convert()
         output, images = Image2Directives(output).convert()
         if images:
             self._images2.extend(images)
@@ -126,19 +124,20 @@ class Rst2Markdown(object):
         output, assessments = MultiChoice(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
-        output, assessments = FillInTheBlanks(output, self._caret_token).convert()
-        if assessments:
-            self._assessments.extend(assessments)
-        output, assessments = FreeText(output, self._caret_token).convert()
-        if assessments:
-            self._assessments.extend(assessments)
-            output, assessments = Parsons(output, self._caret_token).convert()
-        if assessments:
-            self._assessments.extend(assessments)
-        output, assessments = ActiveCode(output, self._caret_token).convert()
-        if assessments:
-            self._assessments.extend(assessments)
-
+        # output, assessments = FillInTheBlanks(output, self._caret_token).convert()
+        # if assessments:
+        #     self._assessments.extend(assessments)
+        # output, assessments = FreeText(output, self._caret_token).convert()
+        # if assessments:
+        #     self._assessments.extend(assessments)
+        #     output, assessments = Parsons(output, self._caret_token).convert()
+        # if assessments:
+        #     self._assessments.extend(assessments)
+        # output, assessments = ActiveCode(output, self._caret_token).convert()
+        # if assessments:
+        #     self._assessments.extend(assessments)
+        output = RawHtml(output, self._caret_token).convert()
+        output = Youtube(output, self._caret_token).convert()
         output = CodeBlock(output, self._caret_token).convert()
 
         output = TagReference(output, self._tag_references).convert()

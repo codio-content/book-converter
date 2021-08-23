@@ -6,7 +6,7 @@ class RawHtml(object):
         self.str = source_string
         self._caret_token = caret_token
         self._raw_html_re = re.compile(
-            r"""^( *\.\.\sraw:: html\n)(?P<content>.*?\n)(?:(?=\S)|(?!=^$)$)""", flags=re.MULTILINE + re.DOTALL)
+            r"""^( *\.\.\sraw:: html\n)(?P<content>.*?\n)(?:(?=\S)|$)""", flags=re.MULTILINE + re.DOTALL)
 
     def _raw_html(self, matchobj):
         content = matchobj.group('content')

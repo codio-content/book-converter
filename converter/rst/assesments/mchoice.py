@@ -9,7 +9,7 @@ class MultiChoice(object):
         self.str = source_string
         self._caret_token = caret_token
         self._assessments = list()
-        self._mchoice_re = re.compile(r"""^( *\.\.\smchoice:: ?(?P<name>.*?)?\n)(?P<options>.*?)\n(?=\S)""",
+        self._mchoice_re = re.compile(r"""^( *\.\.\smchoice:: (?P<name>.*?)\n)(?P<options>.*?)\n(?=\S|(?!^$)$)""",
                                       flags=re.MULTILINE + re.DOTALL)
 
     def _mchoice(self, matchobj):

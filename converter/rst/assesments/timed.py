@@ -7,7 +7,7 @@ class Timed(object):
         self._caret_token = caret_token
         self._assessments = list()
         self._timed_re = re.compile(
-            r"""^( *\.\.\stimed.*?:: ?(?P<name>.*?)?\n)(?P<settings>\s+:.*?:\n\n)(?P<content>.*?)\n(?=\S)""",
+            r"""^( *\.\.\stimed.*?:: ?(?P<name>.*?)?\n)(?P<settings>\s+:.*?:\n\n)?(?P<content>.*?)\n(?=\S)""",
             flags=re.MULTILINE + re.DOTALL)
 
     def _timed(self, matchobj):
@@ -15,9 +15,9 @@ class Timed(object):
         content = matchobj.group('content')
         content_list = content.split('\n')
         for ind, item in enumerate(content_list):
-            spaces_match = re.search(r'^( *)\.\.', content_list[0])
-            if spaces_match:
-                str_len = len(spaces_match.group(1))
+            indent_match = re.search(r'^( *)\.\.', content_list[0])
+            if indent_match:
+                str_len = len(indent_match.group(1))
                 cut_content.append(content_list[ind][str_len:])
         return '\n'.join(cut_content)
 

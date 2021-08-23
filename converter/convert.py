@@ -9,7 +9,7 @@ from collections import OrderedDict
 from pathlib import Path
 
 from converter.opendsa_assessments.code_workout import create_assessments_data
-from converter.rst.assesments.assessment_const import MULTIPLE_CHOICE, FILL_IN_THE_BLANKS, FREE_TEXT
+from converter.rst.assesments.assessment_const import MULTIPLE_CHOICE, FILL_IN_THE_BLANKS, FREE_TEXT, PARSONS
 from converter.rst2markdown import Rst2Markdown
 from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
 from converter.guides.tools import slugify, write_file, write_json, parse_csv_lines
@@ -314,6 +314,8 @@ def convert_assessment(assessment):
         return convert_fillintheblanks_assessment(assessment)
     elif assessment.type == FREE_TEXT:
         return convert_freetext_assessment(assessment)
+    elif assessment.type == PARSONS:
+        return convert_parsons_assessment(assessment)
 
 
 def convert_custom_assessment(assessment):
@@ -402,17 +404,21 @@ def convert_mc_assessment(assessment):
 
 
 def convert_fillintheblanks_assessment(assessment):
-    feedback = []
+    # feedback = []
     options = assessment.options
     text = options.get('text', {})
 
     token_blank = []
     token_text = []
     split_text = text.split('[blank]')
-    for ind, item in enumerate(split_text):
-        token_text.append(item)
-        if ind != len(split_text) - 1:
-            token_text.append(0)
+    if len(split_text) == 1:
+        token_text.append(f'{split_text[0]}\n')
+        token_text.append(0)
+    else:
+        for ind, item in enumerate(split_text):
+            token_text.append(item)
+            if ind != len(split_text) - 1:
+                token_text.append(0)
 
     for opt in options.keys():
         if opt == 'correct_answers':
@@ -424,13 +430,14 @@ def convert_fillintheblanks_assessment(assessment):
                     token_blank.append(item)
             else:
                 correct_answer = list(options[opt].keys())[0]
-                correct_answer = correct_answer.replace('$', '\\$')
+                correct_answer = re.sub(r'\\', '\\\\', correct_answer)
                 text = f'{text}\n<<<{correct_answer}>>>'
+                token_blank.append(correct_answer)
 
-        if opt.startswith('feedback'):
-            feedback_name = opt.replace('feedback_', '')
-            value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
-            feedback.append(value)
+        # if opt.startswith('feedback'):
+        #     feedback_name = opt.replace('feedback_', '')
+        #     value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
+        #     feedback.append(value)
 
     tokens = {
         "blank": token_blank,
@@ -511,6 +518,31 @@ def convert_freetext_assessment(assessment):
             "learningObjectives": ""
         }
     }
+
+
+def convert_parsons_assessment(assessment):
+    answers = []
+    feedback = []
+    options = assessment.options
+    question = options.get('question', {})
+    correctAnswer = options.get('correct', '')
+    for opt in options.keys():
+        if opt.startswith('answer'):
+            answer_name = opt.replace('answer_', '')
+            answer_text = f'{answer_name.upper()}. {options[opt]}'
+            answer = {
+                "_id": str(uuid.uuid4()),
+                "correct": correctAnswer == answer_name.lower(),
+                "answer": answer_text
+            }
+            answers.append(answer)
+
+        if opt.startswith('feedback'):
+            feedback_name = opt.replace('feedback_', '')
+            value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
+            feedback.append(value)
+
+    return {}
 
 
 def instructions_with_examples(test_matches, instructions, method_name):

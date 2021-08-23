@@ -20,26 +20,30 @@ class FillInTheBlanks(object):
         options_group = matchobj.group('options')
         option_re = re.compile(r'\s+(?P<correct>-)?\s+:(?P<key>[^:]+): (?P<value>.+)')
         options_group_list = options_group.split('\n')
-        feedback = []
+        negative_feedback = []
+        correct_feedback = []
         correct_answers = {}
         for line in options_group.split('\n'):
             opt_match = option_re.match(line)
             if opt_match:
                 key = opt_match.group('key')
                 value = opt_match.group('value')
+                correct_feedback.append(value)
                 if key == '.*':
-                    feedback.append(value)
+                    negative_feedback.append(value)
                     options_group_list.pop(opt_match.lastindex)
                     continue
                 options_group_list.pop(opt_match.lastindex)
-                correct_answers[key] = value
+                correct_answers[f'/{key}/'] = value
                 options['correct_answers'] = correct_answers
 
         text = [item.strip() for item in options_group_list if item != '']
         if text:
             options['text'] = text[0]
-        if feedback:
-            options['feedback'] = feedback
+        if negative_feedback:
+            options['negative_feedback'] = negative_feedback
+        if correct_feedback:
+            options['correct_feedback'] = correct_feedback
 
         assessment_id = f'fill-in-the-blanks-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, FILL_IN_THE_BLANKS, DEFAULT_POINTS, options))

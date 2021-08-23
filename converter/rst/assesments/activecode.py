@@ -11,7 +11,7 @@ class ActiveCode(object):
 
     def _activecode(self, matchobj):
 
-        return '<<<<<< ACTIVE CODE ASSESSMENT >>>>>>>\n'
+        return '<<<<<< ACTIVE CODE ASSESSMENT >>>>>>>\n\n'
 
     def convert(self):
         output = self._activecode_re.sub(self._activecode, self.str)
