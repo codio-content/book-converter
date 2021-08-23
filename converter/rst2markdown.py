@@ -124,18 +124,18 @@ class Rst2Markdown(object):
         output, assessments = MultiChoice(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
-        # output, assessments = FillInTheBlanks(output, self._caret_token).convert()
-        # if assessments:
-        #     self._assessments.extend(assessments)
-        # output, assessments = FreeText(output, self._caret_token).convert()
-        # if assessments:
-        #     self._assessments.extend(assessments)
-        #     output, assessments = Parsons(output, self._caret_token).convert()
-        # if assessments:
-        #     self._assessments.extend(assessments)
-        # output, assessments = ActiveCode(output, self._caret_token).convert()
-        # if assessments:
-        #     self._assessments.extend(assessments)
+        output, assessments = FillInTheBlanks(output, self._caret_token).convert()
+        if assessments:
+            self._assessments.extend(assessments)
+        output, assessments = FreeText(output, self._caret_token).convert()
+        if assessments:
+            self._assessments.extend(assessments)
+        output, assessments = Parsons(output, self._caret_token).convert()
+        if assessments:
+            self._assessments.extend(assessments)
+        output, assessments = ActiveCode(output, self._caret_token).convert()
+        if assessments:
+            self._assessments.extend(assessments)
         output = RawHtml(output, self._caret_token).convert()
         output = Youtube(output, self._caret_token).convert()
         output = CodeBlock(output, self._caret_token).convert()

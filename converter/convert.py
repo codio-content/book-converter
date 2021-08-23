@@ -384,7 +384,7 @@ def convert_mc_assessment(assessment):
         "taskId": assessment.id,
         "source": {
             "name": assessment.name,
-            "showName": True,
+            "showName": False,
             "instructions": question,
             "multipleResponse": False,
             "isRandomized": False,
@@ -450,7 +450,7 @@ def convert_fillintheblanks_assessment(assessment):
         "taskId": assessment.id,
         "source": {
             "name": assessment.name,
-            "showName": True,
+            "showName": False,
             "instructions": "",
             "showValues": False,
             "text": text,
@@ -493,7 +493,7 @@ def convert_freetext_assessment(assessment):
         "taskId": assessment.id,
         "source": {
             "name": assessment.name,
-            "showName": True,
+            "showName": False,
             "instructions": instructions,
             "guidance": '',
             "showGuidanceAfterResponseOption": {
@@ -521,28 +521,42 @@ def convert_freetext_assessment(assessment):
 
 
 def convert_parsons_assessment(assessment):
-    answers = []
-    feedback = []
     options = assessment.options
-    question = options.get('question', {})
-    correctAnswer = options.get('correct', '')
-    for opt in options.keys():
-        if opt.startswith('answer'):
-            answer_name = opt.replace('answer_', '')
-            answer_text = f'{answer_name.upper()}. {options[opt]}'
-            answer = {
-                "_id": str(uuid.uuid4()),
-                "correct": correctAnswer == answer_name.lower(),
-                "answer": answer_text
-            }
-            answers.append(answer)
+    instructions = options.get('question', {})
+    initial = options.get('initial', '')
+    max_distractors = options.get('max_distractors', '')
 
-        if opt.startswith('feedback'):
-            feedback_name = opt.replace('feedback_', '')
-            value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
-            feedback.append(value)
-
-    return {}
+    return {
+        "type": assessment.type,
+        "taskId": assessment.id,
+        "source": {
+            "name": assessment.name,
+            "showName": False,
+            "instructions": instructions,
+            "initial": initial,
+            "options": f"{{\"sortableId\":\"sortable\",\"max_wrong_lines\":{max_distractors},\"exec_limit\":2500,"
+                       f"\"can_indent\":false,\"x_indent\":50,\"lang\":\"en\",\"trashId\":\"sortableTrash\"}}",
+            "grader": "1",
+            "guidance": "",
+            "showGuidanceAfterResponseOption": {
+                "type": "Never"
+            },
+            "points": assessment.points,
+            "oneTimeTest": False,
+            "metadata": {
+                "tags": [
+                    {
+                        "name": "Assessment Type",
+                        "value": "Parsons Puzzle"
+                    }
+                ],
+                "files": [],
+                "opened": []
+            },
+            "bloomsObjectiveLevel": "",
+            "learningObjectives": ""
+        }
+    }
 
 
 def instructions_with_examples(test_matches, instructions, method_name):
