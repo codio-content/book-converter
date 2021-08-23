@@ -27,7 +27,7 @@ class Parsons(object):
                 options[opt_match[1]] = opt_match[2]
 
         blocks_group = matchobj.group('blocks')
-        blocks_match = re.search(r'^\s+-{5}(\n.*?)\n$', blocks_group, flags=re.MULTILINE + re.DOTALL)
+        blocks_match = re.search(r'^\s*-{5}(\n.*?)\n$', f'{blocks_group}\n', flags=re.MULTILINE + re.DOTALL)
         if blocks_match:
             initial_list = blocks_match.group(1).split('=====')
             initial_blocks = ''
