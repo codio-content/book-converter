@@ -534,9 +534,10 @@ def convert_freetext_assessment(assessment):
 
 def convert_parsons_assessment(assessment):
     options = assessment.options
-    instructions = options.get('question', {})
+    instructions = options.get('question', '')
+    feedback = options.get('feedback', '')
     initial = options.get('initial', '')
-    max_distractors = options.get('max_distractors', '')
+    max_distractors = options.get('max_distractors', 0)
 
     return {
         "type": assessment.type,
@@ -549,9 +550,9 @@ def convert_parsons_assessment(assessment):
             "options": f"{{\"sortableId\":\"sortable\",\"max_wrong_lines\":{max_distractors},\"exec_limit\":2500,"
                        f"\"can_indent\":false,\"x_indent\":50,\"lang\":\"en\",\"trashId\":\"sortableTrash\"}}",
             "grader": "1",
-            "guidance": "",
+            "guidance": feedback,
             "showGuidanceAfterResponseOption": {
-                "type": "Never"
+                "type": "Always"
             },
             "points": assessment.points,
             "oneTimeTest": False,
