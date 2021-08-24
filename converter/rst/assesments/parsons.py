@@ -33,7 +33,7 @@ class Parsons(object):
             initial_blocks = ''
             max_distractors = 0
             for line in initial_list:
-                line = line.rstrip().replace('\n', '\\n').replace('"', '&quot;')
+                line = line.rstrip().replace('\n', '\\n').replace('"', '&quot;').strip(' ')
                 line = line.replace('#paired', '#distractor')
                 initial_blocks += f'{line}\n'
                 if '#distractor' in line:

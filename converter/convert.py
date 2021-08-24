@@ -383,7 +383,7 @@ def convert_mc_assessment(assessment):
         "type": assessment.type,
         "taskId": assessment.id,
         "source": {
-            "name": assessment.name,
+            "name": f'Multiple Choice ({assessment.name})',
             "showName": False,
             "instructions": question,
             "multipleResponse": False,
@@ -449,8 +449,8 @@ def convert_fillintheblanks_assessment(assessment):
         "type": assessment.type,
         "taskId": assessment.id,
         "source": {
-            "name": assessment.name,
-            "showName": False,
+            "name": f'Fill in the Blank ({assessment.name})',
+            "showName": True,
             "instructions": "",
             "showValues": False,
             "text": text,
@@ -530,8 +530,8 @@ def convert_parsons_assessment(assessment):
         "type": assessment.type,
         "taskId": assessment.id,
         "source": {
-            "name": assessment.name,
-            "showName": False,
+            "name": f'Parsons ({assessment.name})',
+            "showName": True,
             "instructions": instructions,
             "initial": initial,
             "options": f"{{\"sortableId\":\"sortable\",\"max_wrong_lines\":{max_distractors},\"exec_limit\":2500,"
