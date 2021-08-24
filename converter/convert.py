@@ -358,26 +358,38 @@ def convert_code_workout_assessment(assessment):
 
 
 def convert_mc_assessment(assessment):
-    answers = []
+    answers_list = []
     feedback = []
     options = assessment.options
-    question = options.get('question', {})
-    correctAnswer = options.get('correct', '')
-    for opt in options.keys():
-        if opt.startswith('answer'):
-            answer_name = opt.replace('answer_', '')
-            answer_text = f'{answer_name.upper()}. {options[opt]}'
+    question = options.get('question', '')
+    multipleResponse = options.get('multipleResponse', '')
+    if multipleResponse:
+        feedback.append(options.get('feedback', ''))
+        answers = options.get('answers', [])
+        for item in answers:
             answer = {
                 "_id": str(uuid.uuid4()),
-                "correct": correctAnswer == answer_name.lower(),
-                "answer": answer_text
+                "correct": item['is_correct'],
+                "answer": item['answer']
             }
-            answers.append(answer)
+            answers_list.append(answer)
+    else:
+        correctAnswer = options.get('correct', '')
+        for opt in options.keys():
+            if opt.startswith('answer'):
+                answer_name = opt.replace('answer_', '')
+                answer_text = f'{answer_name.upper()}. {options[opt]}'
+                answer = {
+                    "_id": str(uuid.uuid4()),
+                    "correct": correctAnswer == answer_name.lower(),
+                    "answer": answer_text
+                }
+                answers_list.append(answer)
 
-        if opt.startswith('feedback'):
-            feedback_name = opt.replace('feedback_', '')
-            value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
-            feedback.append(value)
+            if opt.startswith('feedback'):
+                feedback_name = opt.replace('feedback_', '')
+                value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
+                feedback.append(value)
 
     return {
         "type": assessment.type,
@@ -386,9 +398,9 @@ def convert_mc_assessment(assessment):
             "name": f'Multiple Choice ({assessment.name})',
             "showName": False,
             "instructions": question,
-            "multipleResponse": False,
+            "multipleResponse": multipleResponse,
             "isRandomized": False,
-            "answers": answers,
+            "answers": answers_list,
             "guidance": '\n\n'.join(feedback),
             "showGuidanceAfterResponseOption": {
                 "type": "Always"
