@@ -7,7 +7,7 @@ class Ignore(object):
         self._index_re = re.compile(r"""^ *\.\.\s+index:: ?(.*?)?\n.*?\n(?=\S)""", flags=re.MULTILINE + re.DOTALL)
         self._qnum_re = re.compile(r"""^ *\.\.\s+qnum:: ?(.*?)?\n.*?\n(?=\S)""", flags=re.MULTILINE + re.DOTALL)
         self._toctree_re = re.compile(r"""^ *\.\.\s+toctree:: ?(.*?)?\n.*?\n(?=\S)""", flags=re.MULTILINE + re.DOTALL)
-        self._comment_re = re.compile(r"""^( *\.\. (\.\. |\w+(?!::)\n).*?)\n(?=\S|(?!^$)$)""",
+        self._comment_re = re.compile(r"""^( *\.\. (\.\. |\w+(?!::)\n).*?)\n(?=\S| +\.\. |(?!^$)$)""",
                                       flags=re.MULTILINE + re.DOTALL)
         self._data_file_re = re.compile(r"""^( *\.\.\sdatafile:: (?P<name>.*?)\n)(?P<options>.*?)\n(?=\S|(?!^$)$)""",
                                         flags=re.MULTILINE + re.DOTALL)

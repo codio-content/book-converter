@@ -7,7 +7,7 @@ class Timed(object):
         self._caret_token = caret_token
         self._assessments = list()
         self._timed_re = re.compile(
-            r"""^( *\.\.\stimed.*?::(?P<name> .*?)?\n)(?P<settings>\s+:.*?:*\n\n)?(?P<content>.*?)\n(?=\S|(?!^$)$)""",
+            r"""^(?: *\.\.\stimed.*?::(?P<name> .*?)?\n)(?P<settings>\s+:.*?:*\n)?(?P<content>.*?)(?=^\S)""",
             flags=re.MULTILINE + re.DOTALL)
 
     def _timed(self, matchobj):
