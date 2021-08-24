@@ -54,13 +54,13 @@ class MultiChoice(object):
                 options[opt_match[1]] = opt_match[2]
 
         answers = '\n'.join(options_group_list)
-        answers_match = re.finditer('^(?P<space> +):click-(?P<correct>correct|incorrect):(?P<text>.*?):endclick:',
+        answers_match = re.finditer('^(?P<indent> +):click-(?P<correct>correct|incorrect):(?P<text>.*?):endclick:',
                                     answers, flags=re.MULTILINE)
         if answers_match:
             answers = []
             for item in answers_match:
                 is_correct = item.group('correct') == 'correct'
-                answer = item.group('space') + item.group('text')
+                answer = item.group('indent') + item.group('text')
                 answers.append({'is_correct': is_correct, 'answer': answer})
             options['answers'] = answers
 
