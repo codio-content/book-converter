@@ -286,6 +286,7 @@ def get_rst_toc(source_path, config_path, exercises={}):
 def add_toc_item(toc, file_path, section_type, codio_section):
     name = get_chapter_name(file_path)
     lines = [line.rstrip('\r\n') for line in get_rst_lines(file_path)]
+
     toc.append(SectionItem(
         section_name=name,
         section_type=section_type,
@@ -293,6 +294,20 @@ def add_toc_item(toc, file_path, section_type, codio_section):
         codio_section=codio_section,
         line_pos=0)
     )
+
+    for line in lines:
+        if line.startswith(".. activecode::"):
+            activecode_match = re.search(r'\.\. activecode:: (?P<name>.*?)$', line, flags=re.MULTILINE)
+            if activecode_match:
+                name = activecode_match.group('name')
+                section_name = f'Active code: {name}'
+                toc.append(SectionItem(
+                    section_name=section_name,
+                    section_type="section",
+                    line_pos=0)
+                )
+                content = f'{{Check It!|assessment}}(test-{name.lower()})'
+                toc[len(toc) - 1].lines.append(content)
 
 
 def get_chapter_name(file_path):

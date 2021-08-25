@@ -1,6 +1,6 @@
 import re
 
-from converter.rst.assesments.assessment_const import DEFAULT_POINTS, MULTIPLE_CHOICE
+from converter.rst.assessments.assessment_const import DEFAULT_POINTS, MULTIPLE_CHOICE
 from converter.rst.model.assessment_data import AssessmentData
 
 

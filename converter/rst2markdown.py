@@ -2,12 +2,12 @@ import pathlib
 import re
 import uuid
 
-from converter.rst.assesments.activecode import ActiveCode
-from converter.rst.assesments.fillintheblanks import FillInTheBlanks
-from converter.rst.assesments.free_text import FreeText
-from converter.rst.assesments.mchoice import MultiChoice
-from converter.rst.assesments.parsons import Parsons
-from converter.rst.assesments.timed import Timed
+from converter.rst.assessments.activecode import ActiveCode
+from converter.rst.assessments.fillintheblanks import FillInTheBlanks
+from converter.rst.assessments.free_text import FreeText
+from converter.rst.assessments.mchoice import MultiChoice
+from converter.rst.assessments.parsons import Parsons
+from converter.rst.assessments.timed import Timed
 from converter.rst.avembed import AvEmbed
 from converter.rst.bibliography import Bibliography
 from converter.rst.code_block import CodeBlock

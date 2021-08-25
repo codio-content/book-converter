@@ -9,7 +9,9 @@ from collections import OrderedDict
 from pathlib import Path
 
 from converter.opendsa_assessments.code_workout import create_assessments_data
-from converter.rst.assesments.assessment_const import MULTIPLE_CHOICE, FILL_IN_THE_BLANKS, FREE_TEXT, PARSONS
+from converter.rst.assessments.active_code.write_data import create_active_code_files
+from converter.rst.assessments.assessment_const import MULTIPLE_CHOICE, FILL_IN_THE_BLANKS, FREE_TEXT, PARSONS, \
+    ACTIVE_CODE
 from converter.rst2markdown import Rst2Markdown
 from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
 from converter.guides.tools import slugify, write_file, write_json, parse_csv_lines
@@ -825,7 +827,7 @@ def convert_bookdown(config, base_path, yes=False):
     process_assets(config, generate_dir, pdfs_for_convert, [], bookdown=True)
 
 
-def get_code_exercises(workspace_dir):
+def get_code_workout_exercises(workspace_dir):
     exercises = {}
     code_dir = workspace_dir.joinpath('ODSAprivate-master')
     code_dir = pathlib.Path(code_dir)
@@ -928,7 +930,7 @@ def convert_rst_v1(config, base_path, yes=False):
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['sources'])
     source_code = config.get('opendsa', {}).get('source_code', 'java')
-    source_exercises = get_code_exercises(source_dir)
+    source_exercises = get_code_workout_exercises(source_dir)
     toc = get_rst_toc(source_dir, Path(config['workspace']['rst']), source_exercises)
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
@@ -1030,7 +1032,6 @@ def convert_rst_v2(config, base_path, yes=False):
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['sources'])
     source_code = config.get('opendsa', {}).get('source_code', 'java')
-    active_code_exercises = list()
     toc = get_rst_toc(source_dir, Path(config['workspace']['rst']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
@@ -1042,8 +1043,6 @@ def convert_rst_v2(config, base_path, yes=False):
     refs = OrderedDict()
     label_counter = 0
     assessments = list()
-    iframe_images = list()
-    source_code_report = list()
     tag_references = prepare_figure_numbers(toc)
     for item in toc:
         if item.section_type == CHAPTER:
@@ -1074,10 +1073,6 @@ def convert_rst_v2(config, base_path, yes=False):
             )
             converted_md = rst_converter.to_markdown()
             assessments += rst_converter.get_assessments()
-            iframe_images += rst_converter.get_iframe_images()
-
-            for code_path in rst_converter.get_source_code_paths():
-                source_code_report.append(tuple([f'{chapter_num}. {chapter}', item.section_name, code_path]))
 
             if slug_name in tokens:
                 for key, value in tokens.get(slug_name).items():
@@ -1112,10 +1107,9 @@ def convert_rst_v2(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-    # create_assessments_data(guides_dir, generate_dir, active_code_exercises)
+    active_code_exercises = list(filter(lambda a: a.type == ACTIVE_CODE, assessments))
+    create_active_code_files(guides_dir, generate_dir, active_code_exercises)
 
     write_metadata(guides_dir, metadata, book)
     write_assessments(guides_dir, assessments)
     process_assets(config, generate_dir, [], [])
-    process_iframe_images(config, generate_dir, iframe_images)
-    print_source_code_report(source_code_report)
