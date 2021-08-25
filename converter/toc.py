@@ -12,8 +12,8 @@ LATEX = 'latex'
 BOOKDOWN = 'bookdown'
 RST = 'rst'
 
-RST_TOC_EXT = '.rst',
-RST_JSON_TOC_EXT = '.json'
+TOCTREE = '.rst'
+JSON = '.json'
 
 
 def is_section(line):
@@ -224,7 +224,7 @@ def get_bookdown_toc(folder):
 
 def get_rst_toc(source_path, config_path, exercises={}):
     toc = []
-    if config_path.suffix == RST_JSON_TOC_EXT:
+    if config_path.suffix == JSON:
         json_config = load_json_file(config_path)
         chapters = json_config.get('chapters')
         for chapter in chapters:
@@ -244,7 +244,7 @@ def get_rst_toc(source_path, config_path, exercises={}):
                 toc += process_rst_lines(lines, exercises)
         return toc
 
-    if config_path.suffix == RST_TOC_EXT[0]:
+    if config_path.suffix == TOCTREE:
         chapters = get_toctree_item(config_path, {})
         process_toctree(source_path, chapters)
 

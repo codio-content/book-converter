@@ -12,8 +12,9 @@ class Timed(object):
 
     def _timed(self, matchobj):
         cut_content = []
-        content = matchobj.group('content')
+        content = matchobj.group('content').rstrip()
         content_list = content.split('\n')
+        content_list = [item for item in content_list if item.strip() != '']
         for ind, item in enumerate(content_list):
             indent_match = re.search(r'^( *)\.\.', content_list[0])
             if indent_match:
