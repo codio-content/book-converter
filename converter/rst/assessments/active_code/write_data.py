@@ -9,10 +9,14 @@ def create_active_code_files(guides_dir, generate_dir, exercises):
     if not exercises:
         return
     logging.debug("process create active code test assessments data")
-    private_dir = guides_dir.joinpath("secure/active_code")
-    private_dir.mkdir(exist_ok=True, parents=True)
-    path = Path('converter/rst/assessments/active_code/CodeTestHelper.java')
-    shutil.copy(path, f'{private_dir}/CodeTestHelper.java')
+
+    tests_dir = guides_dir.joinpath("secure/active_code")
+    tests_dir.mkdir(exist_ok=True, parents=True)
+
+    lib_dir = guides_dir.joinpath("secure/lib")
+    lib_dir.mkdir(exist_ok=True, parents=True)
+    source_lib_path = Path('converter/rst/assessments/active_code/CodeTestHelper.java')
+    shutil.copy(source_lib_path, lib_dir)
 
     for exercise in exercises:
         options = exercise.options
@@ -21,7 +25,7 @@ def create_active_code_files(guides_dir, generate_dir, exercises):
         class_code = options.get('code', '')
         tests_code = options.get('tests', '')
 
-        private_exercise_dir = private_dir.joinpath(exercise_name)
+        private_exercise_dir = tests_dir.joinpath(exercise_name)
         private_exercise_dir.mkdir(exist_ok=True, parents=True)
         tests_file = private_exercise_dir.joinpath(f'{class_name}Test.java')
 

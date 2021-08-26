@@ -365,21 +365,23 @@ def convert_activecode_assessment(assessment):
     options = assessment.options
     instructions = options.get('text', '')
     settings = options.get('settings', {})
-    lang = settings.get('language', '')
+    language = settings.get('language', '')
     class_name = options.get('class_name', '')
+    file_path = f'.guides/secure/active_code/{assessment.name}'
 
     return {
-        "type": assessment.type,
+        "type": "test",
         "taskId": assessment.id,
         "source": {
             "name": f'Active code ({assessment.name})',
             "showName": True,
             "instructions": instructions,
             "command": "python /usr/share/codio/assessments/assessments.py",
-            "codeEnvConfig": f"{{\"type\":\"{lang}\",\"subtype\":\"junit\",\"files\":[{{"
-                             f"\"filePath\":\"RunestoneTests.java\",\"className\":\"{class_name}\"}}],"
-                             f"\"maxPoints\":{assessment.points},\"wd\":\"\",\"sources\":\"\",\"libs\":\"\","
-                             f"\"testsources\":\"\", \"partialPoints\":false}}",
+            "codeEnvConfig": f"{{\"type\":\"{language}\",\"subtype\":\"junit\",\"files\":[{{"
+                             f"\"filePath\":\"{file_path}/RunestoneTests.java\",\"className\":\"RunestoneTests\"}}],"
+                             f"\"maxPoints\":{assessment.points},\"wd\":\"\","
+                             f"\"sources\":\"exercises/{assessment.name}\", "
+                             f"\"libs\":\"\", \"testsources\":\".guides/secure/lib\", \"partialPoints\":false}}",
             "timeoutSeconds": 300,
             "guidance": "",
             "showGuidanceAfterResponseOption": {

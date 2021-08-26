@@ -34,7 +34,7 @@ class ActiveCode(object):
         options['code'] = code
         options['tests'] = matchobj.group('tests')
 
-        assessment_id = f'active-code-{name.lower()}'
+        assessment_id = f'test-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, ACTIVE_CODE, DEFAULT_POINTS, options))
 
         return f'Active code exercise: {name}'
