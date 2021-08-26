@@ -318,6 +318,8 @@ def convert_assessment(assessment):
         return convert_freetext_assessment(assessment)
     elif assessment.type == PARSONS:
         return convert_parsons_assessment(assessment)
+    elif assessment.type == ACTIVE_CODE:
+        return convert_activecode_assessment(assessment)
 
 
 def convert_custom_assessment(assessment):
@@ -355,6 +357,49 @@ def convert_code_workout_assessment(assessment):
             'arePartialPointsAllowed': True,
             'oneTimeTest': False,
             'points': assessment.points
+        }
+    }
+
+
+def convert_activecode_assessment(assessment):
+    options = assessment.options
+    instructions = options.get('text', '')
+    settings = options.get('settings', {})
+    lang = settings.get('language', '')
+    class_name = options.get('class_name', '')
+
+    return {
+        "type": assessment.type,
+        "taskId": assessment.id,
+        "source": {
+            "name": f'Active code ({assessment.name})',
+            "showName": True,
+            "instructions": instructions,
+            "command": "python /usr/share/codio/assessments/assessments.py",
+            "codeEnvConfig": f"{{\"type\":\"{lang}\",\"subtype\":\"junit\",\"files\":[{{"
+                             f"\"filePath\":\"RunestoneTests.java\",\"className\":\"{class_name}\"}}],"
+                             f"\"maxPoints\":{assessment.points},\"wd\":\"\",\"sources\":\"\",\"libs\":\"\","
+                             f"\"testsources\":\"\", \"partialPoints\":false}}",
+            "timeoutSeconds": 300,
+            "guidance": "",
+            "showGuidanceAfterResponseOption": {
+                "type": "Always"
+            },
+            "points": assessment.points,
+            "oneTimeTest": False,
+            "arePartialPointsAllowed": False,
+            "metadata": {
+                "tags": [
+                    {
+                        "name": "Assessment Type",
+                        "value": "Advanced Code Test"
+                    }
+                ],
+                "files": [],
+                "opened": []
+            },
+            "bloomsObjectiveLevel": "",
+            "learningObjectives": ""
         }
     }
 
