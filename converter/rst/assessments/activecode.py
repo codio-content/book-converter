@@ -38,6 +38,8 @@ class ActiveCode(object):
                 options['class_name'] = class_name_match.group('name').strip()
 
         if tests:
+            tests = re.sub(r'assertTrue\(passed\);', 'assertTrue(getFinalResults().replace("Starting Tests ",'
+                                                     '"").replace(" Ending Tests",""), passed);', tests)
             options['tests'] = tests
             test_class_name_match = class_name_re.search(tests)
             if test_class_name_match:
@@ -57,7 +59,7 @@ class ActiveCode(object):
         assessment_id = f'test-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, ACTIVE_CODE, DEFAULT_POINTS, options))
 
-        return f'Active code exercise: {name}'
+        return f'**Active code exercise: {name}**'
 
     def convert(self):
         output = self._activecode_re.sub(self._activecode, self.str)
