@@ -16,6 +16,8 @@ class ActiveCode(object):
     def _activecode(self, matchobj):
         options = {}
         name = matchobj.group('name').strip()
+        code = matchobj.group('code')
+        tests = matchobj.group('tests')
 
         settings = {}
         settings_list = matchobj.group('settings').strip().split('\n')
@@ -25,14 +27,16 @@ class ActiveCode(object):
                 settings[opt_match[1]] = opt_match[2]
         options['settings'] = settings
         options['text'] = matchobj.group('text').strip()
+        options['code'] = code
+        options['tests'] = tests
 
-        code = matchobj.group('code')
-        class_name_match = re.search(r'public\s+class\s+(?P<name>.*?)(?:<Person>)?\n', code.strip())
+        class_name_re = re.compile(r'public\s+class\s+(?P<name>.*?)(?:<Person>|extends .*?)?\n')
+        class_name_match = class_name_re.search(code.strip())
         if class_name_match:
             options['class_name'] = class_name_match.group('name')
-
-        options['code'] = code
-        options['tests'] = matchobj.group('tests')
+        test_class_name_match = class_name_re.search(tests.strip())
+        if test_class_name_match:
+            options['test_class_name'] = test_class_name_match.group('name')
 
         assessment_id = f'test-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, ACTIVE_CODE, DEFAULT_POINTS, options))
