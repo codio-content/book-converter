@@ -10,33 +10,49 @@ class ActiveCode(object):
         self._caret_token = caret_token
         self._assessments = list()
         self._activecode_re = re.compile(
-            r"""^\s*\.\.\sactivecode:: (?P<name>.*?)\n(?P<settings>^[\t ]+:[^:]+: +.*?^$)+\n(?P<text>.*?)
-            \s*~~~~\s*\n(?P<code>.*?)\s*====\s*\n(?P<tests>.*?)\n(?=\S)""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+            r"""^\.\.\s+activecode:: (?P<name>.*?)\n(?P<content>.*?)\n(?=\S|(?!^$)$)""",
+            flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
     def _activecode(self, matchobj):
-        options = {}
         name = matchobj.group('name').strip()
-        code = matchobj.group('code')
-        tests = matchobj.group('tests')
+        content = matchobj.group('content')
+        options_match = re.search(
+            r'(?P<settings>^[\t ]+:[^:]+:[ ]+.*?^\s*$)+\n(?:(?P<text>.*?)\s*~~~~\s*\n)?(?:(?P<code>.*?)'
+            r'\s*====\s*\n)?(?P<tests>.*?)(?=\n\n^$)', content + '\n\n',
+            flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+
+        if not options_match:
+            return
+
+        options = {}
+        code = options_match.group('code')
+        tests = options_match.group('tests')
+        text = options_match.group('text')
+
+        class_name_re = re.compile(r'\s*public\s+class\s+(?P<name>.*?)(?:<Person>|extends .*?)?\n')
+
+        if code:
+            options['code'] = code
+            class_name_match = class_name_re.search(code)
+            if class_name_match:
+                options['class_name'] = class_name_match.group('name').strip()
+
+        if tests:
+            options['tests'] = tests
+            test_class_name_match = class_name_re.search(tests)
+            if test_class_name_match:
+                options['test_class_name'] = test_class_name_match.group('name').strip()
+
+        if text:
+            options['text'] = text.strip()
 
         settings = {}
-        settings_list = matchobj.group('settings').strip().split('\n')
+        settings_list = options_match.group('settings').strip().split('\n')
         for line in settings_list:
             opt_match = re.match(r':([^:]+):(?: +(.+))?', line.strip())
             if opt_match:
                 settings[opt_match[1]] = opt_match[2]
         options['settings'] = settings
-        options['text'] = matchobj.group('text').strip()
-        options['code'] = code
-        options['tests'] = tests
-
-        class_name_re = re.compile(r'public\s+class\s+(?P<name>.*?)(?:<Person>|extends .*?)?\n')
-        class_name_match = class_name_re.search(code.strip())
-        if class_name_match:
-            options['class_name'] = class_name_match.group('name')
-        test_class_name_match = class_name_re.search(tests.strip())
-        if test_class_name_match:
-            options['test_class_name'] = test_class_name_match.group('name')
 
         assessment_id = f'test-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, ACTIVE_CODE, DEFAULT_POINTS, options))
