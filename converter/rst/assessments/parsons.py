@@ -49,7 +49,8 @@ class Parsons(object):
             question = question.replace('"', '\"').strip()
             options['question'] = question
 
-        assessment_id = f'parsons-puzzle-{name.lower()}'
+        name = name.lower().replace('-', '_')
+        assessment_id = f'parsons-puzzle-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, PARSONS, DEFAULT_POINTS, options))
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
@@ -78,7 +79,8 @@ class Parsons(object):
         options['question'] = question.replace('"', '\"').strip()
         options['initial'] = initial_blocks
 
-        assessment_id = f'parsons-puzzle-{name.lower()}'
+        name = name.lower().replace('-', '_')
+        assessment_id = f'parsons-puzzle-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, PARSONS, DEFAULT_POINTS, options))
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'

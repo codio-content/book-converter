@@ -56,7 +56,8 @@ class ActiveCode(object):
                 settings[opt_match[1]] = opt_match[2]
         options['settings'] = settings
 
-        assessment_id = f'test-{name.lower()}'
+        name = name.lower().replace('-', '_')
+        assessment_id = f'test-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, ACTIVE_CODE, DEFAULT_POINTS, options))
 
         return f'\n\n**Active code exercise: {name}**\n\n'

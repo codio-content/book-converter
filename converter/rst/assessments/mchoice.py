@@ -30,10 +30,11 @@ class MultiChoice(object):
 
         question = [item.strip() for item in options_group_list if item != '']
         if question:
-            options['question'] = question[0]
+            options['question'] = '\n'.join(question).strip()
 
         options['multipleResponse'] = False
-        assessment_id = f'multiple-choice-{name.lower()}'
+        name = name.lower().replace('-', '_')
+        assessment_id = f'multiple-choice-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, MULTIPLE_CHOICE, DEFAULT_POINTS, options))
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
@@ -65,7 +66,9 @@ class MultiChoice(object):
             options['answers'] = answers
 
         options['multipleResponse'] = True
-        assessment_id = f'multiple-choice-{name.lower()}'
+
+        name = name.lower().replace('-', '_')
+        assessment_id = f'multiple-choice-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, MULTIPLE_CHOICE, DEFAULT_POINTS, options))
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'

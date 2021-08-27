@@ -45,7 +45,8 @@ class FillInTheBlanks(object):
         if correct_feedback:
             options['correct_feedback'] = correct_feedback
 
-        assessment_id = f'fill-in-the-blanks-{name.lower()}'
+        name = name.lower().replace('-', '_')
+        assessment_id = f'fill-in-the-blanks-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, FILL_IN_THE_BLANKS, DEFAULT_POINTS, options))
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
