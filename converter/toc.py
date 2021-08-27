@@ -254,7 +254,7 @@ def get_rst_toc(source_path, config_path, exercises={}):
             if not file_path.exists():
                 print("File %s doesn't exist\n" % chapter)
                 continue
-            add_toc_item(toc, file_path, "chapter", codio_section=None)
+            add_toc_item(toc, file_path, 'chapter', codio_section=None)
 
             curr_dir = source_path.joinpath(chapter).parent
             for page in pages:
@@ -267,7 +267,7 @@ def get_rst_toc(source_path, config_path, exercises={}):
                 if not file_path.exists():
                     print("File %s doesn't exist\n" % page)
                     continue
-                add_toc_item(toc, file_path, "section", codio_section)
+                add_toc_item(toc, file_path, 'section', codio_section)
 
                 if children_pages:
                     codio_section = None
@@ -279,13 +279,29 @@ def get_rst_toc(source_path, config_path, exercises={}):
                         if not file_path.exists():
                             print("File %s doesn't exist\n" % child)
                             continue
-                        add_toc_item(toc, file_path, "section", codio_section)
+                        add_toc_item(toc, file_path, 'section', codio_section)
         return toc
 
 
 def add_toc_item(toc, file_path, section_type, codio_section):
     name = get_chapter_name(file_path)
     lines = [line.rstrip('\r\n') for line in get_rst_lines(file_path)]
+
+    active_code_toc_list = []
+    for line in lines:
+        if line.startswith(".. activecode::"):
+            activecode_match = re.search(r'\.\. activecode:: (?P<name>.*?)$', line, flags=re.MULTILINE)
+            if activecode_match:
+                ex_name = activecode_match.group('name')
+                section_name = f'Active code: {ex_name}'
+                active_code_toc_list.append(SectionItem(
+                    section_name=section_name,
+                    section_type=section_type,
+                    line_pos=0)
+                )
+                content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
+                active_code_toc_list[len(active_code_toc_list) - 1].lines.append(content)
+            codio_section = 'start'
 
     toc.append(SectionItem(
         section_name=name,
@@ -295,19 +311,9 @@ def add_toc_item(toc, file_path, section_type, codio_section):
         line_pos=0)
     )
 
-    for line in lines:
-        if line.startswith(".. activecode::"):
-            activecode_match = re.search(r'\.\. activecode:: (?P<name>.*?)$', line, flags=re.MULTILINE)
-            if activecode_match:
-                name = activecode_match.group('name')
-                section_name = f'Active code: {name}'
-                toc.append(SectionItem(
-                    section_name=section_name,
-                    section_type="section",
-                    line_pos=0)
-                )
-                content = f'{{Check It!|assessment}}(test-{name.lower()})'
-                toc[len(toc) - 1].lines.append(content)
+    if active_code_toc_list:
+        active_code_toc_list[len(active_code_toc_list) - 1].codio_section = 'end'
+        toc.extend(active_code_toc_list)
 
 
 def get_chapter_name(file_path):
