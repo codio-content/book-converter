@@ -22,11 +22,27 @@ class MultiChoice(object):
         options_group = matchobj.group('options')
         option_re = re.compile(':([^:]+): (.+)')
         options_group_list = options_group.split('\n')
+        answers = []
+        feedback = []
         for line in options_group.split('\n'):
             opt_match = option_re.match(line.strip())
             if opt_match:
                 options_group_list.pop(opt_match.pos)
+                if 'answer_' in line:
+                    answers.append({opt_match[1]: opt_match[2]})
+                    continue
+                if 'feedback_' in line:
+                    feedback.append({opt_match[1]: opt_match[2]})
+                    continue
                 options[opt_match[1]] = opt_match[2]
+
+        if answers:
+            options['answers'] = answers
+        else:
+            return ''
+
+        if feedback:
+            options['feedback'] = feedback
 
         question = [item.strip() for item in options_group_list if item != '']
         if question:

@@ -407,12 +407,15 @@ def convert_activecode_assessment(assessment):
 
 def convert_mc_assessment(assessment):
     answers_list = []
-    feedback = []
     options = assessment.options
     question = options.get('question', '')
+    answers = options.get('answers', [])
+    feedback_list = options.get('feedback', [])
+    feedback_final = []
+
     multipleResponse = options.get('multipleResponse', '')
     if multipleResponse:
-        feedback.append(options.get('feedback', ''))
+        feedback_final.append(options.get('feedback', ''))
         answers = options.get('answers', [])
         for item in answers:
             answer = {
@@ -423,21 +426,22 @@ def convert_mc_assessment(assessment):
             answers_list.append(answer)
     else:
         correctAnswer = options.get('correct', '')
-        for opt in options.keys():
-            if opt.startswith('answer'):
-                answer_name = opt.replace('answer_', '')
-                answer_text = f'{answer_name.upper()}. {options[opt]}'
-                answer = {
-                    "_id": str(uuid.uuid4()),
-                    "correct": correctAnswer == answer_name.lower(),
-                    "answer": answer_text
-                }
-                answers_list.append(answer)
+        for answer in answers:
+            items = list(answer.items())
+            answer_name = items[0][0].replace('answer_', '')
+            answer_text = f'{answer_name.upper()}. {items[0][1]}'
+            answer = {
+                "_id": str(uuid.uuid4()),
+                "correct": correctAnswer == answer_name.lower(),
+                "answer": answer_text
+            }
+            answers_list.append(answer)
 
-            if opt.startswith('feedback'):
-                feedback_name = opt.replace('feedback_', '')
-                value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
-                feedback.append(value)
+            for feedback in feedback_list:
+                items = list(feedback.items())
+                feedback_name = items[0][0].replace('feedback_', '')
+                value = f'<b>{feedback_name.upper()}</b>: {items[0][1]}'
+                feedback_final.append(value)
 
     return {
         "type": assessment.type,
@@ -449,7 +453,7 @@ def convert_mc_assessment(assessment):
             "multipleResponse": multipleResponse,
             "isRandomized": False,
             "answers": answers_list,
-            "guidance": '\n\n'.join(feedback),
+            "guidance": '\n\n'.join(feedback_final),
             "showGuidanceAfterResponseOption": {
                 "type": "Always"
             },
