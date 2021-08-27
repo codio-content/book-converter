@@ -13,7 +13,7 @@ def create_active_code_files(guides_dir, exercises):
     tests_dir = guides_dir.joinpath('secure/active_code')
     tests_dir.mkdir(exist_ok=True, parents=True)
 
-    lib_dir = guides_dir.joinpath(f'code')
+    lib_dir = guides_dir.joinpath(f'active_code')
     lib_dir.mkdir(exist_ok=True, parents=True)
     source_lib_path = Path('converter/rst/assessments/active_code/CodeTestHelper.java')
     shutil.copy(source_lib_path, lib_dir)

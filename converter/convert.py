@@ -379,8 +379,8 @@ def convert_activecode_assessment(assessment):
             "codeEnvConfig": f"{{\"type\":\"{language}\",\"subtype\":\"junit\",\"files\":[{{"
                              f"\"filePath\":\"{file_path}/RunestoneTests.java\",\"className\":\"RunestoneTests\"}}],"
                              f"\"maxPoints\":{assessment.points},\"wd\":\"\","
-                             f"\"sources\":\"exercises/{assessment.name}\", "
-                             f"\"libs\":\"\", \"testsources\":\".guides/secure/lib\", \"partialPoints\":false}}",
+                             f"\"sources\":\"active_code/{assessment.name}\", "
+                             f"\"libs\":\"\", \"testsources\":\".guides/active_code\", \"partialPoints\":false}}",
             "timeoutSeconds": 300,
             "guidance": "",
             "showGuidanceAfterResponseOption": {
