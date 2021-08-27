@@ -429,7 +429,7 @@ def convert_mc_assessment(assessment):
         for answer in answers:
             items = list(answer.items())
             answer_name = items[0][0].replace('answer_', '')
-            answer_text = f'{answer_name.upper()}. {items[0][1]}'
+            answer_text = f'<b>{answer_name.upper()}.</b> {items[0][1]}'
             answer = {
                 "_id": str(uuid.uuid4()),
                 "correct": correctAnswer == answer_name.lower(),
