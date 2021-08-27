@@ -38,8 +38,8 @@ class ActiveCode(object):
                 options['class_name'] = class_name_match.group('name').strip()
 
         if tests:
-            tests = re.sub(r'assertTrue\(passed\);', 'assertTrue(getFinalResults().replace("Starting Tests ",'
-                                                     '"").replace(" Ending Tests",""), passed);', tests)
+            tests = re.sub(r'assertTrue\(passed\);', 'assertTrue(getFinalResults().replace("Starting Tests",'
+                                                     '"").replace("Ending Tests",""), passed);', tests)
             options['tests'] = tests
             test_class_name_match = class_name_re.search(tests)
             if test_class_name_match:
