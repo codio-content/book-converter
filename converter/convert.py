@@ -185,9 +185,9 @@ def prepare_base_directory(generate_dir, yes=False):
     return True
 
 
-def prepare_structure(generate_dir):
-    generate_dir.mkdir()
-    guides_dir = generate_dir.joinpath(".guides")
+def prepare_structure(chapter_dir):
+    chapter_dir.mkdir(parents=True)
+    guides_dir = chapter_dir.joinpath(".guides")
     guides_dir.mkdir()
     content_dir = guides_dir.joinpath("content")
     content_dir.mkdir()
@@ -1074,7 +1074,7 @@ def convert_rst_v2(config, base_path, yes=False):
     if not prepare_base_directory(generate_dir, yes):
         return
     logging.debug("start converting %s" % generate_dir)
-    guides_dir, content_dir = prepare_structure(generate_dir)
+    guides_dir, content_dir = Path(), Path()
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['sources'])
@@ -1089,14 +1089,21 @@ def convert_rst_v2(config, base_path, yes=False):
     logging.debug("convert selected pages")
     refs = OrderedDict()
     label_counter = 0
-    assessments = list()
+    assessments = []
     tag_references = prepare_figure_numbers(toc)
-    for item in toc:
+
+    chapter_dir = Path()
+    lastChaperSection = False
+    for ind, item in enumerate(toc):
         if item.section_type == CHAPTER:
+            assessments = []
+            lastChaperSection = False
             subsection_num = 0
             chapter_num += 1
             slug_name = slugify(item.section_name)
             chapter = item.section_name
+            chapter_dir = generate_dir.joinpath(slug_name.strip('-'))
+            guides_dir, content_dir = prepare_structure(chapter_dir)
         else:
             subsection_num += 1
             slug_name = slugify(item.section_name, chapter=chapter)
@@ -1154,9 +1161,14 @@ def convert_rst_v2(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-    active_code_exercises = list(filter(lambda a: a.type == ACTIVE_CODE, assessments))
-    create_active_code_files(guides_dir, generate_dir, active_code_exercises)
+        lastIndex = ind + 1
+        if lastIndex != len(toc) and toc[lastIndex].section_type == CHAPTER:
+            lastChaperSection = True
 
-    write_metadata(guides_dir, metadata, book)
-    write_assessments(guides_dir, assessments)
-    process_assets(config, generate_dir, [], [])
+        if lastChaperSection:
+            active_code_exercises = list(filter(lambda a: a.type == ACTIVE_CODE, assessments))
+            create_active_code_files(guides_dir, chapter_dir, active_code_exercises)
+
+            write_metadata(guides_dir, metadata, book)
+            write_assessments(guides_dir, assessments)
+            process_assets(config, chapter_dir, [], [])
