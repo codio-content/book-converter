@@ -1173,7 +1173,7 @@ def convert_rst_v2(config, base_path, yes=False):
 
         if lastChaperSection:
             active_code_exercises = list(filter(lambda a: a.type == ACTIVE_CODE, assessments))
-            create_active_code_files(guides_dir, chapter_dir, active_code_exercises)
+            create_active_code_files(guides_dir, active_code_exercises)
 
             write_metadata(guides_dir, metadata, book)
             write_assessments(guides_dir, assessments)

@@ -2,7 +2,7 @@ import pathlib
 import re
 import uuid
 
-from converter.rst.assessments.activecode import ActiveCode
+from converter.rst.assessments.active_code.activecode import ActiveCode
 from converter.rst.assessments.fillintheblanks import FillInTheBlanks
 from converter.rst.assessments.free_text import FreeText
 from converter.rst.assessments.mchoice import MultiChoice
