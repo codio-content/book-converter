@@ -22,9 +22,8 @@ from converter.assets import copy_assets, convert_assets, process_source_code, c
 from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from, make_bookdown_refs
 from converter.optimizer import optimize
 
-RST_TOC_EXT = '.rst',
-RST_JSON_TOC_EXT = '.json'
-
+TOCTREE = '.rst'
+JSON = '.json'
 
 def get_guide_content_path(file_path):
     file_path = str(file_path)
@@ -961,9 +960,9 @@ def print_source_code_report(data):
 
 def convert_rst(config, base_path, yes=False):
     config_type = Path(config.get('workspace', {}).get('rst'))
-    if config_type.suffix == RST_JSON_TOC_EXT:
+    if config_type.suffix == JSON:
         convert_rst_v1(config, base_path, yes)
-    if config_type.suffix == RST_TOC_EXT[0]:
+    if config_type.suffix == TOCTREE:
         convert_rst_v2(config, base_path, yes)
 
 
@@ -1081,11 +1080,11 @@ def convert_rst_v2(config, base_path, yes=False):
     source_code = config.get('opendsa', {}).get('source_code', 'java')
     toc = get_rst_toc(source_dir, Path(config['workspace']['rst']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
-    book, metadata = make_metadata_items(config)
+
     chapter = None
     chapter_num = 0
     subsection_num = 0
-    children_containers = [book["children"]]
+
     logging.debug("convert selected pages")
     refs = OrderedDict()
     label_counter = 0
@@ -1094,6 +1093,7 @@ def convert_rst_v2(config, base_path, yes=False):
 
     chapter_dir = Path()
     lastChaperSection = False
+
     for ind, item in enumerate(toc):
         if item.section_type == CHAPTER:
             assessments = []
@@ -1102,6 +1102,8 @@ def convert_rst_v2(config, base_path, yes=False):
             chapter_num += 1
             slug_name = slugify(item.section_name)
             chapter = item.section_name
+            book, metadata = make_metadata_items(config)
+            children_containers = [book["children"]]
             chapter_dir = generate_dir.joinpath(slug_name.strip('-'))
             guides_dir, content_dir = prepare_structure(chapter_dir)
         else:
