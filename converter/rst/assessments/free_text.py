@@ -44,7 +44,9 @@ class FreeText(object):
         question = matchobj.group('content')
         if question:
             options['question'] = question.strip()
-        assessment_id = f'free-text-{name.lower()}'
+
+        name = name.lower().replace('-', '_')
+        assessment_id = f'free-text-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, FREE_TEXT, DEFAULT_POINTS, options))
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'

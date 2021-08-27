@@ -30,7 +30,7 @@ class MultiChoice(object):
 
         question = [item.strip() for item in options_group_list if item != '']
         if question:
-            options['question'] = '\n'.join(question).strip()
+            options['question'] = question[0]
 
         options['multipleResponse'] = False
         name = name.lower().replace('-', '_')
