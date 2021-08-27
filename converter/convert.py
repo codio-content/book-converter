@@ -437,11 +437,11 @@ def convert_mc_assessment(assessment):
             }
             answers_list.append(answer)
 
-            for feedback in feedback_list:
-                items = list(feedback.items())
-                feedback_name = items[0][0].replace('feedback_', '')
-                value = f'<b>{feedback_name.upper()}</b>: {items[0][1]}'
-                feedback_final.append(value)
+        for feedback in feedback_list:
+            items = list(feedback.items())
+            feedback_name = items[0][0].replace('feedback_', '')
+            value = f'<b>{feedback_name.upper()}</b>: {items[0][1]}'
+            feedback_final.append(value)
 
     return {
         "type": assessment.type,
