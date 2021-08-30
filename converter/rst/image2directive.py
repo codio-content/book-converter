@@ -9,7 +9,7 @@ class Image2Directives(object):
         self.str = source_string
         self._images = list()
         self._image2directives_re = re.compile(
-            r"""^ *\.\.\s+\|(?P<id>.*?)\|\s+image:: ?(?P<path>.*?)?\n(?P<opt>.*?)\n(?=\S)""",
+            r"""^ *\.\.\s+\|(?P<id>.*?)\|\s+image:: ?(?P<path>.*?)?\n(?P<opt>.*?)\n(?=\S|(?!^$)$)""",
             flags=re.MULTILINE + re.DOTALL)
 
     def _image2directives(self, matchobj):

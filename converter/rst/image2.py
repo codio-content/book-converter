@@ -1,8 +1,4 @@
 import re
-from collections import namedtuple
-
-Image2data = namedtuple('Image2data', ['id', 'path', 'options'])
-
 
 class Image2(object):
     def __init__(self, source_string, images, caret_token):
@@ -12,8 +8,8 @@ class Image2(object):
         self._image2_re = re.compile(r""" ?\|(?P<id>.*?)\| ?""")
 
     def _image2(self, matchobj):
+        caret_token = self._caret_token
         image_id = matchobj.group('id')
-        test = self._images
         image = [image for image in self._images if image.id == image_id]
         if not image:
             return
@@ -21,7 +17,7 @@ class Image2(object):
         options = image.options
         alt = options.get('alt', '')
 
-        return f'![{alt}]({image.path})'
+        return f'{caret_token}![{alt}]({image.path}){caret_token}'
 
     def convert(self):
         output = self._image2_re.sub(self._image2, self.str)

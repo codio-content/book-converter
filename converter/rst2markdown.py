@@ -32,6 +32,7 @@ from converter.rst.math_block import MathBlock
 from converter.rst.only import Only
 from converter.rst.paragraph import Paragraph
 from converter.rst.raw_html import RawHtml
+from converter.rst.raw_html_marker import RawHtmlMarker
 from converter.rst.ref import Ref
 from converter.rst.sidebar import Sidebar
 from converter.rst.table import Table
@@ -137,7 +138,9 @@ class Rst2Markdown(object):
         output, assessments = ActiveCode(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
-        output = RawHtml(output, self._caret_token).convert()
+        output, links = RawHtml(output, self._caret_token).convert()
+        if links:
+            output = RawHtmlMarker(output, links, self._caret_token).convert()
         output = Youtube(output, self._caret_token).convert()
         output = CodeBlock(output, self._caret_token).convert()
 
