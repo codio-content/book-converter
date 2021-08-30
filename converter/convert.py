@@ -1094,7 +1094,9 @@ def convert_rst_v2(config, base_path, yes=False):
     label_counter = 0
     assessments = []
     tag_references = prepare_figure_numbers(toc)
-
+    book = {}
+    metadata = {}
+    children_containers = []
     chapter_dir = Path()
     lastChaperSection = False
 
@@ -1170,11 +1172,13 @@ def convert_rst_v2(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-        lastIndex = ind + 1
-        if lastIndex != len(toc) and toc[lastIndex].section_type == CHAPTER:
+        nextIndex = ind + 1
+        lastTocIndex = nextIndex == len(toc)
+
+        if not lastTocIndex and toc[nextIndex].section_type == CHAPTER:
             lastChaperSection = True
 
-        if lastChaperSection:
+        if lastChaperSection or lastTocIndex:
             active_code_exercises = list(filter(lambda a: a.type == ACTIVE_CODE, assessments))
             create_active_code_files(guides_dir, active_code_exercises)
 
