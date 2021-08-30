@@ -1109,6 +1109,9 @@ def convert_rst_v2(config, base_path, yes=False):
             book, metadata = make_metadata_items(config)
             children_containers = [book["children"]]
             chapter_dir = generate_dir.joinpath(slug_name.strip('-'))
+            if not slug_name:
+                print('Chapter name not found', chapter_dir)
+                continue
             guides_dir, content_dir = prepare_structure(chapter_dir)
         else:
             subsection_num += 1

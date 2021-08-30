@@ -342,6 +342,10 @@ def get_toctree_item(path, structure):
     settings = []
     tocTreeFlag = False
     chaptersFlag = False
+    if not Path.exists(path):
+        print('File path not exist:', path)
+        return
+
     try:
         lines = read_file_lines(path)
     except BaseException as e:
