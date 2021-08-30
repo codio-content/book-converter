@@ -30,6 +30,7 @@ from converter.rst.list import List
 from converter.rst.math import Math
 from converter.rst.math_block import MathBlock
 from converter.rst.only import Only
+from converter.rst.paragraph import Paragraph
 from converter.rst.raw_html import RawHtml
 from converter.rst.ref import Ref
 from converter.rst.sidebar import Sidebar
@@ -183,7 +184,7 @@ class Rst2Markdown(object):
         # output = Comment(output).convert()
         # output = re.sub(r"^[ ]*", "", output, flags=re.MULTILINE)
         output = Character(output).convert()
-        # output = Paragraph(output).convert()
+        output = Paragraph(output).convert()
         output = List(output).convert()
         output = Math(output).convert()
         output = re.sub(self._caret_token, "\n", output)

@@ -13,7 +13,7 @@ class CodeBlock(object):
         lang = matchobj.group('lang').strip()
         content = matchobj.group('content').strip('\n')
 
-        return f'{caret_token}``` {lang}{caret_token}{content}{caret_token}```{caret_token}{caret_token}\n'
+        return f'\n``` {lang}{caret_token}{content}{caret_token}\n```\n'
 
     def convert(self):
         output = self._code_block_re.sub(self._code_block, self.str)
