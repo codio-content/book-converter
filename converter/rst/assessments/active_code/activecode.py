@@ -14,11 +14,12 @@ class ActiveCode(object):
             flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
     def _activecode(self, matchobj):
+        class_name = ''
         name = matchobj.group('name').strip()
         content = matchobj.group('content') + '\n>>>'
         options_match = re.search(
             r'(?P<settings>^[\t ]+:[^:]+:[ ]+.*?^\s*$)+\n(?:(?P<text>.*?)\s*~~~~\s*\n)?(?:(?P<code>.*?)'
-            r'\s*====\s*\n)?(?P<tests>.*?)(?=\S|(?!^$)$)', content, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+            r'\s*====\s*\n)?(?P<tests>.*?)\n(?=\S|(?!^$)$)', content, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
         if not options_match:
             return
 
@@ -33,11 +34,17 @@ class ActiveCode(object):
             options['code'] = code
             class_name_match = class_name_re.search(code)
             if class_name_match:
-                options['class_name'] = class_name_match.group('name').strip()
+                class_name = class_name_match.group('name').strip()
+                options['class_name'] = class_name
 
         if tests:
             tests = re.sub(r'assertTrue\(passed\);', 'assertTrue(getFinalResults().replace("Starting Tests",'
                                                      '"").replace("Ending Tests",""), passed);', tests)
+
+            constructor = f'\n        public RunestoneTests() {{\n          super("{class_name}");\n       }}\n\n'
+            tests = re.sub(r'(.*?public class RunestoneTests extends CodeTestHelper\n *{)\n(.*?)',
+                           rf'\1{constructor}\2', tests, flags=re.MULTILINE + re.DOTALL)
+
             options['tests'] = tests
             test_class_name_match = class_name_re.search(tests)
             if test_class_name_match:
