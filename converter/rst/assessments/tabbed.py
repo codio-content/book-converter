@@ -11,11 +11,13 @@ class Tabbed(object):
 
     def _tabbed(self, matchobj):
         content = matchobj.group('content').rstrip()
-        tab_question_match = re.search(r"""\.\.\s+tab::\s+(?P<type>.*?)\n(?P<ex_content>.*?)\n(?=\s*.. tab:: Answer)""",
-                                       content, flags=re.MULTILINE + re.DOTALL)
+        tab_question_match = re.search(r"""\.\.\s+tab::\s+(?P<type>.*?)\n\s*(?P<question>.*?)?(?=\s*\.\.)
+        (?P<ex_content>.*?)\n(?=\s*..[ ]tab::)""", content, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
         if tab_question_match:
             str_len = 0
             cut_content = []
+            question = tab_question_match.group('question').strip()
+            question = f'{question}\n\n' if question else ''
             ex_content = tab_question_match.group('ex_content').rstrip()
             content_list = ex_content.split('\n')
             content_list = [item for item in content_list if item.strip() != '']
@@ -25,7 +27,7 @@ class Tabbed(object):
                     str_len = len(indent_match.group(1))
                 cut_content.append(content_list[ind][str_len:])
             final_content = '\n'.join(cut_content)
-            return f'{final_content}\n\n'
+            return f'{question}{final_content}\n\n'
 
     def convert(self):
         output = self._tabbed_re.sub(self._tabbed, self.str)
