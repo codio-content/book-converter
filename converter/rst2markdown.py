@@ -7,6 +7,7 @@ from converter.rst.assessments.fillintheblanks import FillInTheBlanks
 from converter.rst.assessments.free_text import FreeText
 from converter.rst.assessments.mchoice import MultiChoice
 from converter.rst.assessments.parsons import Parsons
+from converter.rst.assessments.tabbed import Tabbed
 from converter.rst.assessments.timed import Timed
 from converter.rst.avembed import AvEmbed
 from converter.rst.bibliography import Bibliography
@@ -117,6 +118,7 @@ class Rst2Markdown(object):
         # csawesome book
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
+        output = Tabbed(output, self._caret_token).convert()
 
         output, assessments = MultiChoice(output, self._caret_token).convert()
         if assessments:

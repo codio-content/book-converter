@@ -5,7 +5,6 @@ class Timed(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._assessments = list()
         self._timed_re = re.compile(
             r"""^(?: *\.\.\stimed.*?::(?P<name> .*?)?\n)(?P<settings>\s+:.*?:*\n)?(?P<content>.*?)(?=^\S)""",
             flags=re.MULTILINE + re.DOTALL)
