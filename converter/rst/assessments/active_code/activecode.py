@@ -15,12 +15,10 @@ class ActiveCode(object):
 
     def _activecode(self, matchobj):
         name = matchobj.group('name').strip()
-        content = matchobj.group('content')
+        content = matchobj.group('content') + '\n>>>'
         options_match = re.search(
             r'(?P<settings>^[\t ]+:[^:]+:[ ]+.*?^\s*$)+\n(?:(?P<text>.*?)\s*~~~~\s*\n)?(?:(?P<code>.*?)'
-            r'\s*====\s*\n)?(?P<tests>.*?)(?=\n\n^$)', content + '\n\n',
-            flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
-
+            r'\s*====\s*\n)?(?P<tests>.*?)(?=\S|(?!^$)$)', content, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
         if not options_match:
             return
 
