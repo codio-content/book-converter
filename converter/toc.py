@@ -293,6 +293,7 @@ def add_toc_item(toc, file_path, section_type, codio_section):
             activecode_match = re.search(r'\.\. activecode:: (?P<name>.*?)$', line, flags=re.MULTILINE)
             if activecode_match:
                 ex_name = activecode_match.group('name')
+                ex_name = ex_name.strip().replace('-', '_')
                 section_name = f'Active code: {ex_name}'
                 active_code_toc_list.append(SectionItem(
                     section_name=section_name,
