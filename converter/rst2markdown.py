@@ -59,7 +59,6 @@ class Rst2Markdown(object):
                  workspace_dir=pathlib.Path('.'),
                  chapter_num=0,
                  subsection_num=0):
-        self._images2 = list()
         self._caret_token = str(uuid.uuid4())
         self._math_block_separator_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
@@ -118,11 +117,7 @@ class Rst2Markdown(object):
         # csawesome book
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
-        output, images = Image2Directives(output).convert()
-        if images:
-            self._images2.extend(images)
-            output = Image2(output, self._images2, self._caret_token).convert()
-        output = Note(output, self._caret_token).convert()
+
         output, assessments = MultiChoice(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
@@ -138,12 +133,18 @@ class Rst2Markdown(object):
         output, assessments = ActiveCode(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
-        output, links = RawHtml(output, self._caret_token).convert()
-        if links:
-            output = RawHtmlMarker(output, links, self._caret_token).convert()
         output = Youtube(output, self._caret_token).convert()
         output = CodeBlock(output, self._caret_token).convert()
 
+        output, html_links = RawHtml(output, self._caret_token).convert()
+        if html_links:
+            output = RawHtmlMarker(output, html_links, self._caret_token).convert()
+
+        output, images = Image2Directives(output).convert()
+        if images:
+            output = Image2(output, images, self._caret_token).convert()
+
+        output = Note(output, self._caret_token).convert()
         output = TagReference(output, self._tag_references).convert()
         output = MathBlock(output, self._caret_token, self._math_block_separator_token).convert()
         output, assessments = ExtrToolEmbed(output, self._exercises).convert()

@@ -1,7 +1,7 @@
 import re
 from collections import namedtuple
 
-RawHtmlData = namedtuple('RawHtmlData', ['id', 'content'])
+RawHtmlData = namedtuple('RawHtmlData', ['marker', 'content'])
 
 
 class RawHtml(object):
@@ -10,14 +10,14 @@ class RawHtml(object):
         self._caret_token = caret_token
         self._links = list()
         self._raw_html_re = re.compile(
-            r"""\.\.\s*(\|(?P<id>.*?)\|\s+)?raw:: html\n(?P<content>.*?)\n(?=\S|(?!^$)$)""",
-            flags=re.MULTILINE + re.DOTALL)
+            r"""^.. (?:\|(?P<marker>.*?)\| )?raw:: html\n.*?\n(?P<content>.*?)$""", flags=re.MULTILINE)
 
     def _raw_html(self, matchobj):
-        id = matchobj.group('id')
+        marker = matchobj.group('marker')
         content = matchobj.group('content').strip()
-        if id:
-            self._links.append(RawHtmlData(id, content))
+        if marker:
+            marker = marker.strip()
+            self._links.append(RawHtmlData(marker, content))
             return ''
         else:
             split_content = [item.lstrip() for item in content.split('\n')]

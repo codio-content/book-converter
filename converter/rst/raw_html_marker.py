@@ -6,12 +6,14 @@ class RawHtmlMarker(object):
         self.str = source_string
         self._caret_token = caret_token
         self._links = links
-        self._raw_html_marker_re = re.compile(r""" ?\|(?P<id>.*?)\| ?""")
+        self._raw_html_marker_re = re.compile(r""" ?\|(?P<marker>.*?)\| ?""")
 
     def _raw_html_marker(self, matchobj):
-        marker_id = matchobj.group('id')
-        raw_html_data = [image for image in self._links if image.id == marker_id]
-        content = raw_html_data[0].content if raw_html_data else marker_id
+        marker = matchobj.group('marker')
+        raw_html_data = [link for link in self._links if link.marker == marker]
+        if not raw_html_data:
+            return matchobj.group(0)
+        content = raw_html_data[0].content
         return f' {content} '
 
     def convert(self):
