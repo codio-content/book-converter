@@ -4,7 +4,7 @@ import re
 class Ignore(object):
     def __init__(self, source_string):
         self.str = source_string
-        self._ignore_re = re.compile(r"""^\.\.\s+(index|toctree|highlight)::( .*?)?\n.*?\n(?=\S)""",
+        self._ignore_re = re.compile(r"""^\.\.\s+(index|toctree|qnum|highlight)::( .*?)?\n.*?\n(?=\S)""",
                                      flags=re.MULTILINE + re.DOTALL)
         self._comment_re = re.compile(r"""^\.\. +(?:\.\. |(?!.*?::)).*?\n(?:(?=\S)| *$)\n*""", flags=re.MULTILINE)
         self._comment2_re = re.compile(r"""^\.\. +(?:\.\. |(?!.*?::)).*?\n(.*?\n)(?=\S|(?!^$)$)""",

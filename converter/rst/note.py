@@ -11,7 +11,7 @@ class Note(object):
     def _note(self, matchobj):
         caret_token = self._caret_token
         content = matchobj.group('content').strip()
-        content = '\n'.join([item.lstrip() for item in content.split('\n')])
+        content = '\n'.join([item.lstrip() + ' ' for item in content.split('\n')])
         return f'\n||| info{caret_token}{caret_token}{content}{caret_token}{caret_token}|||{caret_token}{caret_token}\n'
 
     def convert(self):
