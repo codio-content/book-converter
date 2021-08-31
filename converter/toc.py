@@ -300,6 +300,8 @@ def add_toc_item(toc, file_path, section_type, codio_section):
                 active_code_toc_list.append(SectionItem(
                     section_name=section_name,
                     section_type=section_type,
+                    exercise=True,
+                    exercise_path=f'.guides/active_code/{ex_name}',
                     line_pos=0)
                 )
                 content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
