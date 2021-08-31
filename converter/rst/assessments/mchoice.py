@@ -53,7 +53,7 @@ class MultiChoice(object):
         assessment_id = f'multiple-choice-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, MULTIPLE_CHOICE, DEFAULT_POINTS, options))
 
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
+        return f'\n{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
 
     def _clickablearea(self, matchobj):
         options = {}
@@ -87,7 +87,7 @@ class MultiChoice(object):
         assessment_id = f'multiple-choice-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, MULTIPLE_CHOICE, DEFAULT_POINTS, options))
 
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
+        return f'\n{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
 
     def convert(self):
         output = self.str
