@@ -7,6 +7,7 @@ class List(object):
     def __init__(self, source_string):
         self.str = source_string
         self._list_re = re.compile(r"""\n(?P<tabs>[\t]+)(?P<marker>[-|]?)?""")
+        self._indented_list_re = re.compile(r"""^ *(#\.|\*|-)\s.*?\n""", flags=re.MULTILINE)
 
     @staticmethod
     def _list(matchobj):
@@ -23,7 +24,14 @@ class List(object):
         content = ' ' * indent_size * TAB_SIZE + content
         return '\n' + content
 
+    @staticmethod
+    def _indented_list(matchobj):
+        content = matchobj.group(0)
+        strip_content = [item.lstrip() for item in content.split('\n')]
+        return '\n'.join(strip_content)
+
     def convert(self):
         output = self.str
         output = self._list_re.sub(self._list, output)
+        output = self._indented_list_re.sub(self._indented_list, output)
         return output
