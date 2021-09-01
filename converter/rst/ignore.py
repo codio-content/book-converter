@@ -6,9 +6,8 @@ class Ignore(object):
         self.str = source_string
         self._ignore_re = re.compile(r"""^\.\.\s+(index|toctree|qnum|highlight)::( .*?)?\n.*?\n(?=\S)""",
                                      flags=re.MULTILINE + re.DOTALL)
-        self._comment_re = re.compile(r"""^\.\. +(?:\.\. |(?!.*?::)).*?\n(?:(?=\S)| *$)\n*""", flags=re.MULTILINE)
-        self._comment2_re = re.compile(r"""^\.\. +(?:\.\. |(?!.*?::)).*?\n(.*?\n)(?=\S|(?!^$)$)""",
-                                       flags=re.MULTILINE + re.DOTALL)
+        self._comment_re = re.compile(r"""^\.\. +(?:\.\. |(?!.*?::)).*?\n\n(?=\S|(?!^$)$)""",
+                                      flags=re.MULTILINE + re.DOTALL)
         self._data_file_re = re.compile(r"""^( *\.\.\sdatafile:: (?P<name>.*?)\n)(?P<options>.*?)\n(?=\S|(?!^$)$)""",
                                         flags=re.MULTILINE + re.DOTALL)
 
@@ -23,6 +22,5 @@ class Ignore(object):
         output = self.str
         output = self._ignore_re .sub(self._ignore, output)
         output = self._comment_re.sub(self._ignore, output)
-        output = self._comment2_re.sub(self._ignore, output)
         output = self._data_file_re.sub(self._data_file, output)
         return output
