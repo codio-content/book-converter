@@ -306,18 +306,16 @@ def add_toc_item(toc, file_path, section_type, codio_section):
                 )
                 content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
                 active_code_toc_list[len(active_code_toc_list) - 1].lines.append(content)
-            codio_section = 'start'
 
     toc.append(SectionItem(
         section_name=name,
         section_type=section_type,
         lines=lines,
-        codio_section=codio_section,
         line_pos=0)
     )
 
     if active_code_toc_list:
-        active_code_toc_list[len(active_code_toc_list) - 1].codio_section = 'end'
+        toc[-1].contains_exercises = True
         toc.extend(active_code_toc_list)
 
 
@@ -450,7 +448,7 @@ sections:
             yaml_structure += f"    codio_section: \"{item.codio_section}\"\n"
 
         next_item = structure[ind + 1] if ind + 1 < len(structure) else {}
-        prev_item = structure[ind - 1]
+        prev_item = structure[ind - 1] if ind != 0 else item
 
         if exercises_flag and not prev_item.exercise:
             yaml_structure += "    configuration:\n" \
@@ -462,7 +460,7 @@ sections:
         if item.contains_exercises:
             yaml_structure += "    codio_section: start\n"
             exercises_flag = True
-        elif exercises_flag and not next_item.exercise:
+        elif exercises_flag and next_item and not next_item.exercise:
             yaml_structure += "    codio_section: end\n"
             exercises_flag = False
 

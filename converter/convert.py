@@ -1165,7 +1165,17 @@ def convert_rst_v2(config, base_path, yes=False):
         })
 
         if item.exercise:
-            section["files"] = make_odsa_ex_files(item.exercise_path)
+            exercise_path = Path(item.exercise_path)
+            ex_name = exercise_path.stem
+            exercise = list(filter(lambda a: a.name == ex_name, assessments))
+            if exercise:
+                code_file_name = exercise[0].options.get('class_name', '') + '.java'
+                code_file_path = str(exercise_path.joinpath(code_file_name))
+                section["files"].append({
+                    "path": code_file_path,
+                    "panel": 0,
+                    "action": "open"
+                })
 
         if section:
             metadata["sections"].append(section)
