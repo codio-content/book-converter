@@ -107,13 +107,12 @@ class Rst2Markdown(object):
         return self._source_code_paths
 
     def to_markdown(self):
-        self.lines_array.append('\n<br>\n')
         self.lines_array = self._enum_lists_parse(self.lines_array)
         lines_array = PreparerMathBlock(self.lines_array, self._math_block_separator_token).prepare()
-        output = '\n'.join(lines_array)
-        output = re.sub(r"\|---\|", "--", output)
-        output = re.sub(r"\+\+", "\\+\\+", output)
-        output = re.sub(r"^\|$", "<br/>", output, flags=re.MULTILINE)
+        output = '\n'.join(lines_array) + '\n\n>>>'
+        output = re.sub(r'\|---\|', '--', output)
+        output = re.sub(r'\+\+', '\\+\\+', output)
+        output = re.sub(r'^\|$', '<br/>', output, flags=re.MULTILINE)
 
         # csawesome book
         output = Ignore(output).convert()
@@ -190,5 +189,6 @@ class Rst2Markdown(object):
         output = Paragraph(output).convert()
         output = List(output).convert()
         output = Math(output).convert()
+        output = re.sub(r'>>>', '', output)
         output = re.sub(self._caret_token, "\n", output)
         return output
