@@ -187,10 +187,11 @@ class Rst2Markdown(object):
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
         output = Character(output).convert()
+        # Comment before Paragraph
+        output = Comment(output).convert()
         output = Paragraph(output).convert()
         output = List(output).convert()
         output = Math(output).convert()
-        output = Comment(output).convert()
         output = re.sub(r'>>>', '', output)
         output = re.sub(self._caret_token, "\n", output)
         return output
