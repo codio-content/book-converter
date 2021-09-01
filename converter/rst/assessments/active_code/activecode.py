@@ -14,21 +14,36 @@ class ActiveCode(object):
             flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
     def _activecode(self, matchobj):
-        class_name = ''
         name = matchobj.group('name').strip()
         content = matchobj.group('content') + '\n\n>>>'
-        options_match = re.search(
-            r'(?P<settings>^[\t ]+:[^:]+:[ ]+.*?^\s*$)+\n(?:(?P<text>.*?)\s*~~~~\s*\n)?(?:(?P<code>.*?)'
-            r'\s*====\s*\n)?(?P<tests>.*?)\n(?=\S|(?!^$)$)', content, flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
-        if not options_match:
-            return
-
         options = {}
-        code = options_match.group('code')
-        tests = options_match.group('tests')
-        text = options_match.group('text')
+        class_name = ''
+        code = ''
+        tests = ''
+        text = ''
 
-        class_name_re = re.compile(r'\s*public\s+class\s+(?P<name>.*?)(?:<Person>|extends .*?)?\n')
+        settings = {}
+        settings_list = re.findall(r'[\t ]+:(?P<key>[^:]+): +(?P<value>.*?)\n', content, flags=re.MULTILINE + re.DOTALL)
+        if settings_list:
+            for item in settings_list:
+                settings[item[0]] = item[1]
+            options['settings'] = settings
+
+        content = re.sub(r'^[\t ]+(:[^:]+: +(.*?))\n', '', content, flags=re.MULTILINE + re.DOTALL)
+
+        instructions_match = re.search(r'^\s*(?P<text>.*?)(?=^\s*~~~~)', content, flags=re.MULTILINE + re.DOTALL)
+        if instructions_match:
+            text = instructions_match.group('text').strip()
+
+        code_match = re.search(r'^\s*~~~~\s*\n(?P<code>.*?)(?=\s*====|\n$)', content, flags=re.MULTILINE + re.DOTALL)
+        if code_match:
+            code = code_match.group('code')
+
+        tests_match = re.search(r'^\s*====\s*\n(?P<tests>.*?)(?=\n\n$)', content, flags=re.MULTILINE + re.DOTALL)
+        if tests_match:
+            tests = tests_match.group('tests')
+
+        class_name_re = re.compile(r'^\s*public\s+class\s+(?P<name>.*?)(?:<Person>|extends .*?)?\n', flags=re.MULTILINE)
 
         if code:
             options['code'] = code
@@ -52,14 +67,6 @@ class ActiveCode(object):
 
         if text:
             options['text'] = text.strip()
-
-        settings = {}
-        settings_list = options_match.group('settings').strip().split('\n')
-        for line in settings_list:
-            opt_match = re.match(r':([^:]+):(?: +(.+))?', line.strip())
-            if opt_match:
-                settings[opt_match[1]] = opt_match[2]
-        options['settings'] = settings
 
         name = name.replace('-', '_')
         assessment_id = f'test-{name.lower()}'
