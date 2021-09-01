@@ -15,7 +15,7 @@ class ActiveCode(object):
 
     def _activecode(self, matchobj):
         name = matchobj.group('name').strip()
-        content = matchobj.group('content') + '\n\n>>>'
+        content = matchobj.group('content') + '\n\n'
         options = {}
         class_name = ''
         code = ''
@@ -31,11 +31,13 @@ class ActiveCode(object):
 
         content = re.sub(r'^[\t ]+(:[^:]+: +(.*?))\n', '', content, flags=re.MULTILINE + re.DOTALL)
 
-        instructions_match = re.search(r'^\s*(?P<text>.*?)(?=^\s*~~~~)', content, flags=re.MULTILINE + re.DOTALL)
+        instructions_match = re.search(r'^\s*(?P<text>.*?)(?:^\s*~~~~\s*\n)', content, flags=re.MULTILINE + re.DOTALL)
         if instructions_match:
             text = instructions_match.group('text').strip()
+        content = re.sub(r'^\s*(?P<text>.*?)(?:^\s*~~~~\s*\n)', '', content, flags=re.MULTILINE + re.DOTALL)
 
-        code_match = re.search(r'^\s*~~~~\s*\n(?P<code>.*?)(?=\s*====|\n$)', content, flags=re.MULTILINE + re.DOTALL)
+        code_match = re.search(r'^(?=\s*public class)(?P<code>.*?)(?=^[\t ]*====)', content,
+                               flags=re.MULTILINE + re.DOTALL)
         if code_match:
             code = code_match.group('code')
 
