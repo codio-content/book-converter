@@ -5,7 +5,7 @@ class Image2(object):
         self.str = source_string
         self._caret_token = caret_token
         self._images = images
-        self._image2_re = re.compile(r""" ?\|(?P<id>.*?)\| ?""")
+        self._image2_re = re.compile(r"""\|(?P<id>\S.*?\S)\|(?= +|$)""")
 
     def _image2(self, matchobj):
         caret_token = self._caret_token
