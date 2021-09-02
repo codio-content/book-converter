@@ -439,7 +439,7 @@ def convert_mc_assessment(assessment):
             }
             answers_list.append(answer)
 
-        for ind, feedback in enumerate(feedback_list):
+        for ind, feedback in enumerate(feedback_list, start=1):
             if type(feedback) != str:
                 items = list(feedback.items())
                 feedback_name = items[0][0].replace('feedback_', '')

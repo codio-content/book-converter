@@ -119,7 +119,10 @@ class Rst2Markdown(object):
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
         output = Tabbed(output, self._caret_token).convert()
-
+        output = CodeBlock(output, self._caret_token).convert()
+        output, html_links = RawHtml(output, self._caret_token).convert()
+        if html_links:
+            output = RawHtmlMarker(output, html_links, self._caret_token).convert()
         output, assessments = MultiChoice(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
@@ -136,11 +139,6 @@ class Rst2Markdown(object):
         if assessments:
             self._assessments.extend(assessments)
         output = Youtube(output, self._caret_token).convert()
-        output = CodeBlock(output, self._caret_token).convert()
-
-        output, html_links = RawHtml(output, self._caret_token).convert()
-        if html_links:
-            output = RawHtmlMarker(output, html_links, self._caret_token).convert()
 
         output, images = Image2Directives(output).convert()
         if images:
@@ -171,7 +169,7 @@ class Rst2Markdown(object):
         output = Table(output, self._caret_token).convert()
         output = Epigraph(output, self._caret_token).convert()
         output = Sidebar(output, self._caret_token).convert()
-        output = ExternalLink(output).convert()
+        # output = ExternalLink(output).convert()
         output = Only(output).convert()
         output = IndentedCode(output, self._caret_token).convert()
         output, source_code_paths = CodeInclude(

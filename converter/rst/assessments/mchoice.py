@@ -43,7 +43,7 @@ class MultiChoice(object):
         else:
             options_group = options_group + '\n\n>>>'
             answers_match = re.findall(
-                r'^(?P<indent>\s{4})- +(?P<answer>.*?)\n(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n',
+                r' +(?P<indent>\s{4})?- +(?P<answer>.*?)(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n',
                 options_group, flags=re.MULTILINE + re.DOTALL)
 
             answer_count = 0
@@ -58,9 +58,10 @@ class MultiChoice(object):
 
             options_group = re.sub('>>>', '', options_group)
             options_group = re.sub(r':([^:]+): (.+)', '', options_group)
-            question = re.sub(r'^(?P<indent>\s{4})- +(?P<answer>.*?)\n(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n', '',
+            question = re.sub(r' +(?P<indent>\s{4})?- +(?P<answer>.*?)(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n', '',
                               options_group, flags=re.MULTILINE + re.DOTALL)
-            options['question'] = question
+            question_list = [item.strip() for item in question.split('\n')]
+            options['question'] = '\n'.join(question_list).strip()
 
         if feedback:
             options['feedback'] = feedback
