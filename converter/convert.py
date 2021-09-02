@@ -428,20 +428,26 @@ def convert_mc_assessment(assessment):
         correctAnswer = options.get('correct', '')
         for answer in answers:
             items = list(answer.items())
-            answer_name = items[0][0].replace('answer_', '')
+            answer_name = str(items[0][0])
+            answer_name = answer_name.replace('answer_', '')
             answer_text = f'<b>{answer_name.upper()}.</b> {items[0][1]}'
+            is_correct_answer = correctAnswer == answer_name.lower()
             answer = {
                 "_id": str(uuid.uuid4()),
-                "correct": correctAnswer == answer_name.lower(),
+                "correct": is_correct_answer,
                 "answer": answer_text
             }
             answers_list.append(answer)
 
-        for feedback in feedback_list:
-            items = list(feedback.items())
-            feedback_name = items[0][0].replace('feedback_', '')
-            value = f'<b>{feedback_name.upper()}</b>: {items[0][1]}'
-            feedback_final.append(value)
+        for ind, feedback in enumerate(feedback_list):
+            if type(feedback) != str:
+                items = list(feedback.items())
+                feedback_name = items[0][0].replace('feedback_', '')
+                value = f'<b>{feedback_name.upper()}</b>: {items[0][1]}'
+                feedback_final.append(value)
+            else:
+                value = f'<b>{ind}.</b> {feedback}'
+                feedback_final.append(value)
 
     return {
         "type": assessment.type,

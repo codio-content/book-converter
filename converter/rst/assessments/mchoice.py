@@ -38,15 +38,32 @@ class MultiChoice(object):
 
         if answers:
             options['answers'] = answers
+            question = [item.strip() for item in options_group_list if item != '']
+            options['question'] = question[0]
         else:
-            return ''
+            options_group = options_group + '\n\n>>>'
+            answers_match = re.findall(
+                r'^(?P<indent>\s{4})- +(?P<answer>.*?)\n(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n',
+                options_group, flags=re.MULTILINE + re.DOTALL)
+
+            answer_count = 0
+            for item in answers_match:
+                answer_count += 1
+                answer_text = item[0] + item[1]
+                answers.append({answer_count: answer_text})
+                options['answers'] = answers
+                feedback.append(item[3])
+                if item[2].strip() == '+':
+                    options['correct'] = str(answer_count)
+
+            options_group = re.sub('>>>', '', options_group)
+            options_group = re.sub(r':([^:]+): (.+)', '', options_group)
+            question = re.sub(r'^(?P<indent>\s{4})- +(?P<answer>.*?)\n(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n', '',
+                              options_group, flags=re.MULTILINE + re.DOTALL)
+            options['question'] = question
 
         if feedback:
             options['feedback'] = feedback
-
-        question = [item.strip() for item in options_group_list if item != '']
-        if question:
-            options['question'] = question[0]
 
         options['multipleResponse'] = False
         name = name.lower().replace('-', '_')
