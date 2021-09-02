@@ -21,7 +21,8 @@ class RawHtml(object):
             return ''
         else:
             split_content = [item.lstrip() for item in content.split('\n')]
-            return '\n'.join(split_content)
+            final_content = '\n'.join(split_content)
+            return f' {final_content}'
 
     def convert(self):
         output = self._raw_html_re.sub(self._raw_html, self.str)
