@@ -11,14 +11,13 @@ from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
 def compile_sources():
     ret1 = subprocess.Popen(
-        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/{ex_path}/RunestoneTests.java',
-        shell=True,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/active_code/{ex_path}/RunestoneTests.java',
+        shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = ret1.communicate()
 
     ret2 = subprocess.Popen(
-        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/{ex_path}/{class_name}.java', shell=True,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/active_code/{ex_path}/{class_name}.java',
+        shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = ret2.communicate()
 
     return error_message.strip(), ret2.returncode
@@ -54,9 +53,8 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         class_name = sys.argv[1]
         ex_path = f'{sys.argv[2]}'
-        code_file_path = f'.guides/{ex_path}/{class_name}.java'
-
-    unit_tests = read_file(f'.guides/secure/{ex_path}/RunestoneTests.java')
+        code_file_path = f'.guides/active_code/{ex_path}/{class_name}.java'
+    unit_tests = read_file(f'.guides/secure/active_code/{ex_path}/RunestoneTests.java')
     answer_code = read_file(code_file_path)
     error_msg, return_code = compile_sources()
     if return_code != 0:

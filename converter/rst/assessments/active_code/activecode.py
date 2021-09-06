@@ -57,9 +57,6 @@ class ActiveCode(object):
             options['code'] = content
 
         if tests:
-            tests = re.sub(r'assertTrue\(passed\);', 'assertTrue(getFinalResults().replace("Starting Tests",'
-                                                     '"").replace("Ending Tests",""), passed);', tests)
-
             constructor = f'\n        public RunestoneTests() {{\n          super("{class_name}");\n       }}\n\n'
             tests = re.sub(r'(.*?public class RunestoneTests extends CodeTestHelper\n *{)\n(.*?)',
                            rf'\1{constructor}\2', tests, flags=re.MULTILINE + re.DOTALL)

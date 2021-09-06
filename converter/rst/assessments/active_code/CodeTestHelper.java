@@ -167,7 +167,7 @@ public class CodeTestHelper
             actual = actual.substring(0, start) + actual.substring(end+1);
             actual = actual.trim();
 
-            //System.out.println(actual);
+            System.out.println(actual);
         }
 
         expected = expected.trim();
@@ -200,7 +200,7 @@ public class CodeTestHelper
 
         String output = formatOutput(expected, actual, msg, passed);
         results += output + "\n";
-        //System.out.println(output);
+        System.out.println(output);
 
         return passed;
     }
@@ -219,7 +219,7 @@ public class CodeTestHelper
     {
         String output = formatOutput(expected, actual, msg, pass);
         results += output + "\n";
-        //System.out.println(output);
+        System.out.println(output);
 
         return pass;
     }
@@ -254,7 +254,7 @@ public class CodeTestHelper
 
         String output = formatOutput(String.format("%.5f",expected), String.format("%.5f",actual), msg, passed);
         results += output + "\n";
-        //System.out.println(output);
+        System.out.println(output);
 
         return passed;
     }
