@@ -11,7 +11,8 @@ from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
 def compile_sources():
     ret1 = subprocess.Popen(
-        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/active_code/{ex_path}/RunestoneTests.java',
+        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/active_code/'
+        f'{ex_path}/RunestoneTests.java',
         shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = ret1.communicate()
 
@@ -73,7 +74,8 @@ if __name__ == '__main__':
             expected = item['expected']
             actual = item['actual']
             message = item['message']
-            feedback += f'Test {ind} {status}\nExpected: {expected}\nActual: {actual}\nMessage: {message}\n\n'
+            feedback += f'Test {ind} {status}\n<b>Expected:</b> {expected}\n<b>Actual:</b> {actual}\n' \
+                        f'<b>Message:</b> {message}\n\n '
 
         output = f'{feedback}<br/><br/><h1>Total Grade: {grade}</h1>'
 

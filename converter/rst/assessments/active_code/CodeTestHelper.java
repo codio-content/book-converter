@@ -1420,7 +1420,9 @@ public class CodeTestHelper
 
             output = formatOutput(""+expected, ""+changed, msg, passed);
             results += output + "\n";
-        
+
+            System.out.println(output);
+
             return passed;
         } catch (Exception e) {
             msg = "Test could not be completed";
