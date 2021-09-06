@@ -373,7 +373,7 @@ def convert_activecode_assessment(assessment):
             "name": f'Active code ({assessment.name})',
             "showName": True,
             "instructions": instructions,
-            "command": f'.guides/secure/run.py {class_name} {assessment.name}',
+            "command": f'.guides/secure/active_code/run.py {class_name} {assessment.name}',
             "timeoutSeconds": 300,
             "guidance": "",
             "showGuidanceAfterResponseOption": {
