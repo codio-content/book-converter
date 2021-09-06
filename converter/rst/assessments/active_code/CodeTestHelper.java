@@ -1274,13 +1274,14 @@ public class CodeTestHelper
             msg = "Checking that code contains " + desc;
             output = formatOutput(""+expected, ""+hasCode, msg, passed);
             results += output + "\n";
+            System.out.println(output);
 
             return passed;
         } catch (Exception e) {
             msg = "Test could not be completed";
             output = formatOutput("true", "false", msg, false);
             results += output + "\n";
-
+            System.out.println(output);
         }
         return false;
     }

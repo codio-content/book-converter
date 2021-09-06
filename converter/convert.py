@@ -25,6 +25,7 @@ from converter.optimizer import optimize
 TOCTREE = '.rst'
 JSON = '.json'
 
+
 def get_guide_content_path(file_path):
     file_path = str(file_path)
     pos = file_path.find(".guides")
@@ -363,10 +364,7 @@ def convert_code_workout_assessment(assessment):
 def convert_activecode_assessment(assessment):
     options = assessment.options
     instructions = options.get('text', '')
-    settings = options.get('settings', {})
-    language = settings.get('language', '')
     class_name = options.get('class_name', '')
-    file_path = f'.guides/secure/active_code/{assessment.name}'
 
     return {
         "type": "test",
@@ -375,12 +373,7 @@ def convert_activecode_assessment(assessment):
             "name": f'Active code ({assessment.name})',
             "showName": True,
             "instructions": instructions,
-            "command": "python /usr/share/codio/assessments/assessments.py",
-            "codeEnvConfig": f"{{\"type\":\"{language}\",\"subtype\":\"junit\",\"files\":[{{"
-                             f"\"filePath\":\"{file_path}/RunestoneTests.java\",\"className\":\"RunestoneTests\"}}],"
-                             f"\"maxPoints\":{assessment.points},\"wd\":\"\","
-                             f"\"sources\":\".guides/active_code/{assessment.name}\", "
-                             f"\"libs\":\"\", \"testsources\":\"\", \"partialPoints\":false}}",
+            "command": f'.guides/secure/run.py {class_name} {assessment.name}',
             "timeoutSeconds": 300,
             "guidance": "",
             "showGuidanceAfterResponseOption": {
@@ -388,7 +381,7 @@ def convert_activecode_assessment(assessment):
             },
             "points": assessment.points,
             "oneTimeTest": False,
-            "arePartialPointsAllowed": False,
+            "arePartialPointsAllowed": True,
             "metadata": {
                 "tags": [
                     {
@@ -396,8 +389,16 @@ def convert_activecode_assessment(assessment):
                         "value": "Advanced Code Test"
                     }
                 ],
-                "files": [],
-                "opened": []
+                "files": [
+                    f".guides/test1/{class_name}.java"
+                ],
+                "opened": [
+                    {
+                        "type": "file",
+                        "panelNumber": 0,
+                        "content": f".guides/{assessment.name}/{class_name}.java"
+                    }
+                ]
             },
             "bloomsObjectiveLevel": "",
             "learningObjectives": ""
@@ -785,19 +786,6 @@ def assets_extension(base_src_dir):
 def cleanup_bookdown(lines):
     lines = lines[1:]
     return lines
-
-
-# def cleanup_rst(lines):
-#     updated = []
-#     starts = (
-#         '.. index::'
-#     )
-#     for line in lines:
-#         if line.startswith(starts):
-#             continue
-#         updated.append(line)
-#     return updated
-
 
 def get_labels(lines):
     label = ''

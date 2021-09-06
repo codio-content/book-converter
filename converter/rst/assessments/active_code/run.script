@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import subprocess
+import re
+
+
+sys.path.append('/usr/share/codio/assessments')
+from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
+
+def compile_sources():
+    ret1 = subprocess.Popen(f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/{ex_path}/RunestoneTests.java', shell=True,
+                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    out, error_message = ret1.communicate()
+
+
+    ret2 = subprocess.Popen(f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/{ex_path}/Test1.java', shell=True,
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    out, error_message = ret2.communicate()
+
+
+    return error_message.strip(), ret2.returncode
+
+
+def run_unit_tests():
+    run = subprocess.Popen(f'java -cp .guides/lib/*:/tmp org.junit.runner.JUnitCore RunestoneTests', shell=True,
+                           stdout=subprocess.PIPE, universal_newlines=True)
+    out, runtime_error = run.communicate()
+    results_match = re.finditer(r'Expected: (?P<expected>.*?)Actual: (?P<actual>.*?)Message: (?P<message>.*?)'
+                                r'Passed: (?P<passed>.*?)$', out.strip(), flags=re.MULTILINE)
+
+    results = []
+    for result in results_match:
+        results.append({'expected': result.group('expected').strip(), 'actual': result.group('actual').strip(),
+                        'message': result.group('message').strip(), 'passed': result.group('passed').strip()})
+
+    return results, run.returncode
+
+
+def read_file(f_path):
+    with open(f_path) as file:
+        return file.read()
+
+
+if __name__ == '__main__':
+    error_msg = ''
+    ex_path = ''
+    ex_private_path = ''
+    code_file_path = ''
+    class_name = ''
+
+    if len(sys.argv) > 1:
+        class_name = sys.argv[1]
+        ex_path = f'{sys.argv[2]}'
+        code_file_path = f'.guides/{ex_path}/{class_name}.java'
+
+    unit_tests = read_file(f'.guides/secure/{ex_path}/RunestoneTests.java')
+    answer_code = read_file(code_file_path)
+    error_msg, return_code = compile_sources()
+    if return_code != 0:
+        output = error_msg
+        grade = 0
+    else:
+        tests_result, ret_code = run_unit_tests()
+        total_tests = len(tests_result)
+        passed_tests = len([test for test in tests_result if test['passed'] == 'true'])
+        grade = round(passed_tests / total_tests * 100)
+        feedback = ''
+        for ind, item in enumerate(tests_result, start=1):
+            passed = item['passed'] == 'true'
+            status = '<span style="color: green;"><b>PASSED</b></span>' if passed \
+                else '<span style="color: red;"><b>FAILED</b></span>'
+            expected = item['expected']
+            actual = item['actual']
+            message = item['message']
+            feedback += f'Test {ind} {status}\nExpected: {expected}\nActual: {actual}\nMessage: {message}\n\n'
+
+        output = f'{feedback}<br/><br/><h1>Total Grade: {grade}</h1>'
+
+    res = send_partial_v2(grade, output, FORMAT_V2_HTML)
+    exit(0 if res else 1)

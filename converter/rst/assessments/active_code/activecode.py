@@ -36,7 +36,7 @@ class ActiveCode(object):
             text = instructions_match.group('text').strip()
         content = re.sub(r'^\s*(?P<text>.*?)(?:^\s*~~~~\s*\n)', '', content, flags=re.MULTILINE + re.DOTALL)
 
-        code_match = re.search(r'^(?=\s*public class)(?P<code>.*?)(?=^[\t ]*====)', content,
+        code_match = re.search(r'^(?P<code>.*?)\n(?= *====)|.*?(?=\n^$)', content,
                                flags=re.MULTILINE + re.DOTALL)
         if code_match:
             code = code_match.group('code')
@@ -53,6 +53,8 @@ class ActiveCode(object):
             if class_name_match:
                 class_name = class_name_match.group('name').strip()
                 options['class_name'] = class_name
+        else:
+            options['code'] = content
 
         if tests:
             tests = re.sub(r'assertTrue\(passed\);', 'assertTrue(getFinalResults().replace("Starting Tests",'
