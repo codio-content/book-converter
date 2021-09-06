@@ -5,20 +5,21 @@ import os
 import subprocess
 import re
 
-
 sys.path.append('/usr/share/codio/assessments')
 from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
+
 def compile_sources():
-    ret1 = subprocess.Popen(f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/{ex_path}/RunestoneTests.java', shell=True,
-                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    ret1 = subprocess.Popen(
+        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/{ex_path}/RunestoneTests.java',
+        shell=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = ret1.communicate()
 
-
-    ret2 = subprocess.Popen(f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/{ex_path}/Test1.java', shell=True,
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    ret2 = subprocess.Popen(
+        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/{ex_path}/{class_name}.java', shell=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = ret2.communicate()
-
 
     return error_message.strip(), ret2.returncode
 
