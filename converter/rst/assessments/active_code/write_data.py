@@ -29,8 +29,8 @@ def create_active_code_files(guides_dir, exercises):
         code_dir.mkdir(exist_ok=True, parents=True)
         code_file = code_dir.joinpath(f'{class_name}.java')
 
-        lib_dir = guides_dir.joinpath(f'lib')
-        lib_dir .mkdir(exist_ok=True, parents=True)
+        lib_dir = guides_dir.joinpath('lib')
+        lib_dir.mkdir(exist_ok=True, parents=True)
         shutil.copy(Path('converter/rst/assessments/active_code/CodeTestHelper.java'), lib_dir)
         shutil.copy(Path('converter/rst/assessments/active_code/junit-4.13.1.jar'), lib_dir)
         shutil.copy(Path('converter/rst/assessments/active_code/hamcrest-core-1.3.jar'), lib_dir)
