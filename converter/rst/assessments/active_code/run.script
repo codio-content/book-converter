@@ -46,6 +46,11 @@ def read_file(f_path):
         return file.read()
 
 
+def grading():
+    res = send_partial_v2(grade, output, FORMAT_V2_HTML)
+    exit(0 if res else 1)
+
+
 if __name__ == '__main__':
     error_msg = ''
     ex_path = ''
@@ -62,10 +67,19 @@ if __name__ == '__main__':
     if os.path.exists(unit_tests_path):
         unit_tests = read_file(unit_tests_path)
         error_msg, return_code = compile_unit_tests()
+
         if return_code != 0:
             output = error_msg
             grade = 0
-        else:
+            grading()
+
+        error_msg, return_code = compile_answer()
+        if return_code != 0:
+            output = error_msg
+            grade = 0
+            grading()
+
+        if return_code == 0:
             tests_result, ret_code = run_unit_tests()
             total_tests = len(tests_result)
             passed_tests = len([test for test in tests_result if test['passed'] == 'true'])
@@ -82,16 +96,16 @@ if __name__ == '__main__':
                             f'<b>Message:</b>\n{message}\n\n'
 
             output = f'{feedback}<br/><br/><h1>Total Grade: {grade}</h1>'
+            grading()
     else:
         error_msg, return_code = compile_answer()
         if return_code != 0:
             output = error_msg
             grade = 0
+            grading()
         else:
-            ret = subprocess.Popen(f'java -cp *;/tmp {class_name}',
+            ret = subprocess.Popen(f'java -cp *:/tmp {class_name}',
                                    shell=True, stdout=subprocess.PIPE, universal_newlines=True)
             output, runtime_error = ret.communicate()
             grade = 100 if runtime_error is None else 0
-
-    res = send_partial_v2(grade, output, FORMAT_V2_HTML)
-    exit(0 if res else 1)
+            grading()

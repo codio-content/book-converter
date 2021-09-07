@@ -1429,6 +1429,7 @@ public class CodeTestHelper
             output = formatOutput("true", "false", msg, false);
             results += output + "\n";
 
+            System.out.println(output);
         }
         
         return false;
