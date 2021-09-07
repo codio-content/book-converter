@@ -289,7 +289,7 @@ def add_toc_item(toc, file_path, section_type, codio_section):
 
     active_code_toc_list = []
     for line in lines:
-        if '.. activecode::' in line:
+        if '.. activecode::' in line and not line.strip().startswith('.. .. '):
             if re.search(r'[Ee]x\d+n?a', line):
                 continue
             activecode_match = re.search(r'\.\. activecode:: (?P<name>.*?)$', line, flags=re.MULTILINE)
