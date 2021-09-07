@@ -39,7 +39,7 @@ class ActiveCode(object):
         code_match = re.search(r'^(?P<code>.*?)\n(?= *====)|.*?(?=\n^$)', content,
                                flags=re.MULTILINE + re.DOTALL)
         if code_match:
-            code = code_match.group('code')
+            code = code_match.group('code') or content
 
         tests_match = re.search(r'^\s*====\s*\n(?P<tests>.*?)(?=\n\n$)', content, flags=re.MULTILINE + re.DOTALL)
         if tests_match:

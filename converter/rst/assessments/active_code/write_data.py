@@ -22,16 +22,16 @@ def create_active_code_files(guides_dir, exercises):
         class_code = options.get('code', '')
         tests_code = options.get('tests', '')
 
-        private_exercise_dir = tests_dir.joinpath(exercise_name)
-        private_exercise_dir.mkdir(exist_ok=True, parents=True)
-        test_file = private_exercise_dir.joinpath(f'{test_class_name}.java')
+        if tests_code:
+            private_exercise_dir = tests_dir.joinpath(exercise_name)
+            private_exercise_dir.mkdir(exist_ok=True, parents=True)
+            test_file = private_exercise_dir.joinpath(f'{test_class_name}.java')
+            write_file(test_file, tests_code)
 
         code_dir = guides_dir.joinpath(f'active_code/{exercise_name}')
         code_dir.mkdir(exist_ok=True, parents=True)
         code_file = code_dir.joinpath(f'{class_name}.java')
-
         write_file(code_file, class_code)
-        write_file(test_file, tests_code)
 
     write_static_files(guides_dir)
 
