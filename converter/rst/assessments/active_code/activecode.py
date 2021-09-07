@@ -57,9 +57,11 @@ class ActiveCode(object):
             options['code'] = content
 
         if tests:
-            constructor = f'\n        public RunestoneTests() {{\n          super("{class_name}");\n       }}\n\n'
-            tests = re.sub(r'(.*?public class RunestoneTests extends CodeTestHelper\n *{)\n(.*?)',
-                           rf'\1{constructor}\2', tests, flags=re.MULTILINE + re.DOTALL)
+            has_constructor = re.search(r'public RunestoneTests\(\)', tests)
+            if not has_constructor:
+                constructor = f'\n        public RunestoneTests() {{\n          super("{class_name}");\n       }}\n\n'
+                tests = re.sub(r'(.*?public class RunestoneTests extends CodeTestHelper\n *{)\n(.*?)',
+                               rf'\1{constructor}\2', tests, flags=re.MULTILINE + re.DOTALL)
 
             options['tests'] = tests
             test_class_name_match = class_name_re.search(tests)
