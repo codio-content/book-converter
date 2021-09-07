@@ -95,7 +95,7 @@ if __name__ == '__main__':
                 feedback += f'Test {ind} {status}\n<b>Expected:</b>\n{expected}\n<b>Actual:</b>\n{actual}\n' \
                             f'<b>Message:</b>\n{message}\n\n'
 
-            output = f'{feedback}<br/><br/><h1>Total Grade: {grade}</h1>'
+            output = f'{feedback}<h1>Total Grade: {grade}</h1>'
             grading()
     else:
         error_msg, return_code = compile_answer()

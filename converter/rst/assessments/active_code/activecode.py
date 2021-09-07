@@ -53,6 +53,8 @@ class ActiveCode(object):
             if class_name_match:
                 class_name = class_name_match.group('name').strip()
                 options['class_name'] = class_name
+            else:
+                options['class_name'] = 'Main'
         else:
             options['code'] = content
 
