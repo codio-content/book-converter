@@ -38,8 +38,8 @@ class MultiChoice(object):
 
         if answers:
             options['answers'] = answers
-            question = [item.strip() for item in options_group_list if item != '']
-            options['question'] = question[0]
+            question = [item.strip() for item in options_group_list if item.strip() != '']
+            options['question'] = '\n'.join(question).strip()
         else:
             options_group = options_group + '\n\n>>>'
             answers_match = re.findall(
