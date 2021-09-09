@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-
+import base64
+import glob
 import sys
 import os
 import subprocess
 import re
+import uuid
 
 sys.path.append('/usr/share/codio/assessments')
 from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
@@ -12,7 +14,7 @@ from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 def compile_unit_tests():
     unit_tests_compile_ret = subprocess.Popen(
         f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/active_code/'
-        f'{ex_path}/RunestoneTests.java',
+        f'{ex_dir}/RunestoneTests.java',
         shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = unit_tests_compile_ret.communicate()
     return error_message.strip(), unit_tests_compile_ret.returncode
@@ -20,7 +22,7 @@ def compile_unit_tests():
 
 def compile_answer():
     answer_compile_ret = subprocess.Popen(
-        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/active_code/{ex_path}/{class_name}.java',
+        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/active_code/{ex_dir}/{class_name}.java',
         shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = answer_compile_ret.communicate()
     return error_message.strip(), answer_compile_ret.returncode
@@ -47,23 +49,24 @@ def read_file(f_path):
 
 
 def grading():
+    output = f'{feedback}<h1>Total Grade: {grade}</h1>'
     res = send_partial_v2(grade, output, FORMAT_V2_HTML)
     exit(0 if res else 1)
 
 
 if __name__ == '__main__':
     error_msg = ''
-    ex_path = ''
+    ex_dir = ''
     ex_private_path = ''
     code_file_path = ''
     class_name = ''
 
     if len(sys.argv) > 1:
         class_name = sys.argv[1]
-        ex_path = f'{sys.argv[2]}'
-        code_file_path = f'.guides/active_code/{ex_path}/{class_name}.java'
+        ex_dir = f'{sys.argv[2]}'
+        code_file_path = f'.guides/active_code/{ex_dir}/{class_name}.java'
     answer_code = read_file(code_file_path)
-    unit_tests_path = f'.guides/secure/active_code/{ex_path}/RunestoneTests.java'
+    unit_tests_path = f'.guides/secure/active_code/{ex_dir}/RunestoneTests.java'
     if os.path.exists(unit_tests_path):
         unit_tests = read_file(unit_tests_path)
         error_msg, return_code = compile_unit_tests()
@@ -94,8 +97,6 @@ if __name__ == '__main__':
                 message = item['message']
                 feedback += f'Test {ind} {status}\n<b>Expected:</b>\n{expected}\n<b>Actual:</b>\n{actual}\n' \
                             f'<b>Message:</b>\n{message}\n\n'
-
-            output = f'{feedback}<h1>Total Grade: {grade}</h1>'
             grading()
     else:
         error_msg, return_code = compile_answer()
@@ -107,5 +108,16 @@ if __name__ == '__main__':
             ret = subprocess.Popen(f'java -cp *:/tmp {class_name}',
                                    shell=True, stdout=subprocess.PIPE, universal_newlines=True)
             output, runtime_error = ret.communicate()
+            image_match_re = re.compile(r'&ltimg src=\"data:image/(?P<ext>.*?);base64,(?P<data>.*?)\"/>')
+            image_match = image_match_re.search(output)
+            if image_match:
+                for file in glob.glob(f'.guides/active_code/{ex_dir}/turtle_image_*'):
+                    os.remove(file)
+                ext = image_match.group('ext')
+                base64image = image_match.group('data')
+                image_path = f'.guides/active_code/{ex_dir}/turtle_image_{str(uuid.uuid4())}.{ext}'
+                with open(image_path, 'wb') as file:
+                    file.write(base64.b64decode(base64image))
+                feedback = image_match_re.sub(f'<img src="{image_path}" />', output)
             grade = 100 if runtime_error is None else 0
             grading()
