@@ -10,7 +10,7 @@ class Parsons(object):
         self._caret_token = caret_token
         self._assessments = list()
         self._parsonsprob_re = re.compile(
-            r"""^( *\.\.\sparsonsprob:: (?P<name>.*?\n)(?P<options>.*?)(?P<blocks>\s+-----.*?)\n(?=\S|(?!^$)$))""",
+            r"""^ *\.\.\sparsonsprob:: (?P<name>.*?\n)(?P<options>.*?)(?P<blocks>\s+-----.*?)\n(?=\S|(?!^$)$)""",
             flags=re.MULTILINE + re.DOTALL)
         self._dragndrop_re = re.compile(
             r"""^( *\.\.\sdragndrop:: (?P<name>.*?)\n)(?P<options>.*?)\n(?=\S|(?!^$)$)""",
