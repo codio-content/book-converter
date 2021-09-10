@@ -10,10 +10,8 @@ from converter.loader import load_json_file
 
 LATEX = 'latex'
 BOOKDOWN = 'bookdown'
-RST = 'rst'
-
-TOCTREE = '.rst'
-JSON = '.json'
+RST_TOCTREE = 'rst'
+RST_JSON = 'json'
 
 
 def is_section(line):
@@ -224,7 +222,8 @@ def get_bookdown_toc(folder):
 
 def get_rst_toc(source_path, config_path, exercises={}):
     toc = []
-    if config_path.suffix == JSON:
+    content_type = config_path.suffix[1:]
+    if content_type == RST_JSON:
         json_config = load_json_file(config_path)
         chapters = json_config.get('chapters')
         for chapter in chapters:
@@ -242,48 +241,40 @@ def get_rst_toc(source_path, config_path, exercises={}):
                     continue
                 lines = get_rst_lines(rst_file_path)
                 toc += process_rst_lines(lines, exercises)
-        return toc
+        return toc, json_config
 
-    if config_path.suffix == TOCTREE:
+    if content_type == RST_TOCTREE:
         chapters = get_toctree_item(config_path, {})
         process_toctree(source_path, chapters)
 
         for chapter in chapters:
             pages = chapters.get(chapter)
-            file_path = pathlib.Path(source_path.joinpath(chapter).resolve())
+            file_path = pathlib.Path(source_path.joinpath(chapter))
             if not file_path.exists():
                 print("File %s doesn't exist\n" % chapter)
                 continue
-            add_toc_item(toc, file_path, 'chapter', codio_section=None)
+            add_toc_item(toc, file_path, 'chapter')
 
             curr_dir = source_path.joinpath(chapter).parent
             for page in pages:
-                codio_section = None
                 children_pages = pages[page]
-                if children_pages:
-                    codio_section = 'start'
-
                 file_path = pathlib.Path(curr_dir.joinpath(page).resolve())
                 if not file_path.exists():
                     print("File %s doesn't exist\n" % page)
                     continue
-                add_toc_item(toc, file_path, 'section', codio_section)
+                add_toc_item(toc, file_path, 'section')
 
                 if children_pages:
-                    codio_section = None
                     for ind, child in enumerate(children_pages):
-                        last_child = ind + 1 == len(children_pages)
-                        if last_child:
-                            codio_section = 'end'
                         file_path = pathlib.Path(curr_dir.joinpath(child).resolve())
                         if not file_path.exists():
                             print("File %s doesn't exist\n" % child)
                             continue
-                        add_toc_item(toc, file_path, 'section', codio_section)
+                        add_toc_item(toc, file_path, 'section')
         return toc
 
 
-def add_toc_item(toc, file_path, section_type, codio_section):
+def add_toc_item(toc, file_path, section_type):
     name = get_chapter_name(file_path)
     lines = [line.rstrip('\r\n') for line in get_rst_lines(file_path)]
 
@@ -432,11 +423,11 @@ def process_rst_lines(lines, exercises):
     return toc
 
 
-def print_to_yaml(structure, workspace_path, source_path, config_path, data_format):
+def print_to_yaml(structure, workspace_path, config_path, source_dir, structure_type):
     yaml_structure = f"""workspace:
   directory: {workspace_path}
-  sources: {source_path}
-  {data_format}: {config_path}
+  source: {source_dir}
+  {structure_type}: {config_path}
 assets:
 sections:
 """
@@ -470,29 +461,31 @@ sections:
     return yaml_structure
 
 
-def generate_toc(output_path, source_path, config_path, content_type, ignore_exists=True):
-    workspace_dir = Path(source_path).parts[0]
-    workspace_path = Path.cwd().parent.joinpath(workspace_dir).resolve()
-    source_path = Path.cwd().parent.joinpath(source_path).resolve()
-    config_path = Path.cwd().parent.joinpath(config_path).resolve()
+def generate_toc(output_path, config_path, source_dir, ignore_exists=True):
+    workspace_path = Path(config_path).parent.parent.resolve()
+    source_dir = Path(source_dir).resolve()
+    config_path = Path(config_path).resolve()
     output_path = Path(output_path)
+    structure_type = config_path.suffix[1:]
 
     if output_path.exists() and not ignore_exists:
         raise Exception("Output dir already exists")
     output_path.mkdir(parents=True, exist_ok=ignore_exists)
 
-    if content_type == LATEX:
+    if structure_type == LATEX:
         toc = get_latex_toc(config_path)
-    elif content_type == BOOKDOWN:
+    elif structure_type == BOOKDOWN:
         toc = get_bookdown_toc(config_path)
-    elif content_type == RST:
-        toc = get_rst_toc(source_path, config_path)
+    elif structure_type == RST_TOCTREE:
+        toc = get_rst_toc(source_dir, config_path)
+    elif structure_type == RST_JSON:
+        toc, _ = get_rst_toc(source_dir, config_path)
     else:
-        raise Exception("Unknown source type")
+        raise Exception("Unknown structure type")
 
     if toc is None:
         raise Exception("TOC is empty")
 
-    content = print_to_yaml(toc, workspace_path, source_path, config_path, content_type)
+    content = print_to_yaml(toc, workspace_path, config_path, source_dir, structure_type)
     a_path = output_path.joinpath("codio_structure.yml").resolve()
     write_file(a_path, content)

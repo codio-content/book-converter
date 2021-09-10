@@ -22,8 +22,8 @@ from converter.assets import copy_assets, convert_assets, process_source_code, c
 from converter.refs import make_refs, override_refs, get_ref_chapter_counter_from, make_bookdown_refs
 from converter.optimizer import optimize
 
-TOCTREE = '.rst'
-JSON = '.json'
+RST_TOCTREE = 'rst'
+RST_JSON = 'json'
 
 
 def get_guide_content_path(file_path):
@@ -331,19 +331,19 @@ def convert_custom_assessment(assessment):
             'arePartialPointsAllowed': False,
             'oneTimeTest': False,
             'points': assessment.points,
-            'instructions': assessment.ex_data.get('question', '')
+            'instructions': assessment.options.get('question', '')
         }
     }
 
 
 def convert_code_workout_assessment(assessment):
-    class_name = assessment.ex_data.get('class_name', '')
-    method_name = assessment.ex_data.get('method_name', '')
-    instructions = assessment.ex_data.get('question', '')
+    class_name = assessment.options.get('class_name', '')
+    method_name = assessment.options.get('method_name', '')
+    instructions = assessment.options.get('question', '')
     instructions = re.sub(r'<img src=\"http://.*?(Exercises.*?)\">',
                           r'<img src=".guides/opendsa_v1/\1">', instructions)
-    ex_path = assessment.ex_data.get('ex_path', '')
-    tests = assessment.ex_data.get('tests', '')
+    ex_path = assessment.options.get('ex_path', '')
+    tests = assessment.options.get('tests', '')
     test_matches = parse_csv_lines(tests)
     instructions = instructions_with_examples(test_matches, instructions, method_name)
 
@@ -787,6 +787,7 @@ def cleanup_bookdown(lines):
     lines = lines[1:]
     return lines
 
+
 def get_labels(lines):
     label = ''
     for line in lines:
@@ -956,15 +957,7 @@ def print_source_code_report(data):
     [print(f'{item[0]} | {item[1]} | {item[2]}') for item in data]
 
 
-def convert_rst(config, base_path, yes=False):
-    config_type = Path(config.get('workspace', {}).get('rst'))
-    if config_type.suffix == JSON:
-        convert_rst_v1(config, base_path, yes)
-    if config_type.suffix == TOCTREE:
-        convert_rst_v2(config, base_path, yes)
-
-
-def convert_rst_v1(config, base_path, yes=False):
+def convert_rst_json(config, base_path, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
         return
@@ -972,10 +965,12 @@ def convert_rst_v1(config, base_path, yes=False):
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
-    source_dir = Path(config['workspace']['sources'])
+    source_dir = Path(config['workspace']['source'])
+    config_path = Path(config['workspace']['json'])
     source_code = config.get('opendsa', {}).get('source_code', 'java')
+    exercises = get_code_workout_exercises(workspace_dir)
     source_exercises = get_code_workout_exercises(source_dir)
-    toc = get_rst_toc(source_dir, Path(config['workspace']['rst']), source_exercises)
+    toc, json_config = get_rst_toc(source_dir, config_path, exercises)
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
     chapter = None
@@ -1012,6 +1007,7 @@ def convert_rst_v1(config, base_path, yes=False):
                 item.lines,
                 source_code,
                 source_exercises,
+                json_config,
                 tag_references,
                 workspace_dir=workspace_dir,
                 chapter_num=chapter_num,
@@ -1066,7 +1062,7 @@ def convert_rst_v1(config, base_path, yes=False):
     print_source_code_report(source_code_report)
 
 
-def convert_rst_v2(config, base_path, yes=False):
+def convert_rst_toctree(config, base_path, yes=False):
     generate_dir = base_path.joinpath("generate")
     if not prepare_base_directory(generate_dir, yes):
         return
@@ -1074,7 +1070,7 @@ def convert_rst_v2(config, base_path, yes=False):
     guides_dir, content_dir = Path(), Path()
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
-    source_dir = Path(config['workspace']['sources'])
+    source_dir = Path(config['workspace']['rst']).parent
     source_code = config.get('opendsa', {}).get('source_code', 'java')
     toc = get_rst_toc(source_dir, Path(config['workspace']['rst']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
