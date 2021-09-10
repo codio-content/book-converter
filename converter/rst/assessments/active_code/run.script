@@ -73,13 +73,13 @@ if __name__ == '__main__':
         error_msg, return_code = compile_unit_tests()
 
         if return_code != 0:
-            output = error_msg
+            feedback = error_msg
             grade = 0
             grading()
 
         error_msg, return_code = compile_answer()
         if return_code != 0:
-            output = error_msg
+            feedback = error_msg
             grade = 0
             grading()
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     else:
         error_msg, return_code = compile_answer()
         if return_code != 0:
-            output = error_msg
+            feedback = error_msg
             grade = 0
             grading()
         else:
