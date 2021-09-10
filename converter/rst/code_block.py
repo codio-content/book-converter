@@ -5,8 +5,9 @@ class CodeBlock(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._code_block_re = re.compile(r""" *\.\. +code-block:: ?(?P<lang>.*?)?\n\s*\n(?P<content>.*?)\n(?=\S)""",
-                                         flags=re.MULTILINE + re.DOTALL)
+        self._code_block_re = re.compile(
+            r"""^([ ]*)\.\. +code-block:: ?(?P<lang>.*?)?\n[ ]*\n(?P<content>.*?)\n(?=\S|^\1\S)""",
+            flags=re.MULTILINE + re.DOTALL)
 
     def _code_block(self, matchobj):
         lang = matchobj.group('lang').strip()

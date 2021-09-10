@@ -455,7 +455,7 @@ def convert_mc_assessment(assessment):
         "taskId": assessment.id,
         "source": {
             "name": f'Multiple Choice ({assessment.name})',
-            "showName": False,
+            "showName": True,
             "instructions": question,
             "multipleResponse": multipleResponse,
             "isRandomized": False,
