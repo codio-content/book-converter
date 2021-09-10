@@ -12,10 +12,10 @@ class ExtrToolEmbed(object):
 
     def _extrtoolembed(self, matchobj):
         name = matchobj.group('name').lower()
-        ex_data = self._exercises.get(name.lower(), {})
+        options = self._exercises.get(name.lower(), {})
         assessment_id = f'test-{name.lower()}'
-        if ex_data:
-            assessment = AssessmentData(assessment_id, name, 'test', 20, ex_data)
+        if options:
+            assessment = AssessmentData(assessment_id, name, 'test', 20, options)
             self._assessments.append(assessment)
         return ''
 
