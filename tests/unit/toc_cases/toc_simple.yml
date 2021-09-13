@@ -1,6 +1,7 @@
 workspace:
   directory: toc_cases
-  tex: toc_simple.tex
+  source: toc_cases
+  tex: toc_cases\toc_simple.tex
 assets:
 sections:
   - name: "Computer programming"

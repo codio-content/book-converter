@@ -970,7 +970,8 @@ def convert_rst_json(config, base_path, yes=False):
     source_code_type = config.get('source_code_type', 'java')
     exercises = get_code_workout_exercises(workspace_dir)
     source_exercises = get_code_workout_exercises(source_dir)
-    toc, json_config = get_rst_toc(source_dir, config_path, exercises)
+    toc, json_config = get_rst_toc(workspace_dir.joinpath(source_dir),
+                                   workspace_dir.joinpath(config_path), exercises)
     source_code_dir = json_config.get('code_dir', '')
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
@@ -1073,7 +1074,8 @@ def convert_rst_toctree(config, base_path, yes=False):
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['rst']).parent
     source_code_type = config.get('source_code_type', 'java')
-    toc = get_rst_toc(source_dir, Path(config['workspace']['rst']))
+    config_path = Path(config['workspace']['rst'])
+    toc = get_rst_toc(workspace_dir.joinpath(source_dir), workspace_dir.joinpath(config_path))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
 
     chapter = None

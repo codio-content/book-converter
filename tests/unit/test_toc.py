@@ -63,9 +63,11 @@ class TestSuite(unittest.TestCase):
     def test_toc_print_yaml(self):
         path = Path(get_file_path('toc_simple'))
         toc = get_latex_toc(path.parent, path.name)
-        yaml = print_to_yaml(toc, path, 'tex')
+        yaml = print_to_yaml(toc, path, path.parent, path, 'tex')
 
         yaml = re.sub(r"directory:(.*)$", r"directory: toc_cases", yaml, flags=re.MULTILINE)
+        yaml = re.sub(r"source:(.*)$", r"source: toc_cases", yaml, flags=re.MULTILINE)
+        yaml = re.sub(r"tex:(.*)$", r"tex: toc_cases/toc_simple.tex", yaml, flags=re.MULTILINE)
         yaml = yaml.strip()
 
         should_be = load_file('toc_simple', extension='yml')
@@ -78,10 +80,12 @@ class TestSuite(unittest.TestCase):
         if generated.exists():
             generated.unlink()
 
-        generate_toc(get_file_path(), path, ignore_exists=True)
+        generate_toc(get_file_path(), path, path.parent, ignore_exists=True)
 
         yaml = load_file('codio_structure', extension='yml')
         yaml = re.sub(r"directory:(.*)$", r"directory: toc_cases", yaml, flags=re.MULTILINE)
+        yaml = re.sub(r"source:(.*)$", r"source: toc_cases", yaml, flags=re.MULTILINE)
+        yaml = re.sub(r"tex:(.*)$", r"tex: toc_cases/toc_simple.tex", yaml, flags=re.MULTILINE)
         yaml = yaml.strip()
         generated.unlink()
 

@@ -8,9 +8,10 @@ from converter.refs import ref_dict
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='Process convert to codio guides.')
-    parser.add_argument('paths', metavar='PATH', type=str, nargs='+', help='path to a book config')
-    parser.add_argument('--source', type=str, help='path to source')
-    parser.add_argument('--generate', type=str, help='path to a latex book')
+    parser.add_argument('paths', metavar='PATH', type=str, nargs='+', help='path to a book yaml config')
+    parser.add_argument('--root', type=str, help='path to the root directory')
+    parser.add_argument('--source', type=str, help='path to the source')
+    parser.add_argument('--generate', type=str, help='path to the structure file')
     parser.add_argument('-l', '--log', action='store', default=None)
     parser.add_argument('-y', '--yes', action='store_true')
     parser.add_argument('-r', '--ref', action='store_true')
@@ -24,7 +25,7 @@ if __name__ == '__main__':
     logging.getLogger('PIL').setLevel(logging.WARN)
 
     if args.generate:
-        generate_toc(args.paths[0], args.generate, args.source)
+        generate_toc(args.paths[0], args.generate, args.source, args.root)
     elif args.ref:
         config, base_path = load_config_file(args.paths[0])
         ref_dict(config)

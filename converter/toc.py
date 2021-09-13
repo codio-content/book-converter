@@ -44,7 +44,14 @@ def include_file(line):
     return get_text_in_brackets(line)
 
 
+def fix_name(name):
+    name = re.sub(r"--", "-", name)
+    name = re.sub(r"\\&", "&", name)
+    return name
+
+
 def cleanup_name(name):
+    name = fix_name(name)
     l_pos = name.find('{')
     r_pos = name.find('}')
     cut_pos = l_pos + 1
@@ -461,10 +468,10 @@ sections:
     return yaml_structure
 
 
-def generate_toc(output_path, config_path, source_dir, ignore_exists=True):
-    workspace_path = Path(config_path).parent.resolve()
-    source_dir = Path(source_dir).resolve()
-    config_path = Path(config_path).resolve()
+def generate_toc(output_path, config_path, source_dir, root_dir, ignore_exists=True):
+    workspace_path = Path(root_dir)
+    source_dir = Path(source_dir)
+    config_path = Path(config_path)
     output_path = Path(output_path)
     structure_type = config_path.suffix[1:]
 
@@ -473,15 +480,15 @@ def generate_toc(output_path, config_path, source_dir, ignore_exists=True):
     output_path.mkdir(parents=True, exist_ok=ignore_exists)
 
     if structure_type == LATEX:
-        toc = get_latex_toc(config_path.parent, config_path.name)
+        toc = get_latex_toc(workspace_path, config_path.name)
     elif structure_type == BOOKDOWN:
         toc = get_bookdown_toc(config_path)
     elif structure_type == RST_TOCTREE:
-        workspace_path = Path(config_path).parent.parent.resolve()
-        toc = get_rst_toc(source_dir, config_path)
+        toc = get_rst_toc(workspace_path.joinpath(source_dir),
+                          workspace_path.joinpath(config_path))
     elif structure_type == RST_JSON:
-        workspace_path = Path(config_path).parent.parent.resolve()
-        toc, _ = get_rst_toc(source_dir, config_path)
+        toc, _ = get_rst_toc(workspace_path.joinpath(source_dir),
+                             workspace_path.joinpath(config_path))
     else:
         raise Exception("Unknown structure type")
 
