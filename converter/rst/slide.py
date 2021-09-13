@@ -1,14 +1,14 @@
 import re
 
 
-class Timed(object):
+class Slide(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._timed_re = re.compile(r"""^\.\. timed:: +.*?\n(?P<settings>\s+:.*?:*\n)?(?P<content>.*?)\n(?=\S)""",
+        self._slide_re = re.compile(r"""^\.\. slide:: +.*?\n(?P<settings>\s+:.*?:*\n)?(?P<content>.*?)\n(?=\S)""",
                                     flags=re.MULTILINE + re.DOTALL)
 
-    def _timed(self, matchobj):
+    def _slide(self, matchobj):
         cut_content = []
         content = matchobj.group('content').lstrip('\n').rstrip()
         content_list = content.split('\n')
@@ -20,5 +20,5 @@ class Timed(object):
         return '\n'.join(cut_content) + '\n\n'
 
     def convert(self):
-        output = self._timed_re.sub(self._timed, self.str)
+        output = self._slide_re.sub(self._slide, self.str)
         return output

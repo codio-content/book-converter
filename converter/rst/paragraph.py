@@ -11,7 +11,7 @@ class Paragraph(object):
     def _paragraph(matchobj):
         content = matchobj.group('content')
         content = content.replace('\n', ' ')
-        return f'\n{content}\n'
+        return f'{content}\n'
 
     def convert(self):
         output = self.str

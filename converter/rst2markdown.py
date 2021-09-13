@@ -37,6 +37,7 @@ from converter.rst.raw_html import RawHtml
 from converter.rst.raw_html_marker import RawHtmlMarker
 from converter.rst.ref import Ref
 from converter.rst.sidebar import Sidebar
+from converter.rst.slide import Slide
 from converter.rst.table import Table
 from converter.rst.term import Term
 from converter.rst.tip import Tip
@@ -55,7 +56,7 @@ class Rst2Markdown(object):
     def __init__(self,
                  lines_array,
                  source_code,
-                 exercises,
+                 exercises={},
                  json_config={},
                  tag_references=None,
                  workspace_dir=pathlib.Path('.'),
@@ -114,9 +115,9 @@ class Rst2Markdown(object):
         output = re.sub(r'\|---\|', '--', output)
         output = re.sub(r'^\|$', '<br/>', output, flags=re.MULTILINE)
 
-        # csawesome book
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
+        output = Slide(output, self._caret_token).convert()
         output = Tabbed(output, self._caret_token).convert()
         output = CodeBlock(output, self._caret_token).convert()
         output, html_links = RawHtml(output, self._caret_token).convert()
