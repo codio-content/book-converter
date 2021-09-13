@@ -27,7 +27,8 @@ class CodeInclude(object):
         self.source_code_type = source_code_type
         self.source_code_dir = source_code_dir
         self._source_code_paths = []
-        self._code_include_re = re.compile(r""" *\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
+        self._code_include_re = re.compile(
+            r""" *\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
     def _code_include(self, matchobj):
         lines = []
