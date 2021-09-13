@@ -15,13 +15,13 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(converted1['type'], 'custom')
         self.assertEqual(converted1['taskId'], assessment1.id)
         self.assertEqual(converted1['source']['name'], assessment1.name)
-        self.assertEqual(converted1['source']['instructions'], assessment1.ex_data['question'])
+        self.assertEqual(converted1['source']['instructions'], assessment1.options['question'])
 
         converted2 = convert_assessment(assessment2)
         self.assertEqual(converted2['type'], 'custom')
         self.assertEqual(converted2['taskId'], assessment2.id)
         self.assertEqual(converted2['source']['name'], assessment2.name)
-        self.assertEqual(converted2['source']['instructions'], assessment2.ex_data['question'])
+        self.assertEqual(converted2['source']['instructions'], assessment2.options['question'])
 
     @patch('converter.convert.write_json')
     def test_convert_unique(self, write_json_mock):
@@ -43,4 +43,4 @@ class TestSuite(unittest.TestCase):
         self.assertEqual(converted1['type'], 'custom')
         self.assertEqual(converted1['taskId'], assessment1.id)
         self.assertEqual(converted1['source']['name'], assessment1.name)
-        self.assertEqual(converted1['source']['instructions'], assessment1.ex_data['question'])
+        self.assertEqual(converted1['source']['instructions'], assessment1.options['question'])

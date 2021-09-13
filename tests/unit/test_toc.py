@@ -80,7 +80,7 @@ class TestSuite(unittest.TestCase):
         if generated.exists():
             generated.unlink()
 
-        generate_toc(get_file_path(), path, path.parent, ignore_exists=True)
+        generate_toc(get_file_path(), path, path.parent, path.parent, ignore_exists=True)
 
         yaml = load_file('codio_structure', extension='yml')
         yaml = re.sub(r"directory:(.*)$", r"directory: toc_cases", yaml, flags=re.MULTILINE)
