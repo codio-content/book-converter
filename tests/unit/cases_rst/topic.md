@@ -3,8 +3,6 @@
 
 **Example 0.0.1**<br/>
 
-
-
 If we clarify the definition of sibling...
 
 </div><br/>

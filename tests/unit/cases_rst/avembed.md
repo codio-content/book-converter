@@ -20,8 +20,6 @@ Each '0' bit indicates a left branch while each '1' bit indicates a right branch
 
 In theory, Huffman coding is an optimal coding method whenever the true frequencies are known, and the frequency of a letter is independent of the context of that letter in the message.
 
-
-
 ![Mid-square method example](Images/MidSquare.png)
 
  

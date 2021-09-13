@@ -2,6 +2,7 @@
 
 **Tip**
 
-   **Use aggregation judiciously**</div><br/>
+**Use aggregation judiciously**
 
+</div><br/>
 

@@ -55,9 +55,9 @@ OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
 class Rst2Markdown(object):
     def __init__(self,
                  lines_array,
-                 source_code,
                  exercises={},
-                 json_config={},
+                 source_code_dir=None,
+                 source_code_type='java',
                  tag_references=None,
                  workspace_dir=pathlib.Path('.'),
                  chapter_num=0,
@@ -72,8 +72,8 @@ class Rst2Markdown(object):
         self._exercises = exercises
         self._tag_references = tag_references
         self.workspace_dir = workspace_dir
-        self.json_config = json_config
-        self.source_code = source_code
+        self.source_code_dir = source_code_dir
+        self.source_code_type = source_code_type
         self._source_code_paths = list()
 
     def _enum_lists_parse(self, lines):
@@ -169,7 +169,7 @@ class Rst2Markdown(object):
         output = Table(output, self._caret_token).convert()
         output = Epigraph(output, self._caret_token).convert()
         output = Sidebar(output, self._caret_token).convert()
-        # output = ExternalLink(output).convert()
+        output = ExternalLink(output).convert()
         output = Only(output).convert()
         output = IndentedCode(output, self._caret_token).convert()
         output, source_code_paths = CodeInclude(
@@ -177,8 +177,8 @@ class Rst2Markdown(object):
             self._caret_token,
             self.workspace_dir,
             self.load_file,
-            self.json_config.get('code_dir', ''),
-            self.source_code
+            self.source_code_dir,
+            self.source_code_type
         ).convert()
         if source_code_paths:
             self._source_code_paths.extend(source_code_paths)
@@ -190,7 +190,6 @@ class Rst2Markdown(object):
         output = Paragraph(output).convert()
         output = List(output).convert()
         output = Math(output).convert()
-        output = re.sub(r'\+\+', '\\+\\+', output)
         output = re.sub(r'>>>', '', output)
         output = re.sub(self._caret_token, "\n", output)
         return output

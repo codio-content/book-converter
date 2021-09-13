@@ -10,17 +10,17 @@ class RawHtml(object):
         self._caret_token = caret_token
         self._links = list()
         self._raw_html_re = re.compile(
-            r"""^(?P<indent>[ ]*)(?P<dash>^[ ]+-[ ]+)?\.\.[ ]+(?:\|(?P<marker>[\w+\s]+)\|[ ]+)?
+            r"""^(?P<indent>[ ]*)(?P<dash>^[ ]+-[ ]+)?\.\.[ ]+(?:\|(?P<tag>[\w+\s]+)\|[ ]+)?
             raw::[ ]html\n.*?\n(?P<content>\s*.*?)\n(?=\S|^[ ]*$)""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
     def _raw_html(self, matchobj):
-        marker = matchobj.group('marker')
+        tag = matchobj.group('tag')
         indent = matchobj.group('indent')
         dash_indent = matchobj.group('dash')
         content = matchobj.group('content').strip()
-        if marker:
-            marker = marker.strip()
-            self._links.append(RawHtmlData(marker, content))
+        if tag:
+            tag = tag.strip()
+            self._links.append(RawHtmlData(tag, content))
             return ''
         else:
             split_content = [f' {item.lstrip()}' for item in content.split('\n')]

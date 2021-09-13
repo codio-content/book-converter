@@ -19,24 +19,27 @@ SOURCE_CODE_DICT = {
 
 
 class CodeInclude(object):
-    def __init__(self, source_string, caret_token, workspace_dir, load_file_method, source_code_dir, source_code):
+    def __init__(self, source_string, caret_token, workspace_dir, load_file_method, source_code_dir, source_code_type):
         self.str = source_string
         self._caret_token = caret_token
         self._workspace_dir = workspace_dir
         self._load_file = load_file_method
-        self.source_code = source_code
-        self.source_code_dir = source_code_dir.strip('//')
+        self.source_code_type = source_code_type
+        self.source_code_dir = source_code_dir
         self._source_code_paths = []
-        self._code_include_re = re.compile(r"""\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
+        self._code_include_re = re.compile(r""" *\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
 
     def _code_include(self, matchobj):
         lines = []
         code_nodes = []
         caret_token = self._caret_token
+        if self.source_code_dir is None:
+            return
+        source_code_dir = self.source_code_dir.strip('//')
         opt = matchobj.group('options')
         tag = self._get_tag_by_opt(opt) if opt else None
         for file_path in self._get_file_paths(matchobj):
-            index = file_path.parts.index(self.source_code_dir)
+            index = file_path.parts.index(source_code_dir)
             self._source_code_paths.append('/'.join(file_path.parts[index+1:]))
             try:
                 lines = self._load_file(file_path)
@@ -54,7 +57,7 @@ class CodeInclude(object):
         if Path(file_path).is_file():
             return [file_path]
 
-        lang_key = self.source_code.lower() if self.source_code.lower() in SOURCE_CODE_DICT else 'java'
+        lang_key = self.source_code_type.lower() if self.source_code_type.lower() in SOURCE_CODE_DICT else 'java'
         lang = SOURCE_CODE_DICT.get(lang_key)
         lang_dir = Path(lang['name'])
 

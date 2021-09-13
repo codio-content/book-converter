@@ -967,10 +967,11 @@ def convert_rst_json(config, base_path, yes=False):
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['source'])
     config_path = Path(config['workspace']['json'])
-    source_code = config.get('opendsa', {}).get('source_code', 'java')
+    source_code_type = config.get('source_code_type', 'java')
     exercises = get_code_workout_exercises(workspace_dir)
     source_exercises = get_code_workout_exercises(source_dir)
     toc, json_config = get_rst_toc(source_dir, config_path, exercises)
+    source_code_dir = json_config.get('code_dir', '')
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     book, metadata = make_metadata_items(config)
     chapter = None
@@ -1005,9 +1006,9 @@ def convert_rst_json(config, base_path, yes=False):
 
             rst_converter = Rst2Markdown(
                 item.lines,
-                source_code,
                 source_exercises,
-                json_config,
+                source_code_dir,
+                source_code_type,
                 tag_references,
                 workspace_dir=workspace_dir,
                 chapter_num=chapter_num,
@@ -1071,7 +1072,7 @@ def convert_rst_toctree(config, base_path, yes=False):
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['rst']).parent
-    source_code = config.get('opendsa', {}).get('source_code', 'java')
+    source_code_type = config.get('source_code_type', 'java')
     toc = get_rst_toc(source_dir, Path(config['workspace']['rst']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
 
@@ -1120,7 +1121,8 @@ def convert_rst_toctree(config, base_path, yes=False):
 
             rst_converter = Rst2Markdown(
                 item.lines,
-                source_code,
+                {},
+                source_code_type,
                 tag_references,
                 workspace_dir=workspace_dir,
                 chapter_num=chapter_num,
