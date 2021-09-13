@@ -8,7 +8,7 @@ from converter.guides.item import SectionItem, SECTION, CHAPTER
 from converter.guides.tools import write_file, get_text_in_brackets, read_file_lines
 from converter.loader import load_json_file
 
-LATEX = 'latex'
+LATEX = 'tex'
 BOOKDOWN = 'bookdown'
 RST_TOCTREE = 'rst'
 RST_JSON = 'json'
@@ -161,11 +161,11 @@ def get_include_lines(tex_folder, tex_name):
         return file.readlines()
 
 
-def get_latex_toc(tex_folder):
-    lines = get_include_lines(tex_folder, tex_folder.name)
+def get_latex_toc(tex_folder, tex_name):
+    lines = get_include_lines(tex_folder, tex_name)
     if not lines:
         return None
-    a_path = tex_folder.joinpath(tex_folder.name).resolve()
+    a_path = tex_folder.joinpath(tex_name).resolve()
     return process_toc_lines(lines, tex_folder, a_path.parent)
 
 
@@ -462,7 +462,7 @@ sections:
 
 
 def generate_toc(output_path, config_path, source_dir, ignore_exists=True):
-    workspace_path = Path(config_path).parent.parent.resolve()
+    workspace_path = Path(config_path).parent.resolve()
     source_dir = Path(source_dir).resolve()
     config_path = Path(config_path).resolve()
     output_path = Path(output_path)
@@ -473,12 +473,14 @@ def generate_toc(output_path, config_path, source_dir, ignore_exists=True):
     output_path.mkdir(parents=True, exist_ok=ignore_exists)
 
     if structure_type == LATEX:
-        toc = get_latex_toc(config_path)
+        toc = get_latex_toc(config_path.parent, config_path.name)
     elif structure_type == BOOKDOWN:
         toc = get_bookdown_toc(config_path)
     elif structure_type == RST_TOCTREE:
+        workspace_path = Path(config_path).parent.parent.resolve()
         toc = get_rst_toc(source_dir, config_path)
     elif structure_type == RST_JSON:
+        workspace_path = Path(config_path).parent.parent.resolve()
         toc, _ = get_rst_toc(source_dir, config_path)
     else:
         raise Exception("Unknown structure type")

@@ -674,7 +674,7 @@ def convert(config, base_path, yes=False):
     logging.debug("start converting %s" % generate_dir)
     guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
-    toc = get_latex_toc(Path(config['workspace']['directory']))
+    toc = get_latex_toc(Path(config['workspace']['directory']), Path(config['workspace']['tex']))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
     refs = make_refs(toc, chapter_counter_from=get_ref_chapter_counter_from(config))
     refs = override_refs(refs, config)
