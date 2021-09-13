@@ -11,6 +11,7 @@ def create_active_code_files(guides_dir, exercises):
         return
     logging.debug('process create active code test assessments data')
 
+    data_files = set()
     tests_dir = guides_dir.joinpath('secure/active_code')
     tests_dir.mkdir(exist_ok=True, parents=True)
 
@@ -21,6 +22,13 @@ def create_active_code_files(guides_dir, exercises):
         test_class_name = options.get('test_class_name', '')
         class_code = options.get('code', '')
         tests_code = options.get('tests', '')
+        settings = options.get('settings', {})
+        data_file = settings.get('datafile', None)
+
+        if data_file:
+            files = data_file.split(',')
+            for file in files:
+                data_files.add(file.strip())
 
         if tests_code:
             private_exercise_dir = tests_dir.joinpath(exercise_name)

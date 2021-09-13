@@ -1088,12 +1088,12 @@ def convert_rst_toctree(config, base_path, yes=False):
     metadata = {}
     children_containers = []
     chapter_dir = Path()
-    lastChaperSection = False
+    lastChapterSection = False
 
     for ind, item in enumerate(toc):
         if item.section_type == CHAPTER:
             assessments = []
-            lastChaperSection = False
+            lastChapterSection = False
             subsection_num = 0
             chapter_num += 1
             slug_name = slugify(item.section_name)
@@ -1176,9 +1176,9 @@ def convert_rst_toctree(config, base_path, yes=False):
         lastTocIndex = nextIndex == len(toc)
 
         if not lastTocIndex and toc[nextIndex].section_type == CHAPTER:
-            lastChaperSection = True
+            lastChapterSection = True
 
-        if lastChaperSection or lastTocIndex:
+        if lastChapterSection or lastTocIndex:
             active_code_exercises = list(filter(lambda a: a.type == ACTIVE_CODE, assessments))
             create_active_code_files(guides_dir, active_code_exercises)
 

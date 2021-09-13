@@ -1,5 +1,6 @@
 import re
 
+
 class Image2(object):
     def __init__(self, source_string, images, caret_token):
         self.str = source_string

@@ -106,7 +106,7 @@ if __name__ == '__main__':
             grade = 0
             grading()
         else:
-            ret = subprocess.Popen(f'java -cp *:/tmp {class_name}',
+            ret = subprocess.Popen(f'java -cp .guides/lib/*:/tmp {class_name}',
                                    shell=True, stdout=subprocess.PIPE, universal_newlines=True)
             output, runtime_error = ret.communicate()
             image_match_re = re.compile(r'&ltimg src=\"data:image/(?P<ext>.*?);base64,(?P<data>.*?)\"/>')

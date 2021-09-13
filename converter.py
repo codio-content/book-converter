@@ -39,4 +39,3 @@ if __name__ == '__main__':
                 convert_rst_json(config, base_path, args.yes)
             elif config.get('workspace', {}).get('rst'):
                 convert_rst_toctree(config, base_path, args.yes)
-
