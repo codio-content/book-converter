@@ -50,6 +50,7 @@ def write_static_files(guides_dir):
     shutil.copy(Path('converter/rst/assessments/active_code/CodeTestHelper.java'), lib_dir)
     shutil.copy(Path('converter/rst/assessments/active_code/junit-4.13.1.jar'), lib_dir)
     shutil.copy(Path('converter/rst/assessments/active_code/hamcrest-core-1.3.jar'), lib_dir)
+    shutil.copy(Path('converter/rst/assessments/active_code/turtleClasses.jar'), lib_dir)
 
     tests_dir = guides_dir.joinpath('secure/active_code')
     run_script_data = read_file(Path('converter/rst/assessments/active_code/run.script'))
