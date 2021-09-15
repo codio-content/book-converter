@@ -11,7 +11,7 @@ class EqnArray(object):
 
     def _eqnarray_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
-        block_contents = re.sub(r"^&& {2}", "", block_contents, flags=re.MULTILINE)
+        block_contents = re.sub(r"^&& {1,2}", "", block_contents, flags=re.MULTILINE)
         block_contents = re.sub(r"^& ", "", block_contents, flags=re.MULTILINE)
         block_contents = re.sub(r" &$", "", block_contents, flags=re.MULTILINE)
         block_contents = re.sub(r" & \\\\$", " \\\\\\\\", block_contents, flags=re.MULTILINE)
