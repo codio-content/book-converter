@@ -41,6 +41,9 @@ class Tabular(TextAsParagraph):
             row = row.strip()
             if not row:
                 continue
+            if '\\multicolumn' in row:
+                table_size = size.strip()
+                row = re.sub(r'\\multicolumn{\d}{.*?}{(.*?)}', r'\1', row)
             pos = 0
             row = row.replace('\\&', token)
             for ind in range(0, len(table_size)):
