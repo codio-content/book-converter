@@ -88,7 +88,6 @@ class LaTeX2Markdown(object):
         output = Quotes(output).convert()
         output = Bold(output).convert()
         output = Italic(output).convert()
-        output = Ignore(output).convert()
         output = SaasSpecific(output, self._caret_token).convert()
         output = ItalicBold(output).convert()
         output, source_codes = CodeBlock(
@@ -163,13 +162,14 @@ class LaTeX2Markdown(object):
         output = Header(output).convert()
         output = Tabular(output, self._caret_token).convert()
         output = Tabularx(output, self._caret_token).convert()
-        output = Table(output, self._caret_token).convert()
+        output = Table(output, self._refs, self._caret_token).convert()
         output = Lists(output, self._caret_token).convert()
         output = Block(output, self._caret_token).convert()
         output = Center(output, self._caret_token).convert()
 
         output = UnEscape(output).convert()
         output = NewLine(output).convert()
+        output = Ignore(output).convert()
 
         # convert all matched % back
         output = re.sub(self._percent_token, "%", output)
