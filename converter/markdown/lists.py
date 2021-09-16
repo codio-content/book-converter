@@ -13,7 +13,7 @@ class Lists(TextAsParagraph):
         self._lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize|description)} # list name
                                     (\[.*?\])? # Optional enumerate settings i.e. (a)
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{(?P=block_name)}\n*(?=(?!\\item )\S)""",  # closing list
+                                    \\end{(?P=block_name)}(?!\n*\\item)""",  # closing list
                                     flags=re.DOTALL + re.VERBOSE)
         self._nested_lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize|description)} # list name
                                     (\[.*?\])? # Optional enumerate settings i.e. (a)
@@ -101,7 +101,7 @@ class Lists(TextAsParagraph):
         block_title = matchobj.groupdict().get('block_title')
 
         if '\\begin{enumerate' in block_contents or '\\begin{itemize' in block_contents:
-            self._indent = self._indent + '#\t'
+            self._indent += '#\t'
             block_contents = self._nested_lists_re.sub(self._replace_block, block_contents)
 
         formatted_contents = self._format_list_contents(block_name, block_contents)
