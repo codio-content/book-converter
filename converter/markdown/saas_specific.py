@@ -49,6 +49,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\textbar({\})?", r"|", output)
         output = re.sub(r"\\hrule", "<hr>", output)
         output = re.sub(r"\\hspace", "", output)
+        output = re.sub(r"\\hfill", "", output)
         output = re.sub(r"\\small", "", output)
         output = re.sub(r"\\mbox{(.*?)(?<!\\)}", r"\1", output)
         output = re.sub(r"\\verb\|(.*?)\|", r"`\1`", output)
