@@ -78,7 +78,9 @@ class Image(object):
             if option_re.match(line.strip()):
                 options[opt_match[1]] = opt_match[2]
         width = options.get('width', '')
-        return f'{caret_token}<img src="{image_path}" alt="" style="width:{width};">{caret_token}\n'
+        alt = options.get('alt', '')
+
+        return f'{caret_token}<img src="{image_path}" alt="{alt}" style="width:{width};">{caret_token}\n'
 
     def convert(self):
         output = self.str
