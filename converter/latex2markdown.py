@@ -44,6 +44,7 @@ from converter.markdown.screencast import Screencast
 from converter.markdown.tabularx import Tabularx
 from converter.markdown.tabular import Tabular
 from converter.markdown.unescape import UnEscape
+from converter.markdown.vocabulary import Vocabulary
 
 
 class LaTeX2Markdown(object):
@@ -123,6 +124,7 @@ class LaTeX2Markdown(object):
         output = Cite(output, self._load_workspace_file).convert()
         output = Consents(output, self._caret_token).convert()
         output = Elaboration(output, self._caret_token).convert()
+        output = Vocabulary(output, self._caret_token).convert()
         output = Fallacy(output, self._caret_token).convert()
         output = PitFall(output, self._caret_token).convert()
         output = Summary(output, self._caret_token).convert()
