@@ -109,3 +109,6 @@ class TestSuite(unittest.TestCase):
 
     def test_epigraph_render(self):
         self.run_case('epigraph')
+
+    def test_list_render(self):
+        self.run_case('list')

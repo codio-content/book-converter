@@ -11,3 +11,10 @@
    representation.
 
 Compared with the implementation illustrated by...
+
+.. |Exercise| image:: ../../_static/exercise.png
+    :width: 35
+    :align: middle
+    :alt: exercise
+
+|Exercise| **Check your understanding**
