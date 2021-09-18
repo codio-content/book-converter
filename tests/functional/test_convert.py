@@ -16,7 +16,7 @@ def get_file_path(name='', extension='tex'):
 
 
 def load_file(path):
-    with open(path, 'r') as file:
+    with open(path, 'r', encoding="utf-8") as file:
         return file.read().strip('\n')
 
 
