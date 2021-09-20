@@ -29,6 +29,10 @@ def compile_answer():
 
 
 def run_unit_tests():
+    subprocess.Popen(f'rm -f *.java', shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+    subprocess.Popen(f'ln -s .guides/active_code/{ex_dir}/{class_name}.java {class_name}.java', shell=True,
+                     stdout=subprocess.PIPE, universal_newlines=True)
+
     run = subprocess.Popen(f'java -cp .guides/lib/*:/tmp org.junit.runner.JUnitCore RunestoneTests', shell=True,
                            stdout=subprocess.PIPE, universal_newlines=True)
     out, runtime_error = run.communicate()
