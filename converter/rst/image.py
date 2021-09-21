@@ -35,8 +35,6 @@ class Image(object):
     def _figure(self, matchobj):
         caret_token = self._caret_token
         image_path = matchobj.group('path')
-        # TODO cdn
-        # image_path = f'{self._open_dsa_cdn}/{image_path}'
         output = MASK_IMAGE_TO_MD.replace('{image}', image_path)
         output = self._set_alt(output, matchobj.group('options'))
         figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
@@ -65,6 +63,8 @@ class Image(object):
         caption = raw_caption.replace('\n', ' ')
         caption = caption.strip()
         caption = re.sub(" +", " ", caption)
+        if raw_caption.strip().startswith('Figure'):
+            return f'<center>*{caption}*</center>'
         return f'**Figure {figure_number}:** *{caption}*'
 
     def _image(self, matchobj):
