@@ -26,7 +26,7 @@ class RawHtml(object):
             split_content = [f' {item.lstrip()}' for item in content.split('\n')]
             final_content = '\n'.join(split_content)
             if not indent and not dash_indent:
-                return final_content.strip()
+                return final_content
             dash_indent = dash_indent or ''
             return f'{dash_indent}{final_content}'
 
