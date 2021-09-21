@@ -22,7 +22,7 @@ class Image2(object):
         extra_style = 'margin-right: 1em; float: left' if align == 'middle' else ''
 
         return f'{caret_token}{caret_token}<img src="{image.path}" alt="{alt}" style="width: {width}; ' \
-               f'{extra_style}">{caret_token}{caret_token}'
+               f'{extra_style}">{caret_token}{caret_token}\n'
 
     def convert(self):
         output = self._image2_re.sub(self._image2, self.str)
