@@ -10,17 +10,18 @@ class Table(object):
 
     @staticmethod
     def _remove_line_boundaries_by_rst(output):
-        output = re.sub(r"[ ]*[+][-]{3,}[+]([-]{3,}[+])+\n", "", output)
+        output = re.sub(r'[ ]*[+][-]{3,}[+]([-]{3,}[+])+\n', '', output)
         return output
 
     def _table(self, matchobj):
         content = matchobj.group(0).replace('+', '|').replace('=', '-')
-        content = content.replace("\n", self._caret_token)
+        content = content.replace('\n', self._caret_token)
         return content
 
     def _table_row(self, matchobj):
         content = matchobj.group(0)
-        content = content.replace("\n", self._caret_token)
+        content = content.replace(' || ', ' &#124;&#124; ')
+        content = content.replace('\n', self._caret_token)
         return content
 
     def convert(self):
