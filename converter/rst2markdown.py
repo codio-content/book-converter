@@ -55,6 +55,7 @@ OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
 class Rst2Markdown(object):
     def __init__(self,
                  lines_array,
+                 tag_images,
                  exercises={},
                  source_code_dir=None,
                  source_code_type='java',
@@ -66,6 +67,7 @@ class Rst2Markdown(object):
         self._math_block_separator_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
+        self._tag_images = tag_images
         self._assessments = list()
         self._iframe_images = list()
         self.lines_array = lines_array
@@ -114,7 +116,6 @@ class Rst2Markdown(object):
         output = '\n'.join(lines_array) + '\n\n>>>'
         output = re.sub(r'\|---\|', '--', output)
         output = re.sub(r'^\|$', '<br/>', output, flags=re.MULTILINE)
-
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
         output = Slide(output, self._caret_token).convert()
@@ -139,11 +140,10 @@ class Rst2Markdown(object):
         if assessments:
             self._assessments.extend(assessments)
         output = Youtube(output, self._caret_token).convert()
-
         output, images = Image2Directives(output).convert()
         if images:
-            output = Image2(output, images, self._caret_token).convert()
-
+            self._tag_images.extend(images)
+        output = Image2(output, self._tag_images, self._caret_token).convert()
         output = Note(output, self._caret_token).convert()
         output = TagReference(output, self._tag_references).convert()
         output = MathBlock(output, self._caret_token, self._math_block_separator_token).convert()

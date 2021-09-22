@@ -1085,6 +1085,7 @@ def convert_rst_toctree(config, base_path, yes=False):
     logging.debug("convert selected pages")
     refs = OrderedDict()
     label_counter = 0
+    tag_images = list()
     assessments = []
     tag_references = prepare_figure_numbers(toc)
     book = {}
@@ -1123,6 +1124,7 @@ def convert_rst_toctree(config, base_path, yes=False):
 
             rst_converter = Rst2Markdown(
                 item.lines,
+                tag_images,
                 {},
                 source_code_type,
                 tag_references,
