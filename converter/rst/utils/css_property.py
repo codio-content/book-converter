@@ -1,5 +1,4 @@
 import re
-import logging
 
 
 def get_property_by_css(css_names, element_id, property_name, workspace_dir):

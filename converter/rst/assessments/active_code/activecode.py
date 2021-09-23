@@ -2,6 +2,7 @@ import re
 
 from converter.rst.assessments.assessment_const import DEFAULT_POINTS, ACTIVE_CODE
 from converter.rst.model.assessment_data import AssessmentData
+from converter.rst.utils.clean_indention import clean_indention
 
 
 class ActiveCode(object):
@@ -49,7 +50,7 @@ class ActiveCode(object):
         class_name_re = re.compile(r'^\s*public\s+class\s+(?P<name>.*?)(?:<Person>|extends .*?)?\n', flags=re.MULTILINE)
 
         if code:
-            code = self._clean_indention(code)
+            code = clean_indention(code)
             options['code'] = code
             class_name_match = class_name_re.search(code)
             if class_name_match:
@@ -58,7 +59,7 @@ class ActiveCode(object):
             else:
                 options['class_name'] = 'Main'
         else:
-            options['code'] = self._clean_indention(content)
+            options['code'] = clean_indention(content)
 
         if tests:
             has_constructor = re.search(r'public RunestoneTests\(\)', tests)
@@ -67,7 +68,7 @@ class ActiveCode(object):
                 tests = re.sub(r'(.*?public class RunestoneTests extends CodeTestHelper\n *{)\n(.*?)',
                                rf'\1{constructor}\2', tests, flags=re.MULTILINE + re.DOTALL)
 
-            options['tests'] = self._clean_indention(tests)
+            options['tests'] = clean_indention(tests)
             test_class_name_match = class_name_re.search(tests)
             if test_class_name_match:
                 options['test_class_name'] = test_class_name_match.group('name').strip()
@@ -80,18 +81,6 @@ class ActiveCode(object):
         self._assessments.append(AssessmentData(assessment_id, name, ACTIVE_CODE, DEFAULT_POINTS, options))
 
         return f'\n\n**See active code exercise: {name}**\n\n'
-
-    @staticmethod
-    def _clean_indention(content):
-        cut_content = []
-        content = content.lstrip('\n').rstrip()
-        content_list = content.split('\n')
-        for ind, item in enumerate(content_list):
-            indent_match = re.search(r'^ *', content_list[0])
-            if indent_match:
-                str_len = len(indent_match.group(0))
-                cut_content.append(content_list[ind][str_len:])
-        return '\n'.join(cut_content)
 
     def convert(self):
         output = self._activecode_re.sub(self._activecode, self.str)

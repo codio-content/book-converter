@@ -1,5 +1,7 @@
 import re
 
+from converter.rst.utils.clean_indention import clean_indention
+
 
 class CodeBlock(object):
     def __init__(self, source_string, caret_token):
@@ -12,8 +14,8 @@ class CodeBlock(object):
     def _code_block(self, matchobj):
         lang = matchobj.group('lang').strip()
         content = matchobj.group('content').rstrip()
-
-        return f'\n ``` {lang}\n{content}\n ```\n'
+        content = clean_indention(content)
+        return f'\n``` {lang}\n{content}\n```\n'
 
     def convert(self):
         output = self._code_block_re.sub(self._code_block, self.str)
