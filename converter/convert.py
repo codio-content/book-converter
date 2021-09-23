@@ -598,7 +598,7 @@ def convert_parsons_assessment(assessment):
     initial = options.get('initial', '')
     max_distractors = options.get('max_distractors', 0)
     can_indent = 'true' if options.get('has_indent', True) else 'false'
-    trashId = ',\"trashId\":\"sortableTrash\"' if max_distractors > 0 else ''
+    trashId = 'sortableTrash' if max_distractors > 0 else ''
 
     return {
         "type": assessment.type,
@@ -609,7 +609,7 @@ def convert_parsons_assessment(assessment):
             "instructions": instructions,
             "initial": initial,
             "options": f"{{\"sortableId\":\"sortable\",\"max_wrong_lines\":{max_distractors},\"exec_limit\":2500,"
-                       f"\"can_indent\":{can_indent},\"x_indent\":50,\"lang\":\"en\"{trashId}}}",
+                       f"\"can_indent\":{can_indent},\"x_indent\":50,\"lang\":\"en\",\"trashId\":\"{trashId}\"}}",
             "grader": "1",
             "guidance": feedback,
             "showGuidanceAfterResponseOption": {

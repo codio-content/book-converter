@@ -15,7 +15,7 @@ class CodeBlock(object):
         lang = matchobj.group('lang').strip()
         content = matchobj.group('content').rstrip()
         content = clean_indention(content)
-        return f'\n``` {lang}\n{content}\n```\n'
+        return f'\n ``` {lang}\n{content}\n ```\n'
 
     def convert(self):
         output = self._code_block_re.sub(self._code_block, self.str)
