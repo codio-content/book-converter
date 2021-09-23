@@ -34,17 +34,20 @@ class Parsons(object):
         blocks_match = re.search(r'^\s*-{5}(\n.*?)\n+(?=\S|\n$(?!^$))', blocks_group,
                                  flags=re.MULTILINE + re.DOTALL)
         if blocks_match:
-            initial_list = blocks_match.group(1).split('=====')
             initial_blocks = ''
             max_distractors = 0
-            for line in initial_list:
-                line = line.rstrip().replace('\n', '\\n').replace('"', '&quot;').strip(' ')
+            initial_list = [item.lstrip(' ').lstrip('\n').rstrip() for item in blocks_match.group(1).split('=====')]
+            cut_initial_list, has_indent = self.clean_extra_indention(initial_list)
+
+            for line in cut_initial_list:
+                line = line.rstrip().lstrip('\\n').replace('"', '&quot;').replace('\n', '\\n')
                 line = line.replace('#paired', '#distractor')
                 initial_blocks += f'{line}\n'
                 if '#distractor' in line:
                     max_distractors += 1
             options['initial'] = initial_blocks
             options['max_distractors'] = max_distractors
+            options['has_indent'] = has_indent
 
         question = '\n'.join(options_group_list)
         if question:
@@ -86,6 +89,21 @@ class Parsons(object):
         self._assessments.append(AssessmentData(assessment_id, name, PARSONS, DEFAULT_POINTS, options))
 
         return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
+
+    @staticmethod
+    def clean_extra_indention(initial_list):
+        str_len = 0
+        has_indent = False
+        cut_initial_list = []
+        indent_match = re.search(r'^ *', initial_list[0])
+        if indent_match:
+            str_len = len(indent_match.group(0))
+        for ind, item in enumerate(initial_list):
+            block = [sub_str[str_len:] for sub_str in item.split('\n')]
+            if not has_indent:
+                has_indent = True if re.search(r'^ +', block[0]) else False
+            cut_initial_list.append('\n'.join(block))
+        return cut_initial_list, has_indent
 
     def convert(self):
         output = self.str
