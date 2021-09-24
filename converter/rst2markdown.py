@@ -33,8 +33,8 @@ from converter.rst.math import Math
 from converter.rst.math_block import MathBlock
 from converter.rst.only import Only
 from converter.rst.paragraph import Paragraph
-from converter.rst.raw_html import RawHtml
-from converter.rst.raw_html_marker import RawHtmlMarker
+from converter.rst.raw_html_directives import RawHtmlDirectives
+from converter.rst.raw_html_tag import RawHtmlTag
 from converter.rst.ref import Ref
 from converter.rst.sidebar import Sidebar
 from converter.rst.slide import Slide
@@ -55,7 +55,7 @@ OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
 class Rst2Markdown(object):
     def __init__(self,
                  lines_array,
-                 tag_images,
+                 tag_directives,
                  exercises={},
                  source_code_dir=None,
                  source_code_type='java',
@@ -67,7 +67,7 @@ class Rst2Markdown(object):
         self._math_block_separator_token = str(uuid.uuid4())
         self._chapter_num = chapter_num
         self._subsection_num = subsection_num
-        self._tag_images = tag_images
+        self._tag_directives = tag_directives
         self._assessments = list()
         self._iframe_images = list()
         self.lines_array = lines_array
@@ -121,9 +121,10 @@ class Rst2Markdown(object):
         output = Slide(output, self._caret_token).convert()
         output = Tabbed(output, self._caret_token).convert()
         output = CodeBlock(output, self._caret_token).convert()
-        output, html_links = RawHtml(output, self._caret_token).convert()
+        output, html_links = RawHtmlDirectives(output, self._caret_token).convert()
         if html_links:
-            output = RawHtmlMarker(output, html_links, self._caret_token).convert()
+            self._tag_directives.extend(html_links)
+        output = RawHtmlTag(output, self._tag_directives, self._caret_token).convert()
         output, assessments = MultiChoice(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
@@ -142,8 +143,8 @@ class Rst2Markdown(object):
         output = Youtube(output, self._caret_token).convert()
         output, images = Image2Directives(output).convert()
         if images:
-            self._tag_images.extend(images)
-        output = Image2(output, self._tag_images, self._caret_token).convert()
+            self._tag_directives.extend(images)
+        output = Image2(output, self._tag_directives, self._caret_token).convert()
         output = Note(output, self._caret_token).convert()
         output = TagReference(output, self._tag_references).convert()
         output = MathBlock(output, self._caret_token, self._math_block_separator_token).convert()

@@ -1,7 +1,6 @@
 import re
-from collections import namedtuple
 
-Image2data = namedtuple('Image2data', ['id', 'path', 'options'])
+from converter.rst.model.tag_directives import TagDirectives
 
 
 class Image2Directives(object):
@@ -22,7 +21,7 @@ class Image2Directives(object):
             opt_match = option_re.match(line.strip())
             if opt_match:
                 options[opt_match[1]] = opt_match[2]
-        self._images.append(Image2data(image_id, path, options))
+        self._images.append(TagDirectives(image_id, 'image', path, options))
 
         return ''
 

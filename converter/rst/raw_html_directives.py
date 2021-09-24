@@ -1,10 +1,9 @@
 import re
-from collections import namedtuple
 
-RawHtmlData = namedtuple('RawHtmlData', ['marker', 'content'])
+from converter.rst.model.tag_directives import TagDirectives
 
 
-class RawHtml(object):
+class RawHtmlDirectives(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
@@ -20,7 +19,7 @@ class RawHtml(object):
         content = matchobj.group('content').strip()
         if tag:
             tag = tag.strip()
-            self._links.append(RawHtmlData(tag, content))
+            self._links.append(TagDirectives(tag, 'html_link', content, {}))
             return ''
         else:
             split_content = [f' {item.lstrip()}' for item in content.split('\n')]
