@@ -42,7 +42,7 @@ class ActiveCode(object):
         if code_match:
             code = code_match.group('code') or content
 
-        tests_match = re.search(r'[ ]*====[ ]*\n*(?P<tests>.*?)\n(?!^$)$', content, flags=re.DOTALL)
+        tests_match = re.search(r'[ ]*====[ ]*\n*(?P<tests>.*?)\n(?=[ ]?\S|(?!^$)$)', content, flags=re.DOTALL)
 
         if tests_match:
             tests = tests_match.group('tests')
@@ -64,9 +64,9 @@ class ActiveCode(object):
         if tests:
             has_constructor = re.search(r'public RunestoneTests\(\)', tests)
             if not has_constructor:
-                constructor = f'\n        public RunestoneTests() {{\n          super("{class_name}");\n       }}\n\n'
-                tests = re.sub(r'(.*?public class RunestoneTests extends CodeTestHelper\n *{)\n(.*?)',
-                               rf'\1{constructor}\2', tests, flags=re.MULTILINE + re.DOTALL)
+                constructor = rf'\1\n\n\2   public RunestoneTests() {{\n\2      super("{class_name}");\n\2   }}\n\n'
+                tests = re.sub(r'(( *)public class RunestoneTests extends CodeTestHelper\n? *{)\n',
+                               constructor, tests, flags=re.MULTILINE + re.DOTALL)
 
             options['tests'] = clean_indention(tests)
             test_class_name_match = class_name_re.search(tests)
