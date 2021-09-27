@@ -413,14 +413,17 @@ def convert_mc_assessment(assessment):
     answers = options.get('answers', [])
     feedback_list = options.get('feedback', [])
     feedback_final = []
+    answer_count = 1
 
     multipleResponse = options.get('multipleResponse', '')
     if multipleResponse:
         feedback_final.append(options.get('feedback', ''))
         answers = options.get('answers', [])
         for item in answers:
+            answer_count += 1
+            answer_id = f'{assessment.name}-answer-{answer_count}'
             answer = {
-                "_id": str(uuid.uuid4()),
+                "_id": answer_id,
                 "correct": item['is_correct'],
                 "answer": item['answer']
             }
@@ -428,13 +431,15 @@ def convert_mc_assessment(assessment):
     else:
         correctAnswer = options.get('correct', '')
         for answer in answers:
+            answer_count += 1
             items = list(answer.items())
             answer_name = str(items[0][0])
             answer_name = answer_name.replace('answer_', '')
             answer_text = f'<b>{answer_name.upper()}.</b> {items[0][1]}'
             is_correct_answer = correctAnswer == answer_name.lower()
+            answer_id = f'{assessment.name}-answer-{answer_count}'
             answer = {
-                "_id": str(uuid.uuid4()),
+                "_id": answer_id,
                 "correct": is_correct_answer,
                 "answer": answer_text
             }
