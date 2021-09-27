@@ -10,7 +10,7 @@ class FillInTheBlanks(object):
         self._caret_token = caret_token
         self._assessments = list()
         self._fillintheblanks_re = re.compile(
-            r"""^( *\.\.\sfillintheblank:: ?(?P<name>.*?)?\n)(?P<options>.*?)\n(?=\S|\s+\n)""",
+            r"""^( *\.\.\sfillintheblank:: ?(?P<name>.*?)?\n)(?P<options>.*?)\n(?=\S|(?!^$)$)""",
             flags=re.MULTILINE + re.DOTALL)
 
     def _fillintheblanks(self, matchobj):
