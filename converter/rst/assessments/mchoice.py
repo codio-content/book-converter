@@ -66,7 +66,12 @@ class MultiChoice(object):
         if feedback:
             options['feedback'] = feedback
 
-        options['multipleResponse'] = False
+        correct_answer_size = len(options['correct'].split(','))
+        if correct_answer_size == 0:
+            return
+        options['multipleResponse'] = True if correct_answer_size > 1 else False
+        options['type'] = 'mchoice'
+
         name = name.lower().replace('-', '_')
         assessment_id = f'multiple-choice-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, MULTIPLE_CHOICE, DEFAULT_POINTS, options))
@@ -77,6 +82,10 @@ class MultiChoice(object):
         options = {}
         caret_token = self._caret_token
         name = matchobj.group('name')
+
+        if name == 'steptracker_instance_variables':
+            test = 0
+
         options_group = matchobj.group('options')
         option_re = re.compile(':([^:]+):(?: (.+))?')
         options_group_list = options_group.split('\n')
@@ -90,7 +99,7 @@ class MultiChoice(object):
 
         answers_str = '\n'.join(options_group_list)
         answers_iscode_match = re.finditer(
-            r'^(?P<indent> +):click-(?P<correct>correct|incorrect):(?P<text>.*?):endclick:',
+            r'^(?P<indent> +).*?:click-(?P<correct>correct|incorrect):(?P<text>.*?):endclick:.*?$',
             answers_str, flags=re.MULTILINE)
         answers_table_match = re.finditer(r' *\|(.*?)\|\n', answers_str)
 
@@ -98,7 +107,9 @@ class MultiChoice(object):
         if 'iscode' in options:
             for item in answers_iscode_match:
                 is_correct = item.group('correct') == 'correct'
-                answer = item.group('indent') + item.group('text')
+                answer = item.group('indent') + item.group(0).strip()
+                answer = re.sub(r':click-(?P<correct>correct|incorrect):', '', answer)
+                answer = re.sub(r':endclick:', '', answer)
                 answers.append({'is_correct': is_correct, 'answer': answer})
         elif 'table' in options:
             correct_answers = options.get('correct', '').split(';')
@@ -113,6 +124,7 @@ class MultiChoice(object):
 
         options['answers'] = answers
         options['multipleResponse'] = True
+        options['type'] = 'clickablearea'
 
         name = name.lower().replace('-', '_')
         assessment_id = f'multiple-choice-{name}'

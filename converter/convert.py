@@ -412,11 +412,12 @@ def convert_mc_assessment(assessment):
     question = options.get('question', '')
     answers = options.get('answers', [])
     feedback_list = options.get('feedback', [])
+    multipleResponse = options.get('multipleResponse', False)
+    exercise_type = options.get('type', None)
     feedback_final = []
     answer_count = 1
 
-    multipleResponse = options.get('multipleResponse', '')
-    if multipleResponse:
+    if exercise_type == 'clickablearea':
         feedback_final.append(options.get('feedback', ''))
         answers = options.get('answers', [])
         for item in answers:
@@ -428,19 +429,20 @@ def convert_mc_assessment(assessment):
                 "answer": item['answer']
             }
             answers_list.append(answer)
-    else:
-        correctAnswer = options.get('correct', '')
+
+    elif exercise_type == 'mchoice':
+        correct_answer = [a.strip() for a in options.get('correct', '').split(',')]
         for answer in answers:
             answer_count += 1
             items = list(answer.items())
             answer_name = str(items[0][0])
             answer_name = answer_name.replace('answer_', '')
             answer_text = f'<b>{answer_name.upper()}.</b> {items[0][1]}'
-            is_correct_answer = correctAnswer == answer_name.lower()
+            is_correct = answer_name.lower() in correct_answer
             answer_id = f'{assessment.name}-answer-{answer_count}'
             answer = {
                 "_id": answer_id,
-                "correct": is_correct_answer,
+                "correct": is_correct,
                 "answer": answer_text
             }
             answers_list.append(answer)
