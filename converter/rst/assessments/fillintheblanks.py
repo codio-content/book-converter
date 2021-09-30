@@ -39,7 +39,13 @@ class FillInTheBlanks(object):
 
         text = [item.strip() for item in options_group_list if item != '']
         if text:
-            options['text'] = text[0]
+            text_list = []
+            for item in text:
+                if re.search(r'- +:.*?:', item):
+                    break
+                text_list.append(item)
+            final_text = '\n'.join(text_list)
+            options['text'] = final_text.strip()
         if negative_feedback:
             options['negative_feedback'] = negative_feedback
         if correct_feedback:

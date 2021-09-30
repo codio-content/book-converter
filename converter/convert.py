@@ -482,9 +482,9 @@ def convert_mc_assessment(assessment):
 
 
 def convert_fillintheblanks_assessment(assessment):
-    # feedback = []
     options = assessment.options
     text = options.get('text', {})
+    text = text.replace('|blank|', '[blank]')
 
     token_blank = []
     token_text = []
@@ -511,11 +511,6 @@ def convert_fillintheblanks_assessment(assessment):
                 correct_answer = re.sub(r'\\', '\\\\', correct_answer)
                 text = f'{text}\n<<<{correct_answer}>>>'
                 token_blank.append(correct_answer)
-
-        # if opt.startswith('feedback'):
-        #     feedback_name = opt.replace('feedback_', '')
-        #     value = f'<b>{feedback_name.upper()}</b>: {options[opt]}'
-        #     feedback.append(value)
 
     tokens = {
         "blank": token_blank,
