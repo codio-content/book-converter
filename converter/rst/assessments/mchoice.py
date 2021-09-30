@@ -88,17 +88,30 @@ class MultiChoice(object):
                 options_group_list.pop(opt_match.pos)
                 options[opt_match[1]] = opt_match[2]
 
-        answers = '\n'.join(options_group_list)
-        answers_match = re.finditer('^(?P<indent> +):click-(?P<correct>correct|incorrect):(?P<text>.*?):endclick:',
-                                    answers, flags=re.MULTILINE)
-        if answers_match:
-            answers = []
-            for item in answers_match:
+        answers_str = '\n'.join(options_group_list)
+        answers_iscode_match = re.finditer(
+            r'^(?P<indent> +):click-(?P<correct>correct|incorrect):(?P<text>.*?):endclick:',
+            answers_str, flags=re.MULTILINE)
+        answers_table_match = re.finditer(r' *\|(.*?)\|\n', answers_str)
+
+        answers = []
+        if 'iscode' in options:
+            for item in answers_iscode_match:
                 is_correct = item.group('correct') == 'correct'
                 answer = item.group('indent') + item.group('text')
                 answers.append({'is_correct': is_correct, 'answer': answer})
-            options['answers'] = answers
+        elif 'table' in options:
+            correct_answers = options.get('correct', '').split(';')
+            for row_num, row in enumerate(answers_table_match, start=1):
+                answer_group = row.group(1)
+                answer_row = answer_group.split('|')
+                for answer_num, answer in enumerate(answer_row, start=1):
+                    answer = answer.strip()
+                    item_num = f'{row_num},{answer_num}'
+                    is_correct = item_num in correct_answers
+                    answers.append({'is_correct': is_correct, 'answer': answer})
 
+        options['answers'] = answers
         options['multipleResponse'] = True
 
         name = name.lower().replace('-', '_')
