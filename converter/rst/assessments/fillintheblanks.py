@@ -29,7 +29,7 @@ class FillInTheBlanks(object):
                 key = opt_match.group('key')
                 value = opt_match.group('value')
                 correct_feedback.append(value)
-                if key == '.*':
+                if key == '.*' or key == 'x':
                     negative_feedback.append(value)
                     options_group_list.pop(opt_match.lastindex)
                     continue
@@ -45,7 +45,7 @@ class FillInTheBlanks(object):
                     break
                 text_list.append(item)
             final_text = '\n'.join(text_list)
-            options['text'] = final_text.strip()
+            options['text'] = final_text
         if negative_feedback:
             options['negative_feedback'] = negative_feedback
         if correct_feedback:
