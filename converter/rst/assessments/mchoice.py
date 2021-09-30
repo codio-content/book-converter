@@ -82,10 +82,6 @@ class MultiChoice(object):
         options = {}
         caret_token = self._caret_token
         name = matchobj.group('name')
-
-        if name == 'steptracker_instance_variables':
-            test = 0
-
         options_group = matchobj.group('options')
         option_re = re.compile(':([^:]+):(?: (.+))?')
         options_group_list = options_group.split('\n')
