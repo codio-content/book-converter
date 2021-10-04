@@ -8,7 +8,7 @@ class CodeBlock(object):
         self.str = source_string
         self._caret_token = caret_token
         self._code_block_re = re.compile(
-            r"""^([ ]*)\.\. +code-block:: ?(?P<lang>.*?)?\n[ ]*\n(?P<content>.*?)\n(?=\S|^\1\S)""",
+            r"""^([ ]*)\.\. +code-block:: ?(?P<lang>.*?)?\n[ ]*\n(?P<content>.*?)\n(?=\S|^\1\S|(?![^$]+$))""",
             flags=re.MULTILINE + re.DOTALL)
 
     def _code_block(self, matchobj):

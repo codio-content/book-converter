@@ -120,7 +120,6 @@ class Rst2Markdown(object):
         output = Timed(output, self._caret_token).convert()
         output = Slide(output, self._caret_token).convert()
         output = Tabbed(output, self._caret_token).convert()
-        output = CodeBlock(output, self._caret_token).convert()
         output, html_links = RawHtmlDirectives(output, self._caret_token).convert()
         if html_links:
             self._tag_directives.extend(html_links)
@@ -140,6 +139,7 @@ class Rst2Markdown(object):
         output, assessments = ActiveCode(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
+        output = CodeBlock(output, self._caret_token).convert()
         output = Youtube(output, self._caret_token).convert()
         output, images = Image2Directives(output).convert()
         if images:

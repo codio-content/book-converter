@@ -1,6 +1,7 @@
 import re
 
 from converter.rst.assessments.assessment_const import DEFAULT_POINTS, MULTIPLE_CHOICE
+from converter.rst.code_block import CodeBlock
 from converter.rst.model.assessment_data import AssessmentData
 
 
@@ -38,8 +39,8 @@ class MultiChoice(object):
 
         if answers:
             options['answers'] = answers
-            question = [item for item in options_group_list if item.strip() != '']
-            question = '\n'.join(question).strip()
+            question = '\n'.join(options_group_list).strip()
+            question = CodeBlock(question + '\n', self._caret_token).convert()
             options['question'] = self.clean_text_indention(question)
         else:
             options_group = options_group + '\n\n>>>'
@@ -50,25 +51,25 @@ class MultiChoice(object):
             answer_count = 0
             for item in answers_match:
                 answer_count += 1
-                answer_text = item[0] + item[1]
+                text = CodeBlock(item[1] + '\n', self._caret_token).convert()
+                answer_text = item[0] + text
                 answers.append({answer_count: answer_text})
-                options['answers'] = answers
                 feedback.append(item[3])
                 if item[2].strip() == '+':
                     options['correct'] = str(answer_count)
+            options['answers'] = answers
 
             options_group = re.sub('>>>', '', options_group)
             options_group = re.sub(r':([^:]+): (.+)', '', options_group)
             question = re.sub(r' +(?P<indent>\s{4})?- +(?P<answer>.*?)(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n', '',
                               options_group, flags=re.MULTILINE + re.DOTALL)
+            question = CodeBlock(question, self._caret_token).convert()
             options['question'] = self.clean_text_indention(question)
 
         if feedback:
             options['feedback'] = feedback
 
         correct_answer_size = len(options['correct'].split(','))
-        if correct_answer_size == 0:
-            return
         options['multipleResponse'] = True if correct_answer_size > 1 else False
         options['type'] = 'mchoice'
 
