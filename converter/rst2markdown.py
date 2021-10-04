@@ -49,7 +49,7 @@ from converter.rst.preparer_math_block import PreparerMathBlock
 from converter.rst.character import Character
 from converter.rst.youtube import Youtube
 
-OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v5'
+OPEN_DSA_CDN = 'https://global.codio.com/opendsa/v6'
 
 
 class Rst2Markdown(object):

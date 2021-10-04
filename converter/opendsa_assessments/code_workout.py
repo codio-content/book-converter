@@ -21,10 +21,10 @@ def create_assessments_data(guides_dir, generate_dir, exercises):
 
     for exercise in exercises:
         exercise_data = exercises[exercise]
-        write_assessment_files(exercise_data, generate_dir, odsa_private_dir)
+        write_assessment_files(exercise_data, guides_dir, odsa_private_dir)
 
 
-def write_assessment_files(exercise_data, generate_dir, odsa_private_dir):
+def write_assessment_files(exercise_data, guides_dir, odsa_private_dir):
     group_name = exercise_data.get('dir_name', None)
     file_name = exercise_data.get('file_name', None)
     if group_name is None or file_name is None:
@@ -35,7 +35,7 @@ def write_assessment_files(exercise_data, generate_dir, odsa_private_dir):
     data_dir = private_group_dir_path.joinpath(file_name)
     data_dir.mkdir(exist_ok=True, parents=True)
 
-    starter_code_dir = generate_dir.joinpath(f'exercises/{group_name}/{file_name}')
+    starter_code_dir = guides_dir.parent.joinpath(f'exercises/{group_name}/{file_name}')
     starter_code_dir.mkdir(exist_ok=True, parents=True)
 
     wrapper_code_path = data_dir.joinpath('wrapper_code.java')

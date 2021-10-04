@@ -12,7 +12,7 @@ from converter.opendsa_assessments.code_workout import create_assessments_data
 from converter.rst.assessments.active_code.write_data import create_active_code_files
 from converter.rst.assessments.assessment_const import MULTIPLE_CHOICE, FILL_IN_THE_BLANKS, FREE_TEXT, PARSONS, \
     ACTIVE_CODE
-from converter.rst2markdown import Rst2Markdown
+from converter.rst2markdown import Rst2Markdown, OPEN_DSA_CDN
 from converter.toc import get_latex_toc, get_bookdown_toc, get_rst_toc
 from converter.guides.tools import slugify, write_file, write_json, parse_csv_lines
 from converter.guides.item import SectionItem, CHAPTER
@@ -340,8 +340,8 @@ def convert_code_workout_assessment(assessment):
     class_name = assessment.options.get('class_name', '')
     method_name = assessment.options.get('method_name', '')
     instructions = assessment.options.get('question', '')
-    instructions = re.sub(r'<img src=\"http://.*?(Exercises.*?)\">',
-                          r'<img src=".guides/opendsa_v1/\1">', instructions)
+    instructions = re.sub(r'<img src=\"https?://.*?(Exercises.*?)\">',
+                          fr'<img src="{OPEN_DSA_CDN}/\1">', instructions)
     ex_path = assessment.options.get('ex_path', '')
     tests = assessment.options.get('tests', '')
     test_matches = parse_csv_lines(tests)
@@ -965,23 +965,22 @@ def convert_rst_json(config, base_path, yes=False):
     if not prepare_base_directory(generate_dir, yes):
         return
     logging.debug("start converting %s" % generate_dir)
-    guides_dir, content_dir = prepare_structure(generate_dir)
+    # guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['source'])
     config_path = Path(config['workspace']['json'])
     source_code_type = config.get('source_code_type', 'java')
-    exercises = get_code_workout_exercises(workspace_dir)
-    source_exercises = get_code_workout_exercises(source_dir)
+    workout_exercises = get_code_workout_exercises(workspace_dir)
+    # source_exercises = get_code_workout_exercises(source_dir)
     toc, json_config = get_rst_toc(workspace_dir.joinpath(source_dir),
-                                   workspace_dir.joinpath(config_path), exercises)
+                                   workspace_dir.joinpath(config_path), workout_exercises)
     source_code_dir = json_config.get('code_dir', '')
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
-    book, metadata = make_metadata_items(config)
+    # book, metadata = make_metadata_items(config)
     chapter = None
     chapter_num = 0
     subsection_num = 0
-    children_containers = [book["children"]]
     logging.debug("convert selected pages")
     refs = OrderedDict()
     label_counter = 0
@@ -989,12 +988,20 @@ def convert_rst_json(config, base_path, yes=False):
     iframe_images = list()
     source_code_report = list()
     tag_references = prepare_figure_numbers(toc)
-    for item in toc:
+    lastChapterSection = False
+
+    for ind, item in enumerate(toc):
         if item.section_type == CHAPTER:
+            lastChapterSection = False
             subsection_num = 0
             chapter_num += 1
             slug_name = slugify(item.section_name)
             chapter = item.section_name
+
+            book, metadata = make_metadata_items(config)
+            children_containers = [book["children"]]
+            chapter_dir = generate_dir.joinpath(slug_name.strip('-'))
+            guides_dir, content_dir = prepare_structure(chapter_dir)
         else:
             subsection_num += 1
             slug_name = slugify(item.section_name, chapter=chapter)
@@ -1010,7 +1017,7 @@ def convert_rst_json(config, base_path, yes=False):
 
             rst_converter = Rst2Markdown(
                 item.lines,
-                source_exercises,
+                workout_exercises,
                 source_code_dir,
                 source_code_type,
                 tag_references,
@@ -1058,12 +1065,19 @@ def convert_rst_json(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-    create_assessments_data(guides_dir, generate_dir, source_exercises)
+        nextIndex = ind + 1
+        lastTocIndex = nextIndex == len(toc)
 
-    write_metadata(guides_dir, metadata, book)
-    write_assessments(guides_dir, assessments)
-    process_assets(config, generate_dir, [], [])
-    process_iframe_images(config, generate_dir, iframe_images)
+        if not lastTocIndex and toc[nextIndex].section_type == CHAPTER:
+            lastChapterSection = True
+
+        if lastChapterSection or lastTocIndex:
+            create_assessments_data(guides_dir, generate_dir, workout_exercises)
+            write_metadata(guides_dir, metadata, book)
+            write_assessments(guides_dir, assessments)
+            process_assets(config, generate_dir, [], [])
+            process_iframe_images(config, generate_dir, iframe_images)
+
     print_source_code_report(source_code_report)
 
 
