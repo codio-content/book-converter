@@ -34,7 +34,9 @@ class ActiveCode(object):
 
         instructions_match = re.search(r'^\s*(?P<text>.*?)(?:^\s*~~~~\s*\n)', content, flags=re.MULTILINE + re.DOTALL)
         if instructions_match:
-            text = instructions_match.group('text').strip()
+            text = instructions_match.group('text')
+            text = [item.strip() for item in text.split('\n')]
+            text = '\n'.join(text)
         content = re.sub(r'^\s*(?P<text>.*?)(?:^\s*~~~~\s*\n)', '', content, flags=re.MULTILINE + re.DOTALL)
 
         code_match = re.search(r'^(?P<code>.*?)\n(?= *====)|.*?(?=\n^$)', content,
