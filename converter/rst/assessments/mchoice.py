@@ -39,7 +39,8 @@ class MultiChoice(object):
         if answers:
             options['answers'] = answers
             question = [item for item in options_group_list if item.strip() != '']
-            options['question'] = '\n'.join(question).strip()
+            question = '\n'.join(question).strip()
+            options['question'] = self.clean_text_indention(question)
         else:
             options_group = options_group + '\n\n>>>'
             answers_match = re.findall(
@@ -60,8 +61,7 @@ class MultiChoice(object):
             options_group = re.sub(r':([^:]+): (.+)', '', options_group)
             question = re.sub(r' +(?P<indent>\s{4})?- +(?P<answer>.*?)(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n', '',
                               options_group, flags=re.MULTILINE + re.DOTALL)
-            question_list = [item.strip() for item in question.split('\n')]
-            options['question'] = '\n'.join(question_list).strip()
+            options['question'] = self.clean_text_indention(question)
 
         if feedback:
             options['feedback'] = feedback
@@ -127,6 +127,20 @@ class MultiChoice(object):
         self._assessments.append(AssessmentData(assessment_id, name, MULTIPLE_CHOICE, DEFAULT_POINTS, options))
 
         return f'\n{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
+
+    @staticmethod
+    def clean_text_indention(question):
+        question_list = []
+        code_block = False
+        for item in question.split('\n'):
+            if item.strip() == '':
+                continue
+            if '```' in item:
+                code_block = True if not code_block else False
+            if not code_block:
+                item = item.strip()
+            question_list.append(item)
+        return '\n'.join(question_list).strip()
 
     def convert(self):
         output = self.str
