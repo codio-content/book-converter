@@ -412,6 +412,7 @@ def convert_mc_assessment(assessment):
     question = options.get('question', '')
     answers = options.get('answers', [])
     feedback_list = options.get('feedback', [])
+    isRandomized = options.get('random', False)
     multipleResponse = options.get('multipleResponse', False)
     exercise_type = options.get('type', None)
     feedback_final = []
@@ -465,7 +466,7 @@ def convert_mc_assessment(assessment):
             "showName": True,
             "instructions": question,
             "multipleResponse": multipleResponse,
-            "isRandomized": False,
+            "isRandomized": isRandomized,
             "answers": answers_list,
             "guidance": '\n\n'.join(feedback_final),
             "showGuidanceAfterResponseOption": {

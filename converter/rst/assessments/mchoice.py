@@ -21,29 +21,31 @@ class MultiChoice(object):
         caret_token = self._caret_token
         name = matchobj.group('name')
         options_group = matchobj.group('options')
-        option_re = re.compile(':([^:]+): (.+)')
-        options_group_list = options_group.split('\n')
         answers = []
         feedback = []
-        for line in options_group.split('\n'):
-            opt_match = option_re.match(line.strip())
+
+        options_re = re.compile(r'^( *):([^:]+):( .*?(?=^\1))?', flags=re.MULTILINE + re.DOTALL)
+        options_iter = options_re.finditer(options_group)
+        for item in options_iter:
+            item = item.group(0).strip()
+            opt_match = re.search(r':([^:]+):(?: (.+))?', item)
             if opt_match:
-                options_group_list.pop(opt_match.pos)
-                if 'answer_' in line:
+                if 'answer_' in item:
                     answers.append({opt_match[1]: opt_match[2]})
                     continue
-                if 'feedback_' in line:
+                if 'feedback_' in item:
                     feedback.append({opt_match[1]: opt_match[2]})
                     continue
-                options[opt_match[1]] = opt_match[2]
+                options[opt_match[1]] = opt_match[2] if opt_match[2] else True
+
+        question = options_re.sub('', options_group)
+        question = question.strip()
 
         if answers:
             options['answers'] = answers
-            question = '\n'.join(options_group_list).strip()
             question = CodeBlock(question + '\n', self._caret_token).convert()
             options['question'] = self.clean_text_indention(question)
         else:
-            options_group = options_group + '\n\n>>>'
             answers_match = re.findall(
                 r' +(?P<indent>\s{4})?- +(?P<answer>.*?)(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n',
                 options_group, flags=re.MULTILINE + re.DOTALL)
@@ -59,10 +61,10 @@ class MultiChoice(object):
                     options['correct'] = str(answer_count)
             options['answers'] = answers
 
-            options_group = re.sub('>>>', '', options_group)
-            options_group = re.sub(r':([^:]+): (.+)', '', options_group)
             question = re.sub(r' +(?P<indent>\s{4})?- +(?P<answer>.*?)(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n', '',
                               options_group, flags=re.MULTILINE + re.DOTALL)
+            question = options_re.sub('', question)
+            question = question.strip()
             question = CodeBlock(question, self._caret_token).convert()
             options['question'] = self.clean_text_indention(question)
 
