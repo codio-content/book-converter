@@ -466,7 +466,7 @@ def convert_mc_assessment(assessment):
             "showName": True,
             "instructions": question,
             "multipleResponse": multipleResponse,
-            "isRandomized": isRandomized,
+            "isRandomized": False,
             "answers": answers_list,
             "guidance": '\n\n'.join(feedback_final),
             "showGuidanceAfterResponseOption": {

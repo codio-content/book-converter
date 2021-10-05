@@ -11,7 +11,7 @@ class ExternalLink(object):
         name = matchobj.group('name')
         ref = matchobj.group('ref')
         name = name.strip()
-        return f'<a href="{ref}">{name}</a>'
+        return f'<a href="{ref}" target="_blank">{name}</a>'
 
     def convert(self):
         output = self.str
