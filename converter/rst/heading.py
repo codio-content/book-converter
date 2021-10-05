@@ -11,7 +11,8 @@ class Heading(object):
         self._heading4_re = re.compile(r"""^(?P<content>.*?\n)?(?:")+\s*$""", flags=re.MULTILINE)
 
     def _heading1(self, matchobj):
-        return ''
+        content = matchobj.group('content')
+        return f'{self._caret_token}# {content}'
 
     def _heading2(self, matchobj):
         content = matchobj.group('content')
