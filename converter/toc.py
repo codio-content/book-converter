@@ -462,7 +462,7 @@ sections:
             yaml_structure += "    codio_section: end\n"
             exercises_flag = False
 
-        if first_item:
+        if first_item or item.section_type == 'chapter':
             first_item = False
             yaml_structure += "    configuration:\n      layout: 1-panel\n"
     return yaml_structure

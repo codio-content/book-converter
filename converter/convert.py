@@ -1162,6 +1162,7 @@ def convert_rst_toctree(config, base_path, yes=False):
                     converted_md = converted_md.replace(key, value)
 
         md_path = content_dir.joinpath(slug_name + ".md")
+
         section, book_item = make_section_items(item, slug_name, md_path, transformation_rules, converted_md)
 
         if item.section_type == CHAPTER or item.codio_section == "start":
