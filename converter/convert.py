@@ -1092,6 +1092,7 @@ def convert_rst_toctree(config, base_path, yes=False):
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['rst']).parent
     source_code_type = config.get('source_code_type', 'java')
+    is_splitted = config.get('chapters_split', False)
     config_path = Path(config['workspace']['rst'])
     toc = get_rst_toc(workspace_dir.joinpath(source_dir), workspace_dir.joinpath(config_path))
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
@@ -1121,6 +1122,9 @@ def convert_rst_toctree(config, base_path, yes=False):
             slug_name = slugify(item.section_name)
             chapter = item.section_name
             book, metadata = make_metadata_items(config)
+            if is_splitted:
+                book["name"] = item.section_name
+                metadata["suppressPageNumbering"] = True
             children_containers = [book["children"]]
             chapter_dir = generate_dir.joinpath(slug_name.strip('-'))
             if not slug_name:
