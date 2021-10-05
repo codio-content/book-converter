@@ -4,7 +4,6 @@ import re
 class ExternalLink(object):
     def __init__(self, source_string):
         self.str = source_string
-        self._externals_links = list()
         self._external_link_re = re.compile(r"""`(?P<name>.*?)\n?<(?P<ref>https?:.*?)>`_""")
 
     @staticmethod
@@ -12,7 +11,7 @@ class ExternalLink(object):
         name = matchobj.group('name')
         ref = matchobj.group('ref')
         name = name.strip()
-        return f'[{name}]({ref})'
+        return f'<a href="{ref}">{name}</a>'
 
     def convert(self):
         output = self.str
