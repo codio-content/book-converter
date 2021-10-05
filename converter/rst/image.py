@@ -43,7 +43,8 @@ class Image(object):
         return output
 
     def _set_caption(self, output, raw_caption, figure_number):
-        caption = self._get_caption(raw_caption, figure_number) if raw_caption is not None else False
+        caption = self._get_caption(raw_caption, figure_number) if raw_caption is not None \
+                                                                   and raw_caption.strip() != '' else False
         if caption:
             output = output.replace('{alt}', caption)
             output = output.replace('{caption}', '{caret_token}' + caption)
