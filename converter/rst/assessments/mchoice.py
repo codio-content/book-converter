@@ -31,7 +31,8 @@ class MultiChoice(object):
             opt_match = re.search(r':([^:]+):(?: (.+))?', item)
             if opt_match:
                 if 'answer_' in item:
-                    answers.append({opt_match[1]: opt_match[2]})
+                    answer_text = re.sub(r'<i>|</i>', '*', opt_match[2])
+                    answers.append({opt_match[1]: answer_text})
                     continue
                 if 'feedback_' in item:
                     feedback.append({opt_match[1]: opt_match[2]})
@@ -50,22 +51,27 @@ class MultiChoice(object):
                 r' +(?P<indent>\s{4})?- +(?P<answer>.*?)(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n',
                 options_group, flags=re.MULTILINE + re.DOTALL)
 
+            correct_answers = []
             answer_count = 0
             for item in answers_match:
                 answer_count += 1
                 text = CodeBlock(item[1] + '\n', self._caret_token).convert()
                 answer_text = item[0] + text
+                if not answer_text.strip().startswith('```'):
+                    answer_text = answer_text.strip()
+                answer_text = re.sub(r'<i>|</i>', '*', answer_text)
                 answers.append({answer_count: answer_text})
                 feedback.append(item[3])
                 if item[2].strip() == '+':
-                    options['correct'] = str(answer_count)
+                    correct_answers.append(str(answer_count))
+            options['correct'] = ','.join(correct_answers)
             options['answers'] = answers
 
             question = re.sub(r' +(?P<indent>\s{4})?- +(?P<answer>.*?)(?:\s+)?\s{6} +(?P<correct>[+-])\s+(.*?)\n', '',
                               options_group, flags=re.MULTILINE + re.DOTALL)
             question = options_re.sub('', question)
             question = question.strip()
-            question = CodeBlock(question, self._caret_token).convert()
+            question = CodeBlock(question + '\n', self._caret_token).convert()
             options['question'] = self.clean_text_indention(question)
 
         if feedback:
