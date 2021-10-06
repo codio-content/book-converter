@@ -49,7 +49,7 @@ class ActiveCode(object):
         if tests_match:
             tests = tests_match.group('tests')
 
-        class_name_re = re.compile(r'^\s*public\s+class\s+(?P<name>.*?)(?:<Person>|extends .*?)?\n', flags=re.MULTILINE)
+        class_name_re = re.compile(r'^[ \t]*public\s+class\s+(?P<name>.*?) ({|extends {|<.*?> )', flags=re.MULTILINE)
 
         if code:
             code = clean_indention(code)
