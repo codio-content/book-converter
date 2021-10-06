@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import base64
 import glob
 import sys
@@ -13,8 +14,8 @@ from lib.grade import send_partial, send_partial_v2, FORMAT_V2_HTML
 
 def compile_unit_tests():
     unit_tests_compile_ret = subprocess.Popen(
-        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/secure/active_code/'
-        f'{ex_dir}/RunestoneTests.java',
+        f'javac -d /tmp/active_code/{ex_dir} -cp .guides/lib/*:. -sourcepath .guides/lib:.guides/active_code/{ex_dir} '
+        f'.guides/secure/active_code/{ex_dir}/RunestoneTests.java',
         shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = unit_tests_compile_ret.communicate()
     return error_message.strip(), unit_tests_compile_ret.returncode
@@ -22,7 +23,8 @@ def compile_unit_tests():
 
 def compile_answer():
     answer_compile_ret = subprocess.Popen(
-        f'javac -d /tmp/ -cp .:.guides/lib/* -sourcepath .guides/lib .guides/active_code/{ex_dir}/{class_name}.java',
+        f'javac -d /tmp/active_code/{ex_dir} -cp .guides/lib/*:. -sourcepath .guides/lib:.guides/active_code/{ex_dir} '
+        f'.guides/active_code/{ex_dir}/{class_name}.java',
         shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     out, error_message = answer_compile_ret.communicate()
     return error_message.strip(), answer_compile_ret.returncode
@@ -33,12 +35,15 @@ def run_unit_tests():
     subprocess.Popen(f'ln -s .guides/active_code/{ex_dir}/{class_name}.java {class_name}.java', shell=True,
                      stdout=subprocess.PIPE, universal_newlines=True)
 
-    run = subprocess.Popen(f'java -cp .guides/lib/*:/tmp org.junit.runner.JUnitCore RunestoneTests', shell=True,
-                           stdout=subprocess.PIPE, universal_newlines=True)
+    run = subprocess.Popen(
+        f'java -cp .guides/lib/*:/tmp/active_code/{ex_dir} org.junit.runner.JUnitCore RunestoneTests', shell=True,
+        stdout=subprocess.PIPE, universal_newlines=True)
     out, runtime_error = run.communicate()
+
+    subprocess.Popen(f'rm -f *.java', shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+
     results_match = re.finditer(r'Expected: (?P<expected>.*?)Actual: (?P<actual>.*?)Message: (?P<message>.*?)'
                                 r'Passed: (?P<passed>.*?)$', out.strip(), flags=re.MULTILINE)
-
     results = []
     for result in results_match:
         results.append({'expected': result.group('expected').strip(), 'actual': result.group('actual').strip(),
@@ -110,7 +115,7 @@ if __name__ == '__main__':
             grade = 0
             grading()
         else:
-            ret = subprocess.Popen(f'java -cp .guides/lib/*:/tmp {class_name}',
+            ret = subprocess.Popen(f'java -cp .guides/lib/*:/tmp/active_code/{ex_dir} {class_name}',
                                    shell=True, stdout=subprocess.PIPE, universal_newlines=True)
             output, runtime_error = ret.communicate()
             image_match_re = re.compile(r'&ltimg src=\"data:image/(?P<ext>.*?);base64,(?P<data>.*?)\"/>')

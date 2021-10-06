@@ -82,7 +82,7 @@ class ActiveCode(object):
         assessment_id = f'test-{name.lower()}'
         self._assessments.append(AssessmentData(assessment_id, name, ACTIVE_CODE, DEFAULT_POINTS, options))
 
-        return f'\n\n**See active code exercise: {name}**\n\n'
+        return f'\n\n**See active code exercise: {name}**\n<br>\n'
 
     def convert(self):
         output = self._activecode_re.sub(self._activecode, self.str)
