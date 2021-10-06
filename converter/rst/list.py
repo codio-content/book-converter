@@ -27,7 +27,7 @@ class List(object):
     @staticmethod
     def _indented_list(matchobj):
         content = matchobj.group(0)
-        strip_content = [f'>{item[2:]}\n' for item in content.split('\n') if item.strip()]
+        strip_content = [f'{item[2:]}\n' for item in content.split('\n') if item.strip()]
         return '\n'.join(strip_content)
 
     def convert(self):
