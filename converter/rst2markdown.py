@@ -192,6 +192,7 @@ class Rst2Markdown(object):
         output = List(output).convert()
         output = Math(output).convert()
         output = re.sub(r'</pre>', '</pre>\n\n', output)
+        output = re.sub(r' #html#', '', output)
         output = re.sub(r'\+\+', '\\+\\+', output)
         output = re.sub(r'>>>', '', output)
         output = re.sub(self._caret_token, "\n", output)

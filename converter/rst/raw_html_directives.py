@@ -22,7 +22,7 @@ class RawHtmlDirectives(object):
             self._links.append(TagDirectives(tag, 'html_link', content, {}))
             return ''
         else:
-            split_content = [f' {item.lstrip()}' for item in content.split('\n')]
+            split_content = [f' #html#{item.lstrip()}' for item in content.split('\n')]
             final_content = '\n'.join(split_content)
             if not indent and not dash_indent:
                 return final_content
