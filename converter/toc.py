@@ -383,7 +383,7 @@ def _math(matchobj):
 
 
 def get_rst_lines(path):
-    with open(path, 'r', errors='replace') as file:
+    with open(path, 'r', errors='replace', encoding="utf-8") as file:
         return file.readlines()
 
 
