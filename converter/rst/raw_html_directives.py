@@ -9,8 +9,8 @@ class RawHtmlDirectives(object):
         self._caret_token = caret_token
         self._links = list()
         self._raw_html_re = re.compile(
-            r"""^(?P<indent>[ ]*)(?P<dash>^[ ]+-[ ]+)?\.\.[ ]+(?:\|(?P<tag>[.()\w\s]+)\|[ ]+)?
-            raw::[ ]html\n.*?\n(?P<content>\s*.*?)\n(?=\S|^[ ]*$)""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+            r"""^(?P<indent>[ ]*)(?P<dash>^[ ]+-[ ]+)?\.\.[ ]+(?:\|(?P<tag>[.()\w\s]+)\|[ ]+)?raw::[ ]html\n.*?\n
+            (?P<content>\s*.*?)\n[ ]*\n(?=\S|^[ ]*$)""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
     def _raw_html(self, matchobj):
         tag = matchobj.group('tag')
