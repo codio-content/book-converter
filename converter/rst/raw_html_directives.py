@@ -10,12 +10,12 @@ class RawHtmlDirectives(object):
         self._links = list()
 
         self._raw_html_re = re.compile(
-            r"""^\.\.[ ]+(?:\|(?P<tag>[.()\w\s]+)\|[ ]+)?raw::[ ]html\n(?P<content>.*?)\n(?=\S|(?![^$]+$))""",
-            flags=re.MULTILINE + re.DOTALL)
+            r"""^\.\.[ ]+(?:\|(?P<tag>[.,~:;!@#$%^&*()\-+=\w\s]+)\|[ ]+)?raw::[ ]html\n(?P<content>.*?)\n
+            (?=\S|(?![^$]+$))""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
         self._raw_html_nested_re = re.compile(
-            r"""^(?P<indent>[ ]*)(?P<dash>^[ ]+-[ ]+)\.\.[ ]+(?:\|(?P<tag>[.,~:;!@#$%^&*()\-+=\w\s]+)\|[ ]+)?
-            raw::[ ]html\n.*?\n(?P<content>\s*.*?)\n(?=\S|^[ ]*$)""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
+            r"""^(?P<indent>[ ]*)(?P<dash>^[ ]+-[ ]+)?\.\.[ ]+raw::[ ]html\n.*?\n(?P<content>\s*.*?)\n(?=\S|^[ ]*$)""",
+            flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
     def _raw_html(self, matchobj):
         tag = matchobj.group('tag')
