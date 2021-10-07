@@ -952,7 +952,7 @@ def prepare_figure_numbers_for_item(item, chapter_num, subsection_num, tag_refer
         if figure_type and figure_type in ['odsafig', 'figure', 'inlineav', 'topic']:
             item.lines[i] = item.lines[i].replace(
                 f'{figure_type}::',
-                f'{figure_type}:: :figure_number:{chapter_num}.{subsection_num}.{figure_counter}:')
+                f'{figure_type}:: :figure_number:{subsection_num}.{figure_counter}:')
             figure_counter += 1
 
 
@@ -966,6 +966,7 @@ def convert_rst_json(config, base_path, yes=False):
     if not prepare_base_directory(generate_dir, yes):
         return
     logging.debug("start converting %s" % generate_dir)
+    is_splitted = config.get('chapters_split', False)
     # guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
@@ -985,6 +986,7 @@ def convert_rst_json(config, base_path, yes=False):
     logging.debug("convert selected pages")
     refs = OrderedDict()
     label_counter = 0
+    tag_directives = list()
     assessments = list()
     iframe_images = list()
     source_code_report = list()
@@ -998,8 +1000,10 @@ def convert_rst_json(config, base_path, yes=False):
             chapter_num += 1
             slug_name = slugify(item.section_name)
             chapter = item.section_name
-
             book, metadata = make_metadata_items(config)
+            if is_splitted:
+                book["name"] = item.section_name
+                metadata["suppressPageNumbering"] = True
             children_containers = [book["children"]]
             chapter_dir = generate_dir.joinpath(slug_name.strip('-'))
             guides_dir, content_dir = prepare_structure(chapter_dir)
@@ -1018,6 +1022,7 @@ def convert_rst_json(config, base_path, yes=False):
 
             rst_converter = Rst2Markdown(
                 item.lines,
+                tag_directives,
                 workout_exercises,
                 source_code_dir,
                 source_code_type,
