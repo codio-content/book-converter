@@ -116,6 +116,11 @@ class Rst2Markdown(object):
         output = '\n'.join(lines_array) + '\n\n>>>'
         output = re.sub(r'\|---\|', '--', output)
         output = re.sub(r'^\|$', '<br/>', output, flags=re.MULTILINE)
+
+        match = re.search('Calculate the expected cost to search a list', output)
+        if match:
+            t = 0
+
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
         output = Slide(output, self._caret_token).convert()
@@ -154,6 +159,11 @@ class Rst2Markdown(object):
         output = Footnote(output).convert()
         output = Heading(output, self._caret_token).convert()
         output = TodoBlock(output).convert()
+
+        match = re.search('Calculate the expected cost to search a list', output)
+        if match:
+            t = 0
+
         output = Topic(output, self._caret_token).convert()
         output = Tip(output, self._caret_token).convert()
         output = Image(output, self._caret_token, OPEN_DSA_CDN).convert()

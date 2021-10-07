@@ -12,7 +12,7 @@ class AvEmbed(object):
         self._workspace_dir = workspace_dir
         self._assessments = list()
         self._avembed_re = re.compile(
-            r"""\s*\.\. avembed:: (?P<name>.*?) (?P<type>[a-z]{2}) *\n(?P<options>(\s+:.*?:\s+.*\n)+)?"""
+            r"""[ ]*\.\.[ ]avembed::[ ](?P<name>.*?)[ ](?P<type>[a-z]{2}[ \t]*)[ ]*\n(?P<options>(\s+:.*?:\s+.*\n)+)?"""
         )
 
     def _avembed(self, matchobj):
