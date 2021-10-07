@@ -7,7 +7,7 @@ from string import Template
 from converter.guides.tools import read_file, write_file, parse_csv_lines
 
 
-def create_assessments_data(guides_dir, generate_dir, exercises):
+def create_assessments_data(guides_dir, exercises):
     if not exercises:
         return
     logging.debug("process create odsa test assessments content")
@@ -20,8 +20,7 @@ def create_assessments_data(guides_dir, generate_dir, exercises):
     subprocess.call(f'chmod +x {run_file_path}', shell=True)
 
     for exercise in exercises:
-        exercise_data = exercises[exercise]
-        write_assessment_files(exercise_data, guides_dir, odsa_private_dir)
+        write_assessment_files(exercise.options, guides_dir, odsa_private_dir)
 
 
 def write_assessment_files(exercise_data, guides_dir, odsa_private_dir):

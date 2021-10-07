@@ -967,19 +967,17 @@ def convert_rst_json(config, base_path, yes=False):
         return
     logging.debug("start converting %s" % generate_dir)
     is_splitted = config.get('chapters_split', False)
-    # guides_dir, content_dir = prepare_structure(generate_dir)
+    guides_dir, content_dir = Path(), Path()
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['source'])
     config_path = Path(config['workspace']['json'])
     source_code_type = config.get('source_code_type', 'java')
     workout_exercises = get_code_workout_exercises(workspace_dir)
-    # source_exercises = get_code_workout_exercises(source_dir)
     toc, json_config = get_rst_toc(workspace_dir.joinpath(source_dir),
                                    workspace_dir.joinpath(config_path), workout_exercises)
     source_code_dir = json_config.get('code_dir', '')
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
-    # book, metadata = make_metadata_items(config)
     chapter = None
     chapter_num = 0
     subsection_num = 0
@@ -987,14 +985,18 @@ def convert_rst_json(config, base_path, yes=False):
     refs = OrderedDict()
     label_counter = 0
     tag_directives = list()
-    assessments = list()
+    assessments = []
     iframe_images = list()
     source_code_report = list()
     tag_references = prepare_figure_numbers(toc)
+    book = {}
+    metadata = {}
+    children_containers = []
     lastChapterSection = False
 
     for ind, item in enumerate(toc):
         if item.section_type == CHAPTER:
+            assessments = []
             lastChapterSection = False
             subsection_num = 0
             chapter_num += 1
@@ -1078,7 +1080,8 @@ def convert_rst_json(config, base_path, yes=False):
             lastChapterSection = True
 
         if lastChapterSection or lastTocIndex:
-            create_assessments_data(guides_dir, generate_dir, workout_exercises)
+            code_workout_assessments = list(filter(lambda a: a.type == 'test', assessments))
+            create_assessments_data(guides_dir, code_workout_assessments)
             write_metadata(guides_dir, metadata, book)
             write_assessments(guides_dir, assessments)
             process_assets(config, generate_dir, [], [])
@@ -1167,7 +1170,6 @@ def convert_rst_toctree(config, base_path, yes=False):
                     converted_md = converted_md.replace(key, value)
 
         md_path = content_dir.joinpath(slug_name + ".md")
-
         section, book_item = make_section_items(item, slug_name, md_path, transformation_rules, converted_md)
 
         if item.section_type == CHAPTER or item.codio_section == "start":
@@ -1215,7 +1217,6 @@ def convert_rst_toctree(config, base_path, yes=False):
         if lastChapterSection or lastTocIndex:
             active_code_exercises = list(filter(lambda a: a.type == ACTIVE_CODE, assessments))
             create_active_code_files(guides_dir, active_code_exercises)
-
             write_metadata(guides_dir, metadata, book)
             write_assessments(guides_dir, assessments)
             process_assets(config, chapter_dir, [], [])

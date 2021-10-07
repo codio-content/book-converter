@@ -227,7 +227,7 @@ def get_bookdown_toc(folder):
         return toc
 
 
-def get_rst_toc(source_path, config_path, exercises={}):
+def get_rst_toc(source_path, config_path, workout_exercises={}):
     toc = []
     content_type = config_path.suffix[1:]
     if content_type == RST_JSON:
@@ -247,7 +247,7 @@ def get_rst_toc(source_path, config_path, exercises={}):
                     print("File %s doesn't exist\n" % rst_file_name)
                     continue
                 lines = get_rst_lines(rst_file_path)
-                toc += process_rst_lines(lines, exercises)
+                toc += process_rst_lines(lines, workout_exercises)
         return toc, json_config
 
     if content_type == RST_TOCTREE:
@@ -387,7 +387,7 @@ def get_rst_lines(path):
         return file.readlines()
 
 
-def process_rst_lines(lines, exercises):
+def process_rst_lines(lines, workout_exercises):
     toc = []
     item_lines = []
     contains_exercises = False
@@ -413,7 +413,7 @@ def process_rst_lines(lines, exercises):
                 contains_exercises = True
                 ex_name = result.group('name')
                 section_name = f'Exercise: {ex_name}'
-                exercise = exercises.get(ex_name.lower(), {})
+                exercise = workout_exercises.get(ex_name.lower(), {})
                 exercise_path = exercise.get('ex_path', '')
                 toc.append(SectionItem(
                     section_name=section_name,
