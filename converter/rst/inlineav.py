@@ -54,7 +54,7 @@ class InlineAv(object):
         css_opt = css_opt.split()
 
         figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
-        caption = self._get_caption(matchobj.group('caption'), figure_number)
+        caption = self._get_caption(matchobj.group('caption').strip(), figure_number)
 
         scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src="{self._open_dsa_cdn}/{x}">'
                                              f'</script>{caret_token}', script_opt)))
@@ -107,11 +107,12 @@ class InlineAv(object):
                f'<br/>{caret_token}{caption}{caret_token}'
 
     def _get_caption(self, raw_caption, figure_number):
-        caption = ': '
-        if raw_caption:
-            caption = raw_caption.replace('\n', ' ')
-            caption = re.sub(r'\s+', ' ', caption)
-        return f'<center>Figure {figure_number}{caption}</center><br/>{self._caret_token}{self._caret_token}'
+        if not raw_caption:
+            return ''
+        caption = raw_caption.strip().replace('\n', ' ')
+        caption = re.sub(r'\s+', ' ', caption)
+        return f'<center>Figure {figure_number}: {caption}</center><br/>{self._caret_token}{self._caret_token}'
+
 
     @staticmethod
     def _increase_size(match_obj):
