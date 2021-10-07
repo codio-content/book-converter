@@ -42,9 +42,11 @@ class Parsons(object):
             for line in cut_initial_list:
                 line = line.rstrip().lstrip('\\n').replace('"', '&quot;').replace('\n', '\\n')
                 line = line.replace('#paired', '#distractor')
-                initial_blocks += f'\\n{line}\n'
                 if '#distractor' in line:
+                    line = line.replace('#distractor', '')
+                    line = f'{line.rstrip()} #distractor\n'
                     max_distractors += 1
+                initial_blocks += f'\\n{line}\n'
             options['initial'] = initial_blocks
             options['max_distractors'] = max_distractors
 
