@@ -1,11 +1,10 @@
 import re
 
-from converter.markdown.text_as_paragraph import TextAsParagraph
+from converter.rst.paragraph import Paragraph
 
 
-class Topic(TextAsParagraph):
+class Topic(object):
     def __init__(self, source_string, caret_token):
-        super().__init__(source_string, caret_token)
         self.str = source_string
         self._caret_token = caret_token
         self._topic_re = re.compile(
@@ -18,8 +17,9 @@ class Topic(TextAsParagraph):
         topic_type = matchobj.group('type')
         content = matchobj.group('content')
         content = re.sub(r"\n +", "\n ", content)
-        content = content.lstrip()
-        content = self.to_paragraph(content)
+        content = [item.lstrip() for item in content.split('\n')]
+        content = '\n'.join(content)
+        content = Paragraph(content).convert()
 
         figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
         figure_number = '' if 'Proof' in topic_type else f' {figure_number}'
