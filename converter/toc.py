@@ -391,12 +391,13 @@ def process_rst_lines(lines, exercises):
     toc = []
     item_lines = []
     contains_exercises = False
+
     for ind, line in enumerate(lines):
-        line = line.rstrip('\r\n')
+        line = line.rstrip('\n')
         next_line = lines[ind + 1] if ind + 1 < len(lines) else ''
         next_line = next_line.strip()
-        is_chapter = next_line == "=" * len(line)
-        if next_line.startswith("===") and is_chapter:
+
+        if not toc and next_line.startswith("==="):
             section_name = line.replace("\\", "\\\\")
             section_name = re.compile(r""":math:`(?P<content>.*?)`""").sub(_math, section_name)
             toc.append(SectionItem(
@@ -405,6 +406,7 @@ def process_rst_lines(lines, exercises):
                 line_pos=0)
             )
             item_lines = []
+
         if line.startswith(".. extrtoolembed::"):
             result = re.match(r'\.\. extrtoolembed:: \'(?P<name>.*?)\'', line)
             if result:
@@ -423,10 +425,12 @@ def process_rst_lines(lines, exercises):
                 content = f'{{Check It!|assessment}}(test-{ex_name.lower()})'
                 toc[len(toc) - 1].lines.append(content)
         item_lines.append(line)
+
     if toc and item_lines and not toc[0].lines:
         item_lines.append('')
         toc[0].lines = item_lines
         toc[0].contains_exercises = contains_exercises
+
     return toc
 
 
