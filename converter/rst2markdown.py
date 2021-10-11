@@ -152,7 +152,7 @@ class Rst2Markdown(object):
         output, assessments = ExtrToolEmbed(output, self._exercises).convert()
         if assessments:
             self._assessments.extend(assessments)
-        output = Footnote(output).convert()
+        output = Footnote(output, self._caret_token).convert()
         output = Heading(output, self._caret_token).convert()
         output = TodoBlock(output).convert()
         output = Topic(output, self._caret_token).convert()

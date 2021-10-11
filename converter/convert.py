@@ -1087,7 +1087,8 @@ def convert_rst_json(config, base_path, yes=False):
             process_assets(config, generate_dir, [], [])
             process_iframe_images(config, generate_dir, iframe_images)
 
-    print_source_code_report(source_code_report)
+    if config.get('source_code_type', False):
+        print_source_code_report(source_code_report)
 
 
 def convert_rst_toctree(config, base_path, yes=False):
