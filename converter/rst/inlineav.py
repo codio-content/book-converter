@@ -30,7 +30,7 @@ class InlineAv(object):
         self._iframe_images = list()
         self._inlineav_re = re.compile(
             r"""(\.\.[ ]_(?P<tag>[^\n]+):\n^$\n)?\.\.[ ]inlineav::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
-            (?P<name>[^\n]+)[ ](?P<type>[^\n]+)\n(?P<options>.*?)\n(\n {3}(?!\n)(?P<caption>.*?)\n)?
+            (?P<name>[^\n]+)[ ](?P<type>[^\n]+)\n(?P<options>.*?)\n(\n {3}(?P<caption>.*?)(?!\n)\n)?
             (?=\S|(?![^$]+$))""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
     def _inlineav(self, matchobj):
