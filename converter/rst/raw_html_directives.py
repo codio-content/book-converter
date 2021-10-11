@@ -7,7 +7,7 @@ class RawHtmlDirectives(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._links = list()
+        self._tags = []
 
         self._raw_html_re = re.compile(
             r"""^\.\.[ ]+(?:\|(?P<tag>[^\n]+)\|[ ]+)?raw::[ ]html\n(?P<content>.*?)\n(?=\S|(?![^$]+$))""",
@@ -22,7 +22,7 @@ class RawHtmlDirectives(object):
         content = matchobj.group('content').strip()
         if tag:
             tag = tag.strip()
-            self._links.append(TagDirectives(tag, 'html_link', content, {}))
+            self._tags.append(TagDirectives(tag, 'html_link', content, {}))
             return ''
         else:
             split_content = [f' {item.lstrip()}' for item in content.split('\n')]
@@ -45,4 +45,4 @@ class RawHtmlDirectives(object):
         output = self.str
         output = self._raw_html_re.sub(self._raw_html, output)
         output = self._raw_html_nested_re.sub(self._raw_html_nested, output)
-        return output, self._links
+        return output, self._tags

@@ -122,10 +122,8 @@ class Rst2Markdown(object):
         output = Timed(output, self._caret_token).convert()
         output = Slide(output, self._caret_token).convert()
         output = Tabbed(output, self._caret_token).convert()
-        output, html_links = RawHtmlDirectives(output, self._caret_token).convert()
-        if html_links:
-            self._tag_directives.extend(html_links)
-        output = RawHtmlTag(output, self._tag_directives, self._caret_token).convert()
+        output, html_tags = RawHtmlDirectives(output, self._caret_token).convert()
+        output = RawHtmlTag(output, html_tags, self._caret_token).convert()
         output, assessments = MultiChoice(output, self._caret_token).convert()
         if assessments:
             self._assessments.extend(assessments)
@@ -195,7 +193,6 @@ class Rst2Markdown(object):
         output = Paragraph(output).convert()
         output = List(output).convert()
         output = Math(output).convert()
-        output = re.sub(r'\+\+', '\\+\\+', output)
         output = re.sub(r'>>>', '', output)
         output = re.sub(self._caret_token, "\n", output)
         return output
