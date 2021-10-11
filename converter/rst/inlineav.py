@@ -29,10 +29,9 @@ class InlineAv(object):
         self._open_dsa_cdn = open_dsa_cdn
         self._iframe_images = list()
         self._inlineav_re = re.compile(
-            r"""(\.\.[ ]_(?P<tag>.*?):\n^$\n)?\.\.[ ]inlineav::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
-                (?P<name>.*?)[ ](?P<type>.*?)(?P<options>:.*?:[ ].*?\n)+(?=\S|$)(?P<caption>(.*?\n))?(?=\S|$)""",
-            flags=re.MULTILINE + re.DOTALL + re.VERBOSE
-        )
+            r"""(\.\.[ ]_(?P<tag>[^\n]+):\n^$\n)?\.\.[ ]inlineav::[ ]:figure_number:(?P<figure_number>[0-9.]*):[ ]
+            (?P<name>[^\n]+)[ ](?P<type>[^\n]+)\n(?P<options>.*?)\n(\n {3}(?!\n)(?P<caption>.*?)\n)?
+            (?=\S|(?![^$]+$))""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
     def _inlineav(self, matchobj):
         images = {}
@@ -54,7 +53,7 @@ class InlineAv(object):
         css_opt = css_opt.split()
 
         figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
-        caption = self._get_caption(matchobj.group('caption').strip(), figure_number)
+        caption = self._get_caption(matchobj.group('caption'), figure_number)
 
         scripts = ''.join(list(map(lambda x: f'<script type="text/javascript" src="{self._open_dsa_cdn}/{x}">'
                                              f'</script>{caret_token}', script_opt)))
