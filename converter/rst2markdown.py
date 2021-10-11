@@ -27,6 +27,7 @@ from converter.rst.image2directive import Image2Directives
 from converter.rst.indented_code import IndentedCode
 from converter.rst.ignore import Ignore
 from converter.rst.inlineav import InlineAv
+from converter.rst.line_block import LineBlock
 from converter.rst.note import Note
 from converter.rst.numref import Numref
 from converter.rst.list import List
@@ -186,6 +187,7 @@ class Rst2Markdown(object):
             self._source_code_paths.extend(source_code_paths)
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
+        output = LineBlock(output, self._caret_token).convert()
         output = Definition(output, self._caret_token).convert()
         output = Character(output).convert()
         # Comment before Paragraph

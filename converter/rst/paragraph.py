@@ -4,7 +4,7 @@ import re
 class Paragraph(object):
     def __init__(self, source_string):
         self.str = source_string
-        self._paragraph_re = re.compile(r"""(?!\s|#\. |\* |- |\d\. |\.\.\s+|```|\|\|\|)^(?P<content>.+?)\n\s*\n""",
+        self._paragraph_re = re.compile(r"""(?!\s|<|#\. |\* |- |\d\. |\.\.\s+|```|\|\|\|)^(?P<content>.+?)\n\s*\n""",
                                         flags=re.MULTILINE + re.DOTALL)
 
     @staticmethod

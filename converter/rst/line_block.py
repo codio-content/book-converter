@@ -5,18 +5,16 @@ class LineBlock(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._lineblock_re = re.compile(r"""^((?: {2,}|\s)?\| )[^\n]*(?:\n(?:\1| {2,})[^\n]+)*""", flags=re.MULTILINE)
+        self._lineblock_re = re.compile(r"""\.\. line-block::[ ]*\n(?P<content>(?:[^\n]+\n)+)(?=^$)""",
+                                        flags=re.MULTILINE)
 
     def _lineblock(self, matchobj):
         caret_token = self._caret_token
-        content = matchobj.group(0)
-        content = re.sub(r'^( *\| ?| {2,})', '', content, flags=re.MULTILINE)
-        out = []
-        for line in content.split('\n'):
-            line = line.strip()
-            out.append(f' {line}')
+        content = matchobj.group('content')
+        content = content.rstrip().replace('``', '')
+        out = [f' {line.strip()}' for line in content.split('\n')]
         content = '\n'.join(out)
-        return f' <div style="padding-left: 50px;">{caret_token}{content}{caret_token} </div>{caret_token}'
+        return f'\n<pre>{content}{caret_token}</pre>{caret_token}{caret_token}\n'
 
     def convert(self):
         output = self.str
