@@ -14,6 +14,7 @@ from converter.rst.bibliography import Bibliography
 from converter.rst.code_block import CodeBlock
 from converter.rst.code_include import CodeInclude
 from converter.rst.comment import Comment
+from converter.rst.definition import Definition
 from converter.rst.epigraph import Epigraph
 from converter.rst.external_link import ExternalLink
 from converter.rst.extrtoolembed import ExtrToolEmbed
@@ -185,6 +186,7 @@ class Rst2Markdown(object):
             self._source_code_paths.extend(source_code_paths)
         output = Glossary(output, self._caret_token).convert()
         output = Bibliography(output, self._caret_token).convert()
+        output = Definition(output, self._caret_token).convert()
         output = Character(output).convert()
         # Comment before Paragraph
         output = Comment(output).convert()

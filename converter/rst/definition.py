@@ -6,7 +6,7 @@ class Definition(object):
         self.str = source_string
         self._caret_token = caret_token
         self._definition_re = re.compile(
-            r"""^(?!\s|\d\. |#\. |\* |- |\.\. ):?(?P<term>[^\n]+)\n(?P<content> {2,}[^\n]+(?:\n {2,}[^\n]+\s*)*\n+)""",
+            r"""^:(?P<term>[^\n]+):[ ]*\n(?P<content> {2,}[^\n]+(?:\n {2,}[^\n]+\s*)*\n+)""",
             flags=re.MULTILINE
         )
 
