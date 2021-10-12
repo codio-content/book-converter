@@ -3,7 +3,7 @@ import re
 import uuid
 
 from converter.rst.assessments.active_code.activecode import ActiveCode
-from converter.rst.assessments.fillintheblanks import FillInTheBlanks
+from converter.rst.assessments.fib import FillInTheBlanks
 from converter.rst.assessments.free_text import FreeText
 from converter.rst.assessments.mchoice import MultiChoice
 from converter.rst.assessments.parsons import Parsons
@@ -118,6 +118,8 @@ class Rst2Markdown(object):
         output = '\n'.join(lines_array) + '\n\n>>>'
         output = re.sub(r'\|---\|', '--', output)
         output = re.sub(r'^\|$', '<br/>', output, flags=re.MULTILINE)
+        output = re.sub(r'^- >', r'- \\>', output, flags=re.MULTILINE)
+        output = re.sub(r'C\+\+', 'C ++', output)
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
         output = Slide(output, self._caret_token).convert()
