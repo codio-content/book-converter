@@ -8,7 +8,7 @@ class List(object):
         self.str = source_string
         self._list_re = re.compile(r"""\n(?P<tabs>[\t]+)(?P<marker>[-|]?)?""")
         self._indented_list_re = re.compile(r"""^ {4,}(\d\.|#\.|\*|-)\s.*?\n""", flags=re.MULTILINE)
-        self._lists_re = re.compile(r"""^(\d\.|#\.|\*)[ ]+(.*?)\n(?=\S|^$|(?![^$]+$))""",
+        self._lists_re = re.compile(r"""^(\d\.|#\.|\*)[ ]+(.*?)\n(?=^(\d\.|#\.|\*)|^[ ]*$|(?![^$]+$))""",
                                     flags=re.MULTILINE + re.DOTALL)
 
     @staticmethod
