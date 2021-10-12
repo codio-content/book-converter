@@ -8,6 +8,8 @@ class List(object):
         self.str = source_string
         self._list_re = re.compile(r"""\n(?P<tabs>[\t]+)(?P<marker>[-|]?)?""")
         self._indented_list_re = re.compile(r"""^ {4,}(\d\.|#\.|\*|-)\s.*?\n""", flags=re.MULTILINE)
+        self._lists_re = re.compile(r"""^(\d\.|#\.|\*|-)[ ]+(.*?\n.*?)\n(?=\S|(?![^$]+$))""",
+                                    flags=re.MULTILINE + re.DOTALL)
 
     @staticmethod
     def _list(matchobj):
@@ -30,8 +32,16 @@ class List(object):
         strip_content = [f'{item[2:]}\n' for item in content.split('\n') if item.strip()]
         return '\n'.join(strip_content)
 
+    @staticmethod
+    def _lists_align(matchobj):
+        content = matchobj.group(0)
+        content = content.replace('\n', ' ')
+        content = re.sub(r'[ ]{2,}', ' ', content)
+        return f'{content}\n\n'
+
     def convert(self):
         output = self.str
         output = self._list_re.sub(self._list, output)
         output = self._indented_list_re.sub(self._indented_list, output)
+        output = self._lists_re.sub(self._lists_align, output)
         return output
