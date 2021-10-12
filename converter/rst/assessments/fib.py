@@ -23,6 +23,7 @@ class FillInTheBlanks(object):
         negative_feedback = []
         correct_feedback = []
         correct_answers = {}
+        text = []
         for line in options_group.split('\n'):
             opt_match = option_re.match(line)
             if opt_match:
@@ -36,16 +37,13 @@ class FillInTheBlanks(object):
                 options_group_list.pop(opt_match.lastindex)
                 correct_answers[f'/{key}/'] = value
                 options['correct_answers'] = correct_answers
+            if not correct_answers:
+                text.append(line)
 
-        text = [item.strip() for item in options_group_list if item != '']
-        if text:
-            text_list = []
-            for item in text:
-                if re.search(r'- +:.*?:', item):
-                    break
-                text_list.append(item)
-            final_text = '\n'.join(text_list)
-            options['text'] = final_text
+        description = '\n'.join([item.strip() for item in text if item != ''])
+
+        if description:
+            options['text'] = description
         if negative_feedback:
             options['negative_feedback'] = negative_feedback
         if correct_feedback:
