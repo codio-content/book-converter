@@ -79,7 +79,7 @@ class LaTeX2Markdown(object):
         output, footnotes = Footnote(output).convert()
         if footnotes:
             footnotes_text = '\n\n'.join(footnotes)
-            output = output + f'\n\n<hr>{footnotes_text}'
+            output = output + f'\n\n<hr>\n\n{footnotes_text}'
         output, figure_counter = TableFigure(
             output, self._caret_token, self._load_workspace_file,
             self._figure_counter_offset, self._chapter_num, self._refs

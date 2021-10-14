@@ -12,19 +12,19 @@ class Footnote(object):
 
     def _footnote_mark(self, matchobj):
         self._count += 1
-        return f'<b style="color: blue">[{self._count}]</b>'
+        return f'**[{self._count}]**'
 
     def _footnote_text(self, matchobj):
         self._count += 1
         text = matchobj.group('text')
-        self._footnotes.append(f'<b style="color: blue">[{self._count}]</b> {text}')
+        self._footnotes.append(f'**[{self._count}]** {text}')
         return ''
 
     def _footnote(self, matchobj):
         self._count += 1
         text = matchobj.group('text')
-        self._footnotes.append(f'<b style="color: blue">[{self._count}]</b> {text}')
-        return f'<b style="color: blue">[{self._count}]</b>'
+        self._footnotes.append(f'**[{self._count}]** {text}')
+        return f'**{self._count}]**'
 
     def convert(self):
         output = self.str
