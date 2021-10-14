@@ -29,6 +29,7 @@ class Tabular(TextAsParagraph):
         block_contents = '\n'.join(sub_lines[1:])
         block_contents = block_contents.replace('\\hline', '')
         block_contents = block_contents.replace('&&', '\\&\\&')
+        block_contents = block_contents.replace('`\\`', '`\\#\\`')
 
         token = str(uuid.uuid4())
 
@@ -63,6 +64,7 @@ class Tabular(TextAsParagraph):
 
         out = out.replace(token, '\\&')
         out = out.replace('\\&\\&', '&&')
+        out = out.replace('`\\#\\`', '`\\\\`')
 
         return out
 
