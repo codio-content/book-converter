@@ -28,6 +28,7 @@ class Tabular(TextAsParagraph):
         size = get_text_in_brackets(sub_lines[0])
         block_contents = '\n'.join(sub_lines[1:])
         block_contents = block_contents.replace('\\hline', '')
+        block_contents = block_contents.replace('&&', '\\&\\&')
 
         token = str(uuid.uuid4())
 
@@ -61,6 +62,7 @@ class Tabular(TextAsParagraph):
             out += '|' + self._caret_token
 
         out = out.replace(token, '\\&')
+        out = out.replace('\\&\\&', '&&')
 
         return out
 
