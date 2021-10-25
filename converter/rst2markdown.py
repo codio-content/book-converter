@@ -75,9 +75,9 @@ class Rst2Markdown(object):
         self.lines_array = lines_array
         self._exercises = exercises
         self._tag_references = tag_references
-        self.workspace_dir = workspace_dir
-        self.source_code_dir = source_code_dir
-        self.source_code_type = source_code_type
+        self._workspace_dir = workspace_dir
+        self._source_code_dir = source_code_dir
+        self._source_code_type = source_code_type
         self._source_code_paths = list()
 
     def _enum_lists_parse(self, lines):
@@ -159,10 +159,10 @@ class Rst2Markdown(object):
         output = Topic(output, self._caret_token).convert()
         output = Tip(output, self._caret_token).convert()
         output = Image(output, self._caret_token, OPEN_DSA_CDN).convert()
-        output, iframe_images = InlineAv(output, self._caret_token, self.workspace_dir, OPEN_DSA_CDN).convert()
+        output, iframe_images = InlineAv(output, self._caret_token, self._workspace_dir, OPEN_DSA_CDN).convert()
         if iframe_images:
             self._iframe_images.extend(iframe_images)
-        output, assessments = AvEmbed(output, self._caret_token, OPEN_DSA_CDN, self.workspace_dir).convert()
+        output, assessments = AvEmbed(output, self._caret_token, OPEN_DSA_CDN, self._workspace_dir).convert()
         if assessments:
             self._assessments.extend(assessments)
         output = Ref(output).convert()
@@ -178,10 +178,10 @@ class Rst2Markdown(object):
         output, source_code_paths = CodeInclude(
             output,
             self._caret_token,
-            self.workspace_dir,
+            self._workspace_dir,
             self.load_file,
-            self.source_code_dir,
-            self.source_code_type
+            self._source_code_dir,
+            self._source_code_type
         ).convert()
         if source_code_paths:
             self._source_code_paths.extend(source_code_paths)

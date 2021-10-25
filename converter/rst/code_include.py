@@ -24,8 +24,8 @@ class CodeInclude(object):
         self._caret_token = caret_token
         self._workspace_dir = workspace_dir
         self._load_file = load_file_method
-        self.source_code_type = source_code_type
-        self.source_code_dir = source_code_dir
+        self._source_code_type = source_code_type
+        self._source_code_dir = source_code_dir
         self._source_code_paths = []
         self._code_include_re = re.compile(
             r""" *\.\. codeinclude:: (?P<path>.*?) *\n(?P<options>(?: +:.*?: .*?\n)+)?""")
@@ -34,9 +34,9 @@ class CodeInclude(object):
         lines = []
         code_nodes = []
         caret_token = self._caret_token
-        if self.source_code_dir is None:
+        if self._source_code_dir is None:
             return
-        source_code_dir = self.source_code_dir.strip('//')
+        source_code_dir = self._source_code_dir.strip('//')
         opt = matchobj.group('options')
         tag = self._get_tag_by_opt(opt) if opt else None
         file_paths = self._get_file_paths(matchobj)
@@ -55,13 +55,13 @@ class CodeInclude(object):
 
     def _get_file_paths(self, matchobj):
         file_paths = []
-        source_code_path = self._workspace_dir.joinpath(self.source_code_dir)
+        source_code_path = self._workspace_dir.joinpath(self._source_code_dir)
         rel_file_path = Path(matchobj.group('path').strip())
         file_path = source_code_path.joinpath(rel_file_path)
         if Path(file_path).is_file():
             return [file_path]
 
-        lang_key = self.source_code_type.lower() if self.source_code_type.lower() in SOURCE_CODE_DICT else 'java'
+        lang_key = self._source_code_type.lower() if self._source_code_type.lower() in SOURCE_CODE_DICT else 'java'
         lang = SOURCE_CODE_DICT.get(lang_key)
         lang_dir = Path(lang['name'])
 

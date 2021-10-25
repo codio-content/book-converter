@@ -967,17 +967,18 @@ def convert_rst_json(config, base_path, yes=False):
         return
     logging.debug("start converting %s" % generate_dir)
     is_splitted = config.get('chapters_split', False)
-    guides_dir, content_dir = Path(), Path()
+    guides_dir, content_dir = prepare_structure(generate_dir)
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['source'])
     config_path = Path(config['workspace']['json'])
-    source_code_type = config.get('source_code_type', 'java')
+    source_code_type = config.get('opendsa', {}).get('source_code', 'java')
     workout_exercises = get_code_workout_exercises(workspace_dir)
     toc, json_config = get_rst_toc(workspace_dir.joinpath(source_dir),
                                    workspace_dir.joinpath(config_path), workout_exercises)
     source_code_dir = json_config.get('code_dir', '')
     toc, tokens = codio_transformations(toc, transformation_rules, insert_rules)
+    book, metadata = make_metadata_items(config)
     chapter = None
     chapter_num = 0
     subsection_num = 0
@@ -989,26 +990,26 @@ def convert_rst_json(config, base_path, yes=False):
     iframe_images = list()
     source_code_report = list()
     tag_references = prepare_figure_numbers(toc)
-    book = {}
-    metadata = {}
-    children_containers = []
+    children_containers = [book["children"]]
     lastChapterSection = False
 
     for ind, item in enumerate(toc):
         if item.section_type == CHAPTER:
-            assessments = []
-            lastChapterSection = False
             subsection_num = 0
             chapter_num += 1
             slug_name = slugify(item.section_name)
             chapter = item.section_name
-            book, metadata = make_metadata_items(config)
+
             if is_splitted:
+                assessments = []
+                children_containers = []
+                lastChapterSection = False
+                book, metadata = make_metadata_items(config)
                 book["name"] = item.section_name
                 metadata["suppressPageNumbering"] = True
-            children_containers = [book["children"]]
-            chapter_dir = generate_dir.joinpath(slug_name.strip('-'))
-            guides_dir, content_dir = prepare_structure(chapter_dir)
+                chapter_dir = generate_dir.joinpath(slug_name.strip('-'))
+                guides_dir, content_dir = prepare_structure(chapter_dir)
+
         else:
             subsection_num += 1
             slug_name = slugify(item.section_name, chapter=chapter)
@@ -1073,22 +1074,32 @@ def convert_rst_json(config, base_path, yes=False):
 
         write_file(md_path, converted_md)
 
-        nextIndex = ind + 1
-        lastTocIndex = nextIndex == len(toc)
+        if is_splitted:
+            nextIndex = ind + 1
+            lastTocIndex = nextIndex == len(toc)
 
-        if not lastTocIndex and toc[nextIndex].section_type == CHAPTER:
-            lastChapterSection = True
+            if not lastTocIndex and toc[nextIndex].section_type == CHAPTER:
+                lastChapterSection = True
 
-        if lastChapterSection or lastTocIndex:
-            code_workout_assessments = list(filter(lambda a: a.type == 'test', assessments))
-            create_assessments_data(guides_dir, code_workout_assessments)
-            write_metadata(guides_dir, metadata, book)
-            write_assessments(guides_dir, assessments)
-            process_assets(config, generate_dir, [], [])
-            process_iframe_images(config, generate_dir, iframe_images)
+            if lastChapterSection or lastTocIndex:
+                write_rst_v1_data(guides_dir, metadata, book, assessments)
+                continue
 
-    if config.get('source_code_type', False):
+    if not is_splitted:
+        write_rst_v1_data(guides_dir, metadata, book, assessments)
+
+    process_assets(config, generate_dir, [], [])
+    process_iframe_images(config, generate_dir, iframe_images)
+
+    if bool(config.get('opendsa', {}).get('source_code', False)):
         print_source_code_report(source_code_report)
+
+
+def write_rst_v1_data(guides_dir, metadata, book, assessments):
+    code_workout_assessments = list(filter(lambda a: a.type == 'test', assessments))
+    create_assessments_data(guides_dir, code_workout_assessments)
+    write_metadata(guides_dir, metadata, book)
+    write_assessments(guides_dir, assessments)
 
 
 def convert_rst_toctree(config, base_path, yes=False):
@@ -1100,7 +1111,7 @@ def convert_rst_toctree(config, base_path, yes=False):
     transformation_rules, insert_rules = prepare_codio_rules(config)
     workspace_dir = Path(config['workspace']['directory'])
     source_dir = Path(config['workspace']['rst']).parent
-    source_code_type = config.get('source_code_type', 'java')
+    source_code_type = config.get('opendsa', {}).get('source_code', 'java')
     is_splitted = config.get('chapters_split', False)
     config_path = Path(config['workspace']['rst'])
     toc = get_rst_toc(workspace_dir.joinpath(source_dir), workspace_dir.joinpath(config_path))
