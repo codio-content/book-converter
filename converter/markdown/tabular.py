@@ -53,7 +53,9 @@ class Tabular(TextAsParagraph):
                 col = self.safe_list_get(data, ind, '').strip()
                 col = col.replace('\n', '<br/>')
                 col = col.replace('\\\\', '')
-                out += "|" + col.strip().strip('`').replace('|', '&#124;')
+                if col.strip().startswith('`') and '||' in col:
+                    col = col.strip().strip('`')
+                out += "|" + col.replace('|', '&#124;')
             if heading:
                 out += '|' + self._caret_token
                 for _ in range(0, len(table_size)):
