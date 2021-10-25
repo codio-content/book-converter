@@ -6,11 +6,11 @@ class RawHtmlTag(object):
         self.str = source_string
         self._caret_token = caret_token
         self._tags = tags
-        self._raw_html_tag_re = re.compile(r"""\|(?P<tag>.*?)\|""")
+        self._raw_html_tag_re = re.compile(r"""\|(?P<tag>[^\n]+)\|""")
 
     def _raw_html_tag(self, matchobj):
         tag = matchobj.group('tag')
-        raw_html_data = [item for item in self._tags if item.type == 'html_link' and item.tag == tag]
+        raw_html_data = [item for item in self._tags if item.type == 'html_link' and item.tag.lower() == tag.lower()]
         if not raw_html_data:
             return matchobj.group(0)
         content = raw_html_data[0].data
