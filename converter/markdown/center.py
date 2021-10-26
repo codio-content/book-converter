@@ -11,10 +11,10 @@ class Center(TextAsParagraph):
 
     def make_block(self, matchobj):
         block_contents = matchobj.group('block_contents')
-        block_contents = re.sub(r"\\\\", "<br/>", block_contents, flags=re.MULTILINE)
         block_contents = self.to_paragraph(block_contents)
+        block_contents = block_contents.replace("\\\\", "<br/>")
         caret_token = self._caret_token
-        return f'<center>{caret_token}{block_contents}{caret_token}</center>'
+        return f'{caret_token}<center>{caret_token}{block_contents}{caret_token}</center>'
 
     def convert(self):
         return center_re.sub(self.make_block, self.str)

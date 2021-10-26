@@ -13,9 +13,11 @@ code_re = re.compile(r"""\\codefilefigure(\[(?P<guid>.*?)])?{(?P<file_path>.*?)}
 
 class CodeFigure(TextAsParagraph):
     def __init__(
-        self, latex_str, caret_token, percent_token, load_workspace_file, figure_counter_offset, chapter_num, refs
+            self, latex_str, caret_token, percent_token, load_workspace_file, figure_counter_offset, chapter_num,
+            refs, code_syntax
     ):
         super().__init__(latex_str, caret_token)
+        self.code_syntax = code_syntax
         self._load_file = load_workspace_file
         self._percent_token = percent_token
         self._matches = []
@@ -52,7 +54,7 @@ class CodeFigure(TextAsParagraph):
             )
 
         return f'{caret_token}{caption}{caret_token}**source:{file_path}**{caret_token}' \
-            f'```code{caret_token}{file_content}{caret_token}```{caret_token}{replace_token}'
+               f'```{self.code_syntax}{caret_token}{file_content}{caret_token}```{caret_token}{replace_token}'
 
     def remove_matched_token(self, output, chars):
         pos = output.find(chars)

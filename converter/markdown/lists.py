@@ -8,12 +8,19 @@ class Lists(TextAsParagraph):
     def __init__(self, latex_str, caret_token):
         super().__init__(latex_str, caret_token)
 
+        self._indent = ''
         self._block_counter = defaultdict(lambda: 1)
         self._lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize|description)} # list name
                                     (\[.*?\])? # Optional enumerate settings i.e. (a)
                                     (?P<block_contents>.*?) # Non-greedy list contents
-                                    \\end{(?P=block_name)}""",  # closing list
+                                    \\end{(?P=block_name)}(?!\n*\\item)""",  # closing list
                                     flags=re.DOTALL + re.VERBOSE)
+        self._nested_lists_re = re.compile(r"""\\begin{(?P<block_name>enumerate|itemize|description)} # list name
+                                    (\[.*?\])? # Optional enumerate settings i.e. (a)
+                                    (?P<block_contents>.*?) # Non-greedy list contents
+                                    \\end{(?P=block_name)}""",  # closing list
+                                           flags=re.DOTALL + re.VERBOSE)
+
         self._block_configuration = {
             "enumerate": {
                 "line_indent_char": "",
@@ -48,7 +55,7 @@ class Lists(TextAsParagraph):
             line = line.lstrip().rstrip()
             line = line.replace("\\\\", "<br/>")
 
-            markdown_list_line = re.sub(r"\\item(\s+)?", list_heading, line)
+            markdown_list_line = re.sub(r"\\item(\s+)?", self._indent + list_heading, line)
             if not line:
                 continue
             if "\\term" in line:
@@ -94,17 +101,21 @@ class Lists(TextAsParagraph):
         block_title = matchobj.groupdict().get('block_title')
 
         if '\\begin{enumerate' in block_contents or '\\begin{itemize' in block_contents:
-            block_contents = self._lists_re.sub(self._replace_block, block_contents)
+            self._indent += '#\t'
+            block_contents = self._nested_lists_re.sub(self._replace_block, block_contents)
 
         formatted_contents = self._format_list_contents(block_name, block_contents)
         formatted_contents = self.to_paragraph(formatted_contents)
+        formatted_contents = re.sub(r'#\t', '    ', formatted_contents)
 
         header = self._format_block_name(block_name, block_title)
         caret_token = self._caret_token
+        extra_caret_token = caret_token if not self._indent else ''
 
-        output_str = f"{header}{caret_token}{caret_token}{formatted_contents}{caret_token}{caret_token}"
+        output_str = f"{header}{caret_token}{extra_caret_token}{formatted_contents}{caret_token}{extra_caret_token}"
         if block_name == "description":
             output_str = f"{header}{formatted_contents}{caret_token}{caret_token}"
+        self._indent = self._indent[2:]
         return output_str
 
     def convert(self):

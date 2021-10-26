@@ -1,6 +1,7 @@
 import uuid
 import re
 
+from converter.markdown.footnote import Footnote
 from converter.markdown.inline_code_block import InlineCodeBlock
 from converter.markdown.code_block import CodeBlock
 from converter.markdown.bold import Bold
@@ -43,14 +44,17 @@ from converter.markdown.screencast import Screencast
 from converter.markdown.tabularx import Tabularx
 from converter.markdown.tabular import Tabular
 from converter.markdown.unescape import UnEscape
+from converter.markdown.vocabulary import Vocabulary
 
 
 class LaTeX2Markdown(object):
     def __init__(
             self, latex_array, refs={}, chapter_num=1, figure_num=0,
             exercise_num=0, remove_trinket=False, remove_exercise=False,
-            detect_asset_ext=lambda _: _, load_workspace_file=lambda _: ''
+            detect_asset_ext=lambda _: _, load_workspace_file=lambda _: '',
+            code_syntax='code'
     ):
+        self._code_syntax = code_syntax
         self._latex_string = '\n'.join(latex_array)
         self._percent_token = str(uuid.uuid4())
         self._caret_token = str(uuid.uuid4())
@@ -74,6 +78,11 @@ class LaTeX2Markdown(object):
     def _latex_to_markdown(self):
         output = self._latex_string
 
+        output = Ignore(output).convert()
+        output, footnotes = Footnote(output).convert()
+        if footnotes:
+            footnotes_text = '\n\n'.join(footnotes)
+            output = output + f'\n\n<hr>\n\n{footnotes_text}'
         output, figure_counter = TableFigure(
             output, self._caret_token, self._load_workspace_file,
             self._figure_counter_offset, self._chapter_num, self._refs
@@ -83,24 +92,23 @@ class LaTeX2Markdown(object):
         output = Quotes(output).convert()
         output = Bold(output).convert()
         output = Italic(output).convert()
-        output = Ignore(output).convert()
         output = SaasSpecific(output, self._caret_token).convert()
         output = ItalicBold(output).convert()
         output, source_codes = CodeBlock(
-            output, self._percent_token, self._caret_token, self._remove_trinket
+            output, self._percent_token, self._caret_token, self._remove_trinket, self._code_syntax
         ).convert()
         if source_codes:
             self._source_codes.extend(source_codes)
         output, source_codes, figure_counter = CodeFigure(
             output, self._caret_token, self._percent_token, self._load_workspace_file,
-            self._figure_counter_offset, self._chapter_num, self._refs
+            self._figure_counter_offset, self._chapter_num, self._refs, self._code_syntax
         ).convert()
         if figure_counter:
             self.increment_figure_counter(figure_counter)
         if source_codes:
             self._source_codes.extend(source_codes)
         output, source_codes = CodeFile(
-            output, self._caret_token, self._percent_token, self._load_workspace_file
+            output, self._caret_token, self._percent_token, self._load_workspace_file, self._code_syntax
         ).convert()
         if source_codes:
             self._source_codes.extend(source_codes)
@@ -119,6 +127,7 @@ class LaTeX2Markdown(object):
         output = Cite(output, self._load_workspace_file).convert()
         output = Consents(output, self._caret_token).convert()
         output = Elaboration(output, self._caret_token).convert()
+        output = Vocabulary(output, self._caret_token).convert()
         output = Fallacy(output, self._caret_token).convert()
         output = PitFall(output, self._caret_token).convert()
         output = Summary(output, self._caret_token).convert()
@@ -158,7 +167,7 @@ class LaTeX2Markdown(object):
         output = Header(output).convert()
         output = Tabular(output, self._caret_token).convert()
         output = Tabularx(output, self._caret_token).convert()
-        output = Table(output, self._caret_token).convert()
+        output = Table(output, self._refs, self._caret_token).convert()
         output = Lists(output, self._caret_token).convert()
         output = Block(output, self._caret_token).convert()
         output = Center(output, self._caret_token).convert()
