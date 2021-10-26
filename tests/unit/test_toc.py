@@ -32,7 +32,7 @@ def get_file_path(name='', extension='tex'):
 
 def load_file(name, extension=''):
     fn = get_file_path(name, extension=extension)
-    with open(fn, 'r') as file:
+    with open(fn, 'r', encoding="utf-8") as file:
         return file.read().strip('\n')
 
 

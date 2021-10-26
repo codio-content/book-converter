@@ -14,10 +14,10 @@ class InlineCodeBlock(object):
 
     def convert(self):
         output = self.str
-        output = re.compile(r"\\java{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
-        output = re.compile(r"\\redis{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
+        output = re.compile(r"\\java{(?P<block_contents>.*?)(?<!\\)}").sub(self._inline_code_block, output)
+        output = re.compile(r"\\redis{(?P<block_contents>.*?)(?<!\\)}").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb\"(?P<block_contents>.*?)\"").sub(self._inline_code_block, output)
         output = re.compile(r"\\verb'(?P<block_contents>.*?)'").sub(self._inline_code_block, output)
-        output = re.compile(r"\\texttt{(?P<block_contents>.*?)}").sub(self._inline_code_block, output)
-        output = re.compile(r"{\\tt (?P<block_contents>.*?)}").sub(self._inline_code_block, output)
+        output = re.compile(r"\\texttt{(?P<block_contents>.*?)(?<!\\)}").sub(self._inline_code_block, output)
+        output = re.compile(r"{\\tt (?P<block_contents>.*?)(?<!\\)}").sub(self._inline_code_block, output)
         return output

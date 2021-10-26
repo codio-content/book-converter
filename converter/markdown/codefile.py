@@ -11,8 +11,9 @@ code_re = re.compile(r"""\\codefile(\[(?P<guid>.*?)])?{(?P<file_path>.*?)}""",
 
 
 class CodeFile(TextAsParagraph):
-    def __init__(self, latex_str, caret_token, percent_token, load_workspace_file):
+    def __init__(self, latex_str, caret_token, percent_token, load_workspace_file, code_syntax):
         super().__init__(latex_str, caret_token)
+        self.code_syntax = code_syntax
         self._load_file = load_workspace_file
         self._percent_token = percent_token
         self._source_codes = []
@@ -31,7 +32,7 @@ class CodeFile(TextAsParagraph):
         file_content = re.sub(r"\n", self._caret_token, file_content)
 
         return f'{caret_token}**source:{file_path}**{caret_token}' \
-            f'```code{caret_token}{file_content}{caret_token}```{caret_token}'
+               f'```{self.code_syntax}{caret_token}{file_content}{caret_token}```{caret_token}'
 
     def convert(self):
         output = self.str
