@@ -112,7 +112,6 @@ class InlineAv(object):
         caption = re.sub(r'\s+', ' ', caption)
         return f'<center>Figure {figure_number}: {caption}</center><br/>{self._caret_token}{self._caret_token}'
 
-
     @staticmethod
     def _increase_size(match_obj):
         return str(int(match_obj.group(0)) + 50)
