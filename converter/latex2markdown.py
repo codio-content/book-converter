@@ -76,6 +76,7 @@ class LaTeX2Markdown(object):
     def _latex_to_markdown(self):
         output = self._latex_string
 
+        output = Ignore(output).convert()
         output, footnotes = Footnote(output).convert()
         if footnotes:
             footnotes_text = '\n\n'.join(footnotes)
@@ -171,7 +172,6 @@ class LaTeX2Markdown(object):
 
         output = UnEscape(output).convert()
         output = NewLine(output).convert()
-        output = Ignore(output).convert()
 
         # convert all matched % back
         output = re.sub(self._percent_token, "%", output)

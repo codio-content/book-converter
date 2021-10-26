@@ -106,7 +106,7 @@ class Lists(TextAsParagraph):
 
         formatted_contents = self._format_list_contents(block_name, block_contents)
         formatted_contents = self.to_paragraph(formatted_contents)
-        formatted_contents = re.sub(r'#\t', '\t', formatted_contents)
+        formatted_contents = re.sub(r'#\t', '    ', formatted_contents)
 
         header = self._format_block_name(block_name, block_title)
         caret_token = self._caret_token

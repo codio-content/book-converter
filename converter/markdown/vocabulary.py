@@ -15,8 +15,8 @@ class Vocabulary(TextAsParagraph):
     def make_block(self, matchobj):
         block_content = matchobj.group('block_content')
         block_content = self.to_paragraph(block_content) + '\n'
-        block_content = term_re.sub(r'<b>\1:</b>\n\t\2\n', block_content)
-        block_content = term_item_re.sub(r'<b>\1:</b>\n\t\2\n', block_content)
+        block_content = term_re.sub(r'<b>\1:</b>\n\2\n', block_content)
+        block_content = term_item_re.sub(r'<b>\1:</b>\n\2\n', block_content)
         return block_content
 
     def convert(self):

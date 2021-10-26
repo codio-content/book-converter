@@ -51,7 +51,7 @@ class SaasSpecific(TextAsParagraph):
         output = re.sub(r"\\hspace", "", output)
         output = re.sub(r"\\hfill", "", output)
         output = re.sub(r"\\small", "", output)
-        output = re.sub(r"\\mbox{(.*?)(?<!\\)}", r"\1", output)
+        output = re.sub(r"\\mbox{(.*?)(?<!\\)}", r"\1", output, flags=re.DOTALL)
         output = re.sub(r"\\verb\|(.*?)\|", r"`\1`", output)
         output = re.sub(r"\\textcolor{comment}", "", output)
         output = re.sub(r"\\(begin|end){scriptsize}", "", output)

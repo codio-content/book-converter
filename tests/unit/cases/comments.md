@@ -18,16 +18,19 @@ At this point, you have seen enough Java to write useful programs that solve eve
 
 Using division and modulo, we can convert to feet and inches like this:
 
+
 ```code
     feet = 76 / 12;    // quotient
     inches = 76 % 12;  // remainder
 ```
+
 
 The first line yields 6. The second line, which is pronounced “76 mod 12”, yields 4. So 76 inches is 6 feet, 4 inches.
 
 Addition, subtraction, and multiplication all do what you expect, but you might be surprised by division. For example, the following fragment tries to compute the fraction of an hour that has elapsed:
 
 At this point, you have seen enough Java to write useful programs that solve everyday problems. You can (1) import Java library classes, (2) create a `Scanner`, (3) get input from the keyboard, (4) format output with `printf`, and (5) divide and mod integers. Now we will put everything together in a complete program:
+
 
 
 
@@ -60,5 +63,6 @@ public class Convert {
     }
 }
 ```
+
 
 Although not required, all variables and constants are declared at the top of `main`. This practice makes it easier to find their types later on, and it helps the reader know what data is involved in the algorithm.
