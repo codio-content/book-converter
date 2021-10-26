@@ -120,6 +120,8 @@ class Rst2Markdown(object):
         output = re.sub(r'^\|$', '<br/>', output, flags=re.MULTILINE)
         output = re.sub(r'^- >', r'- \\>', output, flags=re.MULTILINE)
         output = re.sub(r'C\+\+', 'C\\+\\+', output)
+        output = re.sub(r'<<', '<\\<', output)
+
         output = Ignore(output).convert()
         output = Timed(output, self._caret_token).convert()
         output = Slide(output, self._caret_token).convert()
