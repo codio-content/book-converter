@@ -81,7 +81,7 @@ class TestSuite(unittest.TestCase):
         self.run_case('bibliography')
 
     def test_code_include_render(self):
-        self.run_case('code_include', pathlib.Path.cwd().joinpath('./tests/unit/cases_rst'))
+        self.run_case('code_include', pathlib.Path.cwd().joinpath('./cases_rst'))
 
     def test_glossary_render(self):
         self.run_case('glossary')
