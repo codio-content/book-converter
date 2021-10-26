@@ -40,8 +40,6 @@ class CodeInclude(object):
         opt = matchobj.group('options')
         tag = self._get_tag_by_opt(opt) if opt else None
         file_paths = self._get_file_paths(matchobj)
-        if not file_paths:
-            return
         for file_path in file_paths:
             index = file_path.parts.index(source_code_dir)
             self._source_code_paths.append('/'.join(file_path.parts[index+1:]))
