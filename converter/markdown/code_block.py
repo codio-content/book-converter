@@ -25,6 +25,7 @@ class CodeBlock(object):
                                       flags=re.DOTALL + re.VERBOSE)
 
     def _code_block(self, matchobj):
+        caret_token = self._caret_token
         block_contents = matchobj.group('block_contents')
         try:
             file_name = matchobj.group('file_name')
@@ -34,9 +35,9 @@ class CodeBlock(object):
         block_name = matchobj.group('block_name')
         if self._remove_trinket and block_name == 'trinket':
             return ''
-        block_contents = re.sub(r"%", self.token, block_contents)
-        block_contents = re.sub(r"\n", self._caret_token, block_contents)
-        return f"```{self.code_syntax}{block_contents}```"
+        block_contents = re.sub(r'%', self.token, block_contents)
+        block_contents = re.sub(r'\n', self._caret_token, block_contents)
+        return f'{caret_token}```{self.code_syntax}{block_contents}```{caret_token}'
 
     def convert(self):
         output = self.str

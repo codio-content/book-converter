@@ -54,7 +54,7 @@ def prepare_codio_rules(config):
 def cleanup_latex(lines):
     updated = []
     starts = (
-        '%', '\\index{', '\\label{', '\\markboth{', '\\addcontentsline{',
+        '%', '\\index{', '\\markboth{', '\\addcontentsline{',
         '\\vspace', '\\newpage', '\\noindent',
         '\\ttfamily', '\\chapter', '\\section', '\\newcommand', '\\vfill', '\\pagebreak'
     )
