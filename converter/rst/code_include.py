@@ -35,7 +35,10 @@ class CodeInclude(object):
         caret_token = self._caret_token
         opt = matchobj.group('options')
         tag = self._get_tag_by_opt(opt) if opt else None
-        for file_path in self._get_file_paths(matchobj):
+        file_paths = self._get_file_paths(matchobj)
+        if file_paths is None:
+            return
+        for file_path in file_paths:
             index = file_path.parts.index(self.source_code_dir)
             self._source_code_paths.append('/'.join(file_path.parts[index+1:]))
             try:
