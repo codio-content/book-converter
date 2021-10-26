@@ -44,8 +44,8 @@ class AvEmbed(object):
                f'?selfLoggingEnabled=false&localMode=true&JXOP-debug=true&JOP-lang=en&JXOP-code=java' \
                f'&scoringServerEnabled=false&threshold=5&amp;points=1.0&required=True" ' \
                f'class="embeddedExercise" width="{iframe_width}" height="{iframe_height}"' \
-               f' data-showhide="show" scrolling="yes" ' \
-               f'style="position: relative; top: 0px;">Your browser does not support iframes.</iframe>' \
+               f' data-showhide="show" scrolling="no" ' \
+               f'style="position: relative; top: 0px; border: none;">Your browser does not support iframes.</iframe>' \
                f'{caret_token}{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}{caret_token}\n'
 
     @staticmethod
