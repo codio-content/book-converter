@@ -4,7 +4,9 @@ public interface Comparable<T> {
 }
 ```
 
+
 For example, here's the source code for `java.lang.Integer`:
+
 
 ```code
 public final class Integer extends Number implements Comparable<Integer> {

@@ -7,7 +7,7 @@ class Header(object):
     def __init__(self, latex_str):
         self.str = latex_str
 
-        self._header_re = re.compile(r"""\\(?P<header_name>chapter|section|subsection) # Header
+        self._header_re = re.compile(r"""\\(?P<header_name>chapter|section|subsection|subsubsection*?) # Header
                                     \**{(?P<header_contents>.*?)}""",  # Header title
                                      flags=re.DOTALL + re.VERBOSE)
         self._block_counter = defaultdict(lambda: 1)
@@ -24,6 +24,11 @@ class Header(object):
             },
             "subsection": {
                 "markdown_heading": "####",
+                "pretty_name": "",
+                "show_count": False
+            },
+            "subsubsection": {
+                "markdown_heading": "#####",
                 "pretty_name": "",
                 "show_count": False
             }

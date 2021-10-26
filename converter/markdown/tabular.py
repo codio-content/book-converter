@@ -28,6 +28,8 @@ class Tabular(TextAsParagraph):
         size = get_text_in_brackets(sub_lines[0])
         block_contents = '\n'.join(sub_lines[1:])
         block_contents = block_contents.replace('\\hline', '')
+        block_contents = block_contents.replace('&&', '\\&\\&')
+        block_contents = block_contents.replace('`\\`', '`\\#\\`')
 
         token = str(uuid.uuid4())
 
@@ -41,6 +43,9 @@ class Tabular(TextAsParagraph):
             row = row.strip()
             if not row:
                 continue
+            if '\\multicolumn' in row:
+                table_size = size.strip()
+                row = re.sub(r'\\multicolumn{\d}{.*?}{(.*?)}', r'\1', row)
             pos = 0
             row = row.replace('\\&', token)
             for ind in range(0, len(table_size)):
@@ -48,6 +53,8 @@ class Tabular(TextAsParagraph):
                 col = self.safe_list_get(data, ind, '').strip()
                 col = col.replace('\n', '<br/>')
                 col = col.replace('\\\\', '')
+                if col.strip().startswith('`') and '||' in col:
+                    col = col.strip().strip('`')
                 out += "|" + col.replace('|', '&#124;')
             if heading:
                 out += '|' + self._caret_token
@@ -58,6 +65,8 @@ class Tabular(TextAsParagraph):
             out += '|' + self._caret_token
 
         out = out.replace(token, '\\&')
+        out = out.replace('\\&\\&', '&&')
+        out = out.replace('`\\#\\`', '`\\\\`')
 
         return out
 
