@@ -23,7 +23,7 @@ class Youtube(object):
         height = options.get('height', '')
 
         return f'<div>{caret_token} <iframe width="{width}" height="{height}" ' \
-               f'src="https://www.youtube.com/embed/{id}?autoplay=1" frameborder="0" allowfullscreen></iframe>' \
+               f'src="https://www.youtube.com/embed/{id}?autoplay=0" frameborder="0" allowfullscreen></iframe>' \
                f'{caret_token}</div>{caret_token}<br>{caret_token}{caret_token}\n'
 
     def convert(self):
