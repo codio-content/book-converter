@@ -27,19 +27,19 @@
         <script>
         window.addEventListener("load", sendPostMessage);
         var element = document.getElementById('$name');
-        if (element) {{
+        if (element) {
             element.addEventListener("resize", sendPostMessage);
             element.addEventListener("click", sendPostMessage);
-        }}
+        }
         var height;
-        function sendPostMessage() {{
-            if (height !== element.offsetHeight && element) {{
+        function sendPostMessage() {
+            if (height !== element.offsetHeight && element) {
                 height = element.offsetHeight;
                 window.parent.postMessage(
-                    JSON.stringify({{frameHeight: height, frameId: "$name", status: 'iframe', av: "$name"}}), '*'
+                    JSON.stringify({frameHeight: height, frameId: "$name", status: 'iframe', av: "$name"}), '*'
                 );
-            }}
-        }}
+            }
+        }
         </script>
     </body>
 </html>
