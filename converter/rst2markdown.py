@@ -6,9 +6,9 @@ from converter.rst.assessments.active_code.activecode import ActiveCode
 from converter.rst.assessments.fib import FillInTheBlanks
 from converter.rst.assessments.free_text import FreeText
 from converter.rst.assessments.mchoice import MultiChoice
+from converter.rst.assessments.nested_content import NestedContent
 from converter.rst.assessments.parsons import Parsons
 from converter.rst.assessments.tabbed import Tabbed
-from converter.rst.assessments.timed import Timed
 from converter.rst.avembed import AvEmbed
 from converter.rst.bibliography import Bibliography
 from converter.rst.code_block import CodeBlock
@@ -123,7 +123,7 @@ class Rst2Markdown(object):
         output = re.sub(r'<<', '<\\<', output)
 
         output = Ignore(output).convert()
-        output = Timed(output, self._caret_token).convert()
+        output = NestedContent(output, self._caret_token).convert()
         output = Slide(output, self._caret_token).convert()
         output = Tabbed(output, self._caret_token).convert()
         output, html_tags = RawHtmlDirectives(output, self._caret_token).convert()
