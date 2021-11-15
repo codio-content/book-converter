@@ -10,4 +10,4 @@ Compared with the implementation illustrated by...
 
 <img src="../../_static/exercise.png" alt="exercise" style="width: 35; margin-right: 1em; float: left">
 
- **Check your understanding**
+  **Check your understanding**

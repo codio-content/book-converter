@@ -24,7 +24,7 @@ Summary
 - **length** - The number of characters in a string.
 - **substring** - A new string that contains a copy of part of the original string.
 
-- A String object has index values from 0 to length – 1. Attempting to access indices outside this range will result in an IndexOutOfBoundsException.
+- A String object has index values from 0 to length - 1. Attempting to access indices outside this range will result in an IndexOutOfBoundsException.
 
 - String objects are **immutable**, meaning that String methods do not change the String object. Any method that seems to change a string actually creates a new string.
 
