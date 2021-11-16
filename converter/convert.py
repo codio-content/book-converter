@@ -558,9 +558,9 @@ def convert_freetext_assessment(assessment):
     question = options.get('question', {})
 
     instructions = f'{question}\n\n'
-    for ind, item in enumerate(options, start=1):
+    for ind, item in enumerate(options):
         if item.startswith('option_'):
-            instructions += f'{ind}. {options[item]}\n\n'
+            instructions += f'**{ind}.** {options[item]}\n\n'
 
     return {
         "type": assessment.type,

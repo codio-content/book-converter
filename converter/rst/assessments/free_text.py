@@ -9,43 +9,26 @@ class FreeText(object):
         self.str = source_string
         self._caret_token = caret_token
         self._assessments = list()
-        self._poll_re = re.compile(r"""^( *\.\.\spoll:: ?(?P<name>.*?)?\n)(?P<options>.*?)\n(?=\S)""",
-                                   flags=re.MULTILINE + re.DOTALL)
-        self._shortanswer_re = re.compile(r"""^( *\.\.\sshortanswer:: ?(?P<name>.*?)?\n)(?P<content>.*?)\n(?=\S)""",
-                                          flags=re.MULTILINE + re.DOTALL)
+        self._free_text_re = re.compile(r"""^\.\.[ ]+(poll|shortanswer)::[ ]*(?P<name>.*?)?\n
+        (?P<options>(?:[ ]+:[^\n]+\n)+)?(?P<text>.*?)\n(?=\S|(?!^$)[ ]*$)""",
+                                        flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
-    def _poll(self, matchobj):
+    def _free_text(self, matchobj):
         options = {}
         caret_token = self._caret_token
-        name = matchobj.group('name')
+        name = matchobj.group('name').lower().replace('-', '_')
         options_group = matchobj.group('options')
-        option_re = re.compile(':([^:]+): (.+)')
-        options_group_list = options_group.split('\n')
-        for line in options_group.split('\n'):
-            opt_match = option_re.match(line.strip())
-            if opt_match:
-                options_group_list.pop(opt_match.pos)
-                options[opt_match[1]] = opt_match[2]
+        options['question'] = matchobj.group('text').strip()
 
-        question = [item.strip() for item in options_group_list if item != '']
-        if question:
-            options['question'] = question[0]
+        if options_group:
+            option_re = re.compile(':([^:]+): (.+)')
+            options_group_list = options_group.split('\n')
+            for line in options_group.split('\n'):
+                opt_match = option_re.match(line.strip())
+                if opt_match:
+                    options_group_list.pop(opt_match.pos)
+                    options[opt_match[1]] = opt_match[2]
 
-        name = name.lower().replace('-', '_')
-        assessment_id = f'free-text-{name}'
-        self._assessments.append(AssessmentData(assessment_id, name, FREE_TEXT, DEFAULT_POINTS, options))
-
-        return f'{caret_token}{{Check It!|assessment}}({assessment_id}){caret_token}\n'
-
-    def _shortanswer(self, matchobj):
-        options = {}
-        caret_token = self._caret_token
-        name = matchobj.group('name')
-        question = matchobj.group('content')
-        if question:
-            options['question'] = question.strip()
-
-        name = name.lower().replace('-', '_')
         assessment_id = f'free-text-{name}'
         self._assessments.append(AssessmentData(assessment_id, name, FREE_TEXT, DEFAULT_POINTS, options))
 
@@ -53,6 +36,5 @@ class FreeText(object):
 
     def convert(self):
         output = self.str
-        output = self._poll_re.sub(self._poll, output)
-        output = self._shortanswer_re.sub(self._shortanswer, output)
+        output = self._free_text_re.sub(self._free_text, output)
         return output, self._assessments
