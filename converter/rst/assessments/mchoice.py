@@ -142,8 +142,6 @@ class MultiChoice(object):
         question_list = []
         code_block = False
         for item in question.split('\n'):
-            if item.strip() == '':
-                continue
             if '```' in item:
                 code_block = True if not code_block else False
             if not code_block:
