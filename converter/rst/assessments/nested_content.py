@@ -5,21 +5,24 @@ class NestedContent(object):
     def __init__(self, source_string, caret_token):
         self.str = source_string
         self._caret_token = caret_token
-        self._timed_re = re.compile(
+        self._nested_content_re = re.compile(
             r"""^\.\.[ ]+(timed|reveal)::[ ]+(?P<name>[^\n]+)\n((?:(?P<indent>[ ]+):[^\n]+\n)+)?
             (?P<content>.*?)\n(?=\S|(?!^$)$)""", flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
-    def _timed(self, matchobj):
+    def _nested_content(self, matchobj):
         cut_content = []
         content = matchobj.group('content').lstrip('\n').rstrip()
-        indent = len(matchobj.group('indent')) if matchobj.group('indent') else 3
-        content_list = content.split('\n')
-        for ind, item in enumerate(content_list):
-            if re.search(fr'^[ ]{{{indent}}}', item):
-                item = item[indent:]
-            cut_content.append(item)
+        indent_matched = False
+        indent = 0
+        for ind, item in enumerate(content.split('\n')):
+            if not indent_matched:
+                match_indent = re.search(fr'^([ ]+)\S', item)
+                if match_indent:
+                    indent = len(match_indent.group(1))
+                    indent_matched = True
+            cut_content.append(item[indent:])
         return '\n'.join(cut_content) + '\n\n'
 
     def convert(self):
-        output = self._timed_re.sub(self._timed, self.str)
+        output = self._nested_content_re.sub(self._nested_content, self.str)
         return output
