@@ -10,7 +10,7 @@ class RawHtmlDirectives(object):
         self._tags = []
 
         self._raw_html_re = re.compile(
-            r"""^\.\.[ ]+(?:\|(?P<tag>[^\n]+)\|[ ]+)?raw::[ ]html\n(?P<content>.*?)\n(?=\S|(?![^$]+$))""",
+            r"""^\.\.[ ]+(?:\|(?P<tag>[^\n]+)\|[ ]+)?raw::[ ]html\n(?P<content>.*?)\n(?=\S|(?!^$)$)""",
             flags=re.MULTILINE + re.DOTALL + re.VERBOSE)
 
         self._raw_html_nested_re = re.compile(
