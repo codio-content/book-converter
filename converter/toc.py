@@ -47,7 +47,8 @@ def include_file(line):
 def fix_name(name):
     name = re.sub(r"--", "-", name)
     name = re.sub(r"\\&", "&", name)
-    return name
+    name = re.sub(r"\|[^|]+\|", "", name)
+    return name.strip()
 
 
 def cleanup_name(name):
@@ -326,7 +327,7 @@ def get_chapter_name(file_path):
                                                   or next_line.startswith('===') or next_line.startswith('---')):
             name = line.strip()
             break
-    return name
+    return fix_name(name)
 
 
 def process_toctree(source_path, toc_tree):
