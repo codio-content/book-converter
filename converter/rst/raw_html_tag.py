@@ -6,7 +6,7 @@ class RawHtmlTag(object):
         self.str = source_string
         self._caret_token = caret_token
         self._tags = tags
-        self._raw_html_tag_re = re.compile(r"""\|(?P<tag>[^\n]+)\|""")
+        self._raw_html_tag_re = re.compile(r"""\|(?P<tag>[^|]+)\|""")
 
     def _raw_html_tag(self, matchobj):
         tag = matchobj.group('tag')
