@@ -1,7 +1,7 @@
 import re
 
-MASK_IMAGE_TO_MD = '![{alt}]({image}){caret_token}{caption}{caret_token}{caret_token}\n'
-
+MASK_IMAGE_TO_MD = '<img src="{image}" alt="{alt}" {style}>' \
+                   '{caret_token}{caption}{caret_token}{caret_token}\n'
 
 class Image(object):
     def __init__(self, source_string, caret_token, open_dsa_cdn):
@@ -37,6 +37,7 @@ class Image(object):
         image_path = matchobj.group('path')
         output = MASK_IMAGE_TO_MD.replace('{image}', image_path)
         output = self._set_alt(output, matchobj.group('options'))
+        output = self._set_style(output, matchobj.group('options'))
         figure_number = matchobj.group('figure_number') if matchobj.group('figure_number') is not None else ''
         output = self._set_caption(output, matchobj.group('caption'), figure_number)
         output = output.replace('{caret_token}', caret_token)
@@ -53,11 +54,15 @@ class Image(object):
         return output
 
     def _set_alt(self, output, raw_options):
-        options = self._get_image_options(raw_options) if raw_options is not None else False
-        alt = options.get('alt') if options else False
-        if alt:
-            output = output.replace('{alt}', alt)
-        return output
+        options = self._get_image_options(raw_options)
+        alt = options.get('alt', '')
+        return output.replace('{alt}', alt)
+
+    def _set_style(self, output, raw_options):
+        options = self._get_image_options(raw_options)
+        width = options.get('width', False)
+        style = f'style="width:{width};"' if width else ''
+        return output.replace('{style}', style)
 
     @staticmethod
     def _get_caption(raw_caption, figure_number):
