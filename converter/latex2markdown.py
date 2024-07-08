@@ -26,6 +26,7 @@ from converter.markdown.inline_math import InlineMath
 from converter.markdown.cleanup import Cleanup
 from converter.markdown.exercise import Exercise
 from converter.markdown.figure import Figure
+from converter.markdown.competency import Competency
 from converter.markdown.refs import Refs
 from converter.markdown.sidebar import Sidebar
 from converter.markdown.eqnarray import EqnArray
@@ -118,6 +119,7 @@ class LaTeX2Markdown(object):
         # remove comments
         output = RemoveComments(output).convert()
         output = Quotation(output, self._caret_token).convert()
+        output = Competency(output, self._caret_token).convert()
         output = Paragraph(output).convert_without_tags()
         output = Refs(output, self._refs).convert()
         output = Links(output).convert()
